@@ -838,7 +838,7 @@ $live_redirect_link = add_query_arg(
                                 </a>
                             </div>
                            </div> <p class="wpfnl-pro-modal-footer-text">
-                                <span>Easiest Funnel Builder : <strong>7000+</strong> Users, <strong>85+</strong> Five-Star Reviews</span>
+                                <span>Easiest Funnel Builder : <strong>8000+</strong> Users, <strong>105+</strong> Five-Star Reviews</span>
                             </p>
                         </div>
                     </div>

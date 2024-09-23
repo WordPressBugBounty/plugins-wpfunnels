@@ -629,6 +629,7 @@ class Wpfnl_Admin
 			 */
 			$is_pro_active = apply_filters( 'wpfunnels/is_pro_license_activated', false );
 			$count_funnels = wp_count_posts('wpfunnels')->publish + wp_count_posts('wpfunnels')->draft + wp_count_posts('wpfunnels')->trash;
+			$count_active_funnels = wp_count_posts('wpfunnels')->publish + wp_count_posts('wpfunnels')->draft;
 			$total_allowed_funnels = 3;
 			if ($is_pro_active) {
 				$total_allowed_funnels = -1;
@@ -675,6 +676,7 @@ class Wpfnl_Admin
 				'isNewFunnel' 				=> \Wpfnl_Activator::is_new_install() ? true : false,
 				'isProActivated' 			=> $is_pro_active,
 				'totalFunnels' 				=> $count_funnels,
+				'count_active_funnels' 		=> $count_active_funnels,
 				'product_url' 				=> $product_url,
 				'totalAllowedFunnels' 		=> $total_allowed_funnels,
 				'builder' 					=> $builder,

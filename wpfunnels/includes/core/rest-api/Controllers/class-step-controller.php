@@ -14,7 +14,7 @@ use WPFunnels\Metas\Wpfnl_Step_Meta_keys;
 use WPFunnels\Wpfnl;
 use WPFunnels\Wpfnl_functions;
 use WPFunnels\TemplateLibrary\Manager;
-
+use Elementor\Plugin;
 class StepController extends Wpfnl_REST_Controller
 {
 
@@ -227,6 +227,35 @@ class StepController extends Wpfnl_REST_Controller
                             'type' => 'array',
                             'required' => true
                         ),
+                    ),
+                ),
+            )
+        );
+
+        register_rest_route(
+            $this->namespace, '/' . $this->rest_base . '/paste-step',
+            array(
+                array(
+                    'methods' => \WP_REST_Server::EDITABLE,
+                    'callback' => array(
+                        $this,
+                        'paste_step',
+                    ),
+                    'permission_callback' => array(
+                        $this,
+                        'update_items_permissions_check',
+                    ),
+                    'args' => array(
+                        'stepId' => array(
+                            'description' => __('Funnel step ID.', 'wpfnl'),
+                            'type' => 'integer',
+                            'required' => true
+                        ),
+                        'funnelId' => array(
+                            'description' => __('Funnel ID.', 'wpfnl'),
+                            'type' => 'integer',
+                            'required' => true
+                        )
                     ),
                 ),
             )
@@ -848,5 +877,223 @@ class StepController extends Wpfnl_REST_Controller
 
         // Return a REST response indicating the success of the operation.
         return rest_ensure_response($response);
+    }
+
+
+    /**
+     * Paste a step and all its data to create a new step.
+     * This function creates a new step by duplicating an existing step and updating the post meta with the new step information.
+     *
+     * @param WP_REST_Request $request The REST request object containing parameters.
+     *
+     * @return \WP_REST_Response The REST response indicating the success of the operation.
+     * 
+     * @since 3.4.16
+     */
+    public function paste_step($request){
+        $required_params = array('stepId','funnelId');
+
+        // Check if all required parameters are present in the request.
+        foreach ($required_params as $param) {
+            if (!isset($request[$param])) {
+                return rest_ensure_response( 
+                    $this->prepare_wp_error_response( 400,
+                        sprintf(__("Required parameter '%s' is missing.", 'wpfnl'), $param), ''
+                    ) 
+                 );
+            }
+        }
+        $parent_step_id = sanitize_text_field($request['stepId']);
+        $funnel_id = sanitize_text_field($request['funnelId']);
+        // Clone the parent step to create a new step.
+        $response = $this->clone_parent_step( $parent_step_id, $funnel_id );
+        if( !$response ){
+            return rest_ensure_response($this->prepare_wp_error_response( 400,
+                __("Failed to duplicate a step", 'wpfnl'), ''
+            ));
+        }
+        $step_id = isset($response['step_id']) ? $response['step_id'] : '';
+        $step = isset($response['step']) ? $response['step'] : '';
+        // Duplicate step metadata for this step.
+        $this->duplicate_all_meta( $step, $parent_step_id, $step_id, $funnel_id );
+        
+        $builder = Wpfnl_functions::get_builder_type();
+        // Clear elementor cache
+        $this->clear_elementor_cache( $step_id, $builder );
+        // Get the step view link with UTM
+        $view_link = $this->get_step_view_link_with_utm( $step_id, $funnel_id );
+        /**
+         * Fires after duplicating an A/B testing step in WP Funnels.
+         *
+         * @param int    $step_id The ID of the duplicated step.
+         * @param string $builder The name of the builder used for the duplication.
+         */
+        do_action('wpfunnels_after_ab_testing_duplicate', $step_id, $builder);
+        /**
+         * Fires after a step is duplicated in a funnel.
+         *
+         * @param int $funnel_id The ID of the funnel.
+         * @param int $step_id   The ID of the duplicated step.
+         */
+        do_action('wpfunnels/after_step_duplicate', $funnel_id, $step_id );
+        $response = $this->prepare_response_for_paste_step( $step_id, $response, $view_link );
+        if( !$response ){
+            return rest_ensure_response($this->prepare_wp_error_response( 400, 
+                __("Failed to duplicate a step", 'wpfnl'), ''
+            ));
+        }
+        return $response;
+    }
+
+    /**
+     * Prepare API response for paste step.
+     * 
+     * @param int $step_id The ID of the step.
+     * @param array $response The response data.
+     * @param string $view_link The view link of the step.
+     * 
+     * @return array The response data.
+     * 
+     * @throws \WPFunnels\TemplateLibrary\Wpfnl_Source_Remote
+     * 
+     * @since 3.4.16
+     */
+    public function prepare_response_for_paste_step( $step_id, $response, $view_link ){
+
+        if( !$step_id ){
+            return false;
+        }
+
+        // Create an instance of remote class.
+        $remote = new \WPFunnels\TemplateLibrary\Wpfnl_Source_Remote();
+       
+        return [
+            'success' 		=> true,
+            'stepID' 		=> $step_id,
+            'step_name' 	=> isset($response['title']) ? $response['title'] : '',
+            'step_type' 	=> isset($response['step_type']) ? $response['step_type'] : '',
+			'stepEditLink'	=> get_edit_post_link($step_id),
+			'stepViewLink'	=> $view_link,
+            'abTestingSettingsData'=> $remote->get_default_start_setting($step_id),
+        ];
+    }
+
+    /**
+     * Create a new step by duplicating an existing step.
+     * 
+     * @param int $parent_step_id The ID of the parent step.
+     * @param int $funnel_id The ID of the funnel.
+     * 
+     * @return array The response data.
+     * 
+     * @since 3.4.16
+     */
+    public function clone_parent_step( $parent_step_id, $funnel_id ) {
+        if( !$parent_step_id || !$funnel_id ) {
+            return false;
+        }
+
+        $title = get_the_title($parent_step_id);
+        $page_template = get_post_meta($parent_step_id, '_wp_page_template', true);
+        $step_type = get_post_meta($parent_step_id, '_step_type', true);
+        $post_content = get_post_field('post_content', $parent_step_id);
+
+        // Create an instance of the step store.
+        $step = new \WPFunnels\Data_Store\Wpfnl_Steps_Store_Data();
+        
+        $step_id = $step->create_step($funnel_id, $title, $step_type, $post_content, true);
+        
+        if( !$step_id ){
+            return false;
+        } 
+        // Update the step meta data.
+        $step->update_meta($step_id, '_funnel_id', $funnel_id);
+
+        return [
+            'step'          => $step,
+            'step_id'       => $step_id,
+            'title'         => $title,
+            'step_type'     => $step_type,
+            'page_template' => $page_template,
+        ];
+    }
+
+
+    /**
+     * Duplicate all the meta data for a step.
+     * 
+     * @param object $step The step object.
+     * @param int $parent_step_id The ID of the parent step.
+     * @param int $step_id The ID of the step.
+     * @param int $funnel_id The ID of the funnel.
+     * 
+     * @since 3.4.16
+     */
+    public function duplicate_all_meta( $step, $parent_step_id, $step_id, $funnel_id ) {
+        if( !$parent_step_id || !$step_id || !$funnel_id ) {
+            return;
+        }
+
+        // Create an instance of the funnel store.
+        $funnel = new \WPFunnels\Data_Store\Wpfnl_Funnel_Store_Data();
+		$funnel->duplicate_all_meta( $parent_step_id, $step_id, array('_funnel_id','_is_duplicate','wpfnl_mint_automation_id') );
+
+        /**
+         * Save the new step information on funnel data and funnel identifier.
+         * This is required to show steps in funnel canvas
+         */
+
+        $funnel->update_step_id_in_funnel_data_and_identifier($parent_step_id, $step_id, $funnel_id);
+        $step->update_meta($step_id, '_is_duplicate', 'yes');
+    }
+
+    /**
+     * Clear elememtor cache and remove the cache for the step.
+     * This is required to clear the cache for the step when it is duplicated.
+     * 
+     * @param int $step_id The ID of the step.
+     * @param string $builder The name of the builder.
+     * 
+     * @since 3.4.16
+     */
+    public function clear_elementor_cache( $step_id, $builder ) {
+        if( !$step_id || 'elementor' === $builder) {
+            return;
+        }
+
+        $step_edit_link =  get_edit_post_link($step_id);
+        
+        $step_edit_link = str_replace(['&amp;', 'edit'], ['&', 'elementor'], $step_edit_link);
+        if ( is_plugin_active( 'elementor/elementor.php' ) && class_exists( '\Elementor\Plugin' ) ) {
+            Plugin::$instance->files_manager->clear_cache(); // Clearing cache of Elementor CSS.
+        }
+
+    }
+
+    /**
+     * Get step view link with UTM.
+     * 
+     * @param int $step_id The ID of the step.
+     * @param int $funnel_id The ID of the funnel.
+     * 
+     * @return string The view link of the step.
+     * 
+     * @since 3.4.16
+     */
+    public function get_step_view_link_with_utm( $step_id, $funnel_id ) {
+        if( !$step_id ||!$funnel_id ) {
+            return '';
+        }
+
+        $view_link    = get_post_permalink( $step_id );
+        $utm_settings   = Wpfnl_functions::get_funnel_utm_settings($funnel_id);
+
+	    if ( is_array($utm_settings) && isset($utm_settings[ 'utm_enable' ]) && 'on' === $utm_settings[ 'utm_enable' ] ) {
+		    unset( $utm_settings[ 'utm_enable' ] );
+		    $view_link = add_query_arg( $utm_settings, $view_link );
+		    $view_link = strtolower( $view_link );
+	    }
+
+        return $view_link;
     }
 }

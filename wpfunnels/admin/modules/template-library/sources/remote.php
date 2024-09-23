@@ -133,12 +133,14 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
                 'message' => __('No funnel id found', 'wpfnl'),
             ];
         }
+
         do_action('wpfunnel_step_import_start');
         $response = TemplateLibraryController::get_step($args['step']['ID']);
         $isSingleStep = isset($args['isSingleStep']) && 'yes' === $args['isSingleStep'] ? true : false;
         $title = $response['title'];
         $post_content = $response['content'];
         $post_metas = $response['post_meta'];
+       
         $builder = Wpfnl_functions::get_builder_type();
 
         $step = Wpfnl::$instance->step_store;
@@ -219,12 +221,8 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
                 }
             }
         }
-
-        update_post_meta( $step_id,'_step_type',$args['step']['step_type'] );
-        
+        update_post_meta($step_id, '_step_type', $args['step']['step_type']);
         return $response;
-
-
     }
 
     /**
@@ -314,7 +312,7 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
     /**
      * Get default start settings
      */
-    private function get_default_start_setting( $step_id ){
+    public function get_default_start_setting( $step_id ){
         $step_edit_link =  get_edit_post_link($step_id);
 
 	    $funnel_id    = Wpfnl_functions::get_funnel_id_from_step( $step_id );

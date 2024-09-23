@@ -455,6 +455,7 @@ export default {
             isPro  : window.template_library_object.is_pro,
             createFunnelTitle: 'Create Funnel',
             totalFunnels: window.WPFunnelVars.totalFunnels,
+            countActiveFunnels: window.WPFunnelVars.count_active_funnels,
             totalAllowedFunnels: window.WPFunnelVars.totalAllowedFunnels,
             dependencyPlugins: window.WPFunnelVars.dependencyPlugins,
             isAnyPluginMissing: window.WPFunnelVars.isAnyPluginMissing,
@@ -691,7 +692,7 @@ export default {
     computed: {
         isAddNewFunnelButtonDisabled: function () {
             if (!this.isProActivated) {
-                if (parseInt(this.totalFunnels) >= parseInt(this.totalAllowedFunnels)) {
+                if (parseInt(this.countActiveFunnels) >= parseInt(this.totalAllowedFunnels)) {
                     return true
                 }
             }

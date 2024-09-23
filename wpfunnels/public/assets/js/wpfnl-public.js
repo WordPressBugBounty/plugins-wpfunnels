@@ -104,12 +104,32 @@
                         const fieldSelector = fieldMappings[key]
                         if (fieldSelector) {
                             const field = $(fieldSelector)
-                            console.log(field)
                             if (field[0]) {
                                 field.val(value)
                             }
                         }
                     })
+
+                    // Get optin data fields and set the classes value.
+                    const optinData = {
+                        first_name: '.wpfnl-first-name',
+                        last_name: '.wpfnl-last-name',
+                        email: '.wpfnl-email',
+                        phone: '.wpfnl-phone',
+                        message: '.wpfnl-message',
+                    }
+
+                    // Set the value of the optin fields from the previous step data.
+                    Object.entries(checkoutData).forEach(([key, value]) => {
+                        const optinDataSelector = optinData[key]
+                        if (optinDataSelector) {
+                            const optinField = $(optinDataSelector)
+                            if (optinField[0]) {
+                                optinField.val(value)
+                            }
+                        }
+                    })
+
                 }
             }
         }

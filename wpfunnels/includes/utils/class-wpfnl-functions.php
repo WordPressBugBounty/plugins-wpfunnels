@@ -5074,6 +5074,23 @@ class Wpfnl_functions {
 			'endDateText'                                 => __( 'End Date', 'wpfnl' ),
 			'enableTimeBoundDiscountText'                 => __( 'Enable time bound discount', 'wpfnl' ),
 			'enableTimeBoundDiscountTooltipText'          => __( 'This allows you to set a date range for offering discounts. Simply select the start and end dates, and the discount will automatically apply to purchases made during this period.', 'wpfnl' ),
+			'undo'										  => __('Undo', 'wpfnl'),
+			'stepCopied'								  => __('Step copied', 'wpfnl'),
+			'copy'										  => __('Copy', 'wpfnl'),
+
+			// -------Automation Analytics-------
+			'report'									  => __('Report', 'wpfnl'),
+			'back'										  => __('Back', 'wpfnl'),
+			'automation'								  => __('Automation', 'wpfnl'),
+			'performance'								  => __('Performance', 'wpfnl'),
+			'open_rate'								  	  => __('Open Rate', 'wpfnl'),
+			'click_rate'								  => __('Click Rate', 'wpfnl'),
+			'email_sent'								  => __('Email Sent', 'wpfnl'),
+			'open'										  => __('Open', 'wpfnl'),
+			'click'										  => __('Click', 'wpfnl'),
+			'overall_report'							  => __('Overall Report', 'wpfnl'),
+			'entrance'							  		  => __('Entrance', 'wpfnl'),
+			'subscribers_completed'						  => __('Subscribers Completed', 'wpfnl'),
 		);
 	}
 

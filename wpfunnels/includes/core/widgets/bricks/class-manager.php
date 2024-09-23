@@ -103,9 +103,12 @@ class Manager {
         ];
         
         $elements = apply_filters('wpfunels/bricks_elements', $elements );
-        foreach ( $elements as $element ) {
-            \Bricks\Elements::register_element( $element['file'] );
+        if ( class_exists( '\Bricks\Elements' ) ) {
+            foreach ( $elements as $element ) {
+                \Bricks\Elements::register_element( $element['file'] );
+            }
         }
+        
     }
 
 }

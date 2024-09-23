@@ -2571,8 +2571,8 @@
         const { showSubHeading, subHeading, confirmLink, features } = config
 
         // Define Ratings and Users
-        const ratings = 85
-        const users = 7000
+        const ratings = 105
+        const users = 8000
 
         // Define Elements
         const modalElement = document.querySelector('#wpfnl-pro-modal')
