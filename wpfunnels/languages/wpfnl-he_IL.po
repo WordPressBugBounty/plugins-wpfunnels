@@ -1,0 +1,5150 @@
+﻿msgid ""
+msgstr ""
+"Project-Id-Version: WPFunnels\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-08 08:46+0000\n"
+"PO-Revision-Date: 2024-01-08 11:29+0000\n"
+"Last-Translator: \n"
+"Language-Team: Hebrew\n"
+"Language: he_IL\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.6.6; wp-6.4.2"
+
+#: admin/modules/steps/checkout/views/settings.php:85
+#: admin/modules/steps/checkout/views/settings.php:112
+#: admin/modules/steps/thankyou/views/settings.php:117
+msgid " Back to Step"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:47
+msgid " Checkout Body Style"
+msgstr "סגנון גוף בקופה"
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:778
+msgid " Coupon"
+msgstr "קוּפּוֹן"
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:50
+msgid " Order Body Style"
+msgstr "להזמין סגנון גוף"
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:177
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:147
+msgid " Order Button"
+msgstr "כפתור הזמנה"
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:727
+msgid " Payment Section Tooltip"
+msgstr "סעיף תשלום סעיף כלים"
+
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:153
+msgid " Select Product"
+msgstr "בחר מוצר"
+
+#: includes/core/classes/class-wpfnl-register-funnel.php:425
+msgid "&#8592; Back to Funnel Window"
+msgstr "&#8592; חזרה לחלון המשפך"
+
+#: admin/class-wpfnl-admin.php:202
+msgid "(opens in a new window)"
+msgstr "(נפתח בחלון חדש)"
+
+#: languages/wpfnl.php:37
+msgid ""
+"(when discount type is flat amount) Choose a certain amount to waive off."
+msgstr "(כאשר סוג ההנחה הוא סכום שטוח) בחר סכום מסוים לוויתור."
+
+#: languages/wpfnl.php:36
+msgid ""
+"(when discount type is percentage) Assign a suitable percentage discount."
+msgstr "(כאשר סוג ההנחה הוא אחוז) הקצה הנחה של אחוז מתאים."
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:1031
+#: includes/core/widgets/elementor/elements/checkout-widget.php:241
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:143
+msgid "1 Column Checkout"
+msgstr "קופה 1 עמודות"
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:1032
+#: includes/core/widgets/elementor/elements/checkout-widget.php:242
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:144
+msgid "2 Column Checkout"
+msgstr "2 קופה עמודות"
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:1033
+#: includes/core/widgets/elementor/elements/checkout-widget.php:243
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:145
+msgid "2 Step Checkout"
+msgstr "קופה 2 שלבים"
+
+#: public/modules/checkout/templates-style/order-bump-template-popup.php:97
+#: public/modules/checkout/templates-style/order-bump-template-style1.php:98
+#: public/modules/checkout/templates-style/order-bump-template-style6.php:106
+#: public/modules/checkout/templates-style/order-bump-template-style9.php:98
+#: public/modules/checkout/templates-style/order-bump-template-style12.php:98
+#: public/modules/checkout/templates-style/order-bump-template-style13.php:85
+#: public/modules/checkout/templates-style/order-bump-template-style14.php:107
+msgid "<strong>%s: </strong> %s"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:46
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:425
+msgid "Acceptance"
+msgstr "קַבָּלָה"
+
+#: includes/core/widgets/elementor/elements/optin.php:610
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:429
+msgid "Acceptance Checkbox"
+msgstr "תיבת סימון קבלהתיבת סימון קבלה"
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:638
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:639
+msgid "Acceptance checkbox"
+msgstr "תיבת סימון קבלה"
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:656
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:657
+#: includes/core/widgets/elementor/elements/optin.php:621
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:442
+msgid "Acceptance Text"
+msgstr "טקסט קבלה"
+
+#: languages/wpfnl.php:102
+msgid "Accepted"
+msgstr "מְקוּבָּל"
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:48
+#: includes/core/widgets/elementor/elements/optin.php:910
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:621
+msgid "Action After Submission"
+msgstr "פעולה לאחר הגשה"
+
+#: admin/modules/steps/checkout/views/products-tab.php:64
+#: admin/modules/steps/checkout/views/products-tab.php:109
+#: admin/modules/steps/checkout/views/products-tab.php:121
+#: languages/wpfnl.php:8
+msgid "Actions"
+msgstr "פעולות"
+
+#: admin/class-wpfnl-notices.php:464
+msgid "Activate %s"
+msgstr "להפעיל %s"
+
+#: languages/wpfnl.php:148
+msgid "activated on your site."
+msgstr "מופעל באתר שלך."
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:627
+msgid "Active / Completed"
+msgstr "פעיל / הושלם"
+
+#: admin/modules/settings/views/offer-settings.php:32
+msgid "Add all accepted offers (Upsell/Downsell) to the main order"
+msgstr ""
+
+#: languages/wpfnl.php:113
+msgid "Add Category"
+msgstr ""
+
+#: languages/wpfnl.php:45
+msgid "Add Condition"
+msgstr ""
+
+#: languages/wpfnl.php:46
+msgid "Add Featured Image"
+msgstr ""
+
+#: languages/wpfnl.php:197
+msgid "Add Field"
+msgstr ""
+
+#: languages/wpfnl.php:166
+msgid "Add New Field"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:130
+msgid "Add new Funnel"
+msgstr ""
+
+#: languages/wpfnl.php:4
+msgid "Add New Integration"
+msgstr ""
+
+#: languages/wpfnl.php:120
+msgid "Add Order Bump"
+msgstr ""
+
+#: languages/wpfnl.php:114
+msgid "Add Product"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products-tab.php:37
+msgid "Add product"
+msgstr ""
+
+#: languages/wpfnl.php:25
+msgid "Add To List"
+msgstr ""
+
+#: languages/wpfnl.php:51
+msgid "Add Webhook"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products-tab.php:45
+msgid "Add Your First Product"
+msgstr ""
+
+#: languages/wpfnl.php:170
+msgid "Additional"
+msgstr ""
+
+#: languages/wpfnl.php:195
+msgid "Additional Fields"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2081
+msgid "Additional Info / Shipping Section"
+msgstr ""
+
+#: public/modules/checkout/templates/default-checkout-form.php:76
+#: public/modules/checkout/templates/default-checkout-form.php:120
+#: public/modules/checkout/templates/express-checkout-form.php:92
+#: public/modules/checkout/templates/express-checkout-form.php:135
+msgid "Additional Information"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products-tab.php:141
+#: admin/modules/steps/checkout/views/products-tab.php:169
+#: languages/wpfnl.php:198
+msgid "Additional Options"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:761
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:762
+#: includes/core/widgets/elementor/elements/optin.php:917
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:626
+msgid "Admin Email"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:773
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:774
+#: includes/core/widgets/elementor/elements/optin.php:928
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:636
+msgid "Admin Email Subject"
+msgstr ""
+
+#: admin/modules/settings/views/view.php:84
+msgid "Advanced Settings"
+msgstr "הגדרות מתקדמות"
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:24
+#: includes/core/widgets/elementor/elements/checkout-widget.php:429
+msgid "After Customer Details"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:427
+msgid "After Order Details"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:26
+msgid "After Payment"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:430
+msgid "After Payment Options"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:486
+#: includes/core/widgets/elementor/elements/optin.php:763
+#: includes/core/widgets/elementor/elements/optin.php:868
+msgid "After Text"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:59
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:61
+#: includes/core/widgets/elementor/elements/next-step-widget.php:433
+#: includes/core/widgets/elementor/elements/optin.php:719
+#: includes/core/widgets/elementor/elements/optin.php:827
+msgid "Alignment"
+msgstr ""
+
+#: languages/wpfnl.php:243
+msgid "All"
+msgstr ""
+
+#: languages/wpfnl.php:136
+msgid "all"
+msgstr ""
+
+#: languages/wpfnl.php:71
+msgid "All Fields"
+msgstr ""
+
+#: admin/modules/settings/views/offer-settings.php:35
+msgid ""
+"All purchases including main product, order bump, upsell(s), and downsell(s),"
+" will be included as part of a single order in WooCommerce."
+msgstr ""
+
+#: languages/wpfnl.php:59
+msgid "Allow to connect with 3rd party services."
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products-tab.php:174
+#: languages/wpfnl.php:216
+msgid "Allow Use Of Coupon"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:187
+msgid "Amazing Product"
+msgstr ""
+
+#: languages/wpfnl.php:115
+msgid "Amount"
+msgstr ""
+
+#: languages/wpfnl.php:117
+msgid "Amount must be greater than 0"
+msgstr ""
+
+#: languages/wpfnl.php:116
+msgid "Amount must be greater than 1"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:121
+msgid "An introduction to the Button module"
+msgstr ""
+
+#: languages/wpfnl.php:79
+msgid "Analytics"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:635
+msgid "Animation"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:153
+#: includes/core/widgets/elementor/elements/next-step-widget.php:163
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:92
+msgid "Another Funnel"
+msgstr ""
+
+#: includes/utils/class-wpfnl-functions.php:2195
+msgid "Any product is selected"
+msgstr ""
+
+#: admin/modules/discount/views/view.php:14
+#: admin/modules/product/views/product-options.php:10
+msgid "Apply Coupon"
+msgstr ""
+
+#: languages/wpfnl.php:12
+msgid "Are you sure you want to delete this Automation?"
+msgstr ""
+
+#: languages/wpfnl.php:189
+msgid "Are you sure you want to delete this field?"
+msgstr ""
+
+#: languages/wpfnl.php:55
+msgid "Are you sure you want to delete this List?"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products.php:15 languages/wpfnl.php:75
+msgid "Are you sure you want to delete this product?"
+msgstr ""
+
+#: languages/wpfnl.php:77
+msgid "Are you sure you want to Reset data?"
+msgstr ""
+
+#: languages/wpfnl.php:254
+msgid "As of now, we have ready templates for"
+msgstr ""
+
+#: languages/wpfnl.php:147
+msgid "as your preferred page builder, but you do not have"
+msgstr ""
+
+#: languages/wpfnl.php:157
+msgid ""
+"as your preferred page builder, but you do not have the plugin activated on "
+"your site."
+msgstr ""
+
+#: languages/wpfnl.php:250
+msgid ""
+"as your preferred page builder, but you do not have the plugin activated on "
+"your site. Please install and activate"
+msgstr ""
+
+#: languages/wpfnl.php:26
+msgid "Assign Tag"
+msgstr ""
+
+#: languages/wpfnl.php:91
+msgid "Avg Order Value"
+msgstr ""
+
+#: admin/modules/funnel/views/header.php:20
+msgid "back"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:770
+#: includes/core/widgets/elementor/elements/checkout-widget.php:805
+#: includes/core/widgets/elementor/elements/checkout-widget.php:936
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1008
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1074
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1260
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1357
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1398
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1625
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1735
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1942
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2245
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2644
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2778
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2908
+#: includes/core/widgets/elementor/elements/checkout-widget.php:3043
+#: includes/core/widgets/elementor/elements/checkout-widget.php:3084
+#: includes/core/widgets/elementor/elements/next-step-widget.php:575
+#: includes/core/widgets/elementor/elements/next-step-widget.php:610
+#: includes/core/widgets/elementor/elements/optin.php:1223
+#: includes/core/widgets/elementor/elements/optin.php:1340
+#: includes/core/widgets/elementor/elements/optin.php:1382
+#: includes/core/widgets/elementor/elements/optin.php:1498
+#: includes/core/widgets/elementor/elements/optin.php:1542
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:249
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:242
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:318
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:363
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:538
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:147
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:545
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:609
+msgid "Background Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:547
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:152
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:550
+msgid "Background Hover Color"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:9
+msgid "Basic Tools"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:23
+#: includes/core/widgets/elementor/elements/checkout-widget.php:428
+msgid "Before Checkout Details"
+msgstr ""
+
+#: admin/modules/product/views/product-options.php:101
+msgid "Before Checkout Section"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:22
+#: includes/core/widgets/elementor/elements/checkout-widget.php:426
+msgid "Before Order Details"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:25
+msgid "Before Payment"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:431
+msgid "Before Payment Options"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:485
+#: includes/core/widgets/elementor/elements/optin.php:762
+#: includes/core/widgets/elementor/elements/optin.php:867
+msgid "Before Text"
+msgstr ""
+
+#: languages/wpfnl.php:168
+#: public/modules/checkout/templates/default-checkout-form.php:60
+#: public/modules/checkout/templates/default-checkout-form.php:104
+#: public/modules/checkout/templates/express-checkout-form.php:76
+#: public/modules/checkout/templates/express-checkout-form.php:119
+msgid "Billing"
+msgstr ""
+
+#: public/modules/checkout/templates/multi-step-checkout.php:27
+msgid "Billing Details"
+msgstr ""
+
+#: languages/wpfnl.php:193
+msgid "Billing Fields"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:176
+msgid "Billing Heading"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:191
+msgid "Billing Input Field"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:183
+msgid "Billing Input Label"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1783
+msgid "Billing Section"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:85
+msgid "Blockquote"
+msgstr ""
+
+#: admin/class-wpfnl-admin.php:409
+msgid "Blog"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:96
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:127
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:75
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:248
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:199
+msgid "Body"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1642
+#: includes/core/widgets/elementor/elements/next-step-widget.php:648
+#: includes/core/widgets/elementor/elements/optin.php:1248
+#: includes/core/widgets/elementor/elements/optin.php:1409
+#: includes/core/widgets/elementor/elements/optin.php:1570
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:563
+msgid "Border"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:607
+#: includes/core/widgets/elementor/elements/checkout-widget.php:710
+#: includes/core/widgets/elementor/elements/checkout-widget.php:949
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1189
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2001
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2301
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2531
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2699
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2833
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2963
+#: includes/core/widgets/elementor/elements/next-step-widget.php:621
+msgid "Border Color"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1717
+msgid "Border Hover Color"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:659
+#: includes/core/widgets/elementor/elements/optin.php:1261
+#: includes/core/widgets/elementor/elements/optin.php:1420
+#: includes/core/widgets/elementor/elements/optin.php:1581
+#: languages/wpfnl.php:320
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:236
+msgid "Border Radius"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:572
+#: includes/core/widgets/elementor/elements/checkout-widget.php:673
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1157
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1960
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2262
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2477
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2664
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2798
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2928
+#: languages/wpfnl.php:319
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:201
+msgid "Border Style"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:592
+#: includes/core/widgets/elementor/elements/checkout-widget.php:694
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1177
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1984
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2285
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2504
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2684
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2818
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2948
+msgid "Border Width"
+msgstr ""
+
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:218
+msgid "Border Width (px)"
+msgstr ""
+
+#: languages/wpfnl.php:305
+#: includes/core/widgets/block/assets/dist/checkout-form.js:1
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:604
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:637
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:679
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:785
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:818
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:880
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:913
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:956
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1057
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1090
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1152
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1185
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1456
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:510
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:732
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:956
+msgid "Bottom"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:548
+#: includes/core/widgets/elementor/elements/checkout-widget.php:647
+msgid "Box Background Color"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:519
+msgid "Box Shadow"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:461
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:462
+msgid "Briefly describe your course in 2-3 lines."
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:144
+msgid "Bulk Actions"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:152
+msgid "Bulk Export"
+msgstr ""
+
+#: languages/wpfnl.php:256
+msgid "but we are planning to create templates for more builders soon."
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:198
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:81
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:47
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:132
+#: includes/core/widgets/elementor/elements/next-step-widget.php:529
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:81
+msgid "Button"
+msgstr ""
+
+#: languages/wpfnl.php:310
+#: includes/core/widgets/block/assets/dist/checkout-form.js:1
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1506
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:169
+msgid "Button Background Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:166
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:524
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:602
+msgid "Button Border"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:140
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:538
+msgid "Button Margin"
+msgstr ""
+
+#: languages/wpfnl.php:318
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:186
+msgid "Button Outline Style"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:133
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:531
+msgid "Button Padding"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:126
+msgid "Button Style"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:192
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:748
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:120
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:512
+#: languages/wpfnl.php:316
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:112
+msgid "Button Text"
+msgstr ""
+
+#: languages/wpfnl.php:317
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:177
+msgid "Button Text Color"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1572
+msgid "Buttons"
+msgstr ""
+
+#: admin/modules/settings/views/utm-settings.php:39
+msgid "Campaign (utm_campaign)"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:77
+#: admin/modules/steps/checkout/views/products.php:17 languages/wpfnl.php:13
+msgid "Cancel"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:832
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:833
+#: includes/core/widgets/elementor/elements/optin.php:981
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:682
+msgid "Carry data to the Next Form"
+msgstr ""
+
+#: languages/wpfnl.php:94
+msgid "Cart Total"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2561
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:356
+msgid "Cell Padding"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:441
+#: includes/core/widgets/elementor/elements/optin.php:727
+#: includes/core/widgets/elementor/elements/optin.php:835
+msgid "Center"
+msgstr ""
+
+#: admin/class-wpfnl-admin.php:413
+msgid "Changelog"
+msgstr ""
+
+#: includes/core/page-templates/class-manager.php:258
+msgid "Changes will be reflected in the preview only after the page reloads."
+msgstr ""
+
+#: languages/wpfnl.php:178
+msgid "Checkbox"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:497
+msgid "Checkbox Active Background Color"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1130
+#: includes/core/widgets/elementor/elements/optin.php:1130
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:492
+msgid "Checkbox Active Color"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1117
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:487
+msgid "Checkbox Default Color"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:80
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:175
+#: languages/wpfnl.php:130
+msgid "Checkbox Label"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:1142
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:570
+msgid "Checkbox Size"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:1159
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:578
+msgid "Checkbox Spacing"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1143
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:502
+msgid "Checkbox Tic Sign Color"
+msgstr ""
+
+#: admin/modules/funnel/class-wpfnl-funnel.php:166
+#: admin/modules/funnel/views/view.php:34
+#: includes/core/widgets/elementor/elements/checkout-widget.php:75
+#: languages/wpfnl.php:140
+msgid "Checkout"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:277
+msgid "Checkout body"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:55
+msgid "Checkout Body Content"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:51
+msgid "Checkout Body Title "
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:1028
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:215
+msgid "Checkout layout"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/view.php:42
+msgid "Checkout page"
+msgstr ""
+
+#: languages/wpfnl.php:18
+msgid "Choose A CRM To Start Setting Up Your Integration"
+msgstr ""
+
+#: admin/modules/createFunnel/views/builder-not-activated.php:22
+#: admin/modules/createFunnel/views/view.php:20
+msgid "Choose a template to start funnel"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:69
+msgid "Choose file "
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:234
+msgid "Choose form"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:175
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:176
+#: includes/core/widgets/elementor/elements/next-step-widget.php:398
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:108
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:102
+msgid "Choose funnel"
+msgstr ""
+
+#: languages/wpfnl.php:33
+msgid ""
+"Choose if you want the discount to be applied on the Regular Price or the "
+"Sale Price of the"
+msgstr ""
+
+#: languages/wpfnl.php:209
+msgid ""
+"Choose if you want the discount to be applied on the Regular Price or the "
+"Sale Price of the main product."
+msgstr ""
+
+#: languages/wpfnl.php:30
+msgid "Choose if you want to give a unique percentage/flat discount on your"
+msgstr ""
+
+#: languages/wpfnl.php:208
+msgid ""
+"Choose if you want to give a unique percentage/flat discount on your main "
+"product."
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:164
+msgid "Choose Image"
+msgstr ""
+
+#: languages/wpfnl.php:125
+msgid "Choose offer condition"
+msgstr ""
+
+#: languages/wpfnl.php:124
+msgid "Choose Offers"
+msgstr ""
+
+#: admin/modules/funnel/views/modal.php:17
+msgid "Choose Template"
+msgstr ""
+
+#: languages/wpfnl.php:128
+msgid ""
+"Choose the product that you want to offer as order bump at the checkout."
+msgstr ""
+
+#: admin/modules/settings/views/facebook-pixel-settings.php:38
+msgid "Choose what events to track in your funnels via Facebook Pixel."
+msgstr ""
+
+#: admin/modules/settings/views/gtm-settings.php:38
+msgid "Choose what events to track in your funnels via Google Tag Manager."
+msgstr ""
+
+#: languages/wpfnl.php:152
+msgid "Click here to install & activate"
+msgstr ""
+
+#: languages/wpfnl.php:251
+msgid "Click here to install & active"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:269
+msgid "Click To Expand"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:819
+msgid "Click to Expand"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:806
+#: includes/core/widgets/elementor/elements/optin.php:1456
+msgid "Click to Expand Button"
+msgstr ""
+
+#: admin/modules/settings/views/general-settings.php:44
+msgid ""
+"Click to get the updated funnel templates, made using your preferred page "
+"builder, when creating funnels."
+msgstr ""
+
+#: admin/modules/funnel/views/modal.php:38
+#: admin/modules/funnel/views/modal.php:44
+#: admin/modules/settings/views/view.php:111
+#: admin/modules/settings/views/view.php:158
+#: admin/modules/steps/checkout/views/settings.php:104
+msgid "Click to Upgrade Pro"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:66
+msgid "Click to Upload an Image"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:123
+msgid ""
+"Collect the Secrect Key from your Google reCAPTCHA site settings under the "
+"reCAPTCHA keys."
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:111
+msgid ""
+"Collect the Site Key from your Google reCAPTCHA site settings under the "
+"reCAPTCHA keys."
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:478
+#: includes/core/widgets/elementor/elements/checkout-widget.php:758
+#: includes/core/widgets/elementor/elements/checkout-widget.php:793
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1062
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1345
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1386
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1801
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1862
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2099
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2161
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2397
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2454
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2895
+#: includes/core/widgets/elementor/elements/checkout-widget.php:3031
+#: includes/core/widgets/elementor/elements/checkout-widget.php:3072
+#: includes/core/widgets/elementor/elements/optin.php:1088
+msgid "Color"
+msgstr ""
+
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:163
+msgid "Color Style"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:84
+msgid "Column Label"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/view.php:75
+#: admin/modules/steps/landing/views/view.php:64
+#: admin/modules/steps/thankyou/views/view.php:60
+msgid "Coming Soon"
+msgstr ""
+
+#: admin/modules/funnel/views/modal.php:39
+#: admin/modules/funnel/views/modal.php:45
+#: admin/modules/steps/checkout/views/settings.php:41
+msgid "coming soon"
+msgstr ""
+
+#: languages/wpfnl.php:80
+msgid "compare to"
+msgstr ""
+
+#: languages/wpfnl.php:97
+msgid "Condition"
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-step-controller.php:167
+msgid "Condition status."
+msgstr ""
+
+#: languages/wpfnl.php:15
+msgid "Connect CRM"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:97
+msgid "Connect reCAPTCHA (v3)"
+msgstr ""
+
+#: admin/modules/settings/views/view.php:27
+msgid "Contact Us"
+msgstr ""
+
+#: admin/modules/settings/views/utm-settings.php:47
+msgid "Content (utm_content)"
+msgstr ""
+
+#: admin/modules/funnel/views/header.php:46
+msgid "copy"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:111
+msgid "Coupon"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:983
+msgid "Coupon Button"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:660
+msgid "Coupon Button Background Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:688
+msgid "Coupon Button Border"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:669
+msgid "Coupon Button Hover Background Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:678
+msgid "Coupon Button Hover Text Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:655
+msgid "Coupon Button Padding"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:3005
+msgid "Coupon Button Style"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:685
+msgid "Coupon Button Typography"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:987
+msgid "Coupon Form"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:618
+msgid "Coupon Form Background Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:628
+msgid "Coupon Form Border"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2758
+msgid "Coupon Form Box Style"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:639
+msgid "Coupon Form Input Field Background Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:646
+msgid "Coupon Form Input Field Border"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:649
+msgid "Coupon Form Input Field Padding"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:634
+msgid "Coupon Form Input Field Typography"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:613
+msgid "Coupon Form Margin"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:610
+msgid "Coupon Form Padding"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:625
+msgid "Coupon Form Typography"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2886
+msgid "Coupon Input field Style"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2604
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:573
+msgid "Coupon Section"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2613
+msgid "Coupon Toggle Area Style"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:585
+msgid "Coupon Toggle Box Background Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:604
+msgid "Coupon Toggle Box Border"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:594
+msgid "Coupon Toggle Box Link Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:580
+msgid "Coupon Toggle Box Margin"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:577
+msgid "Coupon Toggle Box Padding"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:601
+msgid "Coupon Toggle Box Typography"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:458
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:459
+msgid "Course Description"
+msgstr ""
+
+#: includes/core/widgets/block/block-types/class-lms-checkout.php:54
+msgid "Course Details"
+msgstr ""
+
+#: admin/modules/createFunnel/views/builder-not-activated.php:21
+#: admin/modules/createFunnel/views/view.php:19 languages/wpfnl.php:257
+msgid "Create A Funnel"
+msgstr ""
+
+#: admin/modules/settings/views/offer-settings.php:15
+msgid "Create a new child order for every accepted Upsell/Downsell offer"
+msgstr ""
+
+#: admin/class-wpfnl-admin.php:145
+msgid "Create New Funnel"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/view.php:81
+#: admin/modules/steps/landing/views/view.php:70
+#: admin/modules/steps/thankyou/views/view.php:66
+msgid "Create Variations"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:475
+msgid "Create Your First Funnel"
+msgstr ""
+
+#: languages/wpfnl.php:259
+msgid "Creating Funnel..."
+msgstr ""
+
+#: languages/wpfnl.php:246
+msgid "Creating Step..."
+msgstr ""
+
+#: languages/wpfnl.php:6
+msgid "CRM"
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-gutenberg-css-controller.php:192
+msgid "CSS can not be saved due to permission!!!"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:139
+msgid "Current Version"
+msgstr ""
+
+#: languages/wpfnl.php:201
+msgid "Custom Billing Section Heading"
+msgstr ""
+
+#: languages/wpfnl.php:199
+msgid "Custom order button text"
+msgstr ""
+
+#: languages/wpfnl.php:205
+msgid "Custom Order Detail Section Heading"
+msgstr ""
+
+#: languages/wpfnl.php:203
+msgid "Custom Shipping Section Heading"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:581
+#: includes/core/widgets/elementor/elements/checkout-widget.php:682
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1166
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1969
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2271
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2486
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2673
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2807
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2937
+msgid "Dashed"
+msgstr ""
+
+#: languages/wpfnl.php:87
+msgid "Date"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:160
+#: includes/core/page-templates/class-manager.php:206
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1765
+msgid "Default"
+msgstr ""
+
+#: includes/core/page-templates/class-manager.php:221
+msgid "Default Page Template from your theme"
+msgstr ""
+
+#: admin/modules/settings/views/permalink-settings.php:11
+msgid "Default Permalink"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:218
+#: includes/core/widgets/elementor/elements/optin.php:281
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:149
+msgid "Default Style"
+msgstr ""
+
+#: languages/wpfnl.php:181
+msgid "Default Value"
+msgstr ""
+
+#: admin/modules/settings/views/permalink-settings.php:16
+msgid "Default WordPress Permalink"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:161
+#: admin/modules/funnels/views/view.php:443
+#: admin/modules/settings/views/log-settings.php:34 languages/wpfnl.php:56
+msgid "Delete"
+msgstr ""
+
+#: languages/wpfnl.php:5
+msgid "Delete Selected"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:24
+msgid "Delete transients"
+msgstr ""
+
+#: admin/modules/product/views/product-options.php:53
+msgid "Design"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:33
+msgid "Disable Analytics Tracking For"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:52
+msgid "Disable Theme Styles in Funnel Pages"
+msgstr ""
+
+#: public/modules/checkout/class-wpfnl-checkout.php:1192
+msgid "Discount"
+msgstr ""
+
+#: admin/modules/discount/class-wpfnl-discount.php:116
+msgid "discount"
+msgstr ""
+
+#: languages/wpfnl.php:32
+msgid "Discount Apply To"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:109
+msgid "Discount Percentage"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:110
+msgid "Discount Price"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:99
+#: languages/wpfnl.php:29
+msgid "Discount Type"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:118
+#: languages/wpfnl.php:35
+msgid "Discount Value"
+msgstr ""
+
+#: admin/class-wpfnl-admin.php:1034
+msgid "Discount:"
+msgstr ""
+
+#: languages/wpfnl.php:40
+msgid "Discounted Offer Price"
+msgstr ""
+
+#: languages/wpfnl.php:188
+msgid "Display in Order Detail Pages"
+msgstr ""
+
+#: admin/modules/funnel/views/header.php:84
+#: includes/core/classes/class-wpfnl-admin-menus.php:72
+#: includes/core/classes/class-wpfnl-admin-menus.php:73
+msgid "Documentation"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:192
+msgid "Don’t Miss this amazing offer"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:580
+#: includes/core/widgets/elementor/elements/checkout-widget.php:681
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1165
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1968
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2270
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2485
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2672
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2806
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2936
+msgid "Dotted"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:579
+#: includes/core/widgets/elementor/elements/checkout-widget.php:680
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1164
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1967
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2269
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2484
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2671
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2805
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2935
+msgid "Double"
+msgstr ""
+
+#: admin/modules/funnel/class-wpfnl-funnel.php:168
+#: admin/modules/funnel/views/view.php:36 languages/wpfnl.php:96
+#: public/class-wpfnl-public.php:804
+msgid "Downsell"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:69
+msgid "Drag & Drop or "
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:406
+msgid "Duplicate"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/view.php:53
+#: admin/modules/steps/general/step-title.php:57
+#: admin/modules/steps/landing/views/view.php:42
+#: admin/modules/steps/thankyou/views/view.php:38
+msgid "Edit"
+msgstr ""
+
+#: languages/wpfnl.php:191
+msgid "Edit Field"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/settings.php:38
+#: admin/modules/steps/thankyou/views/settings.php:15
+msgid "Edit Fields"
+msgstr ""
+
+#: includes/core/classes/class-wpfnl-admin-menus.php:80
+#: includes/core/classes/class-wpfnl-admin-menus.php:81
+msgid "Edit Funnel"
+msgstr ""
+
+#: includes/core/classes/class-wpfnl-register-funnel.php:75
+msgid "Edit Step"
+msgstr ""
+
+#: includes/core/shortcodes/templates/optin/form.php:61
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:42
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:1106
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/template/template-optin.php:75
+#: includes/core/widgets/elementor/elements/optin.php:317
+#: includes/core/widgets/elementor/elements/optin.php:330
+#: includes/core/widgets/elementor/elements/optin.php:1788
+#: includes/core/widgets/elementor/elements/template/template-optin.php:90
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:257
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:263
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:272
+#: includes/core/widgets/oxygen/elements/optin/template/template-optin.php:84
+#: languages/wpfnl.php:174
+#: includes/core/widgets/block/assets/js/blocks/optin-form/block.js:305
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:1390
+msgid "Email"
+msgstr ""
+
+#: includes/core/classes/class-wpfnl-admin-menus.php:97
+#: includes/core/classes/class-wpfnl-admin-menus.php:98
+msgid "Email Builder"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:385
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:386
+#: includes/core/widgets/elementor/elements/optin.php:315
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:261
+msgid "Email Label"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:401
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:402
+#: includes/core/widgets/elementor/elements/optin.php:328
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:270
+msgid "Email Placeholder Text"
+msgstr ""
+
+#: includes/core/compatibility/plugin/class-wpfnl-cart-lift.php:66
+msgid "Enable abandoned cart tracking for WPFunnels:"
+msgstr ""
+
+#: admin/modules/steps/thankyou/views/settings.php:56
+msgid "Enable Billing Details"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:347
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:348
+msgid "Enable Course Overview"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:379
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:380
+msgid "Enable Course Status"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:238
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:163
+msgid "Enable First  Name"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:237
+msgid "Enable First Name"
+msgstr ""
+
+#: languages/wpfnl.php:105
+msgid "Enable Global Funnel"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products.php:114 languages/wpfnl.php:214
+msgid "Enable Highlight"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:311
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:312
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:212
+msgid "Enable Last Name"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:68
+msgid "Enable log status"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:71
+msgid "Enable logger status to save any log"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:564
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:565
+msgid "Enable Message"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:409
+msgid "Enable Order bump %s"
+msgstr ""
+
+#: admin/modules/steps/thankyou/views/settings.php:45
+msgid "Enable Order Details"
+msgstr ""
+
+#: admin/modules/steps/thankyou/views/settings.php:34
+msgid "Enable Order Overview"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:363
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:364
+msgid "Enable Payment Method"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:416
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:417
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:281
+msgid "Enable Phone"
+msgstr ""
+
+#: admin/modules/product/views/product-options.php:30
+msgid "Enable Product Options"
+msgstr ""
+
+#: languages/wpfnl.php:218
+msgid "Enable Quantity Selection"
+msgstr ""
+
+#: languages/wpfnl.php:222
+msgid "Enable Replace Settings"
+msgstr ""
+
+#: languages/wpfnl.php:232
+msgid "Enable replace with the main product."
+msgstr ""
+
+#: admin/modules/steps/thankyou/views/settings.php:67
+msgid "Enable Shipping Details"
+msgstr ""
+
+#: languages/wpfnl.php:11
+msgid "Enable The Integration option to Setup An Integration with CRM"
+msgstr ""
+
+#: languages/wpfnl.php:219
+msgid ""
+"Enable this if you want to allow buyers to change the quantity of the "
+"product they want to buy."
+msgstr ""
+
+#: languages/wpfnl.php:217
+msgid ""
+"Enable this if you want to allow buyers to use coupons during checkout in "
+"the funnel."
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products-tab.php:184
+msgid ""
+"Enable this option if you want to allow buyers to implement coupon codes "
+"during checkout."
+msgstr ""
+
+#: admin/modules/settings/views/offer-settings.php:89
+msgid ""
+"Enable this option in case you want to use a $0 product as the main funnel "
+"product. In this case, Upsell and downsell steps will be skipped since they "
+"won't work without a successful payment during checkout."
+msgstr ""
+
+#: admin/modules/settings/views/utm-settings.php:12
+msgid "Enable UTM Parameters For This Funnel"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:490
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:491
+msgid "Enable Website Url"
+msgstr ""
+
+#: languages/wpfnl.php:187
+msgid "Enabled"
+msgstr ""
+
+#: admin/modules/settings/views/offer-settings.php:18
+msgid ""
+"Enabling this will create separate orders for every post-purchase offers you "
+"make."
+msgstr ""
+
+#: languages/wpfnl.php:223
+msgid ""
+"Enabling this will mean that if a buyer accepts the downsell offer, then the "
+"downsell offer product will replace the main product in the checkout and the "
+"buyer will just have to pay for the downsell offer product."
+msgstr ""
+
+#: includes/core/widgets/block/block-types/class-lms-order-details.php:193
+#: includes/core/widgets/block/block-types/class-lms-order-details.php:475
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:564
+msgid "Enrolled"
+msgstr ""
+
+#: languages/wpfnl.php:135
+msgid "Enter A Step Name"
+msgstr ""
+
+#: languages/wpfnl.php:112
+msgid "Enter Funnel If"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:183
+msgid "Enter Title Text"
+msgstr ""
+
+#: admin/modules/settings/views/facebook-pixel-settings.php:26
+msgid "Enter your Facebook Pixel ID."
+msgstr ""
+
+#: languages/wpfnl.php:99
+msgid "Equal"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:922
+msgid "Error Message Color"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:913
+msgid "Error Messages"
+msgstr ""
+
+#: admin/modules/settings/class-wpfnl-settings.php:410
+msgid ""
+"Error occurred, The version selected is invalid. Try selecting different "
+"version."
+msgstr ""
+
+#: admin/modules/settings/views/view.php:74
+msgid "Event Tracking"
+msgstr "מעקב אחר אירועים"
+
+#: admin/modules/funnels/views/view.php:421
+msgid "Export"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:112
+msgid "Export All"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:1035
+#: includes/core/widgets/elementor/elements/checkout-widget.php:245
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:147
+msgid "Express Checkout"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:142
+#: includes/core/widgets/elementor/elements/optin.php:149
+msgid "Extra Large"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:138
+#: includes/core/widgets/elementor/elements/optin.php:145
+msgid "Extra Small"
+msgstr ""
+
+#: admin/modules/settings/views/facebook-pixel-settings.php:35
+msgid "Facebook Pixel Events"
+msgstr ""
+
+#: admin/modules/settings/views/facebook-pixel-settings.php:23
+msgid "Facebook Pixel ID"
+msgstr ""
+
+#: admin/modules/settings/views/view.php:132
+msgid "Facebook Pixel Integration"
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-step-controller.php:259
+msgid "Failed to create a step"
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-step-controller.php:535
+msgid "Failed to delete step."
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:894
+msgid "Field Border Color"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:71
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:871
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:39
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:478
+msgid "Field Label"
+msgstr ""
+
+#: languages/wpfnl.php:23
+msgid "Field Required"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:873
+msgid "Field Validation"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:865
+msgid "Field Validation & Error Messages"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:223
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:271
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:875
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:192
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:311
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:337
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:402
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:146
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:248
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:274
+#: languages/wpfnl.php:93
+msgid "Fields"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:305
+msgid "Fields Focus"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:464
+msgid "Fiels Icon"
+msgstr ""
+
+#: includes/core/shortcodes/templates/optin/form.php:29
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:40
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:1053
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/template/template-optin.php:23
+#: includes/core/widgets/elementor/elements/optin.php:340
+#: includes/core/widgets/elementor/elements/optin.php:353
+#: includes/core/widgets/elementor/elements/optin.php:366
+#: includes/core/widgets/elementor/elements/optin.php:1735
+#: includes/core/widgets/elementor/elements/template/template-optin.php:38
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:159
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:178
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:188
+#: includes/core/widgets/oxygen/elements/optin/template/template-optin.php:31
+#: includes/core/widgets/block/assets/js/blocks/optin-form/block.js:242
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:1322
+msgid "First Name"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:255
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:256
+#: includes/core/widgets/elementor/elements/optin.php:351
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:176
+msgid "First Name Label"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:272
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:273
+#: includes/core/widgets/elementor/elements/optin.php:364
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:186
+msgid "First Name Placeholder Text"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:1048
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:1052
+#: includes/core/widgets/elementor/elements/checkout-widget.php:280
+#: includes/core/widgets/elementor/elements/checkout-widget.php:286
+#: includes/core/widgets/elementor/elements/checkout-widget.php:353
+#: includes/core/widgets/elementor/elements/checkout-widget.php:359
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:155
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:162
+msgid "Floating Label"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1766
+msgid "Floating Labels"
+msgstr ""
+
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:545
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:769
+msgid "Font size (px)"
+msgstr ""
+
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:556
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:780
+msgid "Font Weight"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:97
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:100
+msgid "Footer"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:59
+msgid "Footer Content"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:42
+msgid "Footer Style"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:1042
+msgid "Form"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:506
+msgid "Form Button"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:304
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:156
+msgid "Form Fields"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:594
+msgid "Form Input Style"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:559
+msgid "Form Label Style"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:38
+#: includes/core/widgets/elementor/elements/optin.php:254
+msgid "Form Layout"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:370
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:408
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:885
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:924
+msgid "Form Notice"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:219
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:114
+msgid "Form Source"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:277
+msgid "Form Style"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:219
+#: includes/core/widgets/elementor/elements/optin.php:282
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:150
+msgid "Form Style-1"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:220
+#: includes/core/widgets/elementor/elements/optin.php:283
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:151
+msgid "Form Style-2"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:221
+#: includes/core/widgets/elementor/elements/optin.php:284
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:152
+msgid "Form Style-3"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:222
+#: includes/core/widgets/elementor/elements/optin.php:285
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:153
+msgid "Form Style-4"
+msgstr ""
+
+#: languages/wpfnl.php:137
+msgid "free"
+msgstr ""
+
+#: admin/modules/funnel/class-wpfnl-funnel.php:312
+msgid "funnel"
+msgstr ""
+
+#: admin/modules/settings/views/permalink-settings.php:24
+msgid "Funnel and Step Slug"
+msgstr ""
+
+#: admin/modules/settings/views/permalink-settings.php:70
+msgid "Funnel Base"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:262
+#: includes/core/widgets/elementor/elements/checkout-widget.php:335
+msgid "Funnel Checkout"
+msgstr ""
+
+#: includes/core/classes/class-wpfnl-register-funnel.php:42
+msgctxt "Funnel general name"
+msgid "Funnels"
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-funnel-controller.php:1348
+msgid "Funnel id is missing"
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-funnel-controller.php:218
+#: includes/core/rest-api/Controllers/class-step-controller.php:76
+msgid "Funnel ID."
+msgstr ""
+
+#: languages/wpfnl.php:3
+msgid "Funnel Integration"
+msgstr ""
+
+#: admin/modules/funnel/views/header.php:24
+msgid "Funnel Name: "
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/order-detail-widget.php:151
+msgid "Funnel Order Details"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products-tab.php:25
+msgid "Funnel Products"
+msgstr ""
+
+#: includes/core/classes/class-wpfnl-register-funnel.php:43
+msgctxt "Funnel singular name"
+msgid "Funnel"
+msgstr ""
+
+#: admin/modules/settings/views/permalink-settings.php:37
+msgid "Funnel Slug"
+msgstr ""
+
+#: admin/modules/funnel/class-wpfnl-funnel.php:263
+msgid "Funnel status has been updated."
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-step-controller.php:162
+#: includes/core/rest-api/Controllers/class-step-controller.php:191
+#: includes/core/rest-api/Controllers/class-step-controller.php:215
+#: includes/core/rest-api/Controllers/class-step-controller.php:220
+msgid "Funnel step ID."
+msgstr ""
+
+#: admin/modules/settings/views/general-settings.php:12
+msgid "Funnel Type"
+msgstr ""
+
+#: admin/partials/dashboard-nav.php:11
+#: includes/core/classes/class-wpfnl-admin-menus.php:54
+#: includes/core/classes/class-wpfnl-admin-menus.php:55
+msgid "Funnels"
+msgstr ""
+
+#: admin/modules/funnels/class-wpfnl-funnels.php:175
+msgid "funnels"
+msgstr ""
+
+#: languages/wpfnl.php:315
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:78
+msgid "General"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:268
+msgid "General Opt-in"
+msgstr ""
+
+#: admin/modules/settings/views/view.php:41
+#: admin/modules/settings/views/view.php:97
+msgid "General Settings"
+msgstr "הגדרות כלליות"
+
+#: admin/modules/settings/views/view.php:112
+#: admin/modules/settings/views/view.php:159
+#: admin/modules/steps/checkout/views/settings.php:105
+msgid "Get Pro"
+msgstr ""
+
+#: languages/wpfnl.php:58
+msgid "Give a name or ID to this webhook."
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1469
+msgid "Global"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:318
+#: admin/modules/funnels/views/view.php:324
+#: admin/modules/funnels/views/view.php:330
+msgid "Global funnel"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:425
+#: includes/core/widgets/elementor/elements/next-step-widget.php:426
+msgid "Go Next"
+msgstr ""
+
+#: includes/core/classes/class-wpfnl-admin-menus.php:110
+#: includes/core/classes/class-wpfnl-admin-menus.php:111
+msgid "Go Pro"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:152
+#: includes/core/widgets/elementor/elements/next-step-widget.php:162
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:91
+msgid "Go To URL Path"
+msgstr ""
+
+#: languages/wpfnl.php:234
+msgid ""
+"Go to WPFunnels > Settings > Offer Settings and enable \"Create a new child "
+"order.\""
+msgstr ""
+
+#: admin/modules/settings/views/view.php:146
+msgid "Google Tag Manager (GTM) Integration"
+msgstr ""
+
+#: languages/wpfnl.php:100
+msgid "Greater than"
+msgstr ""
+
+#: languages/wpfnl.php:92
+msgid "Gross Sale"
+msgstr ""
+
+#: languages/wpfnl.php:89
+msgid "Gross Sales"
+msgstr ""
+
+#: admin/modules/settings/views/gtm-settings.php:23
+msgid "GTM Container ID"
+msgstr ""
+
+#: admin/modules/settings/views/gtm-settings.php:35
+msgid "GTM Events"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:172
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:126
+msgid "Header"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:43
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:46
+msgid "Header Style"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:56
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:835
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:847
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:912
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:374
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:386
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:314
+msgid "Heading"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:326
+msgid "Heading Border"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1792
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2090
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2388
+msgid "Heading Style"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:867
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:398
+msgid "Heading Text"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:208
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:294
+msgid "Heading Typography"
+msgstr ""
+
+#: admin/class-wpfnl-admin.php:421
+msgid "Help"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:343
+#: includes/core/widgets/elementor/elements/optin.php:397
+#: includes/core/widgets/elementor/elements/optin.php:451
+#: includes/core/widgets/elementor/elements/optin.php:505
+#: includes/core/widgets/elementor/elements/optin.php:559
+#: includes/core/widgets/elementor/elements/optin.php:613
+#: includes/core/widgets/elementor/elements/optin.php:652
+#: includes/core/widgets/elementor/elements/optin.php:664
+#: includes/core/widgets/elementor/elements/optin.php:677
+#: includes/core/widgets/elementor/elements/optin.php:996
+#: includes/core/widgets/elementor/elements/optin.php:1007
+msgid "Hide"
+msgstr ""
+
+#: admin/modules/product/views/product-options.php:120
+msgid "Hide Image on Tab and Mobile"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:73
+#: admin/modules/steps/checkout/views/products.php:107 languages/wpfnl.php:129
+msgid "Highlight Text"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:144
+msgid "Horizontal"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:786
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1379
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1693
+#: includes/core/widgets/elementor/elements/checkout-widget.php:3065
+#: includes/core/widgets/elementor/elements/next-step-widget.php:592
+#: includes/core/widgets/elementor/elements/optin.php:1363
+#: includes/core/widgets/elementor/elements/optin.php:1522
+msgid "Hover"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:157
+msgid "Hover Text Color"
+msgstr ""
+
+#: admin/modules/createFunnel/views/builder-not-activated.php:28
+#: admin/modules/createFunnel/views/view.php:26 languages/wpfnl.php:258
+msgid "How to use this funnel"
+msgstr ""
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+msgid "https://getwpfunnels.com"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:965
+msgid "https://your-link.com"
+msgstr ""
+
+#: includes/core/shortcodes/templates/optin/form.php:156
+#: includes/core/widgets/elementor/elements/optin.php:1021
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:723
+msgid "I agree to be registered as a subscriber."
+msgstr ""
+
+#: includes/core/shortcodes/templates/optin/form.php:130
+#: includes/core/widgets/elementor/elements/optin.php:624
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:444
+msgid "I have read and agree the Terms & Condition."
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:472
+#: includes/core/widgets/elementor/elements/optin.php:749
+#: includes/core/widgets/elementor/elements/optin.php:854
+msgid "Icon"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:560
+#: includes/core/widgets/elementor/elements/checkout-widget.php:660
+msgid "Icon Color"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:481
+#: includes/core/widgets/elementor/elements/optin.php:758
+#: includes/core/widgets/elementor/elements/optin.php:863
+msgid "Icon Position"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:497
+#: includes/core/widgets/elementor/elements/optin.php:774
+#: includes/core/widgets/elementor/elements/optin.php:879
+msgid "Icon Spacing"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:16
+msgid ""
+"If you are facing issues such as not getting plugin updates or license not "
+"working, clear the transient cache and try again."
+msgstr ""
+
+#: languages/wpfnl.php:164
+msgid ""
+"If you want to create & design funnel pages without using Oxygen builder, "
+"then don\"t worry."
+msgstr ""
+
+#: languages/wpfnl.php:153
+msgid "If you want to create funnel steps without using"
+msgstr ""
+
+#: languages/wpfnl.php:252
+msgid "If you want to create funnels without using"
+msgstr ""
+
+#: languages/wpfnl.php:159
+msgid "If you want to design the funnel steps without using"
+msgstr ""
+
+#: languages/wpfnl.php:161
+msgid ""
+"If you want to design the funnel steps without using Divi builder, then "
+"don\"t worry."
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:36
+msgid ""
+"If you want WPFunnels not to track traffic, conversion, & revenue count for "
+"Analytics from certain user roles in your site, then you may do so using "
+"these options."
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:81
+#: admin/modules/funnels/views/view.php:119 languages/wpfnl.php:245
+msgid "Import"
+msgstr ""
+
+#: languages/wpfnl.php:134
+msgid "import"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:51
+#: admin/modules/funnels/views/view.php:481
+msgid "Import Funnel"
+msgstr ""
+
+#: languages/wpfnl.php:132
+msgid "Importing Step"
+msgstr ""
+
+#: admin/modules/settings/views/gtm-settings.php:26
+msgid ""
+"In your Google Tab Manager Workspace, near the top of the window, you will "
+"find your container ID, formatted as “GTM-XXXXXX“."
+msgstr ""
+
+#: public/modules/checkout/templates/two-step-checkout.php:49
+#: public/modules/checkout/templates/two-step-checkout.php:74
+msgid "Information"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1162
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1965
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2267
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2482
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2669
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2803
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2933
+msgid "Inherit"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:916
+msgid "Input Field Labels"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1899
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2201
+msgid "Input Field Style"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:920
+#: includes/core/widgets/elementor/elements/optin.php:1187
+msgid "Input Fields"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:195
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:751
+msgid "Input your desired button text, or leave blank for no button."
+msgstr ""
+
+#: admin/class-wpfnl-notices.php:479
+msgid "Install %s"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:301
+#: admin/modules/funnels/views/view.php:307
+msgid "Integration"
+msgstr ""
+
+#: languages/wpfnl.php:14
+msgid "Integration Name:"
+msgstr ""
+
+#: includes/core/data-store/class-wpfnl-store-funnel-data.php:454
+msgid "Invalid Funnel"
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-step-controller.php:242
+msgid "Invalid rest request."
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-settings-controller.php:166
+#: includes/core/rest-api/Controllers/class-settings-controller.php:170
+msgid "Invalid setting group."
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-settings-controller.php:195
+#: includes/core/rest-api/Controllers/class-settings-controller.php:207
+#: includes/core/rest-api/Controllers/class-settings-controller.php:403
+#: includes/core/rest-api/Controllers/class-settings-controller.php:406
+msgid "Invalid setting."
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-step-controller.php:427
+#: includes/core/rest-api/Controllers/class-step-controller.php:489
+#: includes/core/rest-api/Controllers/class-step-controller.php:516
+#: includes/core/rest-api/Controllers/class-step-controller.php:555
+msgid "Invalid Step ID."
+msgstr ""
+
+#: languages/wpfnl.php:98
+msgid "Is"
+msgstr ""
+
+#: languages/wpfnl.php:145
+msgid "is inactive."
+msgstr ""
+
+#: includes/class-wpfnl.php:468 includes/class-wpfnl.php:478
+msgid ""
+"It appears you have an older version of <strong>WPFunnels Pro</strong>. This "
+"may cause some issues with the plugin's functionality. Please update <strong>"
+"WPFunnels Pro</strong> to v%s and above."
+msgstr ""
+
+#: admin/class-wpfnl-notices.php:151
+msgid ""
+"It seems Elementor is %1s on your site. As you have selected Elementor as "
+"builder option, you need to %2s Elementor."
+msgstr ""
+
+#: languages/wpfnl.php:146
+msgid "It seems like you have selected"
+msgstr ""
+
+#: languages/wpfnl.php:160
+msgid ""
+"It seems like you have selected Divi builder as your preferred page builder, "
+"but you do not have the plugin activated on your site. Please install and "
+"activate Divi builder to import funnel templates."
+msgstr ""
+
+#: languages/wpfnl.php:162
+msgid ""
+"It seems like you have selected Oxygen builder as your preferred page "
+"builder, but you do not have the plugin Oxygen builder  activated on your "
+"site."
+msgstr ""
+
+#: admin/class-wpfnl-notices.php:237
+msgid ""
+"It seems Qubely is %1s on your site. As you have selected Gutenberg as "
+"builder option, you need to %2s Qubely."
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:151
+#: admin/modules/steps/checkout/views/order-bump-tab.php:153
+#: languages/wpfnl.php:44
+msgid ""
+"It will replace the first selected product (from checkout products) with the "
+"order bump product."
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-gutenberg-css-controller.php:197
+msgid "JSON can not be saved due to permission!!!"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:449
+#: includes/core/widgets/elementor/elements/optin.php:735
+#: includes/core/widgets/elementor/elements/optin.php:843
+msgid "Justified"
+msgstr ""
+
+#: languages/wpfnl.php:73
+msgid "Key"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:1070
+#: languages/wpfnl.php:179
+msgid "Label"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:882
+msgid "Label Color"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1853
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2152
+msgid "Label Style"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:225
+msgid "Label Typography"
+msgstr ""
+
+#: admin/modules/funnel/class-wpfnl-funnel.php:164
+#: admin/modules/funnel/views/view.php:32 languages/wpfnl.php:139
+msgid "Landing"
+msgstr ""
+
+#: admin/modules/steps/landing/class-wpfnl-landing.php:34
+msgid "landing"
+msgstr ""
+
+#: admin/modules/steps/landing/views/view.php:31
+msgid "Landing page"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:141
+#: includes/core/widgets/elementor/elements/optin.php:148
+msgid "Large"
+msgstr ""
+
+#: includes/core/shortcodes/templates/optin/form.php:45
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:41
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:1081
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/template/template-optin.php:50
+#: includes/core/widgets/elementor/elements/optin.php:394
+#: includes/core/widgets/elementor/elements/optin.php:407
+#: includes/core/widgets/elementor/elements/optin.php:420
+#: includes/core/widgets/elementor/elements/optin.php:1763
+#: includes/core/widgets/elementor/elements/template/template-optin.php:65
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:208
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:227
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:237
+#: includes/core/widgets/oxygen/elements/optin/template/template-optin.php:59
+#: includes/core/widgets/block/assets/js/blocks/optin-form/block.js:275
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:1358
+msgid "Last Name"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:329
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:330
+#: includes/core/widgets/elementor/elements/optin.php:405
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:225
+msgid "Last Name Label"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:346
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:347
+#: includes/core/widgets/elementor/elements/optin.php:418
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:235
+msgid "Last Name Placeholder Text"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:901
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:908
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:1027
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:37
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:214
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:128
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:137
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:140
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:144
+msgid "Layout"
+msgstr ""
+
+#: admin/modules/product/views/product-options.php:52
+msgid "Layout options"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:214
+msgid "Lead"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:361
+#: admin/modules/funnels/views/view.php:376
+msgid "Lead funnel type is activated in global settings"
+msgstr ""
+
+#: admin/modules/settings/views/general-settings.php:18
+msgid "Lead Gen"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:358
+msgid "Lead Type"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:437
+#: includes/core/widgets/elementor/elements/optin.php:723
+#: includes/core/widgets/elementor/elements/optin.php:831
+#: languages/wpfnl.php:306
+#: includes/core/widgets/block/assets/dist/checkout-form.js:1
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:610
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:643
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:685
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:791
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:824
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:886
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:919
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:962
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1063
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1096
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1158
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1191
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1462
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:516
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:738
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:962
+msgid "Left"
+msgstr ""
+
+#: languages/wpfnl.php:101
+msgid "Less than"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products-tab.php:162
+msgid "Let user select multiple products from all options"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products-tab.php:155
+msgid "Let user select one product from all options"
+msgstr ""
+
+#: languages/wpfnl.php:324
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:293
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:603
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:827
+msgid "Letter Spacing"
+msgstr ""
+
+#: includes/core/classes/class-wpfnl-admin-menus.php:122
+#: includes/core/classes/class-wpfnl-admin-menus.php:123
+msgid "License"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:536
+#: includes/core/widgets/elementor/elements/checkout-widget.php:634
+msgid "Line Color"
+msgstr ""
+
+#: languages/wpfnl.php:323
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:279
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:592
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:816
+msgid "Line Height"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:54
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:76
+msgid "Link"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:996
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2633
+#: includes/core/widgets/elementor/elements/optin.php:1118
+msgid "Link Color"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:216
+msgid "LMS"
+msgstr ""
+
+#: admin/modules/settings/views/log-settings.php:9
+msgid "Log Settings"
+msgstr ""
+
+#: public/modules/checkout/templates/default-checkout-form.php:47
+#: public/modules/checkout/templates/express-checkout-form.php:63
+#: public/modules/checkout/templates/two-step-checkout.php:36
+msgid "Login"
+msgstr ""
+
+#: admin/modules/settings/views/view.php:89
+msgid "Logs"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:38
+#: admin/modules/steps/checkout/views/order-bump-tab.php:102
+#: admin/modules/steps/checkout/views/order-bump-tab.php:121
+msgid "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dicta, animi!"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:185
+msgid ""
+"Lorem ipsum dolor sit amet, cons adipiscing elit, sed do eiusmod te "
+"incididunt ut labore."
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:285
+#: admin/modules/funnels/views/view.php:291
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:187
+#: includes/core/widgets/elementor/elements/optin.php:224
+msgid "Mail Mint"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:199
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:200
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:132
+msgid "Mail Mint Form"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:45
+msgid "Main Element"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1225
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1304
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1445
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1825
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1883
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2056
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2122
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2184
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2354
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2418
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2579
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2742
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2872
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:311
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:530
+msgid "Margin"
+msgstr ""
+
+#: languages/wpfnl.php:302
+#: includes/core/widgets/block/assets/dist/checkout-form.js:1
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:586
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:661
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:767
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:862
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:938
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1039
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1134
+msgid "Margin (px)"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:672
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:673
+#: includes/core/widgets/elementor/elements/optin.php:633
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:452
+msgid "Mark Acceptance As Required"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:288
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:289
+#: includes/core/widgets/elementor/elements/optin.php:376
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:196
+msgid "Mark First Name As Required"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:362
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:363
+#: includes/core/widgets/elementor/elements/optin.php:430
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:245
+msgid "Mark Last Name As Required"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:615
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:616
+#: includes/core/widgets/elementor/elements/optin.php:592
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:413
+msgid "Mark Message As Required"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:467
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:468
+#: includes/core/widgets/elementor/elements/optin.php:484
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:314
+msgid "Mark Phone As Required"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:541
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:542
+#: includes/core/widgets/elementor/elements/optin.php:538
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:363
+msgid "Mark Website Url As Required"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:140
+#: includes/core/widgets/elementor/elements/optin.php:147
+msgid "Medium"
+msgstr ""
+
+#: admin/modules/settings/views/utm-settings.php:31
+msgid "Medium (utm_medium)"
+msgstr ""
+
+#: includes/core/shortcodes/templates/optin/form.php:112
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:45
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:1185
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/template/template-optin.php:154
+#: includes/core/widgets/elementor/elements/optin.php:556
+#: includes/core/widgets/elementor/elements/optin.php:569
+#: includes/core/widgets/elementor/elements/optin.php:1867
+#: includes/core/widgets/elementor/elements/template/template-optin.php:169
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:375
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:379
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:395
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:405
+#: includes/core/widgets/oxygen/elements/optin/template/template-optin.php:160
+#: includes/core/widgets/block/assets/js/blocks/optin-form/block.js:407
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:1495
+msgid "Message"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:582
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:583
+#: includes/core/widgets/elementor/elements/optin.php:567
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:393
+msgid "Message Label"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:599
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:600
+#: includes/core/widgets/elementor/elements/optin.php:580
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:403
+msgid "Message Placeholder Text"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:1034
+#: includes/core/widgets/elementor/elements/checkout-widget.php:244
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:146
+msgid "Multistep Checkout"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:751
+msgid "Multistep Navigation"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:456
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:698
+msgid "Multistep Section"
+msgstr ""
+
+#: languages/wpfnl.php:52
+msgid "Name"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:740
+msgid "Navigation Button"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:766
+msgid "Navigation Button Background Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:758
+msgid "Navigation Button Border"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:771
+msgid "Navigation Button Hover Background Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:785
+msgid "Navigation Button Hover Border Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:780
+msgid "Navigation Button Hover Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:761
+msgid "Navigation Button Padding"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:755
+msgid "Navigation Button Typography"
+msgstr ""
+
+#: admin/modules/settings/views/view.php:26
+msgid "Need Help?"
+msgstr ""
+
+#: admin/class-wpfnl-admin.php:176
+msgid "News & Updates"
+msgstr ""
+
+#: public/modules/checkout/templates/default-checkout-form.php:228
+#: public/modules/checkout/templates/default-checkout-form.php:230
+#: public/modules/checkout/templates/express-checkout-form.php:230
+#: public/modules/checkout/templates/express-checkout-form.php:232
+#: public/modules/checkout/templates/multi-step-checkout.php:48
+#: public/modules/checkout/templates/multi-step-checkout.php:62
+#: public/modules/checkout/templates/two-step-checkout.php:180
+#: public/modules/checkout/templates/two-step-checkout.php:182
+msgid "Next"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:151
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:804
+#: includes/core/widgets/elementor/elements/next-step-widget.php:161
+#: includes/core/widgets/elementor/elements/optin.php:955
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:90
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:663
+msgid "Next Step"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:75
+#: includes/core/widgets/elementor/elements/next-step-widget.php:337
+msgid "Next Step Button"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:413
+msgid "Next Step Button Content"
+msgstr ""
+
+#: languages/wpfnl.php:325
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:399
+msgid "Next..."
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:352
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:368
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:384
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:243
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:294
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:317
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:368
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:422
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:473
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:496
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:547
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:570
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:621
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:644
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:678
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:699
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:717
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:735
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:837
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:854
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:871
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:67
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:83
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:99
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:115
+#: includes/core/widgets/elementor/elements/checkout-widget.php:414
+#: includes/core/widgets/elementor/elements/optin.php:379
+#: includes/core/widgets/elementor/elements/optin.php:433
+#: includes/core/widgets/elementor/elements/optin.php:487
+#: includes/core/widgets/elementor/elements/optin.php:541
+#: includes/core/widgets/elementor/elements/optin.php:595
+#: includes/core/widgets/elementor/elements/optin.php:636
+#: includes/core/widgets/elementor/elements/optin.php:984
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:169
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:203
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:218
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:252
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:287
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:321
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:336
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:370
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:385
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:420
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:435
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:459
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:474
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:488
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:501
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:687
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:700
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:714
+msgid "No"
+msgstr ""
+
+#: includes/core/shortcodes/class-wpfnl-shortcode-order-details.php:134
+msgid "No completed orders found in your shop for demo."
+msgstr ""
+
+#: languages/wpfnl.php:54
+msgid "No Data Found"
+msgstr ""
+
+#: admin/modules/funnel/class-wpfnl-funnel.php:237
+#: admin/modules/template-library/sources/remote.php:132
+#: admin/modules/template-library/sources/remote.php:239
+msgid "No funnel id found"
+msgstr ""
+
+#: includes/core/page-templates/class-manager.php:233
+msgid "No header, no footer, just Elementor"
+msgstr ""
+
+#: languages/wpfnl.php:121
+msgid "No Order Bump"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:599
+msgid "No Order Found"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products-tab.php:126
+#: admin/modules/steps/checkout/views/products-tab.php:132
+msgid "No product added"
+msgstr ""
+
+#: public/modules/checkout/class-wpfnl-checkout.php:248
+msgid ""
+"No product is added to the funnel. Please add product from checkout step "
+"settings."
+msgstr ""
+
+#: classes/class-wpfnl-order-bump-actions.php:290
+#: classes/class-wpfnl-order-bump-actions.php:354
+#: classes/class-wpfnl-order-bump-actions.php:419
+#: classes/class-wpfnl-order-bump-actions.php:485
+#: classes/class-wpfnl-order-bump-actions.php:551
+#: classes/class-wpfnl-order-bump-actions.php:618
+#: classes/class-wpfnl-order-bump-actions.php:685
+#: classes/class-wpfnl-order-bump-actions.php:754
+#: classes/class-wpfnl-order-bump-actions.php:823
+msgid "No product is added to this order bump. Please select one."
+msgstr ""
+
+#: includes/class-wpfnl.php:310
+msgid "Nonce verification failed"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:802
+#: includes/core/widgets/elementor/elements/checkout-widget.php:577
+#: includes/core/widgets/elementor/elements/checkout-widget.php:678
+#: includes/core/widgets/elementor/elements/optin.php:953
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:661
+msgid "None"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:529
+#: includes/core/widgets/elementor/elements/checkout-widget.php:751
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1338
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1598
+#: includes/core/widgets/elementor/elements/checkout-widget.php:3024
+#: includes/core/widgets/elementor/elements/next-step-widget.php:556
+#: includes/core/widgets/elementor/elements/optin.php:1321
+#: includes/core/widgets/elementor/elements/optin.php:1478
+msgid "Normal"
+msgstr ""
+
+#: languages/wpfnl.php:103
+msgid "Not Accepted"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:163
+msgid ""
+"Note: Select the step if you want to redirect to a different step on the "
+"order bump purchase."
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:786
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:787
+#: includes/core/widgets/elementor/elements/optin.php:938
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:646
+msgid "Notification Text"
+msgstr ""
+
+#: languages/wpfnl.php:185
+msgid "Number"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/order-detail-widget.php:180
+#: includes/core/widgets/elementor/elements/order-detail-widget.php:192
+#: includes/core/widgets/elementor/elements/order-detail-widget.php:204
+#: includes/core/widgets/elementor/elements/order-detail-widget.php:216
+msgid "Off"
+msgstr ""
+
+#: languages/wpfnl.php:42
+msgid "offer price your buyer will pay."
+msgstr ""
+
+#: languages/wpfnl.php:34
+msgid "offer product."
+msgstr ""
+
+#: admin/modules/settings/views/view.php:62
+msgid "Offer Settings"
+msgstr "הגדרות הצעה"
+
+#: public/class-wpfnl-public.php:781
+msgid "Offer Type"
+msgstr ""
+
+#: languages/wpfnl.php:31
+msgid "offer."
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/order-detail-widget.php:179
+#: includes/core/widgets/elementor/elements/order-detail-widget.php:191
+#: includes/core/widgets/elementor/elements/order-detail-widget.php:203
+#: includes/core/widgets/elementor/elements/order-detail-widget.php:215
+msgid "On"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:157
+msgid "On Order Bump Purchase - Next Step"
+msgstr ""
+
+#: languages/wpfnl.php:255
+msgid "only"
+msgstr ""
+
+#: admin/modules/settings/views/offer-settings.php:52
+msgid "Only show supported payment gateways during funnel checkout"
+msgstr ""
+
+#: languages/wpfnl.php:144
+msgid "Oops! It looks like"
+msgstr ""
+
+#: languages/wpfnl.php:156 languages/wpfnl.php:249
+msgid "Oops! It looks like the page builder you selected is inactive."
+msgstr ""
+
+#: admin/class-wpfnl-notices.php:195
+msgid ""
+"Opps.. Looks like WooCommerce is not activated on your website. WPFunnels "
+"requires WooCommerce to work properly. Please  %s  WooCommerce if you want "
+"to continue creating sales funnels using WPFunnels."
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:37
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:182
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:183
+#: includes/core/widgets/elementor/elements/optin.php:212
+msgid "Opt-in Form Source"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:264
+msgid "Opt-in Form Type"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/view.php:83
+#: admin/modules/steps/landing/views/view.php:72
+#: admin/modules/steps/thankyou/views/view.php:68
+msgid "Optimize your lead and sales with split tests"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:75
+msgid "Optin Form"
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-funnel-controller.php:389
+msgid "Optin form ("
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-funnel-controller.php:390
+msgid "optin_"
+msgstr ""
+
+#: languages/wpfnl.php:10
+msgid "Options"
+msgstr ""
+
+#: languages/wpfnl.php:104
+msgid "or"
+msgstr ""
+
+#: languages/wpfnl.php:88
+msgid "Order"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:65
+msgid "Order body"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:54
+msgid "Order Body Title "
+msgstr ""
+
+#: admin/modules/steps/checkout/views/settings.php:29
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:902
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:49
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:230
+#: languages/wpfnl.php:90 public/class-wpfnl-public.php:798
+msgid "Order Bump"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:422
+msgid "Order bump %s Position"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:133
+msgid "Order Bump Controller"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:19
+msgid "Order Bump Position"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:523
+msgid "Order Button Section"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1319
+msgid "Order Button Style"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:446
+msgid "Order Course Details Title"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/order-detail-widget.php:64
+msgid "Order Detail"
+msgstr ""
+
+#: includes/core/widgets/block/block-types/class-lms-checkout.php:53
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:437
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:449
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:36
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:36
+msgid "Order Details"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:434
+msgid "Order Details Header Title"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:287
+msgid "Order Heading"
+msgstr ""
+
+#: admin/modules/settings/views/offer-settings.php:11
+msgid "Order Management For Upsell/Downsell Offers"
+msgstr ""
+
+#: includes/core/shortcodes/class-wpfnl-shortcode-order-details.php:140
+msgid "Order not found. You cannot access this page directly."
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:339
+msgid "Order Table"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:932
+msgid "Order Table Body "
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:955
+msgid "Order Table Cell"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:928
+msgid "Order Table Column Label"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:951
+msgid "Order Table Row"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:947
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2379
+msgid "Order Table Section"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:108
+msgid "Original"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:131
+#: languages/wpfnl.php:38
+msgid "Original Price"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:798
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:799
+#: includes/core/widgets/elementor/elements/optin.php:949
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:656
+msgid "Other action"
+msgstr ""
+
+#: languages/wpfnl.php:131
+msgid "Oxygen Builder Step URL"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:830
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1213
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1292
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1433
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1837
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2035
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2135
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2334
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2430
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2727
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2859
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2990
+#: includes/core/widgets/elementor/elements/checkout-widget.php:3119
+#: includes/core/widgets/elementor/elements/next-step-widget.php:680
+#: includes/core/widgets/elementor/elements/optin.php:1275
+#: includes/core/widgets/elementor/elements/optin.php:1432
+#: includes/core/widgets/elementor/elements/optin.php:1594
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:239
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:303
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:527
+msgid "Padding"
+msgstr ""
+
+#: languages/wpfnl.php:307
+#: includes/core/widgets/block/assets/dist/checkout-form.js:1
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:619
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:800
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:895
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1072
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1167
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1438
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:492
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:714
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:938
+msgid "Padding (px)"
+msgstr ""
+
+#: languages/wpfnl.php:322
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:265
+msgid "Padding Left & Right"
+msgstr ""
+
+#: languages/wpfnl.php:321
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:251
+msgid "Padding Top & Bottom"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:362
+msgid "Page"
+msgstr ""
+
+#: admin/modules/settings/views/general-settings.php:25
+msgid "Page Builder"
+msgstr ""
+
+#: includes/core/page-templates/class-manager.php:202
+msgid "Page Layout"
+msgstr ""
+
+#: includes/core/page-templates/class-manager.php:98
+msgctxt "Page Template"
+msgid "WPFunnels Boxed"
+msgstr "Wpfunnels באגרוף"
+
+#: includes/core/page-templates/class-manager.php:97
+msgctxt "Page Template"
+msgid "WPFunnels Canvas"
+msgstr "בד WPFunnels"
+
+#: includes/core/page-templates/class-manager.php:96
+msgctxt "Page Template"
+msgid "WPFunnels Default"
+msgstr "WPFunnels ברירת מחדל"
+
+#: languages/wpfnl.php:173
+msgid "Password"
+msgstr ""
+
+#: public/modules/checkout/templates/express-checkout-form.php:105
+#: public/modules/checkout/templates/two-step-checkout.php:60
+#: public/modules/checkout/templates/two-step-checkout.php:85
+msgid "Payment"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1239
+msgid "Payment Box Style"
+msgstr ""
+
+#: admin/modules/settings/views/offer-settings.php:48
+msgid "Payment Management For Upsell/Downsell Offers"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:434
+msgid "Payment Method Border"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:443
+msgid "Payment Method Padding"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1043
+msgid "Payment Method Style"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:450
+msgid "Payment Method Tooltip Background Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:455
+msgid "Payment Method Tooltip Border Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:465
+msgid "Payment Method Tooltip Padding"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:510
+msgid "Payment Method Tooltip Typography"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:427
+msgid "Payment Method Typography"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:975
+msgid "Payment Radio Buttons"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:959
+#: includes/core/widgets/elementor/elements/checkout-widget.php:975
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:391
+msgid "Payment Section"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:396
+msgid "Payment Section Background Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:420
+msgid "Payment Section Border"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:405
+msgid "Payment Section Link Color"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:413
+msgid "Payment Section Typography"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:979
+msgid "Payment Selected Radio Button"
+msgstr ""
+
+#: admin/modules/settings/views/view.php:50
+msgid "Permalink"
+msgstr "קישור קבוע"
+
+#: admin/modules/settings/views/view.php:120
+msgid "Permalink Settings"
+msgstr "הגדרות קישור קבוע"
+
+#: includes/core/shortcodes/templates/optin/form.php:78
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:43
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:1131
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/template/template-optin.php:100
+#: includes/core/widgets/elementor/elements/optin.php:448
+#: includes/core/widgets/elementor/elements/optin.php:461
+#: includes/core/widgets/elementor/elements/optin.php:474
+#: includes/core/widgets/elementor/elements/optin.php:1813
+#: includes/core/widgets/elementor/elements/template/template-optin.php:115
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:277
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:296
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:306
+#: includes/core/widgets/oxygen/elements/optin/template/template-optin.php:107
+#: languages/wpfnl.php:175
+#: includes/core/widgets/block/assets/js/blocks/optin-form/block.js:336
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:1421
+msgid "Phone"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:434
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:435
+#: includes/core/widgets/elementor/elements/optin.php:459
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:294
+msgid "Phone Label"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:451
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:452
+#: includes/core/widgets/elementor/elements/optin.php:472
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:304
+msgid "Phone Placeholder Text"
+msgstr ""
+
+#: admin/modules/product/views/product-options.php:60
+#: admin/modules/product/views/product-options.php:74
+msgid "Photoshop (#13751)"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:380
+msgid "Pick a color to be used for the text written inside notice."
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:618
+msgid "Pick a color to be used for the text written next to radio button."
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:677
+msgid ""
+"Pick a color to be used for the text written next to selected radio button."
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:783
+msgid "Pick a color to fill the module's coupon."
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:377
+msgid "Pick a color to fill the module's notice."
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:615
+msgid "Pick a color to fill the module's radio buttons."
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:674
+msgid "Pick a color to fill the module's selected radio button."
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:552
+msgid "Pick a color to fill the module's table cell."
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:489
+msgid "Pick a color to fill the module's table row."
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:439
+msgid "Pick a color to fill the module's table."
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:732
+msgid "Pick a color to fill the module's tooltip."
+msgstr ""
+
+#: languages/wpfnl.php:180
+msgid "Placeholder"
+msgstr ""
+
+#: includes/core/widgets/block/block-types/class-lms-checkout.php:56
+msgid "Plan Details"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:469
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:470
+msgid "Plan Details Title"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:705
+msgid "Please Add Course in checkout"
+msgstr ""
+
+#: languages/wpfnl.php:150
+msgid "Please install and activate"
+msgstr ""
+
+#: languages/wpfnl.php:163
+msgid ""
+"Please install and activate Oxygen builder to import ready funnel templates."
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:73
+msgid "Please select a valid file."
+msgstr ""
+
+#: languages/wpfnl.php:220
+msgid "Please select an offer"
+msgstr ""
+
+#: includes/utils/class-wpfnl-functions.php:2186
+msgid "Please select type.."
+msgstr ""
+
+#: languages/wpfnl.php:265
+#: includes/core/widgets/block/assets/dist/checkout-form.js:1
+#: includes/core/widgets/block/assets/dist/lms-checkout.js:1
+#: includes/core/widgets/block/assets/dist/lms-order-details.js:1
+#: includes/core/widgets/block/assets/dist/optin-form.js:1
+#: includes/core/widgets/block/assets/js/components/sizing-control/index.js:29
+msgid "Please specify more options."
+msgstr ""
+
+#: admin/class-wpfnl-notices.php:390
+msgid ""
+"Please update the WPFunnels Pro - Global Funnel to version 1.0.18 or higher. "
+"Ignore if already updated."
+msgstr ""
+
+#: admin/class-wpfnl-notices.php:318
+msgid ""
+"Please update the WPFunnels Pro to version 1.0.12 or higher. Ignore if "
+"already updated."
+msgstr ""
+
+#: admin/class-wpfnl-notices.php:332
+msgid ""
+"Please update the WPFunnels Pro to version 1.7.1 or higher. Ignore if "
+"already updated."
+msgstr ""
+
+#: admin/class-wpfnl-notices.php:304
+msgid ""
+"Please update the WPFunnels Pro to version 2.0.0 or higher to use New UI "
+"properly. Ignore if already updated."
+msgstr ""
+
+#: admin/class-wpfnl-notices.php:362
+msgid ""
+"Please update to WPFunnels Pro 1.7.3 or higher to use A/B split testing "
+"feature."
+msgstr ""
+
+#: includes/class-wpfnl.php:329
+msgid "Plugin activated successfully."
+msgstr ""
+
+#: admin/modules/template-library/class-manager.php:454
+msgid "Plugin is installed successfully"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:27
+msgid "Pop-up"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:432
+msgid "Pop-up offer"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:363
+msgid "Popup"
+msgstr ""
+
+#: admin/modules/settings/views/permalink-settings.php:63
+msgid "Post Type Permalink Base"
+msgstr ""
+
+#: languages/wpfnl.php:183
+msgid "Postcode"
+msgstr ""
+
+#: languages/wpfnl.php:138
+msgid "Premium"
+msgstr ""
+
+#: admin/modules/funnel/views/header.php:52 languages/wpfnl.php:244
+msgid "Preview"
+msgstr ""
+
+#: languages/wpfnl.php:133
+msgid "preview"
+msgstr ""
+
+#: public/modules/checkout/templates/default-checkout-form.php:226
+#: public/modules/checkout/templates/express-checkout-form.php:228
+#: public/modules/checkout/templates/multi-step-checkout.php:61
+#: public/modules/checkout/templates/multi-step-checkout.php:77
+#: public/modules/checkout/templates/two-step-checkout.php:178
+msgid "Previous"
+msgstr ""
+
+#: languages/wpfnl.php:81
+msgid "Previous period"
+msgstr ""
+
+#: languages/wpfnl.php:82
+msgid "Previous year"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products-tab.php:60
+#: admin/modules/steps/checkout/views/products-tab.php:107
+#: admin/modules/steps/checkout/views/products-tab.php:119
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:118
+#: languages/wpfnl.php:211
+#: public/modules/checkout/templates-style/order-bump-template-popup.php:7
+#: public/modules/checkout/templates-style/order-bump-template-style1.php:16
+#: public/modules/checkout/templates-style/order-bump-template-style2.php:23
+#: public/modules/checkout/templates-style/order-bump-template-style6.php:17
+#: public/modules/checkout/templates-style/order-bump-template-style9.php:16
+#: public/modules/checkout/templates-style/order-bump-template-style12.php:16
+#: public/modules/checkout/templates-style/order-bump-template-style13.php:16
+#: public/modules/checkout/templates-style/order-bump-template-style14.php:16
+msgid "Price"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:63
+msgid "Price Content"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1477
+msgid "Primary Color"
+msgstr ""
+
+#: admin/modules/settings/views/view.php:66
+#: admin/modules/settings/views/view.php:77 languages/wpfnl.php:248
+msgid "Pro"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products-tab.php:59
+#: admin/modules/steps/checkout/views/products-tab.php:106
+#: admin/modules/steps/checkout/views/products-tab.php:118
+#: languages/wpfnl.php:111
+msgid "Product"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:45
+msgid "Product 1"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:46
+msgid "Product 2"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/view.php:37
+msgid "Product added"
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-checkout-controller.php:111
+#: includes/core/rest-api/Controllers/class-checkout-controller.php:134
+msgid "Product Can't be added"
+msgstr ""
+
+#: includes/utils/class-wpfnl-functions.php:2187
+msgid "Product category is .."
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:87
+msgid "Product Description"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:198
+msgid "Product description"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:195
+msgid "Product Detail"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:185
+msgid "Product Detail Header"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:59
+msgid "Product Image"
+msgstr ""
+
+#: includes/utils/class-wpfnl-functions.php:2188
+msgid "Product is .."
+msgstr ""
+
+#: admin/modules/steps/checkout/views/view.php:33
+msgid "Product not added"
+msgstr ""
+
+#: admin/modules/product/views/product-options.php:51
+msgid "Product Options Conditions"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:52
+msgid "Product Quantity"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/settings.php:20
+msgid "Products"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products-tab.php:61
+#: admin/modules/steps/checkout/views/products-tab.php:108
+#: admin/modules/steps/checkout/views/products-tab.php:120
+#: languages/wpfnl.php:118
+msgid "Quantity"
+msgstr ""
+
+#: languages/wpfnl.php:119
+msgid "Quantity must be greater than 1"
+msgstr ""
+
+#: languages/wpfnl.php:177
+msgid "Radio"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:609
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:627
+msgid "Radio Button"
+msgstr ""
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:482
+msgid "Radio Button Active Background Color"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1100
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:477
+msgid "Radio Button Active Color"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1087
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:472
+msgid "Radio Button Default Color"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:842
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1029
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1201
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1280
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1420
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2018
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2318
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2549
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2715
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2847
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2978
+#: includes/core/widgets/elementor/elements/checkout-widget.php:3106
+msgid "Radius"
+msgstr ""
+
+#: includes/core/classes/class-wpfnl-ajax-handler.php:846
+msgid "reCAPTCHA is not Correct"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:93
+msgid "reCAPTCHA Settings"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:108
+msgid "reCAPTCHA Site Key"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:120
+msgid "reCAPTCHA Site Secret"
+msgstr ""
+
+#: languages/wpfnl.php:242
+msgid "Redirect after [ in second ]"
+msgstr ""
+
+#: languages/wpfnl.php:240
+msgid "Redirect after viewing Thank You Page"
+msgstr ""
+
+#: languages/wpfnl.php:236
+msgid ""
+"Redirect buyers to an external link after viewing the thank you page for a "
+"few seconds or take the buyer to another page instead of the thank you page."
+msgstr ""
+
+#: admin/modules/steps/thankyou/views/settings.php:92
+msgid "Redirect Link After Purchase"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:803
+#: includes/core/widgets/elementor/elements/optin.php:954
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:662
+msgid "Redirect to url"
+msgstr ""
+
+#: languages/wpfnl.php:237
+msgid "Redirect URL"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:817
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:818
+#: includes/core/widgets/elementor/elements/optin.php:963
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:670
+msgid "Redirect url"
+msgstr ""
+
+#: languages/wpfnl.php:238
+msgid "Redirect without viewing Thank You Page"
+msgstr ""
+
+#: admin/modules/settings/views/utm-settings.php:23
+msgid "Referrer (utm_source)"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:849
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:850
+#: includes/core/widgets/elementor/elements/optin.php:993
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:695
+msgid "Register User As Subscriber"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:866
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:867
+#: includes/core/widgets/elementor/elements/optin.php:1004
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:708
+msgid "Registration Permission"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:886
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:887
+#: includes/core/widgets/elementor/elements/optin.php:1018
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:721
+msgid "Registration Permission Text"
+msgstr ""
+
+#: languages/wpfnl.php:210
+msgid "Regular Price"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:159
+#: admin/modules/settings/views/advance-settings.php:161
+msgid "Reinstall"
+msgstr ""
+
+#: languages/wpfnl.php:109
+msgid "Remove image"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:13
+msgid "Remove WPF Transient Cache"
+msgstr ""
+
+#: languages/wpfnl.php:228
+msgid "Replace All Prior Orders"
+msgstr ""
+
+#: languages/wpfnl.php:229
+msgid "Replace All Prior Orders."
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:145
+#: languages/wpfnl.php:43
+msgid "Replace First Product"
+msgstr ""
+
+#: languages/wpfnl.php:226
+msgid "Replace Main Order Excluding Order bump"
+msgstr ""
+
+#: languages/wpfnl.php:227
+msgid "Replace Main Order Excluding Order bump."
+msgstr ""
+
+#: languages/wpfnl.php:224
+msgid "Replace Main Order Including Order Bump"
+msgstr ""
+
+#: languages/wpfnl.php:225
+msgid "Replace Main Order Including Order Bump."
+msgstr ""
+
+#: languages/wpfnl.php:230
+msgid "Replace Order in Previous Step"
+msgstr ""
+
+#: languages/wpfnl.php:231
+msgid "Replace Order in Previous Step."
+msgstr ""
+
+#: includes/core/classes/class-wpfnl-admin-menus.php:89
+#: includes/core/classes/class-wpfnl-admin-menus.php:90
+msgid "Request a Feature"
+msgstr ""
+
+#: languages/wpfnl.php:69
+msgid "Request Body"
+msgstr ""
+
+#: languages/wpfnl.php:63
+msgid "Request Format"
+msgstr ""
+
+#: languages/wpfnl.php:60
+msgid "Request Method"
+msgstr ""
+
+#: languages/wpfnl.php:53
+msgid "Request URL"
+msgstr ""
+
+#: languages/wpfnl.php:186
+msgid "Required"
+msgstr ""
+
+#: includes/core/rest-api/Controllers/class-step-controller.php:625
+#: includes/core/rest-api/Controllers/class-step-controller.php:677
+#: includes/core/rest-api/Controllers/class-step-controller.php:750
+msgid "Required parameter step id is empty."
+msgstr ""
+
+#: languages/wpfnl.php:86
+msgid "Reset Analytics"
+msgstr ""
+
+#: languages/wpfnl.php:78
+msgid "Reseting data.."
+msgstr ""
+
+#: languages/wpfnl.php:196
+msgid "Restore to default"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/products-tab.php:148
+msgid "Restrict user to purchase all products"
+msgstr ""
+
+#: languages/wpfnl.php:85
+msgid "Revenue"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:445
+#: includes/core/widgets/elementor/elements/optin.php:731
+#: includes/core/widgets/elementor/elements/optin.php:839
+#: languages/wpfnl.php:304
+#: includes/core/widgets/block/assets/dist/checkout-form.js:1
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:598
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:631
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:673
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:779
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:812
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:874
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:907
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:950
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1051
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1084
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1146
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1179
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1450
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:504
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:726
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:950
+msgid "Right"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:136
+msgid "Rollback Settings"
+msgstr ""
+
+#: admin/modules/settings/views/advance-settings.php:147
+msgid "Rollback to older Version"
+msgstr ""
+
+#: admin/modules/settings/class-wpfnl-settings.php:427
+msgid "Rollback to Previous Version"
+msgstr ""
+
+#: includes/utils/class-wpfnl-rollback.php:142
+msgid "Rollback to WPFunnels Previous Version"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1657
+msgid "Rounded Corners"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:1053
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:585
+msgid "Row Spacing"
+msgstr ""
+
+#: admin/modules/settings/views/view.php:28
+msgid "Run Setup Wizard"
+msgstr ""
+
+#: languages/wpfnl.php:39
+msgid "Sale Price"
+msgstr ""
+
+#: admin/modules/settings/views/general-settings.php:16
+msgid "Sales"
+msgstr ""
+
+#: admin/modules/settings/views/view.php:186 languages/wpfnl.php:17
+msgid "Save"
+msgstr ""
+
+#: languages/wpfnl.php:207
+msgid "Save Addtional Changes"
+msgstr ""
+
+#: languages/wpfnl.php:123
+msgid "Save Changes"
+msgstr ""
+
+#: languages/wpfnl.php:110
+msgid "Save Data"
+msgstr ""
+
+#: admin/modules/funnels/views/view.php:103
+msgid "Search for a funnel..."
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:44
+msgid "Search for a product..."
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:11
+msgid "Search for a template..."
+msgstr ""
+
+#: admin/modules/discount/views/view.php:18
+#: admin/modules/discount/views/view.php:24
+msgid "Search for coupon"
+msgstr ""
+
+#: admin/modules/product/views/view.php:18
+msgid "Search for products"
+msgstr ""
+
+#: admin/modules/product/views/product-options.php:98
+msgid "Section Position"
+msgstr ""
+
+#: admin/modules/product/views/product-options.php:91
+msgid "Section Title"
+msgstr ""
+
+#: languages/wpfnl.php:176
+msgid "Select"
+msgstr ""
+
+#: languages/wpfnl.php:68
+msgid "Select an event"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:146
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:147
+#: includes/core/widgets/elementor/elements/next-step-widget.php:348
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:85
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:80
+msgid "Select Button Type"
+msgstr ""
+
+#: languages/wpfnl.php:28
+msgid "Select Coupon"
+msgstr ""
+
+#: languages/wpfnl.php:16
+msgid "Select CRM"
+msgstr ""
+
+#: languages/wpfnl.php:22
+msgid "Select event"
+msgstr ""
+
+#: languages/wpfnl.php:72
+msgid "Select Fields"
+msgstr ""
+
+#: languages/wpfnl.php:65
+msgid "Select format"
+msgstr ""
+
+#: includes/core/widgets/block/block-types/class-abstract-block.php:311
+#: includes/utils/class-wpfnl-functions.php:3008
+msgid "Select funnel"
+msgstr ""
+
+#: languages/wpfnl.php:64
+msgid "Select HTTP request sending format."
+msgstr ""
+
+#: languages/wpfnl.php:61
+msgid "Select HTTP request sending method."
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:269
+#: includes/core/widgets/elementor/elements/checkout-widget.php:342
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:140
+msgid "Select Layout"
+msgstr ""
+
+#: languages/wpfnl.php:62
+msgid "Select method"
+msgstr ""
+
+#: languages/wpfnl.php:48
+msgid "Select name"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:374
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:206
+msgid "Select Next Step"
+msgstr ""
+
+#: languages/wpfnl.php:126
+msgid "Select offer"
+msgstr ""
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:1051
+#: includes/core/widgets/elementor/elements/checkout-widget.php:285
+#: includes/core/widgets/elementor/elements/checkout-widget.php:358
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:161
+msgid "Select option"
+msgstr ""
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:35
+#: languages/wpfnl.php:127
+msgid "Select Product"
+msgstr "בחר מוצר"
+
+#: languages/wpfnl.php:167
+msgid "Select Section"
+msgstr "בחר עור"
+
+#: admin/modules/product/views/product-options.php:112
+msgid "Select Skin"
+msgstr "בחר עור"
+
+#: languages/wpfnl.php:27
+msgid "Select tag"
+msgstr "בחר תג"
+
+#: languages/wpfnl.php:107
+msgid "Select Template Builder"
+msgstr "בחר בונה תבניות"
+
+#: languages/wpfnl.php:106
+msgid "Select Template Industries"
+msgstr "בחר תבניות תבניות"
+
+#: languages/wpfnl.php:67
+msgid "Select the WPFunnels event when the request would be sent."
+msgstr "בחר באירוע WPFunnels כאשר הבקשה תישלח."
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:159
+msgid "Select Type"
+msgstr "בחר סוג"
+
+#: languages/wpfnl.php:47
+msgid "Select value"
+msgstr "בחר ערך"
+
+#: languages/wpfnl.php:70
+msgid "Select which values would be sent."
+msgstr "בחר אילו ערכים יישלחו."
+
+#: admin/modules/product/views/product-options.php:50
+msgid "Selected Products"
+msgstr "מוצרים נבחרים"
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:668
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:686
+msgid "Selected Radio Button"
+msgstr "לחצן רדיו נבחר"
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:138
+msgid "Sell Price"
+msgstr "מחיר מכירה"
+
+#: languages/wpfnl.php:202
+msgid "Set a custom heading text for the Billing Section."
+msgstr "הגדר טקסט כותרת מותאם אישית עבור מדור החיוב."
+
+#: languages/wpfnl.php:206
+msgid "Set a custom heading text for the Order Detail Section."
+msgstr "הגדר טקסט כותרת מותאם אישית עבור המדור פרטי הזמנה."
+
+#: languages/wpfnl.php:204
+msgid "Set a custom heading text for the Shipping Section."
+msgstr "הגדר טקסט כותרת מותאם אישית עבור מדור המשלוח."
+
+#: languages/wpfnl.php:200
+msgid "Set a custom text for the place order button."
+msgstr "הגדר טקסט מותאם אישית עבור כפתור ההזמנה."
+
+#: admin/modules/settings/views/view.php:22
+#: admin/modules/steps/checkout/views/settings.php:51
+#: admin/modules/steps/thankyou/views/settings.php:23
+#: admin/partials/dashboard-nav.php:16
+#: includes/core/classes/class-wpfnl-admin-menus.php:63
+#: includes/core/classes/class-wpfnl-admin-menus.php:64
+msgid "Settings"
+msgstr "הגדרות"
+
+#: admin/modules/settings/class-wpfnl-settings.php:336
+msgid "settings"
+msgstr "הגדרות"
+
+#: includes/core/rest-api/Controllers/class-settings-controller.php:69
+msgid "Settings group ID."
+msgstr "מזהה קבוצת הגדרות."
+
+#: languages/wpfnl.php:169
+#: public/modules/checkout/templates/default-checkout-form.php:72
+#: public/modules/checkout/templates/default-checkout-form.php:116
+#: public/modules/checkout/templates/express-checkout-form.php:88
+#: public/modules/checkout/templates/express-checkout-form.php:131
+#: woocommerce/templates/checkout/review-order.php:96
+#: woocommerce/templates/checkout/review-order.php:126
+msgid "Shipping"
+msgstr "משלוח"
+
+#: public/modules/checkout/templates/multi-step-checkout.php:28
+msgid "shipping"
+msgstr "משלוח"
+
+#: languages/wpfnl.php:194
+msgid "Shipping Fields"
+msgstr "שדות משלוח"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:259
+msgid "Shipping Heading"
+msgstr "כותרת משלוח"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:274
+msgid "Shipping Input Field"
+msgstr "שדה קלט משלוח"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:266
+msgid "Shipping Input Label"
+msgstr "תווית קלט משלוח"
+
+#: includes/core/widgets/elementor/elements/optin.php:342
+#: includes/core/widgets/elementor/elements/optin.php:396
+#: includes/core/widgets/elementor/elements/optin.php:450
+#: includes/core/widgets/elementor/elements/optin.php:504
+#: includes/core/widgets/elementor/elements/optin.php:558
+#: includes/core/widgets/elementor/elements/optin.php:612
+#: includes/core/widgets/elementor/elements/optin.php:651
+#: includes/core/widgets/elementor/elements/optin.php:663
+#: includes/core/widgets/elementor/elements/optin.php:676
+#: includes/core/widgets/elementor/elements/optin.php:995
+#: includes/core/widgets/elementor/elements/optin.php:1006
+msgid "Show"
+msgstr "הופעה"
+
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:94
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:95
+#: includes/core/widgets/elementor/elements/order-detail-widget.php:200
+msgid "Show Billing Details"
+msgstr "הצג פרטי חיוב"
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:712
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:713
+#: includes/core/widgets/elementor/elements/optin.php:661
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:482
+msgid "Show Field Label(s)"
+msgstr "הצג תוויות שדות"
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:730
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:731
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:495
+msgid "Show Field Required Mark"
+msgstr "הצג סימון שדה נדרש"
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:694
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:695
+#: includes/core/widgets/elementor/elements/optin.php:649
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:468
+msgid "Show Input Field Icon(s)"
+msgstr "הצג סמלים של שדות קלט"
+
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:78
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:79
+#: includes/core/widgets/elementor/elements/order-detail-widget.php:188
+msgid "Show Order Details"
+msgstr "הצג פרטי הזמנה"
+
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:62
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:63
+#: includes/core/widgets/elementor/elements/order-detail-widget.php:176
+msgid "Show Order Overview"
+msgstr "הצג סקירת הזמנה"
+
+#: includes/core/widgets/elementor/elements/optin.php:674
+msgid "Show Required Mark"
+msgstr "הצג סימון נדרש"
+
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:110
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:111
+#: includes/core/widgets/elementor/elements/order-detail-widget.php:212
+msgid "Show Shipping Details"
+msgstr "הצג פרטי משלוח"
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:461
+msgid "Size"
+msgstr "גודל"
+
+#: admin/modules/product/views/product-options.php:109
+msgid "Skins"
+msgstr "עורות"
+
+#: admin/modules/settings/views/offer-settings.php:86
+msgid "Skip upsell/downsell for free products"
+msgstr "דלג על עלייה/הורדה של מוצרים בחינם"
+
+#: admin/modules/settings/views/offer-settings.php:69
+msgid "Skip upsell/downsell for unsupported payment gateways"
+msgstr "דלג על מכירות עלייה/הורדת עבור שערי תשלום שאינם נתמכים"
+
+#: includes/core/widgets/elementor/elements/next-step-widget.php:139
+#: includes/core/widgets/elementor/elements/optin.php:146
+msgid "Small"
+msgstr "קָטָן"
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:184
+msgid "Social one time offer $29!"
+msgstr "הצעה חברתית חד פעמית $29!"
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:578
+#: includes/core/widgets/elementor/elements/checkout-widget.php:679
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1163
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1966
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2268
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2483
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2670
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2804
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2934
+msgid "Solid"
+msgstr "מוצק"
+
+#: admin/modules/funnels/views/view.php:457
+msgid "Sorry No Funnels Found"
+msgstr "מצטערים לא נמצאו משפכים"
+
+#: admin/modules/template-library/class-manager.php:436
+msgid "Sorry you are not allowed to do this operation"
+msgstr "מצטער שאתה לא מורשה לבצע את הפעולה הזו"
+
+#: includes/core/widgets/block/block-types/class-lms-checkout.php:60
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:512
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:51
+msgid "Sorry, Please place the element in WPFunnels Checkout page"
+msgstr "מצטערים, נא למקם את הרכיב ב-WPFunnels Checkout"
+
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:87
+msgid "Sorry, Please place the element in WPFunnels Landing or Custom page"
+msgstr "מצטערים, נא למקם את האלמנט ב-WPFunnels Landing או Custom"
+
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:51
+msgid "Sorry, Please place the element in WPFunnels Landing page"
+msgstr "מצטערים, נא למקם את הרכיב בדף הנחיתה של WPFunnels"
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:424
+#: includes/core/widgets/oxygen/elements/order-details/order-details.php:48
+msgid "Sorry, Please place the element in WPFunnels Thank You page"
+msgstr "מצטערים, נא למקם את האלמנט בדף תודה של WPFunnels"
+
+#: includes/core/widgets/block/block-types/class-lms-checkout.php:323
+#: includes/core/widgets/block/block-types/class-lms-checkout.php:613
+#: includes/core/widgets/block/block-types/class-lms-order-details.php:258
+#: includes/core/widgets/block/block-types/class-lms-order-details.php:511
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:708
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:602
+msgid "Sorry, Please place the element in WPFunnels when learnDash is active"
+msgstr "מצטערים, נא למקם את הרכיב ב-WPFunnels כאשר learnDash פעיל."
+
+#: public/modules/checkout/class-wpfnl-checkout.php:992
+msgid ""
+"Sorry, the following product(s) that you are willing to purchase is out of "
+"stock at the moment."
+msgstr "מצטערים, המוצרים הבאים שאתה מוכן לרכוש אזל מהמלאי כרגע."
+
+#: includes/core/rest-api/Controllers/class-funnel-controller.php:47
+#: includes/core/rest-api/Controllers/class-gutenberg-css-controller.php:41
+#: includes/core/rest-api/Controllers/class-orderbump-controller.php:45
+#: includes/core/rest-api/Controllers/class-products-controller.php:54
+#: includes/core/rest-api/Controllers/class-remotefunnels-controller.php:34
+#: includes/core/rest-api/Controllers/class-settings-controller.php:43
+#: includes/core/rest-api/Controllers/class-step-controller.php:44
+#: includes/core/rest-api/Controllers/class-templatelibrary-controller.php:107
+msgid "Sorry, you cannot edit this resource."
+msgstr "מצטערים, אינך יכול לערוך משאב זה."
+
+#: includes/core/rest-api/Controllers/class-checkout-controller.php:48
+#: includes/core/rest-api/Controllers/class-funnel-controller.php:63
+#: includes/core/rest-api/Controllers/class-gutenberg-css-controller.php:56
+#: includes/core/rest-api/Controllers/class-orderbump-controller.php:61
+#: includes/core/rest-api/Controllers/class-products-controller.php:70
+#: includes/core/rest-api/Controllers/class-remotefunnels-controller.php:49
+#: includes/core/rest-api/Controllers/class-settings-controller.php:58
+#: includes/core/rest-api/Controllers/class-step-controller.php:60
+#: includes/core/rest-api/Controllers/class-templatelibrary-controller.php:123
+msgid "Sorry, you cannot list resources."
+msgstr "מצטערים, אינך יכול לרשום משאבים."
+
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:118
+msgid "Source"
+msgstr "מָקוֹר"
+
+#: includes/core/widgets/elementor/elements/optin.php:1100
+msgid "Spacing"
+msgstr "מרווחים"
+
+#: admin/modules/createFunnel/views/builder-not-activated.php:43
+#: admin/modules/funnel/views/modal.php:54 languages/wpfnl.php:142
+msgid "Start From scratch"
+msgstr "להתחיל מאפס"
+
+#: admin/modules/steps/checkout/views/view.php:76
+#: admin/modules/steps/landing/views/view.php:65
+#: admin/modules/steps/thankyou/views/view.php:61
+msgid "Start Split Test"
+msgstr "התחל בדיקה מפוצלת"
+
+#: languages/wpfnl.php:184
+msgid "State"
+msgstr "מדינה"
+
+#: languages/wpfnl.php:9
+msgid "Status"
+msgstr "סטָטוּס"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:712
+msgid "Step Active/Completed Line Color"
+msgstr "צבע קו שלב פעיל/הושלם"
+
+#: admin/modules/settings/views/permalink-settings.php:80
+msgid "Step Base"
+msgstr "בסיס צעד"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:726
+msgid "Step Box Active/Completed Background Color"
+msgstr "Step Box פעיל/הושלם צבע רקע"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:748
+msgid "Step Box Active/Completed Border"
+msgstr "גבול פעיל/הושלם של Step Box"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:747
+msgid "Step Box Border"
+msgstr "גבול תיבת הצעד"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:740
+msgid "Step Box Icon Active/Completed Color"
+msgstr "סמל תיבת שלב צבע פעיל/הושלם"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:735
+msgid "Step Box Icon Normal Color"
+msgstr "אייקון תיבת צעד צבע רגיל"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:721
+msgid "Step Box Normal Background Color"
+msgstr "תיבת צעד צבע רקע רגיל"
+
+#: includes/core/rest-api/Controllers/class-funnel-controller.php:222
+#: includes/core/rest-api/Controllers/class-orderbump-controller.php:89
+#: includes/core/rest-api/Controllers/class-orderbump-controller.php:104
+#: includes/core/rest-api/Controllers/class-step-controller.php:80
+msgid "Step ID."
+msgstr "מזהה שלב."
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:707
+msgid "Step Normal Line Color"
+msgstr "צעד צבע קו רגיל"
+
+#: includes/core/classes/class-wpfnl-register-funnel.php:74
+msgctxt "Step singular name"
+msgid "Step"
+msgstr "שלב"
+
+#: admin/modules/settings/views/permalink-settings.php:50
+msgid "Step Slug"
+msgstr "שבלול צעד"
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:509
+msgid "Step State"
+msgstr "מצב צעד"
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:469
+msgid "Step Title"
+msgstr "כותרת שלב"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:702
+msgid "Step Title Typography"
+msgstr "טיפוגרפיה של כותרת צעד"
+
+#: admin/modules/steps/class-wpfnl-steps.php:176
+msgid "steps"
+msgstr "צעדים"
+
+#: includes/core/classes/class-wpfnl-register-funnel.php:73
+msgctxt "Steps general name"
+msgid "Steps"
+msgstr "צעדים"
+
+#: languages/wpfnl.php:309
+#: includes/core/widgets/block/assets/dist/checkout-form.js:1
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1501
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:161
+msgid "Style"
+msgstr "סִגְנוֹן"
+
+#: includes/core/widgets/elementor/elements/optin.php:711
+#: includes/core/widgets/elementor/elements/optin.php:712
+#: languages/wpfnl.php:327
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:1599
+msgid "Submit"
+msgstr "שלח"
+
+#: includes/core/widgets/elementor/elements/optin.php:699
+#: includes/core/widgets/elementor/elements/optin.php:1300
+msgid "Submit Button"
+msgstr "הגש כפתור"
+
+#: admin/modules/steps/checkout/views/products.php:97 languages/wpfnl.php:213
+msgid "Subtext"
+msgstr "תת -טקסט"
+
+#: public/modules/type/class-wpfnl-public-wc.php:118
+msgid "Successfully added"
+msgstr "נוסף בהצלחה"
+
+#: public/modules/type/class-wpfnl-public-wc.php:220
+msgid "Successfully removed"
+msgstr "הוסר בהצלחה"
+
+#: admin/modules/funnels/views/view.php:70
+msgid "Supported formats: JSON file."
+msgstr "פורמטים נתמכים: קובץ JSON."
+
+#: admin/modules/settings/views/general-settings.php:40
+msgid "Sync Template"
+msgstr "תבנית סנכרון"
+
+#: admin/modules/settings/views/general-settings.php:51
+msgid "Sync Templates"
+msgstr ""
+
+#: admin/modules/product/views/product-options.php:67
+msgid "T-Shirt (#114)"
+msgstr "חולצת טריקו (#114)"
+
+#: includes/core/widgets/oxygen/class-manager.php:113
+msgid "Tab Label"
+msgstr "תווית TAB"
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:434
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:457
+msgid "Table"
+msgstr "שולחן"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:378
+msgid "Table Border"
+msgstr "גבול שולחן"
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:547
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:572
+msgid "Table Cell"
+msgstr "תא טבלה"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:348
+msgid "Table Margin"
+msgstr "שולי שולחן"
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:484
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:504
+msgid "Table Row"
+msgstr "שורת שולחן"
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2445
+msgid "Table Style"
+msgstr "סגנון שולחן"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:371
+msgid "Table Typography"
+msgstr "טיפוגרפיה של טבלה"
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:12
+msgid "Template 1"
+msgstr "תבנית 1"
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:13
+msgid "Template 2"
+msgstr "תבנית 2"
+
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:53
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:69
+#: includes/core/widgets/elementor/elements/next-step-widget.php:423
+#: includes/core/widgets/elementor/elements/optin.php:709
+#: includes/core/widgets/elementor/elements/optin.php:817
+#: languages/wpfnl.php:172
+msgid "Text"
+msgstr "טֶקסט"
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:983
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1248
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1539
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1605
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1700
+#: includes/core/widgets/elementor/elements/checkout-widget.php:1908
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2210
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2622
+#: includes/core/widgets/elementor/elements/checkout-widget.php:2767
+#: includes/core/widgets/elementor/elements/next-step-widget.php:563
+#: includes/core/widgets/elementor/elements/next-step-widget.php:599
+#: includes/core/widgets/elementor/elements/optin.php:1209
+#: includes/core/widgets/elementor/elements/optin.php:1328
+#: includes/core/widgets/elementor/elements/optin.php:1370
+#: includes/core/widgets/elementor/elements/optin.php:1485
+#: includes/core/widgets/elementor/elements/optin.php:1529
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:238
+msgid "Text Color"
+msgstr "צבע טקסט"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:556
+msgid "Text Hover Color"
+msgstr "צבע טקסט רחף"
+
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:614
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:838
+msgid "Text Transform"
+msgstr ""
+
+#: admin/modules/funnel/class-wpfnl-funnel.php:165
+#: admin/modules/funnel/views/view.php:33
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:214
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:218
+msgid "Thank You"
+msgstr "תודה"
+
+#: languages/wpfnl.php:141
+msgid "Thank you"
+msgstr "תודה"
+
+#: admin/modules/steps/checkout/views/order-bump-tab.php:161
+msgid "Thank You Page"
+msgstr "תודה לך דף"
+
+#: admin/modules/steps/thankyou/views/view.php:27
+msgid "Thank you page"
+msgstr "תודה לך דף"
+
+#: languages/wpfnl.php:235
+msgid "Thank You Page Redirection"
+msgstr "תודה לניתוב עמוד"
+
+#: admin/modules/steps/thankyou/views/settings.php:84
+msgid "Thank You Page Text"
+msgstr "תודה טקסט עמוד"
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:597
+msgid "Thank you.You are already enrolled"
+msgstr "תודה. אתה כבר רשום"
+
+#: languages/wpfnl.php:247
+msgid "Thankyou"
+msgstr "תודה"
+
+#: languages/wpfnl.php:241
+msgid ""
+"The buyer be taken to thank you page, and after the set time, will be "
+"redirected to the given redirect URL."
+msgstr ""
+"הקונה ייקח לדף תודה, ואחרי הזמן שנקבע, יופנה לכתובת האתר מחדש של הפניה מחדש."
+
+#: languages/wpfnl.php:239
+msgid ""
+"The buyer will be taken to the redirect URL directly instead of the thank "
+"you page."
+msgstr "הקונה יועבר לכתובת האתר מחדש ישירות במקום לדף התודה."
+
+#. Description of the plugin
+msgid ""
+"The Easiest Drag & Drop 🚀 Sales Funnel Builder 🚀 for WordPress to collect "
+"leads and increase sales."
+msgstr ""
+"הקל ביותר Drag & Drop 🚀 בונה משפך מכירות 🚀 עבור וורדפרס לאסוף לידים ולהגדיל "
+"את המכירות."
+
+#: languages/wpfnl.php:221
+msgid ""
+"The value you input here will be added to the quantity of the product that "
+"triggered the funnel, which will be offered to the buyer as the downsell "
+"offer. For example, if someone purchases 2 t-shirts, and you input 3 here, "
+"the buyer will be offered 2+3 = 5 t-shirts as the downsell offer."
+msgstr ""
+"הערך שאתה קלט כאן יתווסף לכמות המוצר שהפעיל את המשפך, שיוצע לקונה כמציע "
+"Downsell. לדוגמה, אם מישהו רוכש 2 חולצות טריקו, ואתה מזין 3 כאן, הקונה יוצע "
+"2+3 = 5 חולצות טריקו כמציע המכר."
+
+#: languages/wpfnl.php:24
+msgid "Then"
+msgstr "לאחר מכן"
+
+#: languages/wpfnl.php:154
+msgid "then don\"t worry."
+msgstr "ואז אל תדאג."
+
+#: languages/wpfnl.php:19
+msgid ""
+"This Integration was set up for FluentCRM, but it appears FluentCRM is not "
+"active. Please activate FluentCRM to view and edit your mappings."
+msgstr ""
+"שילוב זה הוקם עבור pluentCRM, אך נראה כי pluentCRM אינו פעיל. אנא הפעל את "
+"FluentCrm כדי להציג ולערוך את המיפויים שלך."
+
+#: admin/modules/funnels/views/view.php:383
+msgid "This is a Global Funnel"
+msgstr "זהו משפך עולמי"
+
+#: includes/core/widgets/elementor/elements/checkout-widget.php:298
+#: includes/core/widgets/elementor/elements/checkout-widget.php:371
+msgid ""
+"This is a pro feature. <a href=\"https://getwpfunnels.com/pricing/\" "
+"target=\"_blank\" rel=\"noopener\">Upgrade Now!</a>."
+msgstr ""
+"זוהי תכונה מקצוענת. <a href=\"https://getwpfunnels.com/pricing/\" "
+"target=\"_blank\" rel=\"noopener\"> שדרג עכשיו! </a>."
+
+#: includes/core/page-templates/class-manager.php:245
+msgid "This template includes the header, full-width content and footer"
+msgstr "תבנית זו כוללת את הכותרת, תוכן רוחב מלא וכותרת תחתונה"
+
+#: languages/wpfnl.php:41
+msgid "This will be the"
+msgstr "זה יהיה"
+
+#: languages/wpfnl.php:212
+msgid "This will be the main product price your buyer will pay."
+msgstr "זה יהיה מחיר המוצר העיקרי שהקונה שלך ישלם."
+
+#: includes/core/compatibility/plugin/class-wpfnl-cart-lift.php:94
+msgid "This will enable tracking abandoned cart from WPFunnels"
+msgstr "זה יאפשר מעקב אחר עגלה נטושה מ- WPFunnels"
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:110
+msgid "Title"
+msgstr "כותרת"
+
+#: languages/wpfnl.php:143
+msgid "title"
+msgstr "כותרת"
+
+#: languages/wpfnl.php:151
+msgid "to import funnel page templates for Gutenberg."
+msgstr "לייבא תבניות דף משפך לגוטנברג."
+
+#: languages/wpfnl.php:158
+msgid "to import funnel templates."
+msgstr "לייבא תבניות משפך."
+
+#: classes/class-wpfnl-order-bump-actions.php:273
+#: classes/class-wpfnl-order-bump-actions.php:279
+#: classes/class-wpfnl-order-bump-actions.php:337
+#: classes/class-wpfnl-order-bump-actions.php:343
+#: classes/class-wpfnl-order-bump-actions.php:402
+#: classes/class-wpfnl-order-bump-actions.php:408
+#: classes/class-wpfnl-order-bump-actions.php:468
+#: classes/class-wpfnl-order-bump-actions.php:474
+#: classes/class-wpfnl-order-bump-actions.php:534
+#: classes/class-wpfnl-order-bump-actions.php:540
+#: classes/class-wpfnl-order-bump-actions.php:601
+#: classes/class-wpfnl-order-bump-actions.php:607
+#: classes/class-wpfnl-order-bump-actions.php:668
+#: classes/class-wpfnl-order-bump-actions.php:674
+#: classes/class-wpfnl-order-bump-actions.php:737
+#: classes/class-wpfnl-order-bump-actions.php:743
+#: classes/class-wpfnl-order-bump-actions.php:806
+#: classes/class-wpfnl-order-bump-actions.php:812
+#: includes/core/widgets/elementor/elements/checkout-widget.php:3244
+msgid "To see the pop-up offer in action, please preview or view the page."
+msgstr "כדי לראות את ההצעה המוקפצת בפעולה, אנא תצוגה מקדימה או הצגת הדף."
+
+#: admin/modules/funnels/views/view.php:69
+msgid "to upload."
+msgstr "להעלות."
+
+#: languages/wpfnl.php:303
+#: includes/core/widgets/block/assets/dist/checkout-form.js:1
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:592
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:625
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:667
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:773
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:806
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:868
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:901
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:944
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1045
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1078
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1140
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1173
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/edit.js:1444
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:498
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:720
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:944
+msgid "Top"
+msgstr "חלק עליון"
+
+#: languages/wpfnl.php:215
+msgid "Total:"
+msgstr "סה\"כ:"
+
+#: admin/modules/settings/views/facebook-pixel-settings.php:12
+msgid "Track Events Using Facebook Pixel"
+msgstr "עקוב אחר אירועים באמצעות פיקסל פייסבוק"
+
+#: admin/modules/settings/views/gtm-settings.php:12
+msgid "Track Events Using Google Tag Manager"
+msgstr "עקוב אחר אירועים באמצעות מנהל התגים של גוגל"
+
+#: languages/wpfnl.php:7
+msgid "Trigger"
+msgstr "הדק"
+
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:177
+msgid "Try this product"
+msgstr "נסה את המוצר הזה"
+
+#: languages/wpfnl.php:171
+msgid "Type"
+msgstr "סוּג"
+
+#: includes/core/widgets/elementor/elements/optin.php:942
+msgid "Type notification texts here"
+msgstr "הקלד טקסטים כאן"
+
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:199
+msgid "Type your description here"
+msgstr "הקלד את התיאור שלך כאן"
+
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:178
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:188
+msgid "Type your text here"
+msgstr "הקלד את הטקסט שלך כאן"
+
+#: includes/core/widgets/oxygen/elements/checkout/class-checkout.php:533
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:171
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:519
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:563
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:597
+msgid "Typography"
+msgstr "טיפוגרפיה"
+
+#: includes/core/traits/singleton-trait.php:36
+msgid "Unserializing instances of this class is forbidden."
+msgstr "מקרים לא מסורים של כיתה זו אסורים."
+
+#: admin/modules/steps/checkout/views/settings.php:88
+#: admin/modules/steps/checkout/views/settings.php:115
+#: admin/modules/steps/thankyou/views/settings.php:119 languages/wpfnl.php:83
+msgid "Update"
+msgstr "עדכון"
+
+#: languages/wpfnl.php:192
+msgid "update"
+msgstr "עדכון"
+
+#: admin/class-wpfnl-admin.php:417
+msgid "Upgrade"
+msgstr "שדרוג"
+
+#: languages/wpfnl.php:108
+msgid "Upload image"
+msgstr "העלאת תמונה"
+
+#: admin/modules/funnel/class-wpfnl-funnel.php:167
+#: admin/modules/funnel/views/view.php:35
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:210
+#: languages/wpfnl.php:95 public/class-wpfnl-public.php:801
+msgid "Upsell"
+msgstr "מכור"
+
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:164
+#: includes/core/widgets/elementor/elements/next-step-widget.php:386
+#: includes/core/widgets/oxygen/elements/next-step-button/class-next-step-button.php:98
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/edit.js:93
+msgid "URL Path"
+msgstr "נתיב כתובת אתר"
+
+#: admin/modules/settings/views/offer-settings.php:72
+msgid ""
+"Use this option so that if a buyer chooses to use a payment option that is "
+"not supported by WPFunnels, they will not get the post-purchase offers. This "
+"means, all payment options will be shown at the checkout page."
+msgstr ""
+"השתמש באפשרות זו כך שאם קונה יבחר להשתמש באפשרות תשלום שאינן נתמכות על ידי "
+"WPFunnels, הם לא יקבלו את ההצעות שלאחר הרכישה. משמעות הדבר, כל אפשרויות "
+"התשלום יוצגו בדף הקופה."
+
+#: languages/wpfnl.php:21
+msgid "User Event"
+msgstr "אירוע משתמש"
+
+#: admin/modules/createFunnel/views/builder-not-activated.php:45
+msgid "User step by step to create you own funnel"
+msgstr "המשתמש שלב אחר שלב ליצירת משפך משלך"
+
+#: languages/wpfnl.php:182
+msgid "Validation"
+msgstr "מַתַן תוֹקֵף"
+
+#: languages/wpfnl.php:190
+msgid "Validations"
+msgstr "אימות"
+
+#: languages/wpfnl.php:74
+msgid "Value"
+msgstr "ערך"
+
+#: includes/core/widgets/elementor/elements/order-bump-widget.php:145
+msgid "Vertical"
+msgstr "אֲנָכִי"
+
+#: admin/modules/settings/views/log-settings.php:28
+#: includes/core/widgets/elementor/elements/next-step-widget.php:518
+msgid "View"
+msgstr "נוף"
+
+#: languages/wpfnl.php:84
+msgid "Visitors"
+msgstr "מבקרים"
+
+#: languages/wpfnl.php:66
+msgid "Webhook Events"
+msgstr "אירועי WebHook"
+
+#: languages/wpfnl.php:50
+msgid "Webhook List"
+msgstr "רשימת WebHook"
+
+#: languages/wpfnl.php:57
+msgid "Webhook Settings"
+msgstr "הגדרות WebHook"
+
+#: languages/wpfnl.php:49
+msgid "Webhooks"
+msgstr "WebHooks"
+
+#: includes/core/shortcodes/templates/optin/form.php:95
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:44
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:1158
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/template/template-optin.php:127
+#: includes/core/widgets/elementor/elements/optin.php:502
+#: includes/core/widgets/elementor/elements/optin.php:515
+#: includes/core/widgets/elementor/elements/optin.php:528
+#: includes/core/widgets/elementor/elements/optin.php:1840
+#: includes/core/widgets/elementor/elements/template/template-optin.php:142
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:326
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:330
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:345
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:355
+#: includes/core/widgets/oxygen/elements/optin/template/template-optin.php:134
+#: includes/core/widgets/block/assets/js/blocks/optin-form/block.js:372
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:1457
+msgid "Website Url"
+msgstr "כתובת אתר"
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:508
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:509
+#: includes/core/widgets/elementor/elements/optin.php:513
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:343
+msgid "Website Url Label"
+msgstr "תווית כתובת אתר באתר"
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:525
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:526
+#: includes/core/widgets/elementor/elements/optin.php:526
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:353
+msgid "Website Url Placeholder Text"
+msgstr "אתר כתובת אתר טקסט מציין מיקום"
+
+#: languages/wpfnl.php:20
+msgid "When"
+msgstr "מתי"
+
+#: admin/modules/settings/views/advance-settings.php:55
+msgid ""
+"When editing funnel pages, Enabling this option will mean the default theme "
+"styles will not be loaded when editing funnel pages and rather load the "
+"default style by WPFunnels."
+msgstr ""
+"בעת עריכת דפי משפך, הפעלת אפשרות זו פירושה שסגנונות נושא ברירת המחדל לא "
+"יועברו בעת עריכת דפי משפך וכדי לטעון את סגנון ברירת המחדל על ידי WPFunnels."
+
+#: admin/modules/funnels/views/view.php:218
+msgid "Woo"
+msgstr "לְחַזֵר אַחֲרֵי"
+
+#: includes/core/classes/class-wpfnl-admin-menus.php:43
+#: includes/core/classes/class-wpfnl-admin-menus.php:44
+msgid "WP Funnels"
+msgstr "משפכי WP"
+
+#: includes/core/widgets/divi-modules/includes/modules/Checkout/class-checkout.php:32
+msgid "WPF Checkout"
+msgstr "קופה WPF"
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsCheckout/class-lms-checkout.php:30
+msgid "WPF LMS Checkout"
+msgstr "Checkout WPF LMS"
+
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:29
+msgid "WPF LMS Order Details"
+msgstr "פרטי הזמנה של WPF LMS"
+
+#: includes/core/widgets/divi-modules/includes/modules/NextStepButton/class-next-step-button.php:31
+msgid "WPF Next Step Button"
+msgstr "כפתור WPF הבא"
+
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:29
+msgid "WPF Optin Form"
+msgstr "טופס אופטין WPF"
+
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:29
+msgid "WPF Order Details"
+msgstr "פרטי הזמנת WPF"
+
+#: admin/class-wpfnl-notices.php:163 admin/class-wpfnl-notices.php:207
+#: admin/class-wpfnl-notices.php:249
+msgid "wpfnl-%s-plugin"
+msgstr ""
+
+#. Plugin Name of the plugin
+#: admin/class-wpfnl-admin.php:163
+#: includes/core/classes/class-wpfnl-ajax-handler.php:754
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:186
+#: includes/core/widgets/elementor/class-manager.php:188
+#: includes/core/widgets/elementor/elements/optin.php:223
+#: includes/core/widgets/oxygen/class-manager.php:104
+msgid "WPFunnels"
+msgstr "Wpfunnels"
+
+#: admin/modules/setup-wizard/views/views.php:14
+msgid "WPFunnels - Setup Wizard"
+msgstr "WPFunnels - אשף ההתקנה"
+
+#: languages/wpfnl.php:312
+#: includes/core/widgets/block/assets/js/blocks/checkout-form/index.js:33
+msgid "WPFunnels Checkout"
+msgstr "Checkout wpfunnels"
+
+#: languages/wpfnl.php:313
+#: includes/core/widgets/block/assets/js/blocks/lms-checkout/index.js:33
+msgid "WPFunnels LMS Checkout"
+msgstr "WPFunnels LMS Checkout"
+
+#: languages/wpfnl.php:314
+#: includes/core/widgets/block/assets/js/blocks/lms-order-details/index.js:34
+msgid "WPFunnels LMS Order Details"
+msgstr "WPFunnels LMS פרטי הזמנה"
+
+#: languages/wpfnl.php:326
+#: includes/core/widgets/block/assets/dist/next-step-button.js:1
+#: includes/core/widgets/block/assets/js/blocks/next-step-button/index.js:39
+msgid "WPFunnels Next Step"
+msgstr "Wpfunnels השלב הבא"
+
+#: languages/wpfnl.php:328
+#: includes/core/widgets/block/assets/dist/optin-form.js:1
+#: includes/core/widgets/block/assets/js/blocks/optin-form/index.js:38
+msgid "WPFunnels Optin Form"
+msgstr "צורת אופטין wpfunnels"
+
+#: languages/wpfnl.php:329
+#: includes/core/widgets/block/assets/dist/order-details.js:1
+#: includes/core/widgets/block/assets/js/blocks/order-details/index.js:34
+msgid "WPFunnels Order Details"
+msgstr "WPFunnels פרטי הזמנה"
+
+#: admin/class-wpfnl-admin.php:125
+msgid "WPFunnels Overview"
+msgstr "סקירה כללית של WPFunnels"
+
+#: admin/class-wpfnl-admin.php:165
+msgid "WPFunnels Pro"
+msgstr "WPFunnels Pro"
+
+#. Author of the plugin
+msgid "WPFunnels Team"
+msgstr "צוות WPFunnels"
+
+#: includes/core/widgets/block/assets/js/blocks/optin-form/edit.js:1273
+msgid "Write button title"
+msgstr ""
+
+#: includes/core/widgets/elementor/elements/optin.php:820
+msgid "Write the button title"
+msgstr "כתוב את כותרת הכפתור"
+
+#: includes/core/widgets/elementor/elements/optin.php:582
+msgid "Write your message here..."
+msgstr "כתוב את ההודעה שלך כאן ..."
+
+#: admin/modules/steps/checkout/views/products.php:20
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:353
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:369
+#: includes/core/widgets/divi-modules/includes/modules/LmsOrderDetails/class-lms-order-details.php:385
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:242
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:293
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:316
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:367
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:421
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:472
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:495
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:546
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:569
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:620
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:643
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:677
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:700
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:718
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:736
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:838
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:855
+#: includes/core/widgets/divi-modules/includes/modules/OptIn/class-opt-in.php:872
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:68
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:84
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:100
+#: includes/core/widgets/divi-modules/includes/modules/OrderDetails/class-order-details.php:116
+#: includes/core/widgets/elementor/elements/checkout-widget.php:413
+#: includes/core/widgets/elementor/elements/optin.php:378
+#: includes/core/widgets/elementor/elements/optin.php:432
+#: includes/core/widgets/elementor/elements/optin.php:486
+#: includes/core/widgets/elementor/elements/optin.php:540
+#: includes/core/widgets/elementor/elements/optin.php:594
+#: includes/core/widgets/elementor/elements/optin.php:635
+#: includes/core/widgets/elementor/elements/optin.php:983
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:168
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:202
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:217
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:251
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:286
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:320
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:335
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:369
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:384
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:419
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:434
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:458
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:473
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:487
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:500
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:688
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:701
+#: includes/core/widgets/oxygen/elements/optin/class-optin.php:715
+#: languages/wpfnl.php:76
+msgid "Yes"
+msgstr "כן"
+
+#: includes/class-wpfnl.php:305
+msgid "You are not authorize to activate plugins."
+msgstr "אינך מאשר להפעיל תוספים."
+
+#: includes/core/shortcodes/class-wpfnl-shortcode-order-details.php:160
+msgid "You are not authorized to view the order details."
+msgstr "אינך מורשה להציג את פרטי ההזמנה."
+
+#: admin/class-wpfnl-notices.php:279 admin/class-wpfnl-notices.php:427
+msgid ""
+"You are using an older version of Oxygen Builder, which is not compatible "
+"with WPFunnels. You will need Oxygen Builder v3.2 or above to be able to use "
+"it to design funnel pages in WPFunnels. Please update your builder."
+msgstr ""
+"אתה משתמש בגרסה ישנה יותר של בונה חמצן, שאינו תואם ל- WPFunnels. תצטרך בונה "
+"חמצן V3.2 ומעלה כדי שתוכל להשתמש בו כדי לעצב דפי משפך ב- WPFunnels. אנא עדכן "
+"את הבנאי שלך."
+
+#: admin/class-wpfnl-notices.php:391
+msgid ""
+"You are using an older version of WPFunnels Pro - Global Funnel. Please "
+"update to v1.0.18 or above to avoid any discrepancies with the latest "
+"WPFunnels (Basic) plugin."
+msgstr ""
+"אתה משתמש בגרסה ישנה יותר של WPFunnels Pro - Global Funnel. אנא עדכן ל- v1.0."
+"18 ומעלה כדי להימנע מפערים כלשהם עם התוסף האחרון של WPFunnels (בסיסי)."
+
+#: admin/partials/404.php:7
+msgid ""
+"You attempted to edit an item that doesn&#8217;t exist. Perhaps it was "
+"deleted?"
+msgstr "ניסית לערוך פריט שלא קיים. אולי זה נמחק?"
+
+#: languages/wpfnl.php:165
+msgid ""
+"You can go ahead and create funnels from scratch using any page "
+"builder/editor. It will work just fine."
+msgstr ""
+"אתה יכול להמשיך וליצור משפכים מאפס באמצעות כל בונה/עורך עמודים. זה יעבוד "
+"בסדר גמור."
+
+#: languages/wpfnl.php:253
+msgid ""
+"You can go ahead and create funnels from scratch with any page "
+"builder/editor. It will work just fine."
+msgstr ""
+"אתה יכול להמשיך וליצור שלב זה מאפס ולעצב אותו עם כל בונה/עורך של עמודים. זה "
+"יעבוד בסדר גמור."
+
+#: languages/wpfnl.php:155
+msgid ""
+"You can go ahead and create this step from scratch and design it with any "
+"page builder/editor. It will work just fine."
+msgstr ""
+"אתה יכול להמשיך וליצור שלב זה מאפס ולעצב אותו עם כל בונה/עורך של עמודים. זה "
+"יעבוד בסדר גמור."
+
+#: languages/wpfnl.php:122
+msgid ""
+"You can only add 1 order bump offer on a checkout page in the Free version "
+"of WPFunnels. Upgrade to Pro to be able to added as many order bump offers "
+"as you want."
+msgstr ""
+"אתה יכול להוסיף רק הצעת בליטת הזמנה בדף Checkout בגרסה החינמית של WPFunnels. "
+"שדרג ל- Pro כדי להיות מסוגל להוסיף כמה שיותר הצעות בליטות הזמנה."
+
+#: admin/modules/settings/views/offer-settings.php:55
+msgid ""
+"You may have several payment gateways in your site. But since we have "
+"limited supported payment gateways for post purchase offers, you can use "
+"this option to only view supported payment gateways during the funnel "
+"checkout page. This means, you do not have to disable other payment gateways "
+"for the funnel."
+msgstr ""
+"יתכן שיש לך כמה שערי תשלום באתר שלך. אך מכיוון שהגבלנו שערי תשלום נתמכים "
+"עבור הצעות לרכישת פוסט, תוכלו להשתמש באפשרות זו כדי להציג רק שערים תשלום "
+"נתמכים במהלך דף התשלום של המשפך. המשמעות היא, אינך צריך להשבית שערי תשלום "
+"אחרים עבור המשפך."
+
+#: public/modules/checkout/templates/default-checkout-form.php:150
+#: public/modules/checkout/templates/express-checkout-form.php:161
+#: public/modules/checkout/templates/multi-step-checkout.php:20
+#: public/modules/checkout/templates/two-step-checkout.php:103
+msgid "You must be logged in to checkout."
+msgstr "אתה חייב להיות מחובר לקופה."
+
+#: languages/wpfnl.php:233
+msgid "You must enable child orders for offers to use this feature."
+msgstr "עליכם לאפשר הזמנות לילדים להצעות להשתמש בתכונה זו."
+
+#: languages/wpfnl.php:149
+msgid "You see, we create funnel templates for Gutenberg using"
+msgstr "אתה מבין, אנו יוצרים תבניות משפך עבור גוטנברג"
+
+#: public/modules/checkout/templates/checkout-template.php:31
+#: public/modules/checkout/templates/checkout.php:12
+msgid "Your cart is currently empty."
+msgstr "העגלה שלך כרגע ריקה."
+
+#: public/modules/checkout/templates/default-checkout-form.php:90
+#: public/modules/checkout/templates/default-checkout-form.php:132
+#: public/modules/checkout/templates/default-checkout-form.php:212
+#: public/modules/checkout/templates/express-checkout-form.php:148
+#: public/modules/checkout/templates/multi-step-checkout.php:29
+#: public/modules/checkout/templates/two-step-checkout.php:164
+msgid "Your order"
+msgstr "ההזמנה שלך"
+
+#: public/modules/checkout/templates/express-checkout-form.php:248
+msgid "Your orders"
+msgstr "ההזמנות שלך"
