@@ -326,7 +326,7 @@ class FunnelController extends Wpfnl_REST_Controller
 				),
 			)
 		);
-		
+
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/bulk-restore-funnel',
@@ -344,7 +344,7 @@ class FunnelController extends Wpfnl_REST_Controller
 				),
 			)
 		);
-		
+
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/bulk-trash-funnel',
@@ -625,7 +625,7 @@ class FunnelController extends Wpfnl_REST_Controller
 		];
 
 		$funnel_data = Wpfnl_functions::remove_disconnected_addstep_node($funnel_data, $funnel_id);
-		
+
 		if ($funnel_data) {
 			$response = [
 				'status' => 'success',
@@ -724,11 +724,11 @@ class FunnelController extends Wpfnl_REST_Controller
 
 	/**
 	 * get conditional steps with validity checking
-	 * 
+	 *
 	 * @param $funnel_flow_array
-	 * 
+	 *
 	 * @return array
-	 * 
+	 *
 	 * @since 3.4.13
 	 */
 	public function get_conditional_step($funnel_flow_array){
@@ -1547,8 +1547,8 @@ class FunnelController extends Wpfnl_REST_Controller
 
 		return $funnel_controller->delete_marked_funnels($payload);
 	}
-	
-	
+
+
 	/**
 	 * Restore  marked funnel
 	 *
@@ -1563,7 +1563,7 @@ class FunnelController extends Wpfnl_REST_Controller
 
 		return $funnel_controller->restore_marked_funnels($payload);
 	}
-	
+
 	/**
 	 * Restore  marked funnel
 	 *

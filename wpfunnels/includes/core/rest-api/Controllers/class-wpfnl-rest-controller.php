@@ -1,7 +1,7 @@
 <?php
 /**
  * WPFunnels rest api controllers
- * 
+ *
  * @package WPFunnels\Rest\Controller
  */
 namespace WPFunnels\Rest\Controllers;
@@ -30,7 +30,7 @@ abstract class Wpfnl_REST_Controller extends WP_REST_Controller {
      *
      * @param string $setting_id Setting ID.
      * @param string $group_id Group ID.
-     * 
+     *
      * @return array Links for the given setting.
      * @since  3.0.0
      */
@@ -55,14 +55,14 @@ abstract class Wpfnl_REST_Controller extends WP_REST_Controller {
      * @param int    $status        The HTTP status code.
      *
      * @return WP_Error The created WP_Error object.
-     * 
+     *
      * @since 2.7.9
      */
     protected function prepare_wp_error_response( $error_code, $error_message, $data ) {
         return new WP_Error(
             $error_code,
             $error_message,
-            $data 
+            $data
         );
     }
 
@@ -73,7 +73,7 @@ abstract class Wpfnl_REST_Controller extends WP_REST_Controller {
      * @param int    $code     Success coed.
      *
      * @return WP_Rest_Response The created WP_Rest_response object.
-     * 
+     *
      * @since 2.7.9
      */
     protected function prepare_wp_success_response( $message, $code ) {
@@ -84,4 +84,36 @@ abstract class Wpfnl_REST_Controller extends WP_REST_Controller {
 		);
 		return rest_ensure_response( $response );
     }
+
+
+	/**
+	 * Returns default 'before' parameter for the reports.
+	 *
+	 * @return \WC_DateTime
+	 * @throws \Exception
+	 * @since 3.1.7
+	 */
+	public function default_before() {
+		$datetime = new \DateTime();
+		$datetime->setTimezone( new \DateTimeZone( wpf_timezone_string() ) );
+		return $datetime;
+	}
+
+
+	/**
+	 * Returns default 'after' parameter for the reports.
+	 *
+	 * @return \Wpfnl_DateTime
+	 * @throws \Exception
+	 * @since 3.1.7
+	 */
+	public function default_after() {
+		$now       = time();
+		$week_back = $now - YEAR_IN_SECONDS;
+
+		$datetime = new \DateTime();
+		$datetime->setTimestamp( $week_back );
+		$datetime->setTimezone( new \DateTimeZone( wpf_timezone_string() ) );
+		return $datetime;
+	}
 }

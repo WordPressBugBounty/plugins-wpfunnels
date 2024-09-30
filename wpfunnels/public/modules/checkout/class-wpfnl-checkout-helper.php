@@ -25,6 +25,7 @@ class CheckoutHelper extends Module
      * @return void
      * @since 2.7.9
      */
+
     public function update_order_bump_product( $order_bump_products, $order_id ) {
         if ( is_array( $order_bump_products ) && $order_id ){
             foreach( $order_bump_products as $key => $orderBumpProduct ){
@@ -35,11 +36,12 @@ class CheckoutHelper extends Module
                         $order->update_meta_data('_wpfunnels_order_bump_product', $ob_product_id);
                         foreach ($order->get_items() as $order_item_id => $order_item) {
                             $product_id = !empty($order_item['variation_id']) ? $order_item['variation_id'] :$order_item['product_id'];
-                            if($ob_product_id == $product_id ){
+                            if( $ob_product_id == $product_id ) {
+								$ob_products[] = $ob_product_id;
+								$order->update_meta_data('_wpfunnels_order_bump_products', $ob_products );
                                 wc_add_order_item_meta($order_item_id, '_wpfunnels_order_bump', 'yes');
                             }
                         }
-
                         $order->save();
                     }
                 }
@@ -196,7 +198,6 @@ class CheckoutHelper extends Module
      * @since 2.7.9
      */
     public function apply_discount_and_update_total( $order, $total, $discount, $is_main_product_in_cart ){
-
         if ( false === is_a( $order, 'WC_Order' ) || !is_array($discount) || !$is_main_product_in_cart ) {
             return false;
         }

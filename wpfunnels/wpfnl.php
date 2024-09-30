@@ -15,7 +15,7 @@
  * Plugin Name:       WPFunnels
  * Plugin URI:        https://getwpfunnels.com
  * Description:       Easiest 💥 Sales Funnel Builder 💥 For WordPress & WooCommerce by WPFunnels - Generate Leads & Craft A Highly-Converting Sales Journey In Minutes
- * Version:           3.4.16
+ * Version:           3.5.1
  * Author:            WPFunnels Team
  * Author URI:        https://getwpfunnels.com
  * License:           GPL-2.0+
@@ -39,7 +39,7 @@ if ( ! defined( 'WPINC' ) ) {
  */
 
 if ( ! defined( 'WPFNL_VERSION' ) ) {
-	define('WPFNL_VERSION', '3.4.16');
+	define('WPFNL_VERSION', '3.5.1');
 }
 
 if ( ! defined( 'WPFNL_FILE' ) ) {
@@ -73,21 +73,25 @@ if ( ! defined( 'GETWPFUNNEL_PRICING_URL' ) ) {
 	define( 'GETWPFUNNEL_PRICING_URL', 'https://getwpfunnels.com/pricing/' );
 }
 
+define( 'WPFNL_ADMIN_DIR', WPFNL_DIR . 'admin/' );
 
-define( 'WPFNL_TEMPLATE_URL', '' );
-define( 'WPFNL_MAIN_PAGE_SLUG', 'wp_funnels' );
-define( 'WPFNL_TEMPLATE_PAGE_SLUG', 'wpf_templates' );
-define( 'WPFNL_SETTINGS_SLUG', 'wp_funnel_settings' );
-define( 'WPFNL_EDIT_FUNNEL_SLUG', 'edit_funnel' );
-define( 'WPFNL_TRASH_FUNNEL_SLUG', 'trash_funnels' );
-define( 'WPFNL_FUNNELS_POST_TYPE', 'wpfunnels' );
-define( 'WPFNL_STEPS_POST_TYPE', 'wpfunnel_steps' );
-define( 'WPFNL_CREATE_FUNNEL_SLUG', 'create_funnel' );
-define( 'WPFNL_GLOBAL_SETTINGS_SLUG', 'wpfnl_settings' );
-define( 'WPFNL_FUNNEL_PER_PAGE', 10 );
-define( 'WPFNL_TEMPLATES_OPTION_KEY', 'wpfunnels_remote_templates' );
-define( 'WPFNL_TESTS', false );
-define( 'WPFNL_DOCUMENTATION_LINK', 'https://getwpfunnels.com/docs/wpfunnels-wordpress-funnel-builder/' );
+
+define('WPFNL_TEMPLATE_URL', '');
+define('WPFNL_MAIN_PAGE_SLUG', 'wpfunnels');
+define('WPFNL_FUNNEL_PAGE_SLUG', 'wp_funnels');
+define('WPFNL_TEMPLATE_PAGE_SLUG', 'wpf_templates');
+define('WPFNL_SETTINGS_SLUG', 'wp_funnel_settings');
+define('WPFNL_EDIT_FUNNEL_SLUG', 'edit_funnel');
+define('WPFNL_TRASH_FUNNEL_SLUG', 'trash_funnels');
+define('WPFNL_FUNNELS_POST_TYPE', 'wpfunnels');
+define('WPFNL_STEPS_POST_TYPE', 'wpfunnel_steps');
+define('WPFNL_CREATE_FUNNEL_SLUG', 'create_funnel');
+define('WPFNL_GLOBAL_SETTINGS_SLUG', 'wpfnl_settings');
+define('WPFNL_FUNNEL_PER_PAGE', 10);
+define('WPFNL_TEMPLATES_OPTION_KEY', 'wpfunnels_remote_templates');
+define('WPFNL_TESTS', false);
+define('WPFNL_DOCUMENTATION_LINK', 'https://getwpfunnels.com/docs/wpfunnels-wordpress-funnel-builder/');
+
 
 // Template middleman api url.
 define( 'WPFNL_MIDDLEMAN_TEMPLATE_URL', 'https://license.getwpfunnels.com/api/v1/templates' );

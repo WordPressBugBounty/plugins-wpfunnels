@@ -6,7 +6,7 @@
  */
 ?>
 <div class="basic-tools-field">
-	<!-- <div class="wpfnl-user-role-container">
+	<div class="wpfnl-user-role-container">
 		<h4 class="settings-title"> <?php esc_html_e('User role manager', 'wpfnl'); ?> </h4>
 		<div class="wpfnl-box">
 			<?php if ($this->user_roles_settings) { ?>
@@ -37,7 +37,7 @@
 				</div>
 			<?php }?>
 		</div>
-	</div> -->
+	</div>
 
 	<?php if( apply_filters( 'wpfunnels/is_wpfnl_pro_active', false ) ){?>
 		<div class="wpfnl-analytics-settings-container">

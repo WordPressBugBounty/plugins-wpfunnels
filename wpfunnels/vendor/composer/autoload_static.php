@@ -10,6 +10,8 @@ class ComposerStaticInitdc7bdfab0efd7b9738bb4acf83b1a4f4
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'db1766888a4f96ab813d6f6a38125eb9' => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/functions.php',
+        '42ecdafac508117107920039c80ecc5f' => __DIR__ . '/../..' . '/includes/wpf-formatting-functions.php',
+        '7cd7c1cdfee0818e6494720c7224cf83' => __DIR__ . '/../..' . '/includes/wpf-update-functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -443,8 +445,12 @@ class ComposerStaticInitdc7bdfab0efd7b9738bb4acf83b1a4f4
         'UninstallCleanup' => __DIR__ . '/../..' . '/includes/utils/class-wpfnl-uninstall-cleanup.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
         'WPFunnels\\Admin\\Banner\\SpecialOccasionBanner' => __DIR__ . '/../..' . '/admin/class-wpfnl-banner.php',
+        'WPFunnels\\Admin\\BatchProcessing\\BatchProcessingController' => __DIR__ . '/../..' . '/admin/BatchProcessing/BatchProcessingController.php',
         'WPFunnels\\Admin\\FunnelType\\Wpfnl_Funnel_Type' => __DIR__ . '/../..' . '/admin/modules/type/abstruct-wpfnl-type.php',
         'WPFunnels\\Admin\\FunnelType\\Wpfunnels_Wc_Checkout' => __DIR__ . '/../..' . '/admin/modules/type/sales-funnel/class-wpfnl-admin-woocommerce.php',
+        'WPFunnels\\Admin\\Migrations\\AbstractMigrations' => __DIR__ . '/../..' . '/admin/Migrations/AbstractMigrations.php',
+        'WPFunnels\\Admin\\Migrations\\MigrationManager' => __DIR__ . '/../..' . '/admin/Migrations/MigrationManager.php',
+        'WPFunnels\\Admin\\Migrations\\OrderToStatTableMigration' => __DIR__ . '/../..' . '/admin/Migrations/OrderToStatTableMigration.php',
         'WPFunnels\\Admin\\Module\\Layout\\TemplateLayout' => __DIR__ . '/../..' . '/admin/modules/layout/class-wpfnl-template-layout.php',
         'WPFunnels\\Admin\\Module\\Steps\\Wpfnl_Steps_Factory' => __DIR__ . '/../..' . '/admin/modules/steps/class-wpfnl-steps-factory.php',
         'WPFunnels\\Admin\\Module\\Wpfnl_Admin_Module' => __DIR__ . '/../..' . '/admin/modules/abstract-wpfnl-admin-modules.php',
@@ -530,7 +536,11 @@ class ComposerStaticInitdc7bdfab0efd7b9738bb4acf83b1a4f4
         'WPFunnels\\Modules\\Wpfnl_Modules_Manager' => __DIR__ . '/../..' . '/includes/core/classes/class-wpfnl-module-manager.php',
         'WPFunnels\\Optin\\Optin_Record' => __DIR__ . '/../..' . '/includes/core/classes/class-wpfnl-optin-record.php',
         'WPFunnels\\PageTemplates\\Manager' => __DIR__ . '/../..' . '/includes/core/page-templates/class-manager.php',
+        'WPFunnels\\Report\\OptinRecorder' => __DIR__ . '/../..' . '/includes/core/Reporting/OptinRecorder.php',
+        'WPFunnels\\Report\\ReportGenerator' => __DIR__ . '/../..' . '/includes/core/Reporting/ReportGenerator.php',
+        'WPFunnels\\Report\\StatHookHandler' => __DIR__ . '/../..' . '/includes/core/Reporting/StatHookHandler.php',
         'WPFunnels\\Rest\\Controllers\\CheckoutController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-checkout-controller.php',
+        'WPFunnels\\Rest\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/DashboardController.php',
         'WPFunnels\\Rest\\Controllers\\FunnelController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-funnel-controller.php',
         'WPFunnels\\Rest\\Controllers\\GutenbergCSSController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-gutenberg-css-controller.php',
         'WPFunnels\\Rest\\Controllers\\OrderBumpController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-orderbump-controller.php',

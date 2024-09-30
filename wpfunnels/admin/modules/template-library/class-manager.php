@@ -103,9 +103,7 @@ class Manager
 
     public function enqueue_scripts($hook)
     {
-
-        if (in_array($hook, ['toplevel_page_wp_funnels']) || in_array($hook, ['wp-funnels_page_wpf_templates'])) {
-
+        if (in_array($hook, ['wpfunnels_page_wp_funnels']) || in_array($hook, ['wpfunnels_page_wpf_templates'])) {
             $funnel_id = 0;
             if (isset($_GET['page'])) {
                 if ($_GET['page'] === 'edit_funnel') {

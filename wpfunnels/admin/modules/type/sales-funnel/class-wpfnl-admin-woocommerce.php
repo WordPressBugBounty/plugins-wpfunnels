@@ -40,8 +40,8 @@ class Wpfunnels_Wc_Checkout extends Wpfnl_Funnel_Type
                                 $parent_id = $product_object->get_id();
                                 $products[ $parent_id ] = [
                                     'name'       => $formatted_name,
-                                    'price'      => $product_object->get_regular_price(),
-                                    'sale_price' => $product_object->get_price(),
+                                    'price'      => $product_object->get_variation_regular_price( 'min' ) ? $product_object->get_variation_regular_price( 'min' ) : $product_object->get_regular_price(),
+                                    'sale_price' => $product_object->get_variation_sale_price( 'min' ) ? $product_object->get_variation_sale_price( 'min' ) : $product_object->get_price(),
                                 ];
                             }
 
@@ -298,7 +298,13 @@ class Wpfunnels_Wc_Checkout extends Wpfnl_Funnel_Type
                 $title 	= $product->get_type() == 'variation' ? Wpfnl_functions::get_formated_product_name( $product ) : $product->get_name();;
                 $price 	= $product->get_price();
                 $sale_price = $product->get_sale_price() ? $product->get_sale_price() : $product->get_price();
-                $regular_price = $product->get_regular_price() ? $product->get_regular_price() : $product->get_price();
+                
+                if($product->get_type() == 'variable' || $product->get_type() == 'variable-subscription') {
+                    $regular_price = $product->get_variation_regular_price( 'min' ) ? $product->get_variation_regular_price( 'min' ) : $product->get_price();
+                }else{
+                    $regular_price = $product->get_regular_price() ? $product->get_regular_price() : $product->get_price();
+                }
+                
 
                 if ( is_a( $product, 'WC_Product_Bundle' ) ) {
 					$disallow_regular_price = 'yes';
@@ -470,7 +476,12 @@ class Wpfunnels_Wc_Checkout extends Wpfnl_Funnel_Type
                             $image         = wp_get_attachment_image_src( $product->get_image_id(), 'thumbnail' ) ? wp_get_attachment_image_src( $product->get_image_id(), 'thumbnail' ) : wp_get_attachment_image_src( $product->get_image_id(), 'single-post-thumbnail' );
                             $price         = $product->get_price();
                             $sale_price    = $product->get_sale_price() ? $product->get_sale_price() : $product->get_price();
-                            $regular_price = $product->get_regular_price() ? $product->get_regular_price() : $product->get_price();
+                            
+                            if($product->get_type() == 'variable' || $product->get_type() == 'variable-subscription') {
+                                $regular_price = $product->get_variation_regular_price( 'min' ) ? $product->get_variation_regular_price( 'min' ) : $product->get_price();
+                            }else{
+                                $regular_price = $product->get_regular_price() ? $product->get_regular_price() : $product->get_price();
+                            }
 
                             if ( is_a( $product, 'WC_Product_Bundle' ) ) {
 								$disallow_regular_price = 'yes';

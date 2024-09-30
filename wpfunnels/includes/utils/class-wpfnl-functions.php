@@ -20,9 +20,14 @@ class Wpfnl_functions {
 	 *
 	 * @return array|mixed
 	 */
-	public static function get_steps( $funnel_id ) {
-		$steps = get_post_meta( $funnel_id, '_steps_order', true );
-		if ( ! is_array( $steps ) ) {
+	public static function get_steps($funnel_id) {
+		if (!is_int($funnel_id) && !is_string($funnel_id)) {
+			// Throw an error or handle this case as appropriate for your application
+			throw new \InvalidArgumentException('Funnel ID must be an integer or a string');
+		}
+
+		$steps = get_post_meta($funnel_id, '_steps_order', true);
+		if (!is_array($steps)) {
 			$steps = array();
 		}
 		return $steps;
@@ -382,9 +387,10 @@ class Wpfnl_functions {
 	 * @return bool
 	 * @since  1.0.0
 	 */
-	public static function define_active_class( $key ) {
-		$page = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_SPECIAL_CHARS );
-		if ( $page === WPFNL_MAIN_PAGE_SLUG && $key === 'overview' ) {
+	public static function define_active_class($key)
+	{
+		$page = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_SPECIAL_CHARS);
+		if ($page === WPFNL_FUNNEL_PAGE_SLUG && $key === 'overview') {
 			return true;
 		}
 
@@ -547,9 +553,15 @@ class Wpfnl_functions {
 	 * @return bool
 	 */
 	public static function is_funnel_exists( $funnel_id ) {
+		if (!is_int($funnel_id) && !is_string($funnel_id)) {
+			// Throw an error or handle this case as appropriate for your application
+			throw new \InvalidArgumentException('Funnel ID must be an integer or a string');
+		}
+
 		if ( ! $funnel_id ) {
 			return false;
 		}
+
 		if ( false === get_post_status( $funnel_id ) ) {
 			return true;
 		}
@@ -1350,6 +1362,9 @@ class Wpfnl_functions {
 		$default_settings = array();
 
 		foreach ( $user_role_names as $user_role_name ) {
+			if( 'subscriber' === $user_role_name || 'customer' === $user_role_name ) {
+				continue;
+			}
 			$default_settings[ $user_role_name ] = 'no';
 		}
 
@@ -3179,18 +3194,7 @@ class Wpfnl_functions {
 	 * @since  2.6.2
 	 */
 	public static function role_permission_to_allow_wpfunnel( $permitted_role = array() ) {
-
-		return 'manage_options';
-		$user = wp_get_current_user();
-		if ( isset( $user->roles ) ) {
-			$roles = (array) $user->roles;
-			foreach ( $roles as $role ) {
-				if ( isset( $permitted_role['allow_funnels'][ $role ] ) ) {
-					return $role;
-				}
-			}
-		}
-		return 'administrator';
+		return 'wpf_manage_funnels';
 	}
 
 
@@ -3694,8 +3698,8 @@ class Wpfnl_functions {
 		}
 		return false;
 	}
-	
-	
+
+
 	/**
 	 * Mail mint email
 	 *
@@ -5091,6 +5095,33 @@ class Wpfnl_functions {
 			'overall_report'							  => __('Overall Report', 'wpfnl'),
 			'entrance'							  		  => __('Entrance', 'wpfnl'),
 			'subscribers_completed'						  => __('Subscribers Completed', 'wpfnl'),
+			'welcome_to_wpfunnels'						  => __('Welcome to WPFunnels', 'wpfnl'),
+			'setup_wizard'						  		  => __('Setup Wizard', 'wpfnl'),
+			'support'						  		  	  => __('Support', 'wpfnl'),
+			'video'						  		          => __('Video', 'wpfnl'),
+
+			'total_customers'						  	  => __('Total Customers', 'wpfnl'),
+			'total_orders'						  	  	  => __('Total Orders', 'wpfnl'),
+			'total_revenue'						  	  	  => __('Total Revenue', 'wpfnl'),
+			'order_bump_revenue'						  => __('Order Bump Revenue', 'wpfnl'),
+			'upsell_downsell_evenue'					  => __('Upsell/Downsell Revenue', 'wpfnl'),
+			'growth_comparison'					  		  => __('Growth Comparison', 'wpfnl'),
+			'previous_year'					  		  	  => __('Previous Year', 'wpfnl'),
+			'current_year'					  		  	  => __('Current Year', 'wpfnl'),
+			'top_performing_funnels'					  => __('Top Performing Funnels', 'wpfnl'),
+			'funnel_name'					  			  => __('Funnel Name', 'wpfnl'),
+			'views'					  			  		  => __('Views', 'wpfnl'),
+			'conversion'					  			  => __('Conversion', 'wpfnl'),
+			'conversion_rate'					  		  => __('Conversion Rate', 'wpfnl'),
+			'no_top_performing_funnels'					  => __('You have no top performing funnels', 'wpfnl'),
+			'today'					  					  => __('Today', 'wpfnl'),
+			'week_to_date'					  			  => __('Week to date', 'wpfnl'),
+			'month_to_date'					  			  => __('Month to date', 'wpfnl'),
+			'year_to_date'					  			  => __('Year to date', 'wpfnl'),
+			'previous_period'					  		  => __('Previous period', 'wpfnl'),
+			'previous_year'					  			  => __('Previous year', 'wpfnl'),
+
+			// -------Funnel dashboard-------
 		);
 	}
 
@@ -5114,8 +5145,8 @@ class Wpfnl_functions {
 
 		return false;
 	}
-	
-	
+
+
 	/**
 	 * Maybe current theme is WoodMart
 	 *
@@ -5125,7 +5156,7 @@ class Wpfnl_functions {
 	public static function maybe_woodmart_theme() {
 		$current_theme = wp_get_theme();
 		$parent_theme = $current_theme->parent();
-		
+
 		if ('Woodmart' === $current_theme->get('Name')) {
 			return true;
 		}
@@ -5145,13 +5176,14 @@ class Wpfnl_functions {
 	 * @since 3.0.13
 	 */
 	public static function get_wc_price_config() {
-		$config = array(
-			'currency_symbol'    => '',
-			'currency_position'  => 'left',
-			'thousand_separator' => ',',
-			'decimal_separator'  => '.',
-			'decimal_places'     => 2,
-		);
+	    $config = array(
+            'currency_symbol'       => '$',
+            'currency_position'     => 'left',
+            'thousand_separator'    => ',',
+            'decimal_separator'     => '.',
+            'decimal_places'        => 2,
+            'price_format'        	=> '%1$s%2$s',
+        );
 
 		if ( self::is_wc_active() ) {
 			$config = array(
@@ -5418,21 +5450,26 @@ class Wpfnl_functions {
 	 * @since 3.4.8
 	 */
 	public static function validate_google_places_api_key($api_key) {
+		if (!is_string($api_key)) {
+			// Throw an error or handle this case as appropriate for your application
+			throw new InvalidArgumentException('API key must be a string');
+		}
+
 		$url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?key=' . $api_key;
-	
+
 		$response = wp_remote_get($url);
-	
+
 		if (is_wp_error($response)) {
 			return false;
 		}
-	
+
 		$body = wp_remote_retrieve_body($response);
 		$data = json_decode($body, true);
-	
+
 		if (isset($data['status']) && 'REQUEST_DENIED' === $data['status'] ) {
 			return false;
 		}
-	
+
 		return true;
 	}
 }

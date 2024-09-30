@@ -15,6 +15,7 @@
  */
 namespace WPFunnels;
 
+use Wpfnl_Activator;
 use Wpfnl_i18n;
 use Wpfnl_Loader;
 use Wpfnl_Logger;
@@ -34,6 +35,8 @@ use WPFunnels\Data_Store\Wpfnl_Funnel_Store_Data as Funnel_Store;
 use WPFunnels\Data_Store\Wpfnl_Steps_Store_Data as Step_Store;
 use WPFunnels\Menu\Wpfnl_Menus as Menu;
 use WPFunnels\Modules\Wpfnl_Modules_Manager as Module_Manager;
+use WPFunnels\Report\OptinRecorder;
+use WPFunnels\Report\StatHookHandler;
 use WPFunnels\Rest\Server;
 // use WPFunnels\Shortcodes\Wpfnl_Shortcode;
 use WPFunnels\Shortcodes\Wpfnl_Shortcodes;
@@ -192,6 +195,26 @@ class Wpfnl
 	 */
 	protected $slim_seo;
 
+
+	/**
+	 * StatHookHandler Object
+	 *
+	 * @var $stat_hooks_handler
+	 * @type StatHookHandler
+	 * @since 3.2.0
+	 */
+	protected $stat_hooks_handler;
+
+
+    /**
+     * OptinRecorder Object
+     *
+     * @var $optin_recorder
+     * @type OptinRecorder
+     * @since 3.2.0
+     */
+    protected $optin_recorder;
+
     /**
      * Instance.
      *
@@ -250,7 +273,6 @@ class Wpfnl
 
         $this->set_locale();
         $this->init_hooks();
-
     }
 
 
@@ -295,7 +317,7 @@ class Wpfnl
 
         $post_id = get_the_ID();
         $custom_css = get_post_meta( $post_id, 'rex_gutenberg_css', true );
-    
+
         if ( $custom_css ) {
             wp_register_style( 'rex-gutenberg-css', false );
             wp_enqueue_style( 'rex-gutenberg-css' );
@@ -371,14 +393,14 @@ class Wpfnl
 	}
 
     public function init() {
-        $this->admin = new Admin( $this->get_plugin_name(), $this->get_version() );
+        $this->admin 					= new Admin( $this->get_plugin_name(), $this->get_version() );
         $this->frontend                 = Wpfnl_Public::getInstance();
         $this->cpt                      = new CPT();
         $this->menu                     = new Menu();
         $this->funnel_store             = new Funnel_Store();
         $this->step_store               = new Step_Store();
         $this->template_manager         = new TemplateLibrary\Manager();
-        
+
         $this->widget_manager           = Widget_Manager::getInstance()->init();
         $this->page_templates           = new PageTemplates\Manager();
         $this->admin_notice             = new Notice();
@@ -391,6 +413,10 @@ class Wpfnl
         $this->log	                    = Wpfnl_Logger::getInstance()->initialize_logging();
         $this->compatibility 		    = new Wpfnl_Compatibility();
 
+        $this->stat_hooks_handler		= new StatHookHandler();
+        $this->optin_recorder		    = new OptinRecorder();
+
+		Wpfnl_Activator::init();
     }
 
 
@@ -414,6 +440,10 @@ class Wpfnl
     private function load_dependencies()
     {
 
+		/**
+		 * Require the action scheduler
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'vendor/woocommerce/action-scheduler/action-scheduler.php';
 
         /**
          * The class responsible for auto loading all files of the

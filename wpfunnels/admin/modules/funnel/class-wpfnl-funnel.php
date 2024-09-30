@@ -258,7 +258,7 @@ class Module extends Wpfnl_Admin_Module
                 ],
                 admin_url('admin.php')
             );
-    
+
             return [
                 'success' => true,
                 'redirectUrl' => $redirect_link,
@@ -530,13 +530,13 @@ class Module extends Wpfnl_Admin_Module
                     ],
                     admin_url('admin.php')
                 );
-        
+
                 return [
                     'success' => true,
                     'redirectUrl' => $redirect_link,
                 ];
             }
-            
+
             $funnel_id = sanitize_text_field($data_value);
             $funnel = Wpfnl::$instance->funnel_store;
             $funnel->read($funnel_id);
@@ -624,7 +624,7 @@ class Module extends Wpfnl_Admin_Module
         if ($response) {
             $redirect_link = add_query_arg(
                 [
-                    'page' => WPFNL_MAIN_PAGE_SLUG,
+                    'page' => WPFNL_FUNNEL_PAGE_SLUG,
                 ],
                 admin_url('admin.php')
             );

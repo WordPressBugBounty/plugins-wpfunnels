@@ -39,7 +39,7 @@ $trash_redirect_link = add_query_arg(
 
 $live_redirect_link = add_query_arg(
     [
-        'page' => WPFNL_MAIN_PAGE_SLUG,
+        'page' => WPFNL_FUNNEL_PAGE_SLUG,
     ],
     admin_url('admin.php')
 );
@@ -99,7 +99,7 @@ $live_redirect_link = add_query_arg(
                 </div>
             </div>
 
-          
+
             <div class="wpfnl-dashboard__header overview-header">
                 <div class="wpfnl-dashboard-header-left <?php echo 'trash_funnels' == $_GET['page'] ? 'trash-funnels-header' : ''; ?>">
                 <?php //if( isset($_GET['page']) && 'wp_funnels' === $_GET['page'] ) : ?>
@@ -142,7 +142,6 @@ $live_redirect_link = add_query_arg(
 
                 <!-- Export import -->
                 <?php if ( (count($this->funnels) || !empty($_GET['s'])) && $is_pro_active &&  isset($_GET['page']) && 'trash_funnels' != sanitize_text_field( $_GET['page'] ) ) : ?>
-                    
                     <a href="#" class="import-export wpfnl-export-all-funnels">
                         <?php
                             require WPFNL_DIR . '/admin/partials/icons/export-icon.php';
@@ -177,7 +176,7 @@ $live_redirect_link = add_query_arg(
 
                     <!-- Export import -->
                     <?php endif; ?>
-                
+
 
                 <?php
                     if( (count($this->funnels) || !empty($_GET['s'] )) && isset($_GET['page']) && 'trash_funnels' !== sanitize_text_field( $_GET['page'] ) ){
@@ -193,7 +192,7 @@ $live_redirect_link = add_query_arg(
 
                 ?>
             </div>
-           
+
             <div class="wpfnl-dashboard__inner-content <?php echo count($this->funnels) ? '' : 'no-funnel' ?>">
                 <div class="funnel-list__wrapper">
                     <?php if (count($this->funnels)) { ?>
@@ -497,8 +496,6 @@ $live_redirect_link = add_query_arg(
                                         <?php
                                     }
 									?>
-
-
                                     <?php
                                         if( isset($_GET['page']) && 'trash_funnels' !== sanitize_text_field( $_GET['page'] ) ){
                                     ?>
@@ -631,7 +628,7 @@ $live_redirect_link = add_query_arg(
                                                 <?php
                                                     require WPFNL_DIR . '/admin/partials/icons/import-icon.php';
                                                     echo __('Import Funnels', 'wpfnl');
-                                                    
+
                                                 ?>
                                                 <span class="pro-tag-icon"><?php require WPFNL_DIR . '/admin/partials/icons/pro-icon.php'; ?></span>
                                             </a>
@@ -640,7 +637,7 @@ $live_redirect_link = add_query_arg(
                                                 <?php
                                                     require WPFNL_DIR . '/admin/partials/icons/import-icon.php';
                                                     echo __('Import Funnels', 'wpfnl');
-                                                    
+
                                                 ?>
                                             </a>
                                         <?php } ?>
@@ -805,9 +802,9 @@ $live_redirect_link = add_query_arg(
                                     <span>Over 60+ Integrations</span>
                                 </li>
                             </ul>
-                            
+
                             </div>
-                            
+
                         </div>
                         <div class="wpfnl-pro-modal-footer">
                            <div class="wpfnl-pro-modal-footer_container">

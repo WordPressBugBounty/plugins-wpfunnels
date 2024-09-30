@@ -1,8 +1,8 @@
 <?php
 /**
  * Server
- * 
- * @package 
+ *
+ * @package
  */
 namespace WPFunnels\Rest;
 
@@ -88,7 +88,8 @@ class Server
 			'remote_funnel'         => 'RemoteFunnelsController',
 			'products'         		=> 'ProductsController',
 			'gutenberg'         	=> 'GutenbergCSSController',
-            'checkout'              => 'CheckoutController'
+            'checkout'              => 'CheckoutController',
+            'report'              	=> 'DashboardController',
 		));
     }
 

@@ -1,16 +1,21 @@
 <?php
 /**
  * Nav dashboard
- * 
+ *
  * @package
  */
 use WPFunnels\Wpfnl_functions;
 
 $nav_menus = apply_filters('wpfnl_dashboard_nav_lists', [
+		'dashboard' => [
+			'title' => __('Dashboard', 'wpfnl'),
+			'icon'  => 'dashboard-icon',
+			'page'  => WPFNL_MAIN_PAGE_SLUG,
+		],
         'overview' => [
             'title' => __('Funnels', 'wpfnl'),
             'icon'  => 'overview-icon',
-            'page'  => WPFNL_MAIN_PAGE_SLUG,
+            'page'  => WPFNL_FUNNEL_PAGE_SLUG,
         ],
         'settings' => [
             'title' => __('Settings', 'wpfnl'),
@@ -35,8 +40,7 @@ $nav_menus = apply_filters('wpfnl_dashboard_nav_lists', [
                 ],
                 admin_url('admin.php')
             );
-            if($key === 'create_funnel') $link='#';
-            ?>
+            if($key === 'create_funnel') $link='#'; ?>
 
             <li class="wpfnl-dashboard__nav-li <?php echo $key .' '. $active_class; ?>">
                 <a id="<?php echo "wpfnl-tab-".$key ?>" href="<?php echo esc_url($link); ?>">

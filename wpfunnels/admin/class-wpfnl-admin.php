@@ -6,6 +6,8 @@
  */
 namespace WPFunnels\Admin;
 
+use WPFunnels\Admin\BatchProcessing\BatchProcessingController;
+use WPFunnels\Admin\Migrations\MigrationManager;
 use WPFunnels\Wpfnl;
 use WPFunnels\Wpfnl_functions;
 use Wpfnl_Pro_GB_Functions;
@@ -69,18 +71,20 @@ class Wpfnl_Admin
 	 * @var array
 	 */
 	private $page_hooks = [
-		'toplevel_page_wp_funnels',
 		'toplevel_page_wpf_templates',
-		'wp-funnels_page_wpf_templates',
-		'wp-funnels_page_wpf_feature_comparison',
-		'wp-funnels_page_trash_funnels',
-		'wp-funnels_page_wp_funnel_settings',
-		'wp-funnels_page_wp_global_store',
-		'wp-funnels_page_edit_funnel',
-		'wp-funnels_page_create_funnel',
-		'wp-funnels_page_wpfnl_settings',
-		'wp-funnels_page_wpf-license',
-		'wp-funnels_page_email-builder',
+		'toplevel_page_wpfunnels',
+		'wpfunnels_page_wpf_templates',
+		'wpfunnels_page_trash_funnels',
+		'wpfunnels_page_wpf_feature_comparison',
+		'wpfunnels_page_wp_funnel_settings',
+		'wpfunnels_page_wp_global_store',
+		'wpfunnels_page_edit_funnel',
+		'wpfunnels_page_create_funnel',
+		'wpfunnels_page_wpfnl_settings',
+		'wpfunnels_page_wpf-license',
+		'wpfunnels_page_email-builder',
+		'wpfunnels_page_wp_funnels',
+		'wpfunnels_page_wpf_templates'
 	];
 
 	/**
@@ -104,6 +108,7 @@ class Wpfnl_Admin
 			add_filter( 'wp_dropdown_pages', array( $this, 'show_funnel_steps_on_reading' ) );
 			add_filter( 'gettext', [$this,'wpfnl_customizing_checkout_text'], 10, 3 );
 			add_action( 'admin_init', [$this,'wpfnl_add_type_meta'] );
+			add_action('admin_init', array($this, 'init_actions'));
 			add_action( 'deactivated_plugin', [$this, 'wpfnl_deactivated_plugin'] );
 			add_action( 'activated_plugin', [$this, 'wpfnl_activated_plugin'] );
 
@@ -118,6 +123,12 @@ class Wpfnl_Admin
 		add_action( 'admin_head', function() {
 			remove_submenu_page( WPFNL_MAIN_PAGE_SLUG, 'email-builder' );
 		} );
+
+
+		// Remove all admin notices from WPFunnels Dashboard
+		if ($this->is_current_page('wpfunnels' )) {
+			remove_all_actions('admin_notices');
+		}
 
 
 		/**
@@ -144,6 +155,11 @@ class Wpfnl_Admin
 	}
 
 
+	public function init_actions() {
+		$batch_processor = new BatchProcessingController();
+		new MigrationManager( $batch_processor );
+	}
+
 	/**
 	 * Register dashboard widgets.
 	 *
@@ -167,7 +183,7 @@ class Wpfnl_Admin
 
 
 	/**
-	 * Ppfunnels dashboard widget.
+	 * WPFunnels dashboard widget.
 	 *
 	 * Displays the wpfunnels dashboard widget.
   	 *
@@ -505,7 +521,13 @@ class Wpfnl_Admin
 		if ( 'wp-funnels_page_email-builder' === $hook ) {
 			wp_enqueue_style($this->plugin_name .'-email-builder' , plugin_dir_url(__FILE__) . 'assets/dist/email-builder/email-builder.css', [], $this->version, 'all');
 		}
-		if (in_array($hook, $this->page_hooks)) {
+
+		if ( $this->is_current_page('wpfunnels' ) ) {
+			wp_enqueue_style( 'wpfnl-admin-app', plugin_dir_url(__FILE__) . 'assets/css/admin-app.css', [], $this->version, 'all');
+		}
+
+
+		if ( in_array($hook, $this->page_hooks )) {
 			wp_enqueue_style( 'wp-color-picker' );
 			wp_enqueue_style($this->plugin_name . '-jquery-ui', plugin_dir_url(__FILE__) . 'assets/css/jquery-ui.min.css', [], $this->version, 'all');
 			wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'assets/css/wpfnl-admin.css', [], $this->version, 'all');
@@ -535,10 +557,10 @@ class Wpfnl_Admin
 
 		$screen = get_current_screen();
 
+
 		if('dashboard' === $screen->id || 'plugins' === $screen->id ){
 			wp_enqueue_script( $this->plugin_name.'-global', plugin_dir_url(__FILE__) . 'assets/js/wpfnl-global.js', ['jquery', 'jquery-ui-sortable'], $this->version, true );
 		}
-
 
 		if ( 'wp-funnels_page_email-builder' === $hook ) {
 			$dependency = require_once WPFNL_PATH . '/admin/assets/dist/email-builder/main.min.asset.php';
@@ -558,8 +580,24 @@ class Wpfnl_Admin
                 )
             );
 		}
-		if ( in_array($hook, $this->page_hooks ) ) {
 
+
+		// Enqueue the admin dashboard script only on WPFunnels Main Page
+		if ( $this->is_current_page('wpfunnels' ) ) {
+			wp_enqueue_script( 'wpfnl-admin-app', plugin_dir_url(__FILE__) . 'assets/dist/js/wpfnl-admin-app.min.js', array(), $this->version, true );
+			wp_localize_script( 'wpfnl-admin-app', 'WPFAdminObj', array(
+				'rest_api_url'		=> get_rest_url(),
+				'security'			=> wp_create_nonce('wpfnl-admin'),
+				'nonce'				=> wp_create_nonce('wp_rest'),
+				'priceConfig'   	=> Wpfnl_functions::get_wc_price_config(),
+				'isProActivated' 	=> apply_filters( 'wpfunnels/is_wpfnl_pro_active', false ),
+				'isWPFIntegrationActive' 	=> Wpfnl_functions::is_integrations_addon_active(),
+				'getText'					=> Wpfnl_functions::get_text(),
+			) );
+		}
+
+		if ( in_array( $hook, $this->page_hooks ) ) {
+			
             $is_wc_installed = 'no';
 			$is_wpfunnels_installed = 'no';
 			if (is_plugin_active('woocommerce/woocommerce.php')) {
@@ -1340,11 +1378,30 @@ class Wpfnl_Admin
 		}
 	}
 
+    /**
+     * Checks if the current page slug matches the provided slug.
+     *
+     * @param $slug
+     * @return bool
+     * @since 3.5.0
+     */
+    public function is_current_page( $slug ) {
+        if ( empty( $slug ) ) {
+            return false;
+        }
+        $current_page_slug = isset( $_GET['page'] ) ? sanitize_text_field( $_GET['page'] ) : '';
+        if ( $slug === $current_page_slug ) {
+            return true;
+        }
+        return false;
+    }
+
+
 	/**
 	 * Create contact on mailmint when user allows to track data
 	 *
 	 * @param array $data
-	 * 
+	 *
 	 * @since 3.3.1
 	 */
 	public function wpfunnels_tracker_optin( $data ){

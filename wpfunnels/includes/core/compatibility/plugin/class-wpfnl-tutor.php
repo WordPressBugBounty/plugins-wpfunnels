@@ -28,7 +28,7 @@ class Tutor extends PluginCompatibility{
 		add_action( 'wp', array( $this, 'remove_tutor_redirection_for_wpfnl_step'), 9999 );
         add_action( 'wpfunnels/funnel_order_placed', array( $this, 'funnel_order_placed' ), 10, 3 );
         add_action( 'wpfunnels/offer_accepted', array( $this, 'enroll_to_tutor_course' ), 10, 2 );
-		add_filter( 'tutor_maybe_allow_to_redirect', array( $this, 'tutor_maybe_allow_to_redirect' ), 99 );
+		add_filter( 'tutor_woocommerce_redirect_url', array( $this, 'tutor_maybe_allow_to_redirect' ), 99 );
 	}
 
 

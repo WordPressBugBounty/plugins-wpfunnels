@@ -39,9 +39,10 @@ class Wpfnl_Menus
     public function register_plugin_menus()
     {
         $role_permission = Wpfnl_functions::get_general_settings();
+
         add_menu_page(
-            'WP Funnels',
-            'WP Funnels',
+            'WPFunnels',
+            'WPFunnels',
             Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
             WPFNL_MAIN_PAGE_SLUG,
             '',
@@ -49,12 +50,23 @@ class Wpfnl_Menus
             6
         );
 
+
+        // Register dashboard page for WPF
+		add_submenu_page(
+			WPFNL_MAIN_PAGE_SLUG,
+			__('Dashboard', 'wpfnl'),
+			__('Dashboard', 'wpfnl'),
+			'wpf_manage_funnels',
+			WPFNL_MAIN_PAGE_SLUG,
+			[$this, 'render']
+		);
+
         add_submenu_page(
             WPFNL_MAIN_PAGE_SLUG,
             __('Funnels', 'wpfnl'),
             __('Funnels', 'wpfnl'),
 			Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
-            WPFNL_MAIN_PAGE_SLUG,
+            WPFNL_FUNNEL_PAGE_SLUG,
             [$this, 'render_funnels_page']
         );
 
@@ -92,7 +104,7 @@ class Wpfnl_Menus
             WPFNL_EDIT_FUNNEL_SLUG,
             [$this, 'render_edit_funnel_page']
         );
-        
+
         add_submenu_page(
             WPFNL_MAIN_PAGE_SLUG,
             __('Trash', 'wpfnl'),
@@ -130,7 +142,7 @@ class Wpfnl_Menus
                 [$this, 'render_feature_comparison_page']
             );
 
-            
+
             add_submenu_page(
 				WPFNL_MAIN_PAGE_SLUG,
 				__('Go Pro', 'wpfnl'),
@@ -149,7 +161,18 @@ class Wpfnl_Menus
     }
 
 
-    public function render_email_builder_page() { ?>
+	/**
+	 * Render the admin view of WPFunnels
+	 *
+	 * @since 3.1.7
+	 */
+	public function render() {
+		include_once WPFNL_ADMIN_DIR . 'views/base.php';
+	}
+
+
+
+	public function render_email_builder_page() { ?>
         <div id="email-builder"></div>
     <?php }
 
@@ -179,14 +202,14 @@ class Wpfnl_Menus
 
     /**
      * Render feature comparison page
-     * 
+     *
      * @return void
      * @since 3.4.13
      */
     public function render_feature_comparison_page() {
         require WPFNL_DIR . '/admin/partials/feature-comparison.php';
     }
-    
+
 
     /**
      * Render edit funnel page.
@@ -199,8 +222,8 @@ class Wpfnl_Menus
         Wpfnl::$instance->module_manager->get_admin_modules('funnel')->init($funnel_id);
         Wpfnl::$instance->module_manager->get_admin_modules('funnel')->get_view();
     }
-    
-    
+
+
     /**
      * Render trash funnel page.
      *

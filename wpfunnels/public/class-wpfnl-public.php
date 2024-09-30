@@ -114,7 +114,7 @@ class Wpfnl_Public
 		 */
 		add_action('wp_head', array($this, 'add_custom_script'));
 
-		// remove woodmart hook for funnel checkout 
+		// remove woodmart hook for funnel checkout
 		add_action('wp', [$this, 'remove_woodmart_hook'], 150);
 
 	}
