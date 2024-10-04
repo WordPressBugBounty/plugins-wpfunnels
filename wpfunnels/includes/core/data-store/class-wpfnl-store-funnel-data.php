@@ -239,16 +239,17 @@ class Wpfnl_Funnel_Store_Data extends Wpfnl_Abstract_Store_data implements Wpfnl
 
 					$step = new Wpfnl_Steps_Store_Data();
 					for ($i = 0; $i < count($variations); $i++){
-						$id           = isset( $variations[$i]['id'] ) ? $variations[$i]['id'] : 0;
-						$title        = isset( $variations[$i]['step_title'] ) ? $variations[$i]['step_title'] : '' ;
-						$step_type    = isset( $variations[$i]['step_type'] ) ? $variations[$i]['step_type'] : '' ;
+						
+						$id           = isset( $variations[$i]['stepId'] ) ? $variations[$i]['stepId'] : 0;
+						$title        = isset( $variations[$i]['stepName'] ) ? $variations[$i]['stepName'] : '' ;
+						$step_type    = isset( $variations[$i]['stepType'] ) ? $variations[$i]['stepType'] : '' ;
 						$post_content = get_post_field('post_content', $id);
 
-						if (isset($variations[$i]['variation_type']) && 'original' === $variations[$i]['variation_type']){
+						if (isset($variations[$i]['variationType']) && 'original' === $variations[$i]['variationType']){
 							$step_id = $post_id;
 						}else {
+							
 							$step_id = $step->create_step($post_id, $title, $step_type, $post_content, true);
-
 							// If step can't be created, continue to try creating next variation
 							if ( !$step_id || $step_id instanceof WP_Error ){
 								continue;
@@ -256,7 +257,7 @@ class Wpfnl_Funnel_Store_Data extends Wpfnl_Abstract_Store_data implements Wpfnl
 
 							$this->duplicate_elementor_step_meta( $id, $step_id);
 							$this->duplicate_product_data_for_each_step($step_type, $id, $step_id);
-
+							$this->duplicate_all_meta( $id, $step_id, array('_wpfnl_ab_testing_start_settings') );
 							update_post_meta($step_id, '_parent_step_id', $post_id);
 
 							// Get the funnel id from variation parent step id
@@ -265,10 +266,12 @@ class Wpfnl_Funnel_Store_Data extends Wpfnl_Abstract_Store_data implements Wpfnl
 						}
 						$this->update_step_id_in_funnel_data_and_identifier($id, $step_id, $post_id);
 
-						$meta_value['variations'][$i]['id']             = $step_id;
-						$meta_value['variations'][$i]['step_edit_link'] =  get_edit_post_link($step_id);
-						$meta_value['variations'][$i]['step_view_link'] =  get_post_permalink($step_id);
+						$meta_value['variations'][$i]['stepId']         = $step_id;
+						$meta_value['variations'][$i]['stepEditLink'] 	=  get_edit_post_link($step_id);
+						$meta_value['variations'][$i]['stepViewLink'] 	=  get_post_permalink($step_id);
+					
 					}
+					
 					update_post_meta($post_id, $meta_key, $meta_value);
 
 					continue;

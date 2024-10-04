@@ -38,7 +38,7 @@ class OptinRecorder {
     public function record_optin_submission( $step_id, $post_action, $action_type, $record, $post_data ) {
 
         $funnel_id  = Wpfnl_functions::get_funnel_id_from_step( $step_id );
-        $fields     = $record->get_fields();
+        $fields     = method_exists( $record, 'get_fields' ) ? $record->get_fields() : ( isset( $record->form_data ) ? $record->form_data : array() );
         $email      = '';
         $user_id    = 0;
         $hash       = '';

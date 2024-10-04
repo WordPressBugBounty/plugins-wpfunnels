@@ -581,21 +581,6 @@ class Wpfnl_Admin
             );
 		}
 
-
-		// Enqueue the admin dashboard script only on WPFunnels Main Page
-		if ( $this->is_current_page('wpfunnels' ) ) {
-			wp_enqueue_script( 'wpfnl-admin-app', plugin_dir_url(__FILE__) . 'assets/dist/js/wpfnl-admin-app.min.js', array(), $this->version, true );
-			wp_localize_script( 'wpfnl-admin-app', 'WPFAdminObj', array(
-				'rest_api_url'		=> get_rest_url(),
-				'security'			=> wp_create_nonce('wpfnl-admin'),
-				'nonce'				=> wp_create_nonce('wp_rest'),
-				'priceConfig'   	=> Wpfnl_functions::get_wc_price_config(),
-				'isProActivated' 	=> apply_filters( 'wpfunnels/is_wpfnl_pro_active', false ),
-				'isWPFIntegrationActive' 	=> Wpfnl_functions::is_integrations_addon_active(),
-				'getText'					=> Wpfnl_functions::get_text(),
-			) );
-		}
-
 		if ( in_array( $hook, $this->page_hooks ) ) {
 			
             $is_wc_installed = 'no';
@@ -765,11 +750,11 @@ class Wpfnl_Admin
 				array(
 					'ajaxurl' 				=> esc_url_raw(admin_url('admin-ajax.php')),
 					'rest_api_url' 			=> esc_url_raw(get_rest_url()),
-					'dashboard_url' 		=> esc_url_raw(admin_url('admin.php?page=' . WPFNL_MAIN_PAGE_SLUG)),
+					'dashboard_url' 		=> esc_url_raw(admin_url('admin.php?page=' . WPFNL_FUNNEL_PAGE_SLUG)),
 					'settings_url' 			=> esc_url_raw(admin_url('admin.php?page=settings')),
 					'home_url' 				=> esc_url_raw(home_url()),
 					'funnel_id' 			=> $funnel_id,
-					'isTemplatePage' 			=> 'wp-funnels_page_wpf_templates' === $hook,
+					'isTemplatePage' 		=> 'wpfunnels_page_wpf_templates' === $hook,
 					'is_pro' 				=> Wpfnl_functions::is_pro_license_activated(),
 					'is_ab_tesing_available'=> defined('WPFNL_PRO_VERSION') ? version_compare( WPFNL_PRO_VERSION, "1.7.3", ">=" ) : false,
 					'is_webhook_licensed'   => Wpfnl_functions::is_webhook_license_activated(),
@@ -819,6 +804,22 @@ class Wpfnl_Admin
 				)
 			);
 
+			// Enqueue the admin dashboard script only on WPFunnels Main Page
+			
+			if ( $this->is_current_page('wpfunnels' ) ) {
+				wp_enqueue_script( 'wpfnl-admin-app', plugin_dir_url(__FILE__) . 'assets/dist/js/wpfnl-admin-app.min.js', array(), $this->version, true );
+				wp_localize_script( 'wpfnl-admin-app', 'WPFAdminObj', array(
+					'rest_api_url'		=> get_rest_url(),
+					'security'			=> wp_create_nonce('wpfnl-admin'),
+					'nonce'				=> wp_create_nonce('wp_rest'),
+					'priceConfig'   	=> Wpfnl_functions::get_wc_price_config(),
+					'isProActivated' 	=> apply_filters( 'wpfunnels/is_wpfnl_pro_active', false ),
+					'isWPFIntegrationActive' 	=> Wpfnl_functions::is_integrations_addon_active(),
+					'getText'					=> Wpfnl_functions::get_text(),
+				) );
+			}
+			
+
 			/**
 			 * Localize scripts for funnel window
     		 *
@@ -829,6 +830,8 @@ class Wpfnl_Admin
 
 			$localize = apply_filters( 'wpfunnels/funnel_window_admin_localize', array() );
 			wp_localize_script( $this->plugin_name . '-funnel-window', 'wpfunnels_funnel_localize', array($localize));
+
+			
 			do_action( 'wpfunnels_after_scripts_loaded' );
 		}
 	}

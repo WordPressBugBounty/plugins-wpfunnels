@@ -229,7 +229,7 @@ class Module extends Wpfnl_Admin_Module
 
         $redirect_link = add_query_arg(
             [
-                'page' => WPFNL_MAIN_PAGE_SLUG,
+                'page' => WPFNL_FUNNEL_PAGE_SLUG,
             ],
             admin_url('admin.php')
         );
