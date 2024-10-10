@@ -4,7 +4,7 @@
     // ---delete promotional-banner notice permanently ------
     $(document).on("click", ".wp-anniversary-banner .close-promotional-banner", function(event) {
 		event.preventDefault();
-        $('.wp-anniversary-banner').css('display','none');
+        $('.wp-anniversary-banner').attr('style', 'display: none !important');
 		wpAjaxHelperRequest("delete_promotional_banner")
 	});
 

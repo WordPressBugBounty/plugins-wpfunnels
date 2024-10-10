@@ -51,7 +51,7 @@ class SpecialOccasionBanner {
         $this->start_date   = strtotime($start_date);
         $this->end_date     = strtotime($end_date);
 
-        if ( !defined('WPFNL_PRO_VERSION') && 'yes' === get_option( '_is_wpfnl_eid_promotion', 'yes' )) {
+        if ( !defined('WPFNL_PRO_VERSION') && 'yes' === get_option( '_is_wpfnl_hallowen_promotion_24', 'yes' )) {
             // Hook into the admin_notices action to display the banner
             add_action('admin_notices', [$this, 'display_banner']);
             add_action('admin_head', array($this, 'add_styles'));
@@ -59,13 +59,30 @@ class SpecialOccasionBanner {
     }
 
     /**
+     * Calculate time remaining until Halloween
+     *
+     * @return array Time remaining in days, hours, and minutes
+     */
+    public function wpf_get_halloween_countdown() {
+        $halloween = strtotime('2024-10-21 23:59:59'); // Set this to the next Halloween
+        $now = current_time('timestamp');
+        $diff = $halloween - $now;
+
+        return array(
+            'days' => floor($diff / (60 * 60 * 24)),
+            'hours' => floor(($diff % (60 * 60 * 24)) / (60 * 60)),
+            'mins' => floor(($diff % (60 * 60)) / 60),
+        );
+    }
+
+    /**
      * Displays the special occasion banner if the current date and time are within the specified range.
      */
     public function display_banner() {
         $screen                     = get_current_screen();
-        $promotional_notice_pages   = ['dashboard', 'plugins', 'toplevel_page_wp_funnels', 'wp-funnels_page_wpfnl_settings'];
+        $promotional_notice_pages   = ['dashboard', 'plugins', 'wpfunnels_page_wp_funnels', 'wpfunnels_page_edit_funnel', 'wp-funnels_page_wpfnl_settings'];
         $current_date_time          = current_time('timestamp');
-
+       
         if (!in_array($screen->id, $promotional_notice_pages)) {
             return;
         }
@@ -76,6 +93,10 @@ class SpecialOccasionBanner {
         // Calculate the time remaining in seconds
         $time_remaining = $this->end_date - $current_date_time;
 
+        $countdown = $this->wpf_get_halloween_countdown();
+
+
+
         ?>
 
 
@@ -84,88 +105,48 @@ class SpecialOccasionBanner {
             <div class="gwpf-tb__notification" id="rex_deal_notification">
 
                 <div class="banner-overflow">
-                    <div class="gwpf-anniv__container-area">
+                    <section class="wpf-notification-counter default-notification" aria-labelledby="wpf-halloween-offer-title">
+                        <div class="wpf-notification-counter__container">
+                            <div class="wpf-notification-counter__content">
 
-                        <div class="gwpf-anniv__image gwpf-anniv__image--left">
-                        <figure>
-                                    <img src="<?php echo esc_url( WPFNL_URL.'admin/assets/images/banner-image/eid-ul-adha-moon.webp' ); ?>" alt="Eid Ul Adha Moon" />
-                                    </figure>
-                        </div>
+                                <figure class="wpf-notification-counter__figure-logo">
+                                    <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/halloween/halloween-default.webp '); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
+                                </figure>
 
-                        <div class="gwpf-anniv__content-area">
+                                <figure class="wpf-notification-counter__figure-percentage">
+                                    <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/halloween/percentage.webp'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
+                                </figure>
 
+                                <div id="wpf-halloween-countdown" class="wpf-notification-counter__countdown" aria-live="polite">
+                                    <h3 class="screen-reader-text"><?php echo __('Offer Countdown', 'wpfnl'); ?></h3>
+                                    <ul class="wpf-notification-counter__list">
 
-                            <div class="gwpf-anniv__image--group">
-
-                                <div class='gwpf-anniv__image gwpf-anniv__image--eid-mubarak'>
-                                <figure>
-                                    <img src="<?php echo esc_url( WPFNL_URL.'admin/assets/images/banner-image/eid-utl-adha-text.webp' ); ?>" alt="Eid Ul Adha Moon" />
-                                    </figure>
+                                            <?php foreach (['days', 'hours', 'mins'] as $unit): ?>
+                                            <li class="wpf-notification-counter__item ">
+                                                <span id="wpf-halloween-<?php echo esc_attr($unit); ?>" class="wpf-notification-counter__time">
+                                                    <?php echo esc_html($countdown[$unit]); ?>
+                                                </span>
+                                                <span class="wpf-notification-counter__label">
+                                                    <?php echo esc_html($unit); ?>
+                                                </span>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
                                 </div>
 
-                                <div class='gwpf-anniv__image gwpf-anniv__image--wpfunnel-logo'>
-                                <figure>
-                                    <img src="<?php echo esc_url( WPFNL_URL.'admin/assets/images/banner-image/eid-ul-adha-funnel.webp' ); ?>" alt="WP Funnels Logo" />
-                                    </figure>
+                                <div class="wpf-notification-counter__btn-area">
+                                    <a href="<?php echo esc_url('https://getwpfunnels.com/pricing/?utm_source=website&utm_medium=wpf-ui&utm_campaign=halloween24'); ?>" class="wpf-notification-counter__btn" role="button">
+
+                                    <span class="wpf-btn-inner">
+                                        <span class="screen-reader-text"><?php echo __('Click to view Halloween sale products', 'wpfnl'); ?></span>
+                                        <span aria-hidden="true" class="wpf-notification-counter__mint-button"> <?php echo __('FLAT', 'wpfnl'); ?> <strong class="wpf-notification-counter__stroke-font"><?php echo __('30%', 'wpfnl'); ?></strong> <?php echo __('OFF', 'wpfnl'); ?></span>
+                                    </span>
+                                        
+                                    </a>
                                 </div>
-
-                                <div class="gwpf-anniv__image gwpf-anniv__image--four">
-                                <figure>
-                                    <img src="<?php echo esc_url( WPFNL_URL.'admin/assets/images/banner-image/eid-ul-adha-tweenty.webp' ); ?>" alt="Eid Ul Adha Discount" />
-                                    </figure>
-                                </div>
-
-
-
-                                <div class="gwpf-anniv__text-divider">
-
-                                    <div class="gwpf-anniv__lead-text">
-                                        <span>
-                                            <svg width="33" height="30" fill="none" viewBox="0 0 33 30" xmlns="http://www.w3.org/2000/svg">
-                                                <path fill="#EE8133" stroke="#EE8133" d="M28.584 25.483a257.608 257.608 0 00-.525-1.495c-.28-.795-.569-1.614-.769-2.199a1.432 1.432 0 01-.084-.552c.014-.211.106-.57.487-.726a.828.828 0 01.416-.064.754.754 0 01.38.161c.139.11.248.274.309.366l.02.032.003.004c.127.191.203.355.265.49l.04.09.572 1.176a185.411 185.411 0 011.49 3.11c.193.412.306.86.404 1.245l.027.106h0c.077.301.093.67-.128.977-.224.313-.587.415-.925.429h0a54.91 54.91 0 01-3.43.022h-.001l-.166-.003c-1.395-.027-2.84-.055-4.268-.29h-.003c-.312-.053-.574-.138-.78-.299a1.212 1.212 0 01-.371-.523l-.01-.024-.008-.024a.692.692 0 01.175-.694c.137-.136.31-.205.428-.243.248-.08.538-.105.687-.117a5.511 5.511 0 011.039 0c.766.051 1.528.104 2.297.157l.16.01c-5.037-2.4-9.838-5.23-14.007-9.083C7.962 13.508 4.206 9.005 1.53 3.652h0l-.002-.004-.02-.04c-.183-.377-.397-.817-.517-1.283A2.45 2.45 0 00.985 2.3c-.025-.088-.08-.28-.068-.479.016-.273.144-.526.401-.728l.027-.02.029-.018a.729.729 0 01.792.026c.18.117.325.3.442.47.17.24.35.506.507.787l.001.002c2.4 4.35 5.404 8.244 8.893 11.79l-.343.338.343-.338c4.39 4.463 9.63 7.735 15.16 10.655.463.242.93.466 1.415.697z" />
-                                            </svg>
-                                        </span>
-
-                                        <h2 class="gwpf-wp-anniversary__title-end">
-                                            <?php echo __("Ends <br> Soon", 'wpfnl') ?>
-                                        </h2>
-
-                                    </div>
-
-                                </div>
-
                             </div>
-
-                            <!-- .gwpf-anniv__image end -->
-                            <div class="gwpf-anniv__btn-area">
-
-                                <a href="<?php echo esc_url($this->btn_link); ?>"  role="button" class="gwpf-anniv__btn" target="_self">
-                                    <?php echo __('Get It Now', 'wpfnl') ?>
-                                </a>
-                                <svg width="70" height="63" fill="none" viewBox="0 0 70 63" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill="#FF44BC" d="M4.607 7.083c1.027-1.909 1.655-3.536 1.59-5.337a5.106 5.106 0 00-3.25-.907A9.527 9.527 0 011.34 6.08c1.486-.104 2.372.062 3.267 1.002z" />
-                                    <path fill="url(#paint0_linear_2007_3)" d="M67.79 55.948c-1.79-.111-3.545-.96-6.504-4.16a9.216 9.216 0 00-1.916 5.447 16.383 16.383 0 007.3 3.89 8.389 8.389 0 011.12-5.177z" />
-                                    <path fill="#EE8134" d="M60.724 14.364a18.229 18.229 0 01-6.33 3.313 5.826 5.826 0 001.984 3.154 24.284 24.284 0 006.717-2.97c-1.715-1.08-2.408-1.907-2.37-3.497z" />
-                                    <defs>
-                                        <linearGradient id="paint0_linear_2007_3" x1="27276.4" x2="27248.7" y1="7756.52" y2="7812.21" gradientUnits="userSpaceOnUse">
-                                            <stop stop-color="#4D8EFF" />
-                                            <stop offset=".43" stop-color="#3F76FF" />
-                                            <stop offset="1" stop-color="#2850FF" />
-                                        </linearGradient>
-                                    </defs>
-                                </svg>
-
-                            </div>
-
                         </div>
-
-                        <div class="gwpf-anniv__image gwpf-anniv__image--right">
-                        <figure>
-    <img src="<?php echo esc_url( WPFNL_URL.'admin/assets/images/banner-image/eid-ul-adha-right.webp' ); ?>" alt="Eid-ul-adha-mosque" />
-</figure>
-                        </div>
-
-                    </div>
+                    </section>
 
                 </div>
 
@@ -182,41 +163,36 @@ class SpecialOccasionBanner {
   
 
         <script>
-            // var timeRemaining = <?php 
-            // echo esc_js($time_remaining); 
-            ?>;
+            function updateCountdown() {
+                var endDate = new Date("2024-10-21 23:59:59").getTime();
+                var now = new Date().getTime();
+                var timeLeft = endDate - now;
 
-            // Update the countdown every second
-            // setInterval(function() {
-            //     // var countdownElement    = document.getElementById('wpfnl_countdown');
-            //     // var daysElement         = document.getElementById('wpfnl_days');
-            //     // var hoursElement        = document.getElementById('wpfnl_hours');
-            //     // var minutesElement      = document.getElementById('wpfnl_minutes');
+                var days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
 
-            //     // Decrease the remaining time
-            //     timeRemaining--;
+                var daysElement = document.getElementById('wpf-halloween-days');
+                var hoursElement = document.getElementById('wpf-halloween-hours');
+                var minsElement = document.getElementById('wpf-halloween-mins');
 
-            //     // Calculate new days, hours, and minutes
-            //     var days = Math.floor(timeRemaining / (60 * 60 * 24));
-            //     var hours = Math.floor((timeRemaining % (60 * 60 * 24)) / (60 * 60));
-            //     var minutes = Math.floor((timeRemaining % (60 * 60)) / 60);
+                if (daysElement) {
+                    daysElement.innerHTML = days;
+                }
 
+                if (hoursElement) {
+                    hoursElement.innerHTML = hours;
+                }
 
-            //     // Format values with leading zeros
-            //     days = (days < 10) ? '0' + days : days;
-            //     hours = (hours < 10) ? '0' + hours : hours;
-            //     minutes = (minutes < 10) ? '0' + minutes : minutes;
+                if (minsElement) {
+                    minsElement.innerHTML = minutes;
+                }
+            }
 
-            //     // Update the HTML
-            //     // daysElement.textContent = days;
-            //     // hoursElement.textContent = hours;
-            //     // minutesElement.textContent = minutes;
-
-            //     // Check if the countdown has ended
-            //     if (timeRemaining <= 0) {
-            //         countdownElement.innerHTML = 'Campaign Ended';
-            //     }
-            // }, 1000); // Update every second
+            document.addEventListener('DOMContentLoaded', function() {
+                updateCountdown();
+                setInterval(updateCountdown, 60000); // Update every minute
+            });
         </script>
         <?php
     }
@@ -260,6 +236,15 @@ class SpecialOccasionBanner {
                 box-sizing: border-box;
             }
 
+            .wp-anniversary-banner.notice {
+                display: block !important;
+                background: none;
+                border: none;
+                box-shadow: none;
+                padding: 0;
+                margin: 0;
+            }
+
             .gwpf-tb__notification {
                 background-color: #d6e4ff;
                 width: calc(100% - 20px);
@@ -279,6 +264,7 @@ class SpecialOccasionBanner {
                 overflow: hidden;
                 position: relative;
                 width: 100%;
+                z-index: 1;
             }
 
             .gwpf-tb__notification .close-promotional-banner {
@@ -830,6 +816,202 @@ class SpecialOccasionBanner {
                 .gwpf-anniv__image--group {
                     gap: 10px;
                     padding: 0;
+                }
+            }
+
+             /* Halloween */
+
+             .wpf-notification-counter {
+                position: relative;
+                background-image: url(<?php echo esc_url(WPFNL_URL . 'admin/assets/images/halloween/promotional-banner.png'); ?>);
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: 100% 100%;
+                object-fit: cover;
+                background-color: #03031E;
+                z-index: 1111;
+                padding: 9px 0 4px;
+            }
+
+            .wpf-notification-counter__container {
+                position: relative;
+                width: 100%;
+                max-height: 110px;
+                max-width: 1310px;
+                margin: 0 auto;
+                padding: 0px 15px;
+            }
+
+            .wpf-notification-counter__content {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .wpf-notification-counter__figure-logo {
+                max-width: 268px;
+            }
+
+            .wpf-notification-counter__figure-percentage {
+                max-width: 248px;
+                margin-left: -75px;
+            }
+
+            .wpf-notification-counter__img {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .wpf-notification-counter__list {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin: 0;
+                padding: 0;
+                list-style: none;
+            }
+
+            .wpf-notification-counter__item {
+                display: flex;
+                flex-direction: column;
+                width: 56.14px;
+                font-family: "Circular Std Book";
+                font-size: 15px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: normal;
+                letter-spacing: 0.75px;
+                text-transform: uppercase;
+                text-align: center;
+                color: #FFF;
+            }
+
+            .wpf-notification-counter__time {
+                font-size: 32px;
+                font-family: "Inter";
+                font-style: normal;
+                font-weight: 700;
+                line-height: normal;
+                color: #fff;
+                text-align: center;
+                margin-bottom: 6px;
+                border-radius: 3px 3px 10px 10px;
+                border-top: 1px solid #6746D0;
+                border-right: 1px solid #6746D0;
+                border-bottom: 5px solid #6746D0;
+                border-left: 1px solid #6746D0;
+                background: linear-gradient(155deg, #6746D0 2.02%, #100E35 55.1%, #100E35 131.47%);
+            }
+
+            .wpf-notification-counter__btn-area {
+                display: flex;
+                align-items: flex-end;
+                justify-content: flex-end;
+                margin-bottom: 30px;
+            }
+
+            .wpf-notification-counter__btn {
+                position: relative;
+                font-family: "Inter";
+                font-size: 20px;
+                line-height: normal;
+                color: #FFF;
+                text-align: center;
+                filter: drop-shadow(0px 30px 60px rgba(21, 19, 119, 0.20));
+                padding: 12px 22px;
+                display: inline-block;
+                cursor: pointer;
+                text-transform: uppercase;
+                background: #6746D0;
+                text-decoration: none;
+                border-radius: 10px;
+                font-weight: 400;
+                transition: all 0.3s ease;
+            }
+
+            .wpf-notification-counter__btn:hover {
+                background-color: #201cfe;
+                color: #ffffff;
+            }
+
+            .wpf-notification-counter__stroke-font {
+                font-size: 26px;
+                font-family: "Inter";
+                font-weight: 700;
+            }
+
+            /* Media Queries */
+            @media only screen and (max-width: 1199px) {
+                .wpf-notification-counter__container {
+                    max-width: 1010px;
+                }
+                .wpf-notification-counter__figure-percentage {
+                    margin-left: -60px;
+                }
+                .wpf-notification-counter__figure-percentage,
+                .wpf-notification-counter__figure-logo {
+                    max-width: 220px;
+                }
+                .wpf-notification-counter__btn {
+                    font-size: 15px;
+                    line-height: 20px;
+                    padding: 10px 16px;
+                    font-weight: 400;
+                }
+                .wpf-notification-counter__stroke-font {
+                    font-size: 20px;
+                }
+
+                .wpf-notification-counter {
+                    padding: 5px 0 4px;
+                }
+                .wpf-notification-counter__figure-percentage {
+                    margin-left: 0px;
+                }
+                .wpf-notification-counter__figure-logo {
+                    max-width: 160px;
+                }
+                .wpf-notification-counter__figure-percentage {
+                    max-width: 150px;
+                }
+                .wpf-notification-counter__btn {
+                    font-size: 14px;
+                    line-height: 18px;
+                    padding: 9px 10px;
+                }
+                .wpf-notification-counter__stroke-font {
+                    font-size: 18px;
+                }
+                .wpf-notification-counter__time {
+                    font-size: 24px;
+                }
+            }
+
+            @media only screen and (max-width: 767px) {
+                .wpf-notification-counter {
+                    padding: 50px 0;
+                    background-image: url(<?php echo esc_url(WPFNL_URL . 'admin/assets/images/halloween/promotional-banner-mobile.webp'); ?>);
+                }
+                .wpf-notification-counter__container {
+                    max-height: none;
+                }
+                .wpf-notification-counter__figure-logo {
+                    max-width: 174px;
+                }
+                .wpf-notification-counter__figure-percentage {
+                    max-width: 150px;
+                }
+                .wpf-notification-counter__content {
+                    flex-flow: column;
+                    gap: 12px;
+                    text-align: center;
+                }
+                .wpf-notification-counter__btn {
+                    font-size: 16px;
+                    padding: 11px 16px;
+                }
+                .wpf-notification-counter__stroke-font {
+                    font-size: 22px;
                 }
             }
 
