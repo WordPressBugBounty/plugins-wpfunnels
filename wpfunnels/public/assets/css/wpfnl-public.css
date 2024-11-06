@@ -567,6 +567,9 @@ body.wpfnl-theme-style-removed {
 .wpfnl-checkout .woocommerce-message:before {
   display: none;
 }
+.wpfnl-checkout .subtotal-text-for-mobile {
+  display: none;
+}
 .wpfnl-checkout .wpfnl-multistep-wizard {
   display: none;
 }
@@ -650,7 +653,6 @@ body.wpfnl-theme-style-removed {
   font-weight: 500;
   padding: 15px 20px;
   border: 1px solid #E5E8F3;
-  border-bottom: none;
   float: none !important;
   display: block;
   width: 100% !important;
@@ -1345,6 +1347,7 @@ body.wpfnl-theme-style-removed {
   flex: inherit;
   padding: 0;
   max-width: 100%;
+  margin-bottom: 20px;
 }
 
 .wpfnl-checkout .woocommerce form .form-row-first,
@@ -2051,6 +2054,60 @@ body.rtl .woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-
   .wpfnl-checkout .woocommerce-checkout #payment .wc-credit-card-form div.form-row.form-row-last {
     width: 100%;
     padding-left: 0;
+  }
+  .wpfnl-checkout table.woocommerce-checkout-review-order-table {
+    border-top: 1px solid #E5E8F3 !important;
+  }
+  .wpfnl-checkout table.woocommerce-checkout-review-order-table tr {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    border-bottom: 1px solid #E5E8F3 !important;
+  }
+  .wpfnl-checkout table.woocommerce-checkout-review-order-table tr.woocommerce-shipping-totals.shipping td {
+    text-align: right;
+  }
+  .wpfnl-checkout table.woocommerce-checkout-review-order-table tr.woocommerce-shipping-totals.shipping td .woocommerce-shipping-methods {
+    min-width: auto;
+  }
+  .wpfnl-checkout table.woocommerce-checkout-review-order-table th, .wpfnl-checkout table.woocommerce-checkout-review-order-table td {
+    border: none !important;
+    width: auto !important;
+    min-width: auto !important;
+    max-width: 100%;
+    padding: 5px 10px !important;
+    word-break: break-all;
+  }
+  .wpfnl-checkout table.woocommerce-checkout-review-order-table th::before, .wpfnl-checkout table.woocommerce-checkout-review-order-table td::before {
+    display: none;
+  }
+  .wpfnl-checkout table.woocommerce-checkout-review-order-table th.product-total, .wpfnl-checkout table.woocommerce-checkout-review-order-table td.product-total {
+    text-align: right;
+    width: auto !important;
+    min-width: max-content !important;
+  }
+  .wpfnl-checkout table.woocommerce-checkout-review-order-table thead {
+    display: block;
+    min-width: 100%;
+    max-width: 100%;
+  }
+  .wpfnl-checkout table.woocommerce-checkout-review-order-table thead tr th {
+    width: 100% !important;
+    text-align: center;
+  }
+  .wpfnl-checkout table.woocommerce-checkout-review-order-table thead tr th.product-total {
+    display: none;
+  }
+  .wpfnl-checkout table.woocommerce-checkout-review-order-table thead tr th .subtotal-text-for-mobile {
+    display: inline-block;
+  }
+  .wpfnl-checkout table.woocommerce-checkout-review-order-table tbody, .wpfnl-checkout table.woocommerce-checkout-review-order-table tfoot {
+    display: block;
+    min-width: 100%;
+    max-width: 100%;
+  }
+  .wpfnl-checkout table.woocommerce-checkout-review-order-table tfoot tr:last-child {
+    border-bottom: none;
   }
 }
 @media only screen and (max-width: 450px) {

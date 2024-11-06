@@ -1,4 +1,5 @@
 <?php
+defined('ABSPATH') || exit;
 $step_id             = $_GET[ 'post_id' ] ?? get_the_ID();
 $layout              = $options[ 'layout' ] ?? '';
 $admin_email         = $options[ 'admin_email' ]  ?? '';
@@ -224,7 +225,7 @@ $redirect_url        = $options[ 'redirect_url' ] ?? '';
 
             <div class="wpfnl-optin-form-group submit">
                 <button type="submit" class="btn-optin-oxygen btn-optin">
-                    <?php echo $options['button_text'] ?>
+                    <?php echo isset($options['button_text']) ? esc_html($options['button_text']) : ''; ?>
                     <span class="wpfnl-loader"></span>
                 </button>
             </div>

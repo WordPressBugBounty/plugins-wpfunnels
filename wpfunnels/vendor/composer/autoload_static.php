@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitdc7bdfab0efd7b9738bb4acf83b1a4f4
+class ComposerStaticInit0606b46d39823e16ec4708e5d1cb78bd
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -120,8 +120,6 @@ class ComposerStaticInitdc7bdfab0efd7b9738bb4acf83b1a4f4
         'Appsero\\License' => __DIR__ . '/..' . '/appsero/client/src/License.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'Flatted' => __DIR__ . '/../..' . '/includes/core/widgets/block/node_modules/flatted/php/flatted.php',
-        'FlattedString' => __DIR__ . '/../..' . '/includes/core/widgets/block/node_modules/flatted/php/flatted.php',
         'GuzzleHttp\\Psr7\\AppendStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/AppendStream.php',
         'GuzzleHttp\\Psr7\\BufferStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/BufferStream.php',
         'GuzzleHttp\\Psr7\\CachingStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/CachingStream.php',
@@ -623,9 +621,9 @@ class ComposerStaticInitdc7bdfab0efd7b9738bb4acf83b1a4f4
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitdc7bdfab0efd7b9738bb4acf83b1a4f4::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitdc7bdfab0efd7b9738bb4acf83b1a4f4::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitdc7bdfab0efd7b9738bb4acf83b1a4f4::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit0606b46d39823e16ec4708e5d1cb78bd::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit0606b46d39823e16ec4708e5d1cb78bd::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit0606b46d39823e16ec4708e5d1cb78bd::$classMap;
 
         }, null, ClassLoader::class);
     }

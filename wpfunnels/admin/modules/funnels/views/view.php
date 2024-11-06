@@ -131,7 +131,7 @@ $live_redirect_link = add_query_arg(
                         ?>
 
                         <div class="search-group">
-                            <input name="page" type="hidden" value="<?php echo 'trash_funnels' != sanitize_text_field( $_GET['page'])  ? WPFNL_MAIN_PAGE_SLUG : WPFNL_TRASH_FUNNEL_SLUG; ?>">
+                            <input name="page" type="hidden" value="<?php echo 'trash_funnels' != sanitize_text_field( $_GET['page'])  ? WPFNL_FUNNEL_PAGE_SLUG : WPFNL_TRASH_FUNNEL_SLUG; ?>">
                             <?php require_once WPFNL_DIR . '/admin/partials/icons/search-icon.php'; ?>
                             <input name="s" type="text" value="<?php echo esc_attr($s); ?>" placeholder="<?php echo __('Search for a funnel...', 'wpfnl'); ?>">
                         </div>

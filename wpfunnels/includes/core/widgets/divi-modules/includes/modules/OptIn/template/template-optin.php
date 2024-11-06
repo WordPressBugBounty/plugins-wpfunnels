@@ -1,3 +1,5 @@
+<?php defined('ABSPATH') || exit; ?>
+
 <div class="wpfnl-optin-form wpfnl-shortcode-optin-form-wrapper" >
     <form method="post">
         <input type="hidden" name="post_id" value="<?php echo $step_id ?>" />

@@ -13,6 +13,9 @@
 			display: none;
 		}
 	}
+	.subtotal-text-for-mobile {
+		display: none;
+	}
 
 	.wpfnl-multistep-wizard {
 		display: none;
@@ -106,7 +109,6 @@
 		font-weight: 500;
 		padding: 15px 20px;
 		border: 1px solid #E5E8F3;
-		border-bottom: none;
 		float: none!important;
 		display: block;
 		width: 100%!important;
@@ -929,6 +931,7 @@
     flex: inherit;
     padding: 0;
     max-width: 100%;
+	margin-bottom: 20px;
 }
 
 .wpfnl-checkout .woocommerce form .form-row-first,
@@ -1701,6 +1704,80 @@ body.rtl {
 	.wpfnl-checkout .woocommerce-checkout #payment .wc-credit-card-form div.form-row.form-row-last {
 		width: 100%;
 		padding-left: 0;
+	}
+
+	// Responsiveness of Order Details table
+	.wpfnl-checkout table.woocommerce-checkout-review-order-table {
+		border-top: 1px solid #E5E8F3 !important;
+		tr{
+			display: flex;
+			flex-wrap: nowrap;
+			justify-content: space-between;
+			border-bottom: 1px solid #E5E8F3 !important;
+
+			&.woocommerce-shipping-totals.shipping {
+				td {
+					text-align: right;
+
+					.woocommerce-shipping-methods {
+						min-width: auto;
+					}
+				}
+			}
+		}
+
+		th, td {
+			border: none !important;
+			width: auto  !important;
+			min-width: auto !important;
+			max-width: 100%;
+			padding: 5px 10px !important;
+			word-break: break-all;
+
+			&::before {
+				display: none;
+			}
+
+			&.product-total {
+				text-align: right;
+    			width: auto !important;
+    			min-width: max-content !important;
+			}
+		}
+
+		thead {
+			display: block;
+			min-width: 100%;
+			max-width: 100%;
+			tr {
+
+				th {
+					width: 100% !important;
+					text-align: center;
+
+					&.product-total {
+						display: none;
+					}
+					.subtotal-text-for-mobile {
+						display: inline-block;
+					}
+				}
+			}
+		}
+
+		tbody, tfoot {
+			display: block;
+			min-width: 100%;
+			max-width: 100%;
+		}
+
+		tfoot {
+			tr {
+				&:last-child {
+					border-bottom: none;
+				}
+			}
+		}
 	}
 
 }
