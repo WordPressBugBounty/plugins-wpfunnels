@@ -76,7 +76,7 @@ class Module extends Wpfnl_Admin_Module
 		'wp-funnels_page_create_funnel',
 		'wp-funnels_page_wpfnl_settings',
 		'wp-funnels_page_wpf-license',
-		'wp-funnels_page_email-builder',
+		'wpfunnels_page_email-builder',
 	];
 
     protected $settings_meta_keys = [

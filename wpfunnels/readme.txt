@@ -3,9 +3,9 @@ Contributors: coderexltd, getwpfunnels, coderexco
 Donate link: https://getwpfunnels.com/
 Tags: funnel builder, order bump, sales funnels, lead generation, custom checkout
 Requires at least: 6.1
-Tested up to:  6.6.2
+Tested up to:  6.7.0
 Requires PHP: 7.4
-Stable tag:  3.5.4
+Stable tag:  3.5.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -568,6 +568,10 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.5.5 (2024-11-19) =
+* Compatibility : Compatible with WordPress 6.7.0
+* Bugfix: Checkout Page Breaks with Thrive Architect Builder
 
 = 3.5.4 (2024-11-05) =
 * Bugfix: Order Details on the Funnel Templates are not Responsive

@@ -1806,3 +1806,13 @@ body.rtl {
 	}
 
 }
+
+// Thrive Architect Builder Compatibility Add
+.wpfunnel_steps-template .thrv_wrapper div {
+    box-sizing: border-box !important;
+}
+
+.wpfunnel_steps-template #tve_editor .woocommerce-checkout * {
+    white-space: normal;
+}
+

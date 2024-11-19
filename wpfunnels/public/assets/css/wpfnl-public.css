@@ -2132,6 +2132,14 @@ body.rtl .woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-
     min-width: 150px;
   }
 }
+.wpfunnel_steps-template .thrv_wrapper div {
+  box-sizing: border-box !important;
+}
+
+.wpfunnel_steps-template #tve_editor .woocommerce-checkout * {
+  white-space: normal;
+}
+
 .wpfnl-thankyou-wrapper section {
   padding: 0;
 }

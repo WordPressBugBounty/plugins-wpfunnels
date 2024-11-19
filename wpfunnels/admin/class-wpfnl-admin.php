@@ -518,7 +518,7 @@ class Wpfnl_Admin
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-		if ( 'wp-funnels_page_email-builder' === $hook ) {
+		if ( 'wpfunnels_page_email-builder' === $hook ) {
 			wp_enqueue_style($this->plugin_name .'-email-builder' , plugin_dir_url(__FILE__) . 'assets/dist/email-builder/email-builder.css', [], $this->version, 'all');
 		}
 
@@ -562,7 +562,7 @@ class Wpfnl_Admin
 			wp_enqueue_script( $this->plugin_name.'-global', plugin_dir_url(__FILE__) . 'assets/js/wpfnl-global.js', ['jquery', 'jquery-ui-sortable'], $this->version, true );
 		}
 
-		if ( 'wp-funnels_page_email-builder' === $hook ) {
+		if ( 'wpfunnels_page_email-builder' === $hook ) {
 			$dependency = require_once WPFNL_PATH . '/admin/assets/dist/email-builder/main.min.asset.php';
 			wp_enqueue_script(
 					$this->plugin_name . '-email-builder',
