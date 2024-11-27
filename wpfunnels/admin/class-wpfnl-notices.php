@@ -577,7 +577,7 @@ class Notice {
      */
     public function wpfnl_delete_promotional_banner( $payload ){
 
-        update_option( '_is_wpfnl_3rd_anniversy_promotion', 'no' );
+        update_option( '_is_wpfnl_black_friday_24', 'no' );
         return [
             'success' => true,
         ];

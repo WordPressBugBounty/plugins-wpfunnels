@@ -5,7 +5,7 @@ Tags: funnel builder, order bump, sales funnels, lead generation, custom checkou
 Requires at least: 6.1
 Tested up to:  6.7.0
 Requires PHP: 7.4
-Stable tag:  3.5.6
+Stable tag:  3.5.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,9 @@ and many more.
 You can easily craft a sales funnel journey that is built to boost your revenue with high AOV.
 
 No matter what type of funnel you want to create - sales funnels to offer services, course funnels, tripwire funnels, SLO funnels, WooCommerce sales funnels, etc. - WPFunnels will make it easy for you.
+
+🥳 Special Black Friday Deal 🎉
+<a href="https://getwpfunnels.com/pricing/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpfbf24" target="_blank"> 👉 Enjoy 30% OFF on WPFunnels Pro!</a>
 
 
 <a href="https://getwpfunnels.com/resources/" target="_blank"> Documentation</a> | <a href="https://www.youtube.com/channel/UCIDB7eo-kCAVXRG4xKG-GCQ/playlists" target="_blank">Video Tutorials</a> | <a href="https://www.facebook.com/groups/wpfunnels/" target="_blank">Join our Facebook Community</a>
@@ -565,6 +568,9 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.5.7 (2024-11-27) =
+* Bugfix: _load_textdomain_just_in_time Notice with WordPress 6.7
 
 = 3.5.6 (2024-11-20) =
 * Bugfix: SQL injection vulnerability Issues
