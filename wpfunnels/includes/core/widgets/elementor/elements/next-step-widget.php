@@ -13,7 +13,6 @@ use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
 use Elementor\Group_Control_Text_Shadow;
 use Elementor\Icons_Manager;
-use Elementor\Core\Schemes\Color as Scheme_Color;
 use WPFunnels\Data_Store\Wpfnl_Steps_Store_Data;
 use WPFunnels\Wpfnl_functions;
 use Elementor\Controls_Stack;
@@ -574,13 +573,10 @@ class Step_Pointer extends Widget_Base
 			[
 				'label' => __('Background Color', 'wpfnl'),
 				'type' => Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => Scheme_Color::get_type(),
-					'value' => Scheme_Color::COLOR_4,
-				],
 				'selectors' => [
 					'{{WRAPPER}} a.elementor-button, {{WRAPPER}} .elementor-button' => 'background-color: {{VALUE}};',
 				],
+				'default' => '#61CE70',
 			]
 		);
 
