@@ -1,7 +1,7 @@
 <?php
 /**
  * Orderbump style5 template
- * 
+ *
  * @package
  */
 $product 			= wc_get_product($settings['product']);
@@ -46,7 +46,7 @@ if( $product ){
     <div class="oderbump-loader">
         <span class="wpfnl-loader"></span>
     </div>
-    
+
     <div class="offer-checkbox">
         <span class="wpfnl-checkbox">
             <input
@@ -58,6 +58,7 @@ if( $product ){
                 data-quantity="<?php echo $settings['quantity']; ?>"
                 data-replace="<?php echo $settings['isReplace']; ?>"
                 data-step="<?php echo get_the_ID(); ?>"
+				data-lms="<?php echo $type; ?>"
                 value="<?php echo $settings['product'] ?>"
             >
 
@@ -90,7 +91,7 @@ if( $product ){
         $rating  = $product->get_average_rating();
         $count   = $product->get_rating_count();
         $average = $product->get_average_rating();
-        
+
         ?>
         <div class="template-img" style="background-image: url('<?php echo $img; ?>');">
             <img src="<?php echo $img; ?>" alt="" class="for-mobile">
@@ -98,7 +99,7 @@ if( $product ){
 
         <div class="template-content">
             <h5 class="template-title" style="color: <?php echo $ob_title_color ?>" ><?php echo $settings['productName'] ?></h5>
-            <div class="template-price">        
+            <div class="template-price">
                 <span class="product-price" style="--priceColor5: <?php echo $orderbump_priceColor ?> ">
                     <?php echo $price; ?>
                 </span>
@@ -121,6 +122,6 @@ if( $product ){
             color: var(--priceColor5);
         }
     </style>
-    
+
 </div>
 <?php } ?>

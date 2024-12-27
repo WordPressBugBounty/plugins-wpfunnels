@@ -1,7 +1,7 @@
 <?php
 /**
  * Orderbump style4 template
- * 
+ *
  * @package
  */
 $product 			= wc_get_product($settings['product']);
@@ -46,7 +46,7 @@ if( $product ){
     <div class="oderbump-loader">
         <span class="wpfnl-loader"></span>
     </div>
-    
+
     <div class="template-preview-wrapper">
         <?php
         $img = '';
@@ -72,7 +72,7 @@ if( $product ){
         $rating  = $product->get_average_rating();
         $count   = $product->get_rating_count();
         $average = $product->get_average_rating();
-        
+
         ?>
         <div class="template-img" style="background-image: url('<?php echo $img; ?>');">
             <img src="<?php echo $img; ?>" alt="" class="for-mobile">
@@ -80,12 +80,12 @@ if( $product ){
 
         <div class="template-content">
             <h5 class="template-title" style="color: <?php echo $ob_title_color ?>" ><?php echo $settings['productName'] ?></h5>
-            <?php 
+            <?php
                 if( $count > 0 ){
-                    echo '<div class="rating">'.wc_get_rating_html( $rating, $count ).' '.$average.' ('.$count.')</div>'; 
+                    echo '<div class="rating">'.wc_get_rating_html( $rating, $count ).' '.$average.' ('.$count.')</div>';
                 }
             ?>
-            
+
         </div>
 
         <div class="template-price">
@@ -105,6 +105,7 @@ if( $product ){
                     data-quantity="<?php echo $settings['quantity']; ?>"
                     data-replace="<?php echo $settings['isReplace']; ?>"
                     data-step="<?php echo get_the_ID(); ?>"
+					data-lms="<?php echo $type; ?>"
                     value="<?php echo $settings['product'] ?>"
                 >
 
@@ -121,6 +122,6 @@ if( $product ){
 
     </div>
 
-    
+
 </div>
 <?php } ?>

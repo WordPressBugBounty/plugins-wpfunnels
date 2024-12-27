@@ -5349,6 +5349,7 @@ body.rtl .wpfnl-order-bump__template-style9 .offer-checkbox .wpfnl-checkbox labe
   margin: 0;
   width: calc(100% - 60px);
   padding-right: 15px;
+  display: flex;
 }
 .wpfnl-order-bump__template-style10 .template-preview-wrapper .template-title .nav-arrow {
   line-height: 1;

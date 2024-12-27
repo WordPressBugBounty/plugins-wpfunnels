@@ -1,7 +1,7 @@
 <?php
 /**
  * Orderbump style3 template
- * 
+ *
  * @package
  */
 $product 			= wc_get_product($settings['product']);
@@ -80,6 +80,7 @@ if( $product ){
                     data-quantity="<?php echo $settings['quantity']; ?>"
                     data-replace="<?php echo $settings['isReplace']; ?>"
                     data-step="<?php echo get_the_ID(); ?>"
+					data-lms="<?php echo $type; ?>"
                     value="<?php echo $settings['product'] ?>"
                 >
 
@@ -91,9 +92,9 @@ if( $product ){
             <span class="product-price" style="--priceColor3: <?php echo $orderbump_priceColor ?> ">
                 <?php echo $price; ?>
             </span>
-            
+
             <h5 class="template-title" style="color: <?php echo $ob_title_color ?>" ><?php echo $settings['productName'] ?></h5>
-            
+
             <?php if( !empty( $settings['highLightText'] ) ){  ?>
                 <h6 class="subtitle" style="color: <?php echo $ob_highlight_color ?>" ><?php echo $settings['highLightText'] ?></h6>
             <?php }  ?>

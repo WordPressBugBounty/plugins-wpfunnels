@@ -1,7 +1,7 @@
 <?php
 /**
  * Orderbump style7 template
- * 
+ *
  * @package
  */
 $product 			= wc_get_product($settings['product']);
@@ -89,6 +89,7 @@ if( $product ){
                         data-quantity="<?php echo $settings['quantity']; ?>"
                         data-replace="<?php echo $settings['isReplace']; ?>"
                         data-step="<?php echo get_the_ID(); ?>"
+						data-lms="<?php echo $type; ?>"
                         value="<?php echo $settings['product'] ?>"
                     >
 
@@ -103,7 +104,7 @@ if( $product ){
         </div>
 
     </div>
-    
+
     <style>
         .wpfnl-order-bump__template-style7 .template-preview-wrapper .template-content .description li,
         .wpfnl-order-bump__template-style7 .template-preview-wrapper .template-content .description span,

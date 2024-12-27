@@ -1027,10 +1027,13 @@
             let checker = false,
                 main_products = $(this).attr('data-main-products')
 
+            var specificLabel = $('#wpfnl-order-bump-add-btn-' + key);
             if ($(this).prop('checked') == true) {
                 checker = true
+                specificLabel.text('Remove');
             } else if ($(this).prop('checked') == false) {
                 checker = false
+                specificLabel.text('Add');
             }
 
             if (checker) {
@@ -1098,7 +1101,7 @@
                     $('.wpfnl-order-bump__popup-wrapper')
                     .removeClass('show')
                     .css('top', '-' + inner_height + 'px')
-                    
+
                     $('.wpfnl-place-order').removeClass('wpfnl-place-order-add-overlay')
                 },
             })
@@ -1123,10 +1126,10 @@
 
             $('.wpfnl-place-order')
                 .removeClass('wpfnl-place-order-add-overlay')
-            
+
         })
-        
-       
+
+
 
         //--------woocommerce checkout page coupon toggle add class-----------
         $('.wpfnl-checkout .woocommerce-form-coupon-toggle .showcoupon').on('click', function () {
@@ -1223,7 +1226,7 @@
                 optinSubmit(thisParents)
             },
         )
-        
+
         /**
          * Divi optin form submission ajax
          */

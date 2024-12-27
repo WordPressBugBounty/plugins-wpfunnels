@@ -1,7 +1,7 @@
 <?php
 /**
  * Orderbump style6 template
- * 
+ *
  * @package
  */
 $product 			= wc_get_product($settings['product']);
@@ -81,13 +81,14 @@ if( $product ){
                         data-quantity="<?php echo $settings['quantity']; ?>"
                         data-replace="<?php echo $settings['isReplace']; ?>"
                         data-step="<?php echo get_the_ID(); ?>"
+						data-lms="<?php echo $type; ?>"
                         value="<?php echo $settings['product'] ?>"
                     >
 
                     <label for="wpfnl-order-bump-cb-<?php echo $key ?>" style="color: <?php echo $ob_checkbox_title_color ?>" ><?php echo $settings['checkBoxLabel'] ?></label>
                 </span>
             </div>
-            
+
             <?php if(!empty($settings['productName'])){
                 echo '<h5 class="template-title" style="'.$ob_title_color.'">'.$settings['productName'].'</h5>';
             } ?>
@@ -99,7 +100,7 @@ if( $product ){
             <?php if(!empty($settings['productDescriptionText'])){
                 echo '<div class="description" style="color:'.$ob_description_color.'; --descColor6:'.$ob_description_color.'">'.$settings['productDescriptionText'].'</div>';
             } ?>
-            
+
         </div>
 
         <span class="product-price" style="--priceColor6: <?php echo $orderbump_priceColor ?> ">
