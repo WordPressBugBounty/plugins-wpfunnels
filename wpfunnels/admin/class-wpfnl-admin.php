@@ -563,6 +563,14 @@ class Wpfnl_Admin
 		}
 
 		if ( 'wpfunnels_page_email-builder' === $hook ) {
+			$is_wc_installed = 'no';
+			$is_wpfunnels_installed = 'no';
+			if (is_plugin_active('woocommerce/woocommerce.php')) {
+				$is_wc_installed = 'yes';
+			}
+			if (is_plugin_active('wpfunnels/wpfunnels.php')) {
+				$is_wpfunnels_installed = 'yes';
+			}
 			$dependency = require_once WPFNL_PATH . '/admin/assets/dist/email-builder/main.min.asset.php';
 			wp_enqueue_script(
 					$this->plugin_name . '-email-builder',
@@ -576,7 +584,9 @@ class Wpfnl_Admin
                 'WPFEmailBuilderVars',
                 array(
                     'editor_data_source' => $this->get_editor_source(),
-					'post_types'		 => MrmCommon::get_all_post_types()
+					'post_types'		 => MrmCommon::get_all_post_types(),
+					'is_wc_installed'    => $is_wc_installed,
+					'is_mint_active'     => Wpfnl_functions::is_mint_mrm_active(),
                 )
             );
 		}

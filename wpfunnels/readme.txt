@@ -5,7 +5,7 @@ Tags: funnel builder, order bump, sales funnels, lead generation, custom checkou
 Requires at least: 6.1
 Tested up to:  6.7.1
 Requires PHP: 7.4
-Stable tag:  3.5.9
+Stable tag:  3.5.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,9 +51,6 @@ and many more.
 You can easily craft a sales funnel journey that is built to boost your revenue with high AOV.
 
 No matter what type of funnel you want to create - sales funnels to offer services, course funnels, tripwire funnels, SLO funnels, WooCommerce sales funnels, etc. - WPFunnels will make it easy for you.
-
-Merry Christmas! Here's A Special Gift: 🎉
-<a href="https://getwpfunnels.com/pricing/?utm_source=wtf-repo-cta&utm_medium=wp-repo&utm_campaign=wpfxmas24" target="_blank"> 👉 Enjoy 25% OFF on WPFunnels Pro!</a>
 
 
 <a href="https://getwpfunnels.com/resources/" target="_blank"> Documentation</a> | <a href="https://www.youtube.com/channel/UCIDB7eo-kCAVXRG4xKG-GCQ/playlists" target="_blank">Video Tutorials</a> | <a href="https://www.facebook.com/groups/wpfunnels/" target="_blank">Join our Facebook Community</a>
@@ -187,11 +184,11 @@ This will make the funnel building process easier even without high technical an
 = ⭐ Customize Funnel Pages With Popular Page Builders ⭐ =
 
 WPFunnels has support for the following popular page builders:
-* Gutenberg
-* Elementor
-* Divi
-* Oxygen Builder
-* Bricks
+✅ Gutenberg
+✅ Elementor
+✅ Divi
+✅ Oxygen Builder
+✅ Bricks
 
 For each, you will get several pre-made templates with dedicated blocks/widgets/modules/elements to make the funnel functional.
 
@@ -307,12 +304,12 @@ You will get specific analytics for each funnel pages to make informed decisions
 
 WPFunnels has a core integration with WooCommerce to help you easily create sales funnels for your products and increase revenue.
 
-** Create Exclusive Sales Funnels **
+= 🌟 Create Exclusive Sales Funnels 🌟 =
 Create sales funnels for specific products and run exclusive campaigns, that are not available in your WooCommerce shop.
 
 These funnels will include their own landing pages, checkout pages, dedicated offers, and unique customer journeys.
 
-** Conditional WooCommerce Funnels (Pro) **
+= 🌟 Conditional WooCommerce Funnels (Pro) 🌟 =
 
 Get a special add-on - The Global Funnel Checkout - which allows you to create funnels for your WooCommerce store directly.
 
@@ -328,7 +325,7 @@ Get a special add-on - The Global Funnel Checkout - which allows you to create f
 
 In such a funnel, people who will naturally visit your eCommerce store will enter the funnel if their product choices meet the conditions.
 
-** Replace Your WooCommerce Checkout Page (Pro) **
+= 🌟 Replace Your WooCommerce Checkout Page (Pro) 🌟 =
 
 Global Funnels will also allow you to replace your default WooCommerce checkout page with a custom funnel checkout page.
 
@@ -568,6 +565,12 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.5.10 (2025-01-08) =
+* New: WooCommerce Custom Blocks on the Automation Email Editor
+* New: Post Block on the Automation Email Editor
+* Bugfix: A/B Testing Conversion Rate Showing Wrong Data
+* Compatibility : Compatible with the Latest WooCommerce
 
 = 3.5.9 (2024-12-27) =
 * Bugfix: Multiple Order Bump Issues on the Checkout
