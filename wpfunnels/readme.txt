@@ -5,7 +5,7 @@ Tags: funnel builder, order bump, sales funnels, lead generation, custom checkou
 Requires at least: 6.1
 Tested up to:  6.7.1
 Requires PHP: 7.4
-Stable tag:  3.5.10
+Stable tag:  3.5.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -343,7 +343,7 @@ You can then add dynamic upsell offers and automated email offers (with Mail Min
 WPFunnels Pro will also give you access to Checkoutify, a modern checkout form customizer, that will help you design and optimize your WooCommerce checkout form with full control.
 
 ✅ Drag and drop field editor
-✅ Cutom layouts and design
+✅ Custom layouts and design
 ✅ Multi-step checkout form
 ✅ Replace WooCommerce checkout form
 ✅ Custom order bump offer
@@ -565,6 +565,10 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.5.11 (2025-01-08) =
+* Bugfix: Setup Wizard Style Issues
+* Bugfix: _load_textdomain_just_in_time Notice with WordPress Latest Version
 
 = 3.5.10 (2025-01-08) =
 * New: WooCommerce Custom Blocks on the Automation Email Editor
