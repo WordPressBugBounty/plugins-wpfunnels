@@ -5,7 +5,7 @@ Tags: funnel builder, order bump, sales funnels, lead generation, custom checkou
 Requires at least: 6.1
 Tested up to:  6.7.1
 Requires PHP: 7.4
-Stable tag:  3.5.11
+Stable tag:  3.5.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -565,6 +565,11 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.5.12 (2025-01-23) =
+* Improvement: Performance Optimizations with Divi Builder
+* Compatibility: Compatible with the Latest WooCommerce
+* Compatibility: Added Compatibility with Fox Currency Switcher
 
 = 3.5.11 (2025-01-08) =
 * Bugfix: Setup Wizard Style Issues

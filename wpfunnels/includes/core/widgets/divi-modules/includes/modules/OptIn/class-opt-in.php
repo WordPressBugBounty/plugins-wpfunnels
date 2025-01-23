@@ -1,7 +1,7 @@
 <?php
 /**
- * Opt-in 
- * 
+ * Opt-in
+ *
  * @package WPFunnels\Widgets\DiviModules\Modules
  */
 namespace WPFunnels\Widgets\DiviModules\Modules;
@@ -210,7 +210,7 @@ class WPFNL_OptIN extends ET_Builder_Module {
 				'show_if'          => [ 'form_source' => 'mailmint_forms' ]
 			],
 
-			
+
 
 			'layout' => array(
 				'label'            => esc_html__( 'Layout', 'wpfnl' ),
@@ -635,7 +635,7 @@ class WPFNL_OptIN extends ET_Builder_Module {
 				),
 			),
 
-			
+
 
 			//--------Acceptance--------
 			'acceptance_checkbox'       => array(
@@ -967,7 +967,7 @@ class WPFNL_OptIN extends ET_Builder_Module {
 		);
 
 		if( \WPFunnels\Integrations\Helper::maybe_enabled() ){
-			
+
 			$settings['enable_mm_contact'] = array(
 				'label'            => __( 'Send leads to Mail Mint', 'wpfnl' ),
 				'type'             => 'yes_no_button',
@@ -1039,7 +1039,7 @@ class WPFNL_OptIN extends ET_Builder_Module {
 				'show_if' => [ 'enable_mm_contact' => 'on' ]
 			);
 		}
-		
+
 		return $settings;
 	}
 
@@ -1048,7 +1048,7 @@ class WPFNL_OptIN extends ET_Builder_Module {
 	 * Generate and get the opt-in form
      *
 	 * @param $props
-	 * 
+	 *
 	 * @return string
 	 * @since 2.8.15
 	 */
@@ -1097,7 +1097,7 @@ class WPFNL_OptIN extends ET_Builder_Module {
 		$mm_contact_status 			= isset($props['mm_contact_status']) ? $props['mm_contact_status'] : 'pending';
 		$mm_lists 					= isset($props['mm_lists']) ? $props['mm_lists'] : '';
 		$mm_tags 					= isset($props['mm_tags']) ? $props['mm_tags'] : '';
-		
+
 		// Design related props are added via $this->advanced_options['button']['button']
 
 		// Render button
@@ -1379,7 +1379,7 @@ class WPFNL_OptIN extends ET_Builder_Module {
 	 * @param array $attrs
 	 * @param null $content
 	 * @param string $render_slug
-	 * 
+	 *
 	 * @return bool|string|null
 	 */
 
@@ -1492,4 +1492,3 @@ class WPFNL_OptIN extends ET_Builder_Module {
 
 }
 
-new WPFNL_OptIN;

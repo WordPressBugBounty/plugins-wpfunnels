@@ -1,7 +1,7 @@
 <?php
 /**
  * LMS checkout
- * 
+ *
  * @package
  */
 namespace WPFunnels\Widgets\DiviModules\Modules;
@@ -498,7 +498,7 @@ class WPFNL_Lms_Checkout extends ET_Builder_Module {
      * Computed checkout form
      *
      * @param $props
-	 * 
+	 *
      * @return string
      */
 
@@ -716,7 +716,7 @@ class WPFNL_Lms_Checkout extends ET_Builder_Module {
      * @param array $attrs
      * @param null $content
      * @param string $render_slug
-	 * 
+	 *
      * @return bool|string|null
      */
 
@@ -726,4 +726,4 @@ class WPFNL_Lms_Checkout extends ET_Builder_Module {
     }
 }
 
-new WPFNL_Lms_Checkout;
+

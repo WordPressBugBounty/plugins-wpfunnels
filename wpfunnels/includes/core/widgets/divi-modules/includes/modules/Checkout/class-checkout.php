@@ -1,7 +1,7 @@
 <?php
 /**
  * Checkout
- * 
+ *
  * @package
  */
 namespace WPFunnels\Widgets\DiviModules\Modules;
@@ -1084,7 +1084,7 @@ class WPFNL_Checkout extends ET_Builder_Module {
 	 * Computed checkout form
      *
 	 * @param $props
-	 * 
+	 *
 	 * @return string
 	 */
 
@@ -1106,7 +1106,7 @@ class WPFNL_Checkout extends ET_Builder_Module {
 		if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-express-checkout' === $checkout_layout ){
 			$checkout_layout .= ' wpfnl-multistep';
 		}
-		
+
 		if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-2-step' === $checkout_layout ){
 			$checkout_layout .= ' wpfnl-multistep';
 		}
@@ -1126,7 +1126,7 @@ class WPFNL_Checkout extends ET_Builder_Module {
 	 * @param $template
 	 * @param $template_name
 	 * @param $template_path
-	 * 
+	 *
 	 * @return mixed|string
 	 */
 
@@ -1160,7 +1160,7 @@ class WPFNL_Checkout extends ET_Builder_Module {
 	 * @param array $attrs
 	 * @param null $content
 	 * @param string $render_slug
-	 * 
+	 *
 	 * @return bool|string|null
 	 */
 
@@ -1168,7 +1168,4 @@ class WPFNL_Checkout extends ET_Builder_Module {
 		$output = self::get_checkout_form( $this->props );
 		return $output;
 	}
-}
-if( defined( 'WC_PLUGIN_FILE' ) ){
-	new WPFNL_Checkout;
 }

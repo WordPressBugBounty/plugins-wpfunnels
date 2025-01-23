@@ -1,12 +1,11 @@
 <?php
 /**
  * Divi manager
- * 
+ *
  * @package
  */
 namespace WPFunnels\Widgets\DiviModules;
 
-use WPFunnels\Wpfnl_functions;
 use function cli\err;
 
 final class Manager {
@@ -37,7 +36,7 @@ final class Manager {
 
 
     public function wpfnl_initialize_extension() {
-        new WPFNL_DiviModules;
+        WPFNL_DiviModules::get_instance();
     }
 
 }

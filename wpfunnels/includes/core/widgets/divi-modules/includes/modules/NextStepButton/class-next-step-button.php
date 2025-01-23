@@ -1,7 +1,7 @@
 <?php
 /**
  * Next step button
- * 
+ *
  * @package
  */
 namespace WPFunnels\Widgets\DiviModules\Modules;
@@ -63,7 +63,7 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 				),
 			),
 		);
-		
+
 
 		$this->advanced_fields = array(
 			'text' =>array(
@@ -205,7 +205,7 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 	 * Get button alignment.
 	 *
 	 * @param string $device Current device name.
-	 * 
+	 *
 	 * @return string         Alignment value, rtl or not.
 	 * @since  3.23 Add responsive support by adding device parameter.
 	 */
@@ -267,16 +267,16 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 
 		// Module classnames
 		$this->remove_classname( 'et_pb_module' );
-	
+
 		$url = '';
 		if( isset($this->props['button_type_selector']) && 'another-funnel' === $this->props['button_type_selector'] ){
 			$url = isset($this->props['another_funnel_field']) ? $this->props['another_funnel_field'] : '';
 		}elseif( isset($this->props['button_type_selector']) && 'url-path' === $this->props['button_type_selector'] ){
 			$url = isset($this->props['url_path_field']) ? $this->props['url_path_field'] : '';
 		}
-		
+
 		$button_type = isset($this->props['button_type_selector']) ? $this->props['button_type_selector'] : '';
-		
+
 
 		// Render Button
 		$button = $this->render_button(
@@ -440,14 +440,14 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 			'data-url="%1$s"',
 			$args['data_url']
 		);
-		
+
 		$data_button_type = sprintf(
 			'data-button-type="%1$s"',
 			esc_attr( et_pb_process_font_icon( $args['data_button_type'] ) )
 		);
 
 
-		
+
 		// Render button.
 		return sprintf(
 			'%7$s<a%9$s class="%5$s" href="%1$s"%3$s%4$s%6$s%10$s%11$s%12$s%13$s%14$s>%2$s</a>%8$s',
@@ -473,7 +473,7 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 	 * Filter multi view value.
 	 *
 	 * @param mixed                                     $raw_value Props raw value.
-	 * @param array                                     $args 
+	 * @param array                                     $args
 	 * @param ET_Builder_Module_Helper_MultiViewOptions $multi_view Multiview object instance.
 	 *
 	 * @return mixed
@@ -495,5 +495,3 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 		return $raw_value;
 	}
 }
-
-new WPFNL_Next_Step_Button;

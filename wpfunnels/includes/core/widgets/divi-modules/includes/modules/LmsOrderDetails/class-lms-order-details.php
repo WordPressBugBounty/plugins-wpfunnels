@@ -1,7 +1,7 @@
 <?php
 /**
  * LMS order details
- * 
+ *
  * @package
  */
 namespace WPFunnels\Widgets\DiviModules\Modules;
@@ -411,7 +411,7 @@ class WPFNL_Lms_Order_details extends ET_Builder_Module {
      * Computed checkout form
      *
      * @param $props
-	 * 
+	 *
      * @return string
      */
 
@@ -611,7 +611,7 @@ class WPFNL_Lms_Order_details extends ET_Builder_Module {
      * @param $template
      * @param $template_name
      * @param $template_path
-	 * 
+	 *
      * @return mixed|string
      */
 
@@ -644,7 +644,7 @@ class WPFNL_Lms_Order_details extends ET_Builder_Module {
      * @param array $attrs
      * @param null $content
      * @param string $render_slug
-	 * 
+	 *
      * @return bool|string|null
      */
 
@@ -652,11 +652,5 @@ class WPFNL_Lms_Order_details extends ET_Builder_Module {
         $output = self::get_lms_order_details( $this->props );
         return $output;
     }
-
-
-}
-
-if( Wpfnl_functions::is_lms_addon_active()){
-	new WPFNL_Lms_Order_details;
 }
 

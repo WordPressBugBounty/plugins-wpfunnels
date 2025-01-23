@@ -445,8 +445,22 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 	 * @since 2.0.5
 	 */
 	private function get_product_price( \WC_Product $product, $discount_apply = 'regular' ) {
-		$price = $product->get_regular_price();
-		return $discount_apply === 'sale' && $product->get_sale_price() ? $product->get_sale_price() : $price;
+		$price       = $product->get_regular_price();
+		$final_price = $discount_apply === 'sale' && $product->get_sale_price() ? $product->get_sale_price() : $price;
+
+		if (class_exists('WOOCS')) {
+			global $WOOCS;
+			if ($WOOCS->is_multiple_allowed) {
+				$current = $WOOCS->current_currency;
+				if ($current != $WOOCS->default_currency) {
+					$currencies = $WOOCS->get_currencies();
+					$rate = $currencies[$current]['rate'];
+					$final_price = $final_price / $rate;
+				}
+			}
+		}
+
+		return $final_price;
 	}
 
 
