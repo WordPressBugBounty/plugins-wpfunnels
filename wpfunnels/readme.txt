@@ -3,9 +3,9 @@ Contributors: coderexltd, getwpfunnels, coderexco
 Donate link: https://getwpfunnels.com/
 Tags: funnel builder, order bump, sales funnels, lead generation, custom checkout
 Requires at least: 6.1
-Tested up to:  6.7.1
+Tested up to:  6.7.2
 Requires PHP: 7.4
-Stable tag:  3.5.12
+Stable tag:  3.5.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,9 @@ and many more.
 You can easily craft a sales funnel journey that is built to boost your revenue with high AOV.
 
 No matter what type of funnel you want to create - sales funnels to offer services, course funnels, tripwire funnels, SLO funnels, WooCommerce sales funnels, etc. - WPFunnels will make it easy for you.
+
+Valentine's Special Discount: 🎉
+<a href="https://getwpfunnels.com/pricing/?utm_source=wtf-repo-cta&utm_medium=wp-repo&utm_campaign=valentine2025" target="_blank"> 👉 Enjoy 20% OFF on WPFunnels Pro!</a>
 
 
 <a href="https://getwpfunnels.com/resources/" target="_blank"> Documentation</a> | <a href="https://www.youtube.com/channel/UCIDB7eo-kCAVXRG4xKG-GCQ/playlists" target="_blank">Video Tutorials</a> | <a href="https://www.facebook.com/groups/wpfunnels/" target="_blank">Join our Facebook Community</a>
@@ -565,6 +568,13 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.5.13 (2025-02-12) =
+* Improvement: UX Improvement on A/B Testing start and pause
+* Improvement: Traffic Distribution on the Funnel Canvas
+* Bugfix: A/B Testing Analytics on the Landing Page
+* Bugfix: A/B Testing Analytics on the Checkout Page
+* Bugfix: A/B Testing does not Show the Correct Revenue
 
 = 3.5.12 (2025-01-23) =
 * Improvement: Performance Optimizations with Divi Builder

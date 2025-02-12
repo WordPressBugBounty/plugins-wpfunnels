@@ -9625,14 +9625,6 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   padding-top: 25px;
   padding-bottom: 30px;
 }
-.wpfnl-mm-setup-wizard .wpfnl-mm-setup-wizard__wrapper .setup-wizard__content {
-  width: inherit;
-  height: inherit;
-  background: inherit;
-  border-radius: inherit;
-  margin: inherit;
-  text-align: inherit;
-}
 .wpfnl-mm-setup-wizard .wpfnl-mm-setup-wizard__nav {
   display: flex;
   flex-flow: row wrap;
@@ -15771,7 +15763,7 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   display: block;
 }
 .ab-testing-drawer .header-right .copy-ab-url {
-  width: auto;
+  width: 40px;
   height: 40px;
   display: flex;
   align-items: center;
@@ -15783,14 +15775,6 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   outline: none;
   position: relative;
   background: transparent;
-  padding: 11px 20px 9px;
-  gap: 9px;
-}
-.ab-testing-drawer .header-right .copy-ab-url .copy-text {
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1;
-  color: #363B4E;
 }
 .ab-testing-drawer .header-right .copy-ab-url .copyed {
   background-color: #464646;
@@ -15848,14 +15832,10 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   background: #6E42D3;
   border-color: #6E42D3;
   color: #fff;
-  width: 40px;
-  height: auto;
-  padding: 10px;
-  border-radius: 10px;
 }
 .ab-testing-drawer .header-right .btn-default.start svg {
   position: relative;
-  top: 0px;
+  top: -1px;
 }
 .ab-testing-drawer .header-right .btn-default.start:hover {
   background-color: #00B4FF;
@@ -15876,46 +15856,17 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 .ab-testing-drawer .header-right .btn-default.its-disabled.start path {
   fill: rgba(255, 255, 255, 0.7);
 }
+.ab-testing-drawer .header-right .btn-default.pause.start {
+  background: #FF5155;
+  border-color: #FF5155;
+}
+.ab-testing-drawer .header-right .btn-default.pause.start .wpfnl-loader {
+  border-color: #df4a4d;
+  border-top-color: #fff;
+}
 .ab-testing-drawer .header-right .btn-default .wpfnl-loader {
   display: inline-block;
   margin-left: 0;
-}
-.ab-testing-drawer .header-right .action-buttons {
-  display: flex;
-  align-items: stretch;
-  border-radius: 8px;
-  overflow: hidden;
-}
-.ab-testing-drawer .header-right .action-buttons button {
-  width: 40px;
-  height: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #FF5155;
-  padding: 10px;
-  border: 1px solid #FF5155;
-  border-right: 1px solid #ffffff;
-  cursor: pointer;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-.ab-testing-drawer .header-right .action-buttons button:last-child {
-  border-right: none;
-}
-.ab-testing-drawer .header-right .action-buttons button:hover {
-  background-color: #FF5C5C;
-}
-.ab-testing-drawer .header-right .action-buttons button:active {
-  transform: scale(0.95);
-}
-.ab-testing-drawer .header-right .action-buttons button .icon {
-  width: 20px;
-  height: 20px;
-  fill: #FF4D4D;
-  transition: fill 0.3s ease;
-}
-.ab-testing-drawer .header-right .action-buttons button .icon:hover {
-  fill: #FFFFFF;
 }
 .ab-testing-drawer .header-right .more-options {
   line-height: 1;
@@ -16925,32 +16876,6 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   font-weight: 400;
   line-height: 1.2;
 }
-.ab-testing-drawer .ab-testing-confirmation-modal .confirmation-modal-body .variant-select-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 15px;
-  width: 100%;
-  flex-direction: column;
-  align-items: flex-start;
-}
-.ab-testing-drawer .ab-testing-confirmation-modal .confirmation-modal-body .variant-select-container .variant-select {
-  margin-bottom: 10px;
-}
-.ab-testing-drawer .ab-testing-confirmation-modal .confirmation-modal-body .variant-select-container .archive-checkbox label {
-  color: #2D3149;
-  padding-left: 26px;
-}
-.ab-testing-drawer .ab-testing-confirmation-modal .confirmation-modal-body .variant-select-container .archive-checkbox label::before {
-  border: 1px solid #C5C6C8;
-  height: 16px;
-  width: 16px;
-}
-.ab-testing-drawer .ab-testing-confirmation-modal .confirmation-modal-body .variant-select-container .archive-checkbox label::after {
-  left: 4px;
-  top: 2px;
-  width: 8px;
-  height: 4px;
-}
 .ab-testing-drawer .ab-testing-confirmation-modal .confirmation-modal-footer {
   padding: 20px;
   border-top: 1px solid #E2E2E2;
@@ -16980,10 +16905,6 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 }
 .ab-testing-drawer .ab-testing-confirmation-modal .confirmation-modal-footer .wpfnl-checkbox {
   margin-right: auto;
-}
-.ab-testing-drawer .ab-testing-confirmation-modal .confirmation-modal-footer .variant-alert {
-  margin-right: auto;
-  color: #D8000C;
 }
 .ab-testing-drawer .ab-testing-confirmation-modal.archive-modal .confirmation-modal-body .icon {
   background: #239654;
@@ -24537,4 +24458,4 @@ body.rtl .wpfnl-automation-window .automation-darwer .drawer-header .connect-crm
   padding-right: 0;
 }
 
-/*# sourceMappingURL=wpfnl-admin.css.map */
+/*# sourceMappingURL=style.css.map */
