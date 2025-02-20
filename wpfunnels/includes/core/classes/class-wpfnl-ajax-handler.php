@@ -220,7 +220,6 @@ class Ajax_Handler {
 			}
 		}
 
-
 		echo json_encode( $response, true );
 		die();
 	}
@@ -768,7 +767,7 @@ class Ajax_Handler {
 					}
 					$info .= "----<br><br>Date : {$current_date} <br>Time : {$current_time} <br>Powered by : {$poweredBy} <br>";
 
-					$email_body = $info;
+					$email_body = apply_filters('wpfunnels/after_optin_submit_admin_email_body', $info );
 					if ( !$subject ) {
 						$subject = 'New Submission';
 					}

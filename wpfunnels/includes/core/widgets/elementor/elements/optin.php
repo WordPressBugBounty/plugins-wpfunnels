@@ -1020,7 +1020,7 @@ class OptinForm extends Widget_Base {
 		$this->add_control(
 			'notification_text',
 			[
-				'label' => __( 'Notification Text', 'wpfnl' ),
+				'label' => __( 'Confirmation Text', 'wpfnl' ),
 				'type' => Controls_Manager::TEXTAREA,
 				'rows' => 5,
 				'default' => 'Thank you! Your form was submitted successfully!',

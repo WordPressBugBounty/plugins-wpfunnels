@@ -789,7 +789,7 @@ class Optin extends Element
         $this->controls['notification_text'] = [
             'tab' => 'content',
             'group' => 'action_after_submission_group',
-            'label' => esc_html__( 'Notification Text', 'wpfnl' ),
+            'label' => esc_html__( 'Confirmation Text', 'wpfnl' ),
             'type' => 'textarea',
             'inlineEditing' => false,
             'default' => 'Thank you! Your form was submitted successfully!',
@@ -1367,14 +1367,19 @@ class Optin extends Element
 
 
 		//mm contact
-		$enable_mm_contact 			= isset($settings['enable_mm_contact']) && $settings['enable_mm_contact'] == 'on' ? 'yes' : 'no';
-		$mm_contact_status 			= isset($settings['mm_contact_status']) ? $settings['mm_contact_status'] : 'pending';
-		$mm_lists 					= isset($settings['mm_lists']) ? $settings['mm_lists'] : '';
-		$mm_tags 					= isset($settings['mm_tags']) ? $settings['mm_tags'] : '';
+		$enable_mm_contact = isset($settings['enable_mm_contact']) && $settings['enable_mm_contact'] == 'on' ? 'yes' : 'no';
+		$mm_contact_status = isset($settings['mm_contact_status']) ? $settings['mm_contact_status'] : 'pending';
+		$mm_lists 		   = isset($settings['mm_lists']) ? $settings['mm_lists'] : '';
+		$mm_tags 		   = isset($settings['mm_tags']) ? $settings['mm_tags'] : '';
+
+		$post_action         = isset($settings['post_action']) ? $settings['post_action'] : 'notification';
+		$redirect_url        = isset($settings['redirect_url']['url']) ? $settings['redirect_url']['url'] : '#';
+		$admin_email_subject = isset($settings['admin_email_subject']) ? $settings['admin_email_subject'] : '';
+		$admin_email         = isset($settings['admin_email']) ? $settings['admin_email'] : '';
+		$notification_text   = isset($settings['notification_text']) ? $settings['notification_text'] : '';
 
 		// We need the form element ID to recover the element settings on form submit
 		$this->set_attribute( '_root', 'data-element-id', $this->id );
-
 
 		// Submit button
 		$submit_button_icon_position = ! empty( $settings['submitButtonIconPosition'] ) ? $settings['submitButtonIconPosition'] : 'right';
@@ -1418,6 +1423,11 @@ class Optin extends Element
 				<input type="hidden" name="mm_contact_status" value="<?php echo $mm_contact_status; ?>" />
 				<input type="hidden" name="mm_lists" value="<?php echo $mm_lists; ?>" />
 				<input type="hidden" name="mm_tags" value="<?php echo $mm_tags; ?>" />
+				<input type="hidden" name="post_action" value="<?php echo $post_action; ?>" />
+				<input type="hidden" name="redirect_url" value="<?php echo $redirect_url; ?>" />
+				<input type="hidden" name="admin_email_subject" value="<?php echo $admin_email_subject; ?>" />
+				<input type="hidden" name="admin_email" value="<?php echo $admin_email; ?>" />
+				<input type="hidden" name="notification_text" value="<?php echo $notification_text; ?>" />
 				<?php
 				echo $is_recaptch_input;
 				echo $token_input;

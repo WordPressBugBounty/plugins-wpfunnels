@@ -83,13 +83,13 @@ class SpecialOccasionBanner {
         $promotional_notice_pages   = ['dashboard', 'plugins', 'wpfunnels_page_wp_funnels', 'wpfunnels_page_edit_funnel', 'wp-funnels_page_wpfnl_settings'];
         $current_date_time          = current_time('timestamp');
        
-        // if (!in_array($screen->id, $promotional_notice_pages)) {
-        //     return;
-        // }
+        if (!in_array($screen->id, $promotional_notice_pages)) {
+            return;
+        }
 
-        // if ( $current_date_time < $this->start_date || $current_date_time > $this->end_date ) {
-        //     return;
-        // }
+        if ( $current_date_time < $this->start_date || $current_date_time > $this->end_date ) {
+            return;
+        }
 
         // Calculate the time remaining in seconds
         $time_remaining = $this->end_date - $current_date_time;

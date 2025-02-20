@@ -789,8 +789,8 @@ class WPFNL_OptIN extends ET_Builder_Module {
 			),
 
 			'notification_text'       => array(
-				'label'            => __( 'Notification Text', 'wpfnl' ),
-				'description'      => __( 'Notification Text', 'wpfnl' ),
+				'label'            => __( 'Confirmation Text', 'wpfnl' ),
+				'description'      => __( 'Confirmation Text', 'wpfnl' ),
 				'type'             => 'text',
 				'default'          => 'Thank you! Your form was submitted successfully!',
 				'default_on_front' => 'Thank you! Your form was submitted successfully!',
