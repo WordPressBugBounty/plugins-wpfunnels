@@ -18681,6 +18681,399 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 }
 .mailmint-automation .steps-settings-sidebar .steps-settings .form-group {
   margin-bottom: 21px;
+  position: relative;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown {
+  position: absolute;
+  background: #fff;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 300px;
+  border: 1px solid #e2e5ed;
+  z-index: 9999;
+  transition: all 0.3s ease;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.06);
+  border-radius: 6px;
+  padding: 8px;
+  display: none;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown::-webkit-scrollbar {
+  width: 5px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown::-webkit-scrollbar-track {
+  background: #f2f5f8;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 20px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown.show {
+  display: block;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown.timezone {
+  width: 320px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown.country {
+  width: 320px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown.dropdown-left {
+  right: inherit;
+  left: 0;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown.width-120px {
+  width: 120px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  color: #2d3149;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li svg {
+  margin-right: 7px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li:not(.searchbar):not(.list-title):not(.button-area):hover, .mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li:not(.searchbar):not(.list-title).active {
+  background: #f6f8fa;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li:first-child a {
+  border-radius: 5px 5px 0 0;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li:last-child {
+  border-bottom: 0;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li:last-child a {
+  border-radius: 0 0 5px 5px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.delete {
+  color: #ec5956;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.searchbar {
+  background: transparent;
+  padding: 8px 8px 14px;
+  display: list-item;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.searchbar svg {
+  position: absolute;
+  top: 9px;
+  left: 16px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.searchbar input[type=search] {
+  font-weight: 400;
+  height: 34px;
+  padding: 4px 15px 4px 40px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.single-column {
+  display: block;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.list-title {
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 15px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #667085;
+  border-top: 1px solid #ebedf0;
+  border-bottom: 1px solid #ebedf0;
+  border-radius: 0;
+  background: #f9fafb;
+  position: relative;
+  padding: 8px 18px;
+  left: -8px;
+  width: calc(100% + 16px);
+  cursor: text;
+  margin-bottom: 10px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.list-title.not-found {
+  color: #ec5956;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.button-area {
+  border-top: 1px solid #ebedf0;
+  border-radius: 0;
+  position: relative;
+  left: -12px;
+  width: calc(100% + 16px);
+  padding: 20px 20px 8px;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  margin-top: 10px;
+  margin-left: 4px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.button-area button {
+  cursor: pointer;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.button-area .cancel-btn {
+  margin-left: auto;
+  margin-right: 12px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.has-sub-dropdown {
+  position: relative;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.has-sub-dropdown::before {
+  content: url("data:image/svg+xml,%3Csvg%20fill%3D%22none%22%20viewBox%3D%220%200%206%2010%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20stroke%3D%22%23A7A8B3%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22M1%201l4%204-4%204%22%2F%3E%3C%2Fsvg%3E");
+  position: absolute;
+  width: 6px;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.has-sub-dropdown ul.mintmrm-dropdown {
+  left: calc(100% + 8px);
+  top: -10px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.has-sub-dropdown.show::before {
+  top: 25%;
+  transform: rotate(90deg);
+  transition: all 0.3s ease;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown li.group-item {
+  transition: all 0.3s ease;
+  padding-left: 20px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown .no-found {
+  background-color: #f9fafb;
+  padding: 5px 0 5px 20px;
+  border-radius: 0;
+  background: #f9fafb;
+  position: relative;
+  left: -12px;
+  width: calc(100% + 24px);
+  cursor: text;
+  margin-top: 10px;
+  display: none;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown .no-found span {
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 15px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #ec5956;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown .add-action {
+  display: flex;
+  align-items: center;
+  padding: 15px 17px 10px;
+  color: #573bff;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+  border-top: 1px solid #e2e5ed;
+  position: relative;
+  text-decoration: underline;
+  left: -12px;
+  width: calc(100% + 24px);
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown .add-action svg {
+  margin-right: 5px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown .add-action svg path {
+  stroke: #573bff;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown .add-action:hover {
+  color: #4c25a5;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown .add-action:hover svg path {
+  stroke: #4c25a5;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown .option-section {
+  max-height: 200px;
+  overflow: auto;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown .option-section::-webkit-scrollbar {
+  width: 5px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown .option-section::-webkit-scrollbar-track {
+  background: #f2f5f8;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group ul.mintmrm-dropdown .option-section::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 20px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .mintmrm-merge-tag-wrapper .merge-tag-icon {
+  position: absolute;
+  bottom: 0;
+  right: 8px;
+  cursor: pointer;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .mintmrm-merge-tag-wrapper .personalization.mintmrm-dropdown {
+  width: 225px;
+  top: calc(100% + 5px);
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .mintmrm-merge-tag-wrapper .personalization.mintmrm-dropdown::before {
+  display: none;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .mintmrm-merge-tag-wrapper .personalization.mintmrm-dropdown .title {
+  margin-bottom: 6px;
+  border-bottom: 1px solid #f0f1f4;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 16px;
+  color: #2d3149;
+  padding: 5px 12px 12px;
+  margin-left: -8px;
+  width: calc(100% + 16px);
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .mintmrm-merge-tag-wrapper .personalization.mintmrm-dropdown li {
+  font-weight: 400;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .mintmrm-merge-tag-wrapper li.has-sub-dropdown {
+  position: relative;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .mintmrm-merge-tag-wrapper li.has-sub-dropdown::before {
+  content: url("data:image/svg+xml,%3Csvg%20fill%3D%22none%22%20viewBox%3D%220%200%206%2010%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20stroke%3D%22%23A7A8B3%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22M1%201l4%204-4%204%22%2F%3E%3C%2Fsvg%3E");
+  position: absolute;
+  width: 6px;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .mintmrm-merge-tag-wrapper li.has-sub-dropdown ul.mintmrm-dropdown {
+  left: calc(100% + 8px);
+  top: -10px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .mintmrm-merge-tag-wrapper li.has-sub-dropdown.show::before {
+  top: 25%;
+  transform: rotate(90deg);
+  transition: all 0.3s ease;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .mintmrm-merge-tag-wrapper li.group-item {
+  transition: all 0.3s ease;
+  padding-left: 20px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .openai-icon {
+  cursor: pointer;
+  position: absolute;
+  bottom: 0;
+  right: 10px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .openai-icon .openai-icon-wrapper .personalized-tooltip {
+  position: absolute;
+  top: -45px;
+  right: 0;
+  background: #333;
+  font-size: 12px;
+  color: #fff;
+  width: 80px;
+  text-align: center;
+  padding: 6px;
+  border-radius: 7px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .openai-icon .openai-icon-wrapper .personalized-tooltip:before {
+  content: "";
+  position: absolute;
+  right: 5px;
+  bottom: -4px;
+  background: #333333;
+  width: 12px;
+  height: 12px;
+  transform: rotate(45deg);
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .openai-icon:hover .personalized-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .modal-overlay .modal-inner {
+  position: relative;
+  max-width: 650px;
+  width: 100%;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .modal-overlay .modal-inner .close-icon {
+  position: absolute;
+  cursor: pointer;
+  height: 46px;
+  right: -17px;
+  top: -17px;
+  width: 46px;
+  z-index: 6;
+  align-items: center;
+  background: #fff;
+  border-radius: 100px;
+  box-shadow: 0 1px 1px #dadada;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .modal-overlay .modal-inner .close-icon svg {
+  height: 12px;
+  width: 12px;
+  cursor: pointer;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .modal-overlay .modal-inner .modal-content {
+  background-color: white;
+  padding: 40px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 100%;
+  width: 100%;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .modal-overlay .modal-inner .modal-content .welcome-title {
+  align-items: center;
+  display: flex;
+  flex-flow: column;
+  margin-bottom: 24px;
+  width: 100%;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .modal-overlay .modal-inner .modal-content .welcome-title svg {
+  height: 56px;
+  width: 56px;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .modal-overlay .modal-inner .modal-content .welcome-title svg path {
+  fill: #11a37f;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .modal-overlay .modal-inner .modal-content .welcome-title .title {
+  color: #2d3149;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+  padding: 17px 0 0;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .modal-overlay .modal-inner .modal-content .openai-input-wrapper {
+  text-align: center;
+  width: 100%;
+}
+.mailmint-automation .steps-settings-sidebar .steps-settings .form-group .modal-overlay .modal-inner .modal-content .openai-input-wrapper .openai-connect-btn {
+  background-color: #573bff;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 17px;
+  padding: 11px 18px;
+  text-align: center;
+  text-transform: capitalize;
+  opacity: 1;
+  transition: all 0.3s ease;
+  text-decoration: none;
 }
 .mailmint-automation .steps-settings-sidebar .steps-settings .form-group:last-child {
   margin-bottom: 0;
@@ -18817,7 +19210,66 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   margin: 0 auto;
   cursor: pointer;
 }
-.mailmint-automation .steps-settings-sidebar .add-template-section .add-template > span {
+.mailmint-automation .steps-settings-sidebar .add-template-section .add-template .thumbnail-image-wrapper {
+  align-items: center;
+  background-color: #f6f6f7;
+  border-radius: 100px;
+  display: flex;
+  height: 190px;
+  justify-content: center;
+  position: relative;
+  width: 190px;
+}
+.mailmint-automation .steps-settings-sidebar .add-template-section .add-template .thumbnail-image-wrapper .thumbnail-image-bg {
+  background-color: #f4f5fa;
+  border: 1px solid #e4e6eb;
+  border-radius: 6px;
+  padding: 4px 7px;
+  position: relative;
+}
+.mailmint-automation .steps-settings-sidebar .add-template-section .add-template .thumbnail-image-wrapper .thumbnail-image-bg .hoverlay {
+  position: absolute;
+  width: 154px;
+  height: 168px;
+  border-radius: 6px;
+  background: rgba(38, 27, 103, 0.6);
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  z-index: 999;
+}
+.mailmint-automation .steps-settings-sidebar .add-template-section .add-template .thumbnail-image-wrapper .thumbnail-image-bg .hoverlay:hover {
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+.mailmint-automation .steps-settings-sidebar .add-template-section .add-template .thumbnail-image-wrapper .thumbnail-image-bg .hoverlay button {
+  background: #fff;
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 10px 16px rgba(97, 103, 116, 0.15);
+  color: #2d3149;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  padding: 8px 11px;
+  width: 105px;
+  cursor: pointer;
+}
+.mailmint-automation .steps-settings-sidebar .add-template-section .add-template .thumbnail-image-wrapper .thumbnail-image-bg .image-wrapper {
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  height: 158px;
+  overflow: hidden;
+  position: relative;
+  width: 139px;
+}
+.mailmint-automation .steps-settings-sidebar .add-template-section .add-template .edit-mode {
   font-weight: 600;
   font-size: 15px;
   line-height: 1.3;
@@ -18827,15 +19279,15 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   display: block;
   margin-top: 12px;
 }
-.mailmint-automation .steps-settings-sidebar .add-template-section .add-template > span svg {
+.mailmint-automation .steps-settings-sidebar .add-template-section .add-template .edit-mode svg {
   position: relative;
   top: 3px;
   margin-left: 8px;
 }
-.mailmint-automation .steps-settings-sidebar .add-template-section .add-template > span svg path {
+.mailmint-automation .steps-settings-sidebar .add-template-section .add-template .edit-mode svg path {
   stroke: #6E42D3;
 }
-.mailmint-automation .steps-settings-sidebar .add-template-section .add-template > span.edit-mood svg {
+.mailmint-automation .steps-settings-sidebar .add-template-section .add-template .edit-mode.edit-mood svg {
   margin-right: 8px;
   margin-left: 0;
 }
@@ -19363,6 +19815,99 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
     max-width: 345px;
   }
 }
+.arco-popover-content,
+.arco-popconfirm-content {
+  border-radius: 8px;
+  border: none;
+  width: 293px;
+  padding: 20px;
+}
+.arco-popover-content .arco-tree-node-title,
+.arco-popconfirm-content .arco-tree-node-title {
+  width: 100%;
+}
+.arco-popover-content .color-input-picker-wrapper,
+.arco-popconfirm-content .color-input-picker-wrapper {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #EBEDF0;
+}
+.arco-popover-content .color-title,
+.arco-popconfirm-content .color-title {
+  color: #2D3149;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.13px;
+  margin-bottom: 8px;
+}
+.arco-popover-content .title-field-wrapper .color-field-wrapper,
+.arco-popconfirm-content .title-field-wrapper .color-field-wrapper {
+  display: flex;
+  gap: 7px;
+}
+.arco-popover-content .title-field-wrapper .color-field-wrapper input[type=text],
+.arco-popconfirm-content .title-field-wrapper .color-field-wrapper input[type=text] {
+  width: 96px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 1px solid #EBEDF0;
+  line-height: 1.3;
+}
+.arco-popover-content .title-field-wrapper .color-field-wrapper .color-bg,
+.arco-popconfirm-content .title-field-wrapper .color-field-wrapper .color-bg {
+  border-radius: 4px;
+  border: 1px solid #EBEDF0;
+}
+.arco-popover-content .title-field-wrapper .picker-btn,
+.arco-popconfirm-content .title-field-wrapper .picker-btn {
+  position: relative;
+  width: 34px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid #EBEDF0;
+}
+.arco-popover-content .title-field-wrapper .picker-btn:before,
+.arco-popconfirm-content .title-field-wrapper .picker-btn:before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  content: url("data:image/svg+xml;base64,PHN2ZyBmaWxsPSJub25lIiB2aWV3Qm94PSIwIDAgMTYgMTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZmlsbD0iIzJEMzE0OSIgZD0iTTE0LjMgMS43NWMtMS0xLTIuNi0xLTMuNTUgMEw4LjkgMy42Yy0uNTUtLjI1LTEuMjUtLjItMS43LjMtLjYuNi0uNiAxLjU1IDAgMi4xNWwtNC4zIDQuM2MtLjMuMy0uNDUuNy0uNDUgMS4xNWwtMSAxYy0uNi42LS42IDEuNTUgMCAyLjE1LjM1LjIuNy4zNSAxLjEuMzUuNCAwIC43NS0uMTUgMS4wNS0uNDVsMS0xYy40LjA1Ljg1LS4xNSAxLjE1LS40NWw0LjMtNC4zYy4zLjMuNy40NSAxLjA1LjQ1LjQgMCAuNzUtLjE1IDEuMDUtLjQ1LjQ1LS40NS41NS0xLjE1LjMtMS43bDEuODUtMS44NWMxLS45NSAxLTIuNTUgMC0zLjV6bS00Ljk1IDYuNEw3LjUgMTBINC42bDMuMy0zLjMgMS40NSAxLjQ1eiIvPjwvc3ZnPg==");
+  height: 16px;
+  width: 16px;
+  transform: translate(-50%, -50%);
+}
+
+.openai-button-wrapper {
+  width: 100%;
+  padding: 14px 14px 0;
+  display: none;
+}
+.openai-button-wrapper .arco-space-item .arco-btn-size-default {
+  height: auto;
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  background-color: #11A37F;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+}
+.openai-button-wrapper .arco-space-item .arco-btn-size-default:hover {
+  background-color: #11A37F;
+}
+.openai-button-wrapper .arco-space-item .arco-btn::before {
+  content: url("data:image/svg+xml;base64,PHN2ZyBmaWxsPSJub25lIiB2aWV3Qm94PSIwIDAgMTggMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTE2LjcxIDcuMzY2YTQuNDg4IDQuNDg4IDAgMDAtLjM4Ny0zLjY4MyA0LjUzNSA0LjUzNSAwIDAwLTQuODgyLTIuMTc1IDQuNTQ4IDQuNTQ4IDAgMDAtNy43MDcgMS42MjhBNC40ODkgNC40ODkgMCAwMC43MzYgNS4zMTFhNC41MzUgNC41MzUgMCAwMC41NTcgNS4zMjMgNC40ODUgNC40ODUgMCAwMC4zODMgMy42ODMgNC41MzggNC41MzggMCAwMDQuODg2IDIuMTc1QTQuNDg4IDQuNDg4IDAgMDA5Ljk0NCAxOGE0LjU0MSA0LjU0MSAwIDAwNC4zMjktMy4xNTQgNC40OTEgNC40OTEgMCAwMDIuOTk4LTIuMTc1IDQuNTQyIDQuNTQyIDAgMDAtLjU2LTUuMzA1em0tNi43NjYgOS40NTZhMy4zNTcgMy4zNTcgMCAwMS0yLjE1OC0uNzhsLjEwNy0uMDYxIDMuNTg0LTIuMDY5YS41OTYuNTk2IDAgMDAuMjk0LS41MVY4LjM0OGwxLjUxNS44NzZhLjA1My4wNTMgMCAwMS4wMjkuMDR2NC4xODZhMy4zNzggMy4zNzggMCAwMS0zLjM3MSAzLjM3em0tNy4yNDYtMy4wOTRhMy4zNTMgMy4zNTMgMCAwMS0uNC0yLjI2bC4xMDYuMDYzIDMuNTg3IDIuMDdhLjU3OC41NzggMCAwMC41ODUgMGw0LjM4My0yLjUyN3YxLjc0OWEuMDYuMDYgMCAwMS0uMDI1LjA0NmwtMy42MyAyLjA5NGEzLjM3NCAzLjM3NCAwIDAxLTQuNjA2LTEuMjM1em0tLjk0NC03LjgwNmEzLjM2NCAzLjM2NCAwIDAxMS43NzUtMS40OFY4LjdhLjU3NS41NzUgMCAwMC4yOS41MDdsNC4zNjEgMi41MTYtMS41MTUuODc3YS4wNTcuMDU3IDAgMDEtLjA1MyAwbC0zLjYyMy0yLjA5YTMuMzc4IDMuMzc4IDAgMDEtMS4yMzUtNC42MDZ2LjAxOHptMTIuNDQ4IDIuODkyTDkuODI3IDYuMjczbDEuNTExLS44NzNhLjA1Ny4wNTcgMCAwMS4wNTQgMGwzLjYyMiAyLjA5M2EzLjM3IDMuMzcgMCAwMS0uNTA3IDYuMDc5VjkuMzE0YS41OTIuNTkyIDAgMDAtLjMwNS0uNXptMS41MDgtMi4yNjhsLS4xMDctLjA2NC0zLjU4LTIuMDg2YS41ODIuNTgyIDAgMDAtLjU4OSAwTDcuMDU2IDYuOTIyVjUuMTczYS4wNS4wNSAwIDAxLjAyLS4wNDZsMy42MjQtMi4wOWEzLjM3NCAzLjM3NCAwIDAxNS4wMSAzLjQ5NXYuMDE0ek02LjIyOSA5LjY0N2wtMS41MTUtLjg3M2EuMDYuMDYgMCAwMS0uMDI5LS4wNDJWNC41NTZhMy4zNzQgMy4zNzQgMCAwMTUuNTMyLTIuNTlsLS4xMDcuMDYtMy41ODMgMi4wNjhhLjU5Ni41OTYgMCAwMC0uMjk1LjUxMUw2LjIzIDkuNjQ3em0uODIzLTEuNzc0bDEuOTUxLTEuMTI1IDEuOTU2IDEuMTI1djIuMjVMOS4wMSAxMS4yNDhsLTEuOTU2LTEuMTI1LS4wMDMtMi4yNXoiLz48L3N2Zz4=");
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
 .wpfnl-mrm-email-template__wrapper {
   position: fixed;
   top: 32px;
@@ -19874,6 +20419,175 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 }
 .folded .mintmrm-delete-alert-wrapper {
   width: calc(100% - 36px);
+}
+
+.wpfnl-mrm-email-template__wrapper {
+  width: calc(100% - 36px);
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner {
+  align-items: center;
+  display: flex;
+  max-width: 1215px;
+  width: 100%;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper {
+  background: #f6f8fa;
+  border-radius: 10px;
+  padding: 24px 48px 40px 40px;
+  position: relative;
+  width: 100%;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .cross-icon {
+  align-items: center;
+  background: #fff;
+  border-radius: 100px;
+  box-shadow: 0 1px 1px #dadada;
+  cursor: pointer;
+  display: flex;
+  height: 34px;
+  justify-content: center;
+  position: absolute;
+  right: -15px;
+  top: -15px;
+  width: 34px;
+  z-index: 2;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper h2 {
+  color: #2d3149;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 25px;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper {
+  align-items: start;
+  display: flex;
+  gap: 24px;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .preview-test-section {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 1px hsla(220deg, 7%, 73%, 0.3);
+  width: 65%;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .preview-test-section .preview-email-header {
+  align-items: center;
+  border-bottom: 1px solid #ebedf0;
+  display: flex;
+  justify-content: space-between;
+  padding: 17px 20px 17px 24px;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .preview-test-section .preview-email-header .responsive-view-section {
+  border-radius: 6px;
+  display: flex;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .preview-test-section .preview-email-header .responsive-view-section .desktop-icon {
+  border-radius: 6px 0 0 6px;
+  cursor: pointer;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .preview-test-section .preview-email-header .responsive-view-section .desktop-icon.active svg g {
+  stroke: #573BFF;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .preview-test-section .preview-email-header .responsive-view-section .desktop-icon.active svg path {
+  stroke: #573BFF;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .preview-test-section .preview-email-header .responsive-view-section .mobile-icon {
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .preview-test-section .preview-email-header .responsive-view-section .mobile-icon.active svg g {
+  stroke: #573BFF;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .preview-test-section .preview-email-header .responsive-view-section .mobile-icon.active svg path {
+  stroke: #573BFF;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .preview-test-section .preview-email-header .responsive-view-section button {
+  align-items: center;
+  background-color: #fff;
+  border-right: 1px solid #ebedf0;
+  border: 1px solid #ebedf0;
+  display: flex;
+  height: 34px;
+  justify-content: center;
+  width: 44px;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .preview-test-section .preview-email-header .edit-template-section .edit-template-btn {
+  align-items: center;
+  background-color: transparent;
+  border: 1px solid #ebedf0;
+  border-radius: 6px;
+  color: #2d3149;
+  display: flex;
+  font-size: 14px;
+  font-weight: 500;
+  gap: 7px;
+  line-height: 1.07;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .preview-test-section .template-modal-overflow {
+  display: flex;
+  height: 500px;
+  justify-content: center;
+  padding: 19px 24px 24px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: auto;
+  width: 100%;
+  margin: 0 auto;
+  max-width: 1365px;
+  position: relative;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .preview-test-section .template-modal-overflow .mobile-view {
+  max-width: 400px;
+  width: 100%;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .test-email-section {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 1px hsla(220deg, 7%, 73%, 0.3);
+  padding: 24px;
+  width: 35%;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .test-email-section .form-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .test-email-section .form-group .at-the-rate-icon {
+  bottom: 10px;
+  left: 15px;
+  position: absolute;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .test-email-section .form-group input[type=email] {
+  padding: 14px 15px 14px 43px;
+  border: 1px solid #ebedf0;
+  border-radius: 6px;
+  color: #2d3149;
+  display: block;
+  font-weight: 400;
+  line-height: 1.3;
+  width: 100%;
+  box-shadow: 0 0 0 transparent;
+  background-color: #fff;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .test-email-section .footer-btn {
+  display: flex;
+  gap: 12px;
+  justify-content: end;
+  position: relative;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .test-email-section .footer-btn .alert-message {
+  left: 0;
+  max-width: 240px;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .test-email-section .footer-btn .alert-message.wpfnl-error {
+  color: #f44336;
+}
+.wpfnl-mrm-email-template__wrapper .template-modal-inner .preview-modal-wrapper .preview-test-email-wrapper .test-email-section .footer-btn .alert-message.wpfnl-success {
+  color: #4caf50;
 }
 
 .wpfnl-order-bump__template .template-preview-wrapper .description p {

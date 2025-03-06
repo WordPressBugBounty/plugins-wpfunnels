@@ -236,29 +236,30 @@
 
         });
 
-        if (
-            $('#shipping_state').length ||
-            $('#shipping_country').length ||
-            $('#billing_state').length ||
-            $('#billing_country').length
-        ) {
-            if ('undefined' !== typeof $.fn.select2) {
-                $('#billing_country, #billing_state, #shipping_country, #shipping_state')
-                    .select2()
-                    .on('select2:open', (elm) => {
-                        const targetLabel = $(elm.target).parents('.form-row').find('label')
-                        targetLabel.addClass('floated')
-                    })
-                    .on('select2:close', (elm) => {
-                        const target = $(elm.target)
-                        const targetLabel = target.parents('.form-row').find('label')
-                        const targetOptions = $(elm.target.selectedOptions)
-                        if (!targetOptions.length) {
-                            targetLabel.removeAttr('class')
-                        }
-                    })
-            }
-        }
+        // if (
+        //     $('#shipping_state').length ||
+        //     $('#shipping_country').length ||
+        //     $('#billing_state').length ||
+        //     $('#billing_country').length
+        // ) {
+        //     if ('undefined' !== typeof $.fn.select2) {
+                
+        //         $('#billing_country, #billing_state, #shipping_country, #shipping_state')
+        //             .select2()
+        //             .on('select2:open', (elm) => {
+        //                 const targetLabel = $(elm.target).parents('.form-row').find('label')
+        //                 targetLabel.addClass('floated')
+        //             })
+        //             .on('select2:close', (elm) => {
+        //                 const target = $(elm.target)
+        //                 const targetLabel = target.parents('.form-row').find('label')
+        //                 const targetOptions = $(elm.target.selectedOptions)
+        //                 if (!targetOptions.length) {
+        //                     targetLabel.removeAttr('class')
+        //                 }
+        //             })
+        //     }
+        // }
         //--------end floating label script-------
 
         //-------multistep checkout------

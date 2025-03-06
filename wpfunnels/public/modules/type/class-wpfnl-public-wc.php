@@ -114,11 +114,20 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
     private function wpfnl_order_bump_accept( $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $replaceable_ob, $ob_cart_item_data, $should_replace_first_product, $replace_settings ){
 
         if( Wpfnl_functions::is_wc_active() ){
-            $cookie_name        = 'wpfnl_order_bump';
-            $cookie             = isset( $_COOKIE[$cookie_name] ) ? json_decode( wp_unslash( $_COOKIE[$cookie_name] ), true ) : array();
-            $cookie['order_bump_accepted']   = 'yes';
+            $cookie_name = 'wpfnl_order_bump';
+            $cookie      = isset( $_COOKIE[$cookie_name] ) ? json_decode( wp_unslash( $_COOKIE[$cookie_name] ), true ) : array();
 
-			
+            $cookie['order_bump_accepted'] = 'yes';
+
+			// Check if 'order_bump_product' exists and is an array, if not initialize it as an array
+			if (!isset($cookie['order_bump_product']) || !is_array($cookie['order_bump_product'])) {
+				$cookie['order_bump_product'] = array();
+			}
+
+			// Append the product_id to the 'order_bump_product' array if it doesn't already exist
+			if (!in_array($product_id, $cookie['order_bump_product'])) {
+				$cookie['order_bump_product'][] = $product_id;
+			}
 
 			ob_start();
             setcookie( $cookie_name, wp_json_encode( $cookie ), time() + 3600 * 6, '/', COOKIE_DOMAIN );
@@ -132,7 +141,7 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 				
                 $checkout_products = get_post_meta( $step_id, '_wpfnl_checkout_products', true);
                 $is_gbf = get_post_meta( $funnel_id, 'is_global_funnel', true);
-               
+
 				if(( isset($replace_settings['isAllReplace']) && 'yes' === $replace_settings['isAllReplace'] ) || 'yes' === $is_gbf ){
 					\WC()->cart->empty_cart();
 					if( 'yes' === $is_gbf ){
@@ -195,15 +204,28 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
         if( Wpfnl_functions::is_wc_active() ){
 
             // fetch main products
-            $checkout_meta 		= new Wpfnl_Default_Meta();
-            $main_products		= $checkout_meta->get_main_products( $funnel_id, $step_id );
+            $checkout_meta = new Wpfnl_Default_Meta();
+            $main_products = $checkout_meta->get_main_products( $funnel_id, $step_id );
 
-            $cookie_name        = 'wpfnl_order_bump';
-            $cookie             = isset( $_COOKIE[$cookie_name] ) ? json_decode( wp_unslash( $_COOKIE[$cookie_name] ), true ) : array();
+            $cookie_name = 'wpfnl_order_bump';
+            $cookie      = isset( $_COOKIE[$cookie_name] ) ? json_decode( wp_unslash( $_COOKIE[$cookie_name] ), true ) : array();
+
             $cookie['order_bump_accepted']   = 'no';
             if( !isset($cookie['order_bump_accepted']) ){
                 $cookie['order_bump_accepted'] = 'no';
             }
+
+			// Check if 'order_bump_product' exists and is an array
+			if (isset($cookie['order_bump_product']) && is_array($cookie['order_bump_product'])) {
+				// Find the index of the product_id in the array
+				$index = array_search($product_id, $cookie['order_bump_product']);
+				if ($index !== false) {
+					// Remove the product_id from the array
+					unset($cookie['order_bump_product'][$index]);
+					// Re-index the array to remove gaps
+					$cookie['order_bump_product'] = array_values($cookie['order_bump_product']);
+				}
+			}
 
 			ob_start();
             setcookie( $cookie_name, wp_json_encode( $cookie ), time() + 3600 * 6, '/', COOKIE_DOMAIN );
