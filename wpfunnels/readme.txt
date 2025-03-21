@@ -1,14 +1,13 @@
-=== Easiest Funnel Builder For WordPress & WooCommerce by WPFunnels ===
+=== Easiest Funnel Builder For WordPress & WooCommerce, Specialized For Digital Creators - WPFunnels ===
 Contributors: coderexltd, getwpfunnels, coderexco
 Donate link: https://getwpfunnels.com/
 Tags: funnel builder, order bump, sales funnels, lead generation, custom checkout
 Requires at least: 6.1
 Tested up to:  6.7.2
 Requires PHP: 7.4
-Stable tag:  3.5.16
+Stable tag:  3.5.17
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-
 
 WPFunnels - funnel building made easy. Craft lead generation funnels, sales funnels, or eCommerce funnels visually within WordPress.
 
@@ -16,7 +15,7 @@ WPFunnels - funnel building made easy. Craft lead generation funnels, sales funn
 
 👥 Lead Generator 💰 Sales Funnel Builder 🛍️ eCommerce Funnel Builder 🎓 Course Funnel Builder
 
-Create high-converting lead funnels and sales funnels using the easiest visual WordPress Funnel Builder – WPFunnels.
+Create high-converting lead funnels and sales funnels using the easiest visual WordPress Funnel Builder - WPFunnels.
 
 = A Reliable Funnel Builder To Generate Leads In WordPress =
 
@@ -25,9 +24,8 @@ Automate lead generation and customer engagement effortlessly within WordPress.
 ✅  Plan conversion-optimized funnels with no complications.
 ✅  Design high-converting landing pages for your funnels.
 ✅  Use built-in opt-in forms to collect leads easily.
-✅  Send leads to <a href="https://wordpress.org/plugins/mail-mint/" target="_blank">Mail Mint</a> for active segmentation & nurturing.
+✅  Send leads to <a href="https://wordpress.org/plugins/mail-mint/" target="_blank">Mail Mint</a> for segmentation & nurturing.
 ✅  Set up automated email workflows for follow-ups and conversions. (<a href="https://youtu.be/_LUTTPGZsKk?si=QAqqt97SlItKXOIA" target="_blank">See how</a>)
-
 
 Use WPFunnels and Mail Mint to grow your business on autopilot.
 
@@ -35,27 +33,25 @@ Use WPFunnels and Mail Mint to grow your business on autopilot.
 
 Use a visual canvas to plan a complete sales funnel journey and leverage exclusive features, which include:
 
-✅ Conversion-optimized templates
-✅ Custom landing pages
-✅ Optimized checkout pages
-✅ Exclusive discounts
-✅ Order bumps at the checkout
-✅ One click upsell offers after checkout (Pro)
-✅ Conditional funnel steps & offers (Pro)
-✅ Email automation campaigns (via Mail Mint integration) (Pro)
-✅ Detailed funnel analytics (Pro)
-✅ WooCommerce checkout customizer (Pro)
-✅ Conditional funnel for WooCommerce shop (Pro)
-✅ Dynamic upsells for WooCommerce (Pro)
+- Conversion-optimized templates
+- Custom landing pages
+- Optimized checkout pages
+- Exclusive discounts
+- Order bumps at the checkout
+- One click upsell offers after checkout (Pro)
+- Conditional funnel steps & offers (Pro)
+- Email automation campaigns (via Mail Mint integration) (Pro)
+- Detailed funnel analytics (Pro)
+- WooCommerce checkout customizer (Pro)
+- Conditional funnel for WooCommerce shop (Pro)
+- Dynamic upsells for WooCommerce (Pro)
 and many more.
 
-You can easily craft a WordPress sales funnel, designed to boost your revenue with high AOV.
+You can easily craft a WordPress sales funnel to boost your revenue with high AOV.
 
-No matter what type of funnel you need - course funnels, tripwire funnels, SLO funnels, WooCommerce sales funnels, or service-based funnels - WPFunnels will make the process super easy.
-
+No matter what type of funnel you need - course funnels, tripwire funnels, SLO funnels, eCommerce funnels, or service-based funnels - WPFunnels will make the process super easy.
 
 <a href="https://getwpfunnels.com/resources/" target="_blank"> Documentation</a> | <a href="https://www.youtube.com/channel/UCIDB7eo-kCAVXRG4xKG-GCQ/playlists" target="_blank">Video Tutorials</a> | <a href="https://www.facebook.com/groups/wpfunnels/" target="_blank">Join our Facebook Community</a>
-
 
 [youtube https://youtu.be/GrzIRl5jfBE?si=g-48K1WrhE7ZcVTp]
 
@@ -67,16 +63,16 @@ It is specially built for digital creators (such as online coaches, educators, t
 
 You will get everything you need to automate your sales process and stay in control of every stage of the buyer’s journey.
 
-**✅ Easy Lead Generation In WordPress**
+**Easy Lead Generation In WordPress**
 Build lead generation funnels in minutes, collect & segment leads, and run automated email campaigns easily.
 
-**✅ Features Focused On Revenue Growth**
+**Features Focused On Revenue Growth**
 Use key features such as order bumps, upsells, exclusive discounts, and automated coupons to increase revenue growth through your sales funnel.
 
-**✅ Funnel Builder To Streamline Marketing Automation**
+**Funnel Builder To Streamline Marketing Automation**
 Use a powerful funnel builder to set up a complete funnel journey with the necessary pages and automated email campaigns to maximize conversions.
 
-**✅ Analytics For Data-Driven Funnel Optimizations**
+**Analytics For Data-Driven Funnel Optimizations**
 Access detailed analytics and A/B testing options for your sales funnel pages to track performance and optimize for better results.
 
 Getting Started is Easy:
@@ -86,12 +82,12 @@ Getting Started is Easy:
 4. Launch and promote your campaign.
 5. Start getting leads & sales on autopilot.
 
-With the right Funnel Builder for WordPress, creating a high-converting sales funnel has never been simpler.
+Creating a high-converting sales funnel in WordPress has never been simpler.
 
 Watch how Darrel Wilson used WPFunnels to create sales funnels:
 [youtube https://www.youtube.com/watch?v=rEcChDYV2e8&t=1332s]
 
-== 🌟 Powerful Features of WPFunnels – The Ultimate WordPress Funnel Builder 🌟 ==
+== 🌟 Powerful Features of WPFunnels - The Ultimate WordPress Funnel Builder 🌟 ==
 
 No need to use multiple tools to create or track your funnels.
 
@@ -100,24 +96,28 @@ No need to use multiple tools to create or track your funnels.
 - Visual funnel mapping canvas
 - Basic funnel steps: Landing, Checkout, and Thank You pages.
 - Pre-made Funnel Templates for quick setup.
-- Design funnel pages using Gutenberg, Elementor, Divi, Bricks, or Oxygen.
 - Opt-in forms to collect leads
-- Direct integration with Mail Mint to collect & manage leads.
-- Order bump offers at the checkout to boost AOV
-- Strategic conditional funnels to influence your buyers’ journey
-- Exclusive discounts within funnels
+- Custom checkout page
+- Order bump offers at the checkout
 - One Click Upsell and Downsell offers after checkout (Pro)
+- A/B split testing within WordPress (Pro)
 - Detailed analytics to optimize your funnels (Pro)
+
+- Design funnel pages using Gutenberg, Elementor, Divi, Bricks, or Oxygen.
+- Collect & manage leads (via Mail Mint)
+- Conditional funnels to influence buyers’ journey
+- Exclusive discounts within funnels
+
 - Conditional eCommerce Funnels for WooCommerce (Pro)
-- Email Marketing Automation without leaving the funnel canvas (via Mail Mint integration) (Pro)
+- Email Marketing Automation within the funnel cancas (via Mail Mint integration) (Pro)
 - Create course funnels (WooCommerce + Tutor LMS or LearnDash)
 - Funnels for LearnDash Courses without WooCommerce (Pro)
 - Integration with Popular CRMs and Automation Tools (Pro)
 - Webhooks support (Pro)
+
 - Offline payments support
-- One-click upsells support for major payment gateways such as Stripe, PayPal, Mollie, etc. (<a href="https://getwpfunnels.com/docs/supported-payment-gateways/?utm_source=repo&utm_medium=repo&utm_campaign=supported-payment-gateways" target="_blank">View all.</a>)
 - Post-purchase upsell support for any payment gateway (Pro).
-- A/B split testing within WordPress (Pro)
+- One-click upsells support for major payment gateways such as Stripe, PayPal, Mollie, etc. (<a href="https://getwpfunnels.com/docs/supported-payment-gateways/?utm_source=repo&utm_medium=repo&utm_campaign=supported-payment-gateways" target="_blank">View all.</a>)
 
 Get everything from planning your funnel journey to launching a live campaign—all in one place—no complexity.
 
@@ -135,7 +135,7 @@ Though the plugin can be used for any business or niche, most of the core featur
 
 If you are one of the following, then you must give WPFunnels a try:
 
-* Coaches & Consultants: Marketing Coach, Life Coach, Business Coach, Financial Coach, Fitness Trainer, Yoga Instructor
+* Coaches & Consultants: Marketing Coach, Life Coach, Business Coach, Fitness Trainer, Yoga Instructor, etc.
 * Digital Creators & Educators: Course Creator, Educational Portal, Tutor, Online Trainer
 * E-commerce & Online Businesses: eCommerce Shop, Print-on-Demand Store, Subscription Service, Software Firm
 * Agencies & Marketers: Marketing Agency, Advertising Agency, Marketing Strategist, Affiliate Marketer
@@ -144,7 +144,7 @@ If you are one of the following, then you must give WPFunnels a try:
 ** Types Of Funnels You Can Create Using WPFunnels **
 
 * Lead Generation Funnel (with lead magnets or resources)
-* Product Sales Funnels (physical or tangible products)
+* Product Sales Funnels
 * Digital Product Sales Funnel
 * eCommerce Sales Funnel
 * Course Funnels
@@ -152,19 +152,17 @@ If you are one of the following, then you must give WPFunnels a try:
 * Affiliate Sales Funnel
 * Bridge Funnel
 * Tripwire Sales Funnel
-* Social Followers Growth Funnel
 * Squeeze Page Funnel
 * Subscription Funnel
-* Free Consultation Funnel
 * VSL Funnel
 * SLO Funnel
 and many more.
 
 == Everything You Need To Craft Conversion-Optimized Funnels ==
 
-WPFunnels is your go-to Funnel Builder for WordPress, packed with all the necessary features to help you create high-converting lead generation funnels and sales funnels easily.
+WPFunnels is your go-to Funnel Builder for WordPress to help you create high-converting lead generation funnels and sales funnels easily.
 
-= ⭐ The Visual Funnel Canvas – Plan & Organize Funnels with Ease ⭐ =
+= 👉 The Visual Funnel Canvas - Plan & Organize Funnels with Ease =
 
 You can map out and structure your funnel journey visually with no technical confusion.
 
@@ -172,17 +170,17 @@ Easily add funnel pages, make attractive offers, set up conditional flows, and m
 
 > Learn More About <a href="https://getwpfunnels.com/visual-funnel-mapping-canvas/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-visual-canvas" target="_blank">Visual Funnel Canvas</a>
 
-= ⭐ Pre-made Sales Funnel Templates ⭐ =
+= 👉 Pre-made Sales Funnel Templates =
 
 Choose from dozens of niche-specific funnel templates that you can quickly tweak and launch.
 
 This makes the funnel-building process easy, even if you have no technical or design skills.
 
-(You can design from scratch if you want to.)
+<em>(You can design from scratch if you want to.)</em>
 
 > Check Out WPFunnels' <a href="https://getwpfunnels.com/pre-made-sales-funnel-templates/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-funnel-templates" target="_blank">Exclusive Funnel Templates</a>
 
-= ⭐ Customize Funnel Pages With Popular Page Builders ⭐ =
+= 👉 Customize Funnel Pages With Popular Page Builders =
 
 WPFunnels has support for the following popular page builders:
 ✅ Gutenberg
@@ -197,9 +195,9 @@ For other page builders, <a href="https://getwpfunnels.com/docs/wpfunnels-shortc
 
 > Learn More About WPFunnesl And <a href="https://getwpfunnels.com/design-funnel-pages-with-the-best-page-builders/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-page-builders" target="_blank">Page Builders Support</a>
 
-= ⭐ Custom Funnel Checkout Pages ⭐ =
+= 👉 Custom Funnel Checkout Pages =
 
-With WPFunnels, you can fully customize the checkout page of every funnel to deliver the best buying experience for your customers.
+You can fully customize the checkout page of every funnel to deliver the best buying experience for your customers.
 
 ✅ Custom design and typography
 ✅ Single and two-column checkout
@@ -210,7 +208,7 @@ With WPFunnels, you can fully customize the checkout page of every funnel to del
 
 > Learn More About <a href="https://getwpfunnels.com/custom-checkout-page/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-custom-funnel-checkout" target="_blank">Funnel Checkout Customization</a>
 
-= ⭐ Order Bump Offers At The Checkout ⭐ =
+= 👉 Order Bump Offers At The Checkout =
 
 Easily add order bump offers to your sales funnel checkout page, letting customers accept an extra offer with one click instantly.
 
@@ -225,14 +223,14 @@ The right offer can significantly boost your AOV (Average Order Value).
 
 > Learn More About <a href="https://getwpfunnels.com/woocommerce-order-bump/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-order-bump" target="_blank">Using Order Bumps</a>
 
-= ⭐ Post-purchase Upsells (Pro) ⭐ =
+= 👉 Post-purchase Upsells (Pro) =
 
 Unlike most other tools, with WPFunnels, you will be able to make post-purchase upsell offers no matter what payment gateway you use—Razorpay, MBWay, EUPago, Mercado Pago, etc.
 
 Take a look:
 [youtube https://youtu.be/FajRJY9UVXM?si=QunbNMMoDsZMcT8x]
 
-= ⭐ One Click Upsell And Downsell Offers (Pro) ⭐ =
+= 👉 One Click Upsell And Downsell Offers (Pro) =
 
 For <a href="https://getwpfunnels.com/docs/supported-payment-gateways/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-upsell-payment-gateways" target="_blank">selected payment gateways</a>, you can trigger exclusive one-time offers or one click upsell and downsell offers after checkout in your sales funnel—helping you maximize revenue by leveraging buyer intent.
 
@@ -245,7 +243,7 @@ Since these are one-click offers, customers won’t need to re-enter payment det
 
 > Learn More About Using <a href="https://getwpfunnels.com/one-click-upsell/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-one-click-upsell" target="_blank">One Click Upsell Offers</a>
 
-= ⭐ Create Lead Generation Funnels For Free ⭐ =
+= 👉 Create Lead Generation Funnels For Free =
 
 With WPFunnels, you can easily set up a lead generation funnel using basic features:
 
@@ -267,16 +265,15 @@ Learn to create a lead generation funnel for free:
 
 [youtube https://www.youtube.com/watch?v=iEe_aW0o4UY]
 
-= ⭐ Email Automation For Your WordPress Funnels (Pro) ⭐ =
+= 👉 Email Automation For Your WordPress Funnels (Pro) =
 
 WPFunnels integrates directly with Mail Mint so that you can set up email automation workflows based on buyer actions in your sales funnel, all without leaving your funnel canvas.
 
 > <a href="https://getwpfunnels.com/docs/wpfunnels-new-ui/funnel-automation-with-mail-mint/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-and-mm-auto" target="_blank">Check it out!</a>
 
-= ⭐ Advanced A/B Split Testing In WordPress (Pro) ⭐ =
+= 👉 Advanced A/B Split Testing In WordPress (Pro) ⭐ =
 
 With WPFunnels, you can A/B test your sales funnel pages with multiple variants, designs, offers, copies, etc., and get precise data to see what works best.
-
 
 ✅ A/B Testing for any funnel page
 ✅ Unlimited page variants
@@ -285,25 +282,20 @@ With WPFunnels, you can A/B test your sales funnel pages with multiple variants,
 
 > Learn More About WPFunnels' <a href="https://getwpfunnels.com/a-b-testing/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-a-b-testing" target="_blank">A/B Testing</a>
 
-= ⭐ Detailed Funnel Analytics (Pro) ⭐ =
+= 👉 Detailed Funnel Analytics (Pro) =
 
 You can get comprehensive analytics to track your funnel performance based on key metrics and make data-driven decisions to optimize your results.
 
-✅ Gross Revenue
+✅ Revenue from orders, order bumps, upsells and downsells.
 ✅ Average Order Value (AOV)
-✅ Order Bump Revenue
-✅ Revenue From Upsells & Downsells
 ✅ Opt-in Submissions
-✅ Total Visitors
-✅ Unique Visitors
-✅ Conversion Rate
+✅ Visitors & Conversion Rate
 ✅ Weekly Revenue Graph
-✅ Quick Stats
 ✅ Download Report (PDF)
 
 > Learn More About WPFunnels' <a href="https://getwpfunnels.com/sales-funnel-analytics/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-funnel-analytics" target="_blank">Detailed Funnel Analytics</a>
 
-= 🌟 Exclusive Sales Funnels For WooCommerce Products 🌟 =
+= 👉 Exclusive Sales Funnels For WooCommerce Products =
 
 With a core integration with WooCommerce, you may easily create sales funnels for your products and increase revenue. 
 
@@ -316,7 +308,7 @@ These funnels will include:
 * Dedicated checkout pages
 * Exclusive offers
 
-= 🌟 Conditional eCommerce Funnels (Pro) 🌟 =
+= 👉 Conditional eCommerce Funnels (Pro) =
 
 With the medium or large plans of WPFunnels Pro, you will get access to a special add-on - The Global Funnel Checkout.
 
@@ -325,11 +317,11 @@ This add-on will let you define conditions to create a personalized e-commerce f
 Here's how it works:
 
 1. Design your funnel pages starting with checkout.
-2. Define conditions to enter the funnel, such as cart total, product in category, etc.
+2. Define conditions to enter the funnel (such as cart total, product in category, etc.)
 3. Add relevant order bump offers.
-4. Set conditions to offer dynamic upsell offers such as more quantity, relevant products, etc.
+4. Set conditions to offer dynamic upsell offers )such as more quantity, relevant products, etc.)
 5. Customer adds products to the cart and is ready to checkout.
-6. WPFunnels checks the cart for the condition.
+6. WPFunnels checks the condition.
 7. If the condition is true, the user is directed to the funnel checkout.
 
 **You can also set up automated email follow-ups to maximize conversions.
@@ -340,7 +332,7 @@ With e-commerce funnels, you can easily achieve more conversions, more revenue, 
 
 In such a funnel, people who will naturally visit your WooCommerce store will enter the funnel if their product choices meet the conditions.
 
-= 🌟 Replace Your WooCommerce Checkout Page (Pro) 🌟 =
+= 👉 Replace Your WooCommerce Checkout Page (Pro) =
 
 Global Funnels will also allow you to replace your default WooCommerce checkout page with a custom funnel checkout page in just a few clicks.
 
@@ -350,43 +342,41 @@ Watch how:
 
 With this, anytime a person wants to order from your online shop, they will see your custom checkout page.
 
-Next, you can follow-up with dynamic upsell offers and automated emails (with Mail Mint Pro) to make this funnel more personalized and profitable.
+Next, you can follow-up with dynamic upsell offers and automated emails (via Mail Mint Pro) to make this funnel more profitable.
 
 **You can also enable <a https://youtu.be/LFcwImkpXZA?si=G8TseverQLe0d3PK" target="_blank">Skip cart</a> in the settings if you want to.
 
 > Learn More About WPFunnels' <a href="https://getwpfunnels.com/global-dynamic-woocommerce-funnels/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-global-funnels" target="_blank">Conditional WooCommerce Funnels</a>
 
-= ⭐ Checkoutify - Checkout Customizer For WooCommerce (Pro) ⭐ =
+= 👉 Checkoutify - Checkout Customizer For WooCommerce (Pro) =
 
 WPFunnels Pro will also give you access to Checkoutify, a modern checkout form customizer that will help you design and optimize your WooCommerce checkout form with full control.
 
-✅ Drag and drop field editor
-✅ Full design and layout customization
-✅ Multi-step checkout form
-✅ Replace WooCommerce checkout form
-✅ Custom order bump offer
-✅ Replace a funnel checkout form
-✅ Embed checkout form on any page
-✅ Gutenberg block and Elementor widget
+- Drag and drop field editor
+- Full design and layout customization
+- Multi-step checkout forms
+- Replace WooCommerce or funnel checkout form
+- Custom order bump offer
+- Gutenberg block and Elementor widget
 
 > Learn more about <a href="https://getwpfunnels.com/checkout-field-editor-for-woocommerce-checkoutify/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-checkoutify" target="_blank">Checkoutify</a>
 
-= ⭐ Integration With Major Automation & CRM Tools (Pro) ⭐ =
+= 👉 Integration With Major Automation & CRM Tools (Pro) =
 
-With WPFunnels Pro (Medium or Large), you can integrate with 15+ popular CRMs and automation tools (such as FluentCRM, PabblyConnect, ActiveCampaign, etc.) and collect data based on user actions in the funnel.
+With WPFunnels Pro (Medium or Large), you can integrate with 15+ popular CRMs and automation tools (such as FluentCRM, PabblyConnect, etc.) and collect data based on user actions in the funnel.
 
 > Checkout All The <a href="https://getwpfunnels.com/integration-with-crm-and-automation-tools/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-integrations" target="_blank">Tools That Integrate With WPFunnels</a>
 
-= ⭐ Create Course Funnels In WordPress ⭐ =
+= 👉 Create Course Funnels In WordPress =
 
 If you’re selling courses using TutorLMS or LearnDash, then you can use WPFunnels to set up high-converting course funnels easily.
 
-👉 Create funnels for TutorLMS courses:
+☑️ Create funnels for TutorLMS courses:
 
 * Create course products using Tutor LMS and WooCommerce.
 * Then create funnels for these courses with WPFunnels.
 
-👉 Create funnels for LearnDash courses (Pro):
+☑️ Create funnels for LearnDash courses (Pro):
 
 * Use Learndash to create courses.
 * Use WPfunnel's LMS Add-on to directly build funnels for these courses. 
@@ -404,7 +394,7 @@ If you’re selling courses using TutorLMS or LearnDash, then you can use WPFunn
 == 🤩 Join The WPFunnels Users Community On Facebook 🤩 ==
 
 👉 [JOIN OUR FACEBOOK USERS COMMUNITY](https://www.facebook.com/groups/wpfunnels/):
-Join our bustling funnel community. Take part in discussions and see how others are building high-converting sales funnels to grow their business. Discover best practices, share ideas, and stay updated on exciting new features!
+Join our bustling funnel community. Take part in discussions, see how others are building high-converting sales funnels and stay updated on exciting new features!
 
 
 ## Privacy Policy
@@ -591,6 +581,10 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 
 == Changelog ==
 
+= 3.5.17 (2025-03-21) =
+* Improvement: Query and Performance Optimizations
+* Compatibility: Compatible with the Latest WooCommerce
+
 = 3.5.16 (2025-03-14) =
 * Enhancement: Add Searchable Dropdown on the Integration
 * Bugfix: Lists or Tags Selection Issues on the MailChimp Integration
@@ -754,7 +748,7 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 * New : Added Bricks templates
 * New : Introduced full-width setup wizard
 * New : Integrated with Google Autocomplete
-* New : Added compatibility with Product Addons for WooCommerce – Product Options with Custom Fields
+* New : Added compatibility with Product Addons for WooCommerce - Product Options with Custom Fields
 * Enhancement : Updated the notice and tooltip messages
 * BugFix : Resolved the contact status issue 
 * BugFix : Resolve PHP dedicated warnings
@@ -1135,8 +1129,8 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 * Improvement: Improved UI Content
 * Improvement: WPFunnels updated notices
 * Improvement: Deleting an event log takes the user to a new tab
-* Bug Fix: Stripe – American Express card is calculating the fees incorrectly
-* Bug Fix: Create a Subscriber not working – opt-in form
+* Bug Fix: Stripe - American Express card is calculating the fees incorrectly
+* Bug Fix: Create a Subscriber not working - opt-in form
 * Bug Fix: Thank you Step disabled for Lead Gen type funnel
 
 
@@ -1202,8 +1196,8 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 * Improvement: Upsell order not tracked with AffiliateWP
 * Bug Fix: Replacing Orders with Upsell/Downsell does not refund shipping or taxes
 * Bug Fix: Cancelled Orderbump or Upsell order keeps the taxes
-* Bug Fix: Tax issue – If shipping is taxable, then in funnels, shipping tax does not work
-* Bug Fix: Tax issues – If the product price is inclusive of tax, then the wrong price is shown in Global Funnels Thank You page
+* Bug Fix: Tax issue - If shipping is taxable, then in funnels, shipping tax does not work
+* Bug Fix: Tax issues - If the product price is inclusive of tax, then the wrong price is shown in Global Funnels Thank You page
 * Bug Fix: Session Expired On Checkout Page For RTL
 * Bug Fix: Replacing any orders with Upsell/Downsell shows wrong price at Thank You page
 * Bug Fix: Critical error when funnel checkout product is removed from the website (trash)

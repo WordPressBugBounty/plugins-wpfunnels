@@ -43,7 +43,6 @@ class Wpfnl_Shortcodes {
 		add_action( 'wp_enqueue_scripts', array( $this, 'thankyou_scripts' ), 21 );
 	}
 
-
 	/**
 	 * Render order details markup
 	 *
@@ -56,7 +55,6 @@ class Wpfnl_Shortcodes {
 		return $shortcode->get_content();
 	}
 
-
 	/**
 	 * Render next step button
 	 *
@@ -66,7 +64,6 @@ class Wpfnl_Shortcodes {
 		$shortcode	= new Wpfnl_Shortcode_NextStepButton( (array) $atts );
 		return $shortcode->get_content();
 	}
-
 
 	/**
 	 * Render checkout
