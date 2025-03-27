@@ -116,7 +116,6 @@ class StatHookHandler {
 			$order_id       = $order->get_id();
 		} else {
 			$order_id 		= $order->get_meta('_wpfunnels_offer_parent_id');
-           
 		}
 		
 		if ( 'completed' === $new_status ) {

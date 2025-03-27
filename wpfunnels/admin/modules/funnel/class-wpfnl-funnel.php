@@ -7,6 +7,7 @@
 namespace WPFunnels\Modules\Admin\Funnel;
 
 use WPFunnels\Admin\Module\Wpfnl_Admin_Module;
+use WPFunnels\Admin\Wpfnl_Admin;
 use WPFunnels\Traits\SingletonTrait;
 use WPFunnels\Wpfnl;
 use WPFunnels\Wpfnl_functions;
@@ -69,6 +70,9 @@ class Module extends Wpfnl_Admin_Module
             ->with_callback([ $this, 'wpfnl_update_funnel_settings' ])
             ->with_validation($this->get_validation_data());
 
+		wp_ajax_helper()->handle('wpfnl-guided-tour')
+			->with_callback([ $this, 'wpfnl_guided_tour' ])
+			->with_validation($this->get_validation_data());
     }
 
 
@@ -689,6 +693,91 @@ class Module extends Wpfnl_Admin_Module
 
         return $response;
     }
+
+	/**
+	 * Handle guided tour
+	 *
+	 * @param $payload
+	 *
+	 * @return array
+	 * @since 3.4.16
+	 */
+
+	public function wpfnl_guided_tour($payload)
+	{
+		if(isset($payload['security']) && !wp_verify_nonce($payload['security'], 'wpfnl-admin')) {
+			return [
+				'success' => false,
+				'data'    => 'You do not have permission to perform this action',
+			];
+		}
+		if(!current_user_can('manage_options')){
+			return [
+				'success' => false,
+				'data'    => 'You do not have permission to perform this action',
+			];
+		}
+		if (empty($payload)) {
+			return [
+				'success' => false,
+				'data'    => 'Required value is missing',
+			];
+		}
+
+		$tour_name = !empty($payload['tourName']) ? $payload['tourName'] : '';
+		$tour_type = !empty($payload['tourType']) ? $payload['tourType'] : '';
+
+		if ('skip' === $tour_type) {
+			return $this->handle_skip_tour();
+		}
+
+		if ('finish' === $tour_type) {
+			return $this->handle_finish_tour($tour_name);
+		}
+
+		return [
+			'success' => false,
+			'data'    => 'Invalid tour type',
+		];
+	}
+
+	/**
+	 * Handle skip tour
+	 *
+	 * @return array
+	 * @since 3.4.16
+	 */
+	public function handle_skip_tour()
+	{
+		update_option('wpfnl_guided_tour', []);
+		return [
+			'success' => true,
+			'data'    => 'Tour skipped successfully',
+            'tour'    => [],
+		];
+	}
+
+	/**
+	 * Handle finish tour
+	 * @param $tour_name
+	 * @return array
+	 * @since 3.4.16
+	 */
+	public function handle_finish_tour($tour_name)
+	{
+		$guided_tour = Wpfnl_functions::get_guided_tour();
+        
+		if (($key = array_search($tour_name, $guided_tour)) !== false) {
+			unset($guided_tour[$key]);
+		}
+        
+		update_option('wpfnl_guided_tour', array_values($guided_tour));
+		return [
+			'success' => true,
+			'data'    => 'Tour finished successfully',
+			'tour'    => $guided_tour,
+		];
+	}
 
 
 }

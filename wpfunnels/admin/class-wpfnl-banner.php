@@ -51,7 +51,7 @@ class SpecialOccasionBanner {
         $this->start_date   = strtotime($start_date);
         $this->end_date     = strtotime($end_date);
 
-        if ( !defined('WPFNL_PRO_VERSION') && 'yes' === get_option( '_is_wpfnl_valentine_25', 'yes' )) {
+        if ( !defined('WPFNL_PRO_VERSION') && 'yes' === get_option('_is_wpfnl_eid_25', 'yes' )) {
             // Hook into the admin_notices action to display the banner
             add_action('admin_notices', [$this, 'display_banner']);
             add_action('admin_head', array($this, 'add_styles'));
@@ -64,7 +64,7 @@ class SpecialOccasionBanner {
      * @return array Time remaining in days, hours, and minutes
      */
     public function wpf_get_halloween_countdown() {
-        $halloween = strtotime('2025-02-12 15:30:00'); // Set this to the next Halloween
+        $halloween = strtotime('2025-03-27 11:30:00'); // Set this to the next Halloween
         $now = current_time('timestamp');
         $diff = $halloween - $now;
 
@@ -72,6 +72,7 @@ class SpecialOccasionBanner {
             'days' => floor($diff / (60 * 60 * 24)),
             'hours' => floor(($diff % (60 * 60 * 24)) / (60 * 60)),
             'mins' => floor(($diff % (60 * 60)) / 60),
+            'secs' => $diff % 60,
         );
     }
 
@@ -92,7 +93,7 @@ class SpecialOccasionBanner {
         }
 
         // Calculate the time remaining in seconds
-        $time_remaining = $this->end_date - $current_date_time;
+        $time_remaining = $this->end_date - $current_date_time; 
 
         $countdown = $this->wpf_get_halloween_countdown();
         ?>
@@ -106,22 +107,22 @@ class SpecialOccasionBanner {
                             <div class="wpf-notification-counter__content">
 
                                 <figure class="wpf-notification-counter__figure-logo">
-                                    <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/valentine-image/promotional-text.png'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
+                                    <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/eid-banner/eid-mubarak.webp'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
                                 </figure>
 
-                                <figure class="wpf-notification-counter__figure-occasion">
-                                    <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/valentine-image/event-img.png'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
-                                </figure>
+                                <!-- <figure class="wpf-notification-counter__figure-occasion">
+                                    <img src="<?php //echo esc_url(WPFNL_URL . 'admin/assets/images/valentine-image/event-img.png'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
+                                </figure> -->
 
                                 <figure class="wpf-notification-counter__figure-percentage">
-                                    <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/valentine-image/discount-image.png'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
+                                    <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/eid-banner/discount-funnel.webp'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
                                 </figure>
 
                                 <div id="wpf-halloween-countdown" class="wpf-notification-counter__countdown" aria-live="polite">
                                     <h3 class="screen-reader-text"><?php echo __('Offer Countdown', 'wpfnl'); ?></h3>
                                     <ul class="wpf-notification-counter__list">
 
-                                            <?php foreach (['days', 'hours', 'mins'] as $unit): ?>
+                                            <?php foreach (['days', 'hours', 'mins', 'secs'] as $unit): ?>
                                             <li class="wpf-notification-counter__item ">
                                                 <span id="wpf-halloween-<?php echo esc_attr($unit); ?>" class="wpf-notification-counter__time">
                                                     <?php echo esc_html($countdown[$unit]); ?>
@@ -139,7 +140,7 @@ class SpecialOccasionBanner {
 
                                     <span class="wpf-btn-inner">
                                         <span class="screen-reader-text"><?php echo __('Click to view Halloween sale products', 'wpfnl'); ?></span>
-                                        <span aria-hidden="true" class="wpf-notification-counter__mint-button"> <?php echo __('Get Discount Now', 'wpfnl'); ?></span>
+                                        <span aria-hidden="true" class="wpf-notification-counter__mint-button"> <?php echo __('Get The Deal Now', 'wpfnl'); ?></span>
                                     </span>
                                         
                                     </a>
@@ -164,17 +165,19 @@ class SpecialOccasionBanner {
 
         <script>
             function updateCountdown() {
-                var endDate = new Date("2025-02-16 23:59:59").getTime();
+                var endDate = new Date("2025-04-15 12:00:00").getTime();
                 var now = new Date().getTime();
                 var timeLeft = endDate - now;
 
                 var days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
                 var hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 var minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
 
                 var daysElement = document.getElementById('wpf-halloween-days');
                 var hoursElement = document.getElementById('wpf-halloween-hours');
                 var minsElement = document.getElementById('wpf-halloween-mins');
+                var secsElement = document.getElementById('wpf-halloween-secs');
 
                 if (daysElement) {
                     daysElement.innerHTML = days;
@@ -187,11 +190,14 @@ class SpecialOccasionBanner {
                 if (minsElement) {
                     minsElement.innerHTML = minutes;
                 }
+                if (secsElement) {
+                    secsElement.innerHTML = seconds;
+                }
             }
 
             document.addEventListener('DOMContentLoaded', function() {
                 updateCountdown();
-                setInterval(updateCountdown, 60000); // Update every minute
+                setInterval(updateCountdown, 1000); // Update every minute
             });
         </script>
         <?php
@@ -246,11 +252,8 @@ class SpecialOccasionBanner {
             }
 
             .gwpf-tb__notification {
-                background-color: #d6e4ff;
                 width: calc(100% - 20px);
                 margin: 20px 0 20px;
-                background-color: #6e42d3;
-                background-image: url(<?php echo WPFNL_URL.'admin/assets/images/banner-image/notification-br-bg.webp'; ?>);
                 background-repeat: no-repeat;
                 background-size: cover;
                 position: relative;
@@ -823,10 +826,10 @@ class SpecialOccasionBanner {
 
             .wpf-notification-counter {
                 position: relative;
-                background-image: url(<?php echo esc_url(WPFNL_URL . 'admin/assets/images/valentine-image/banner-bg.png'); ?>);
+                background-image: url(<?php echo esc_url(WPFNL_URL . 'admin/assets/images/eid-banner/banner-bg.webp'); ?>);
                 background-position: center;
                 background-repeat: no-repeat;
-                background-size: 100% 100%;
+                background-size: cover;
                 object-fit: cover;
                 background-color: #03031E;
                 z-index: 1111;
@@ -850,7 +853,7 @@ class SpecialOccasionBanner {
             }
 
             .wpf-notification-counter__figure-logo {
-                max-width: 218px;
+                max-width: 236px;
                 margin: 0;
                 line-height: 0;
             }
@@ -861,7 +864,7 @@ class SpecialOccasionBanner {
             }
 
             .wpf-notification-counter__figure-percentage {
-                max-width: 200px;
+                max-width: 422px;
                 margin: 0;
                 line-height: 0;
             }
@@ -881,19 +884,19 @@ class SpecialOccasionBanner {
             }
 
             .wpf-notification-counter__item {
+                margin: 0;
                 display: flex;
                 flex-direction: column;
                 width: 56.14px;
-                font-family: "Circular Std Book";
-                font-size: 15px;
+                font-family: "Inter";
+                font-size: 14px;
                 font-style: normal;
-                font-weight: 500;
+                font-weight: 400;
                 line-height: normal;
-                letter-spacing: 0.75px;
+                letter-spacing: 0.56px;
                 text-transform: uppercase;
                 text-align: center;
                 color: #111827;
-                margin: 0;
             }
 
             .wpf-notification-counter__time {
@@ -952,6 +955,12 @@ class SpecialOccasionBanner {
                 .wpf-notification-counter__container {
                     max-width: 1200px;
                 }
+                .wpf-notification-counter__figure-logo {
+                    max-width: 220px;   
+                }
+                .wpf-notification-counter__figure-percentage {
+                    max-width: 363px;
+                }
             }
             @media only screen and (max-width: 1550px) {
                 .wpf-notification-counter__container {
@@ -964,7 +973,7 @@ class SpecialOccasionBanner {
                     max-width: 100px;
                 }
                 .wpf-notification-counter__figure-percentage {
-                    max-width: 190px;
+                    max-width: 329px;
                 }
                 .wpf-notification-counter__btn {
                     padding: 12px 18px;
@@ -975,17 +984,17 @@ class SpecialOccasionBanner {
 
             @media only screen and (max-width: 1440px) {
                 .wpf-notification-counter__container {
-                    max-width: 990px;
+                    max-width: 1040px;
                 }
                 .wpf-notification-counter__figure-logo {
-                    max-width: 190px;
+                    max-width: 170px;
                 }
                 .wpf-notification-counter__figure-occasion {
                     max-width: 100px;
                 }
                 .wpf-notification-counter__figure-percentage {
-                    max-width: 180px;
-                }
+                    max-width: 300px;
+                }   
                 .wpf-notification-counter__btn {
                     font-size: 17px;
                     padding: 12px 18px;
@@ -1009,13 +1018,13 @@ class SpecialOccasionBanner {
                     max-width: 860px;
                 }
                 .wpf-notification-counter__figure-logo {
-                    max-width: 170px;
+                    max-width: 160px;
                 }
                 .wpf-notification-counter__figure-occasion {
                     max-width: 80px;
                 }
                 .wpf-notification-counter__figure-percentage {
-                    max-width: 170px;
+                    max-width: 265px;
                 }
                 .wpf-notification-counter__btn {
                     font-size: 16px !important;
@@ -1050,14 +1059,14 @@ class SpecialOccasionBanner {
                     font-size: 20px;
                 }
                 .wpf-notification-counter__figure-logo {
-                    max-width: 180px;
+                    max-width: 150px;
                 }
                 .wpf-notification-counter__figure-occasion {
                     max-width: 90px;
                 }
                 .wpf-notification-counter__figure-percentage {
-                    max-width: 140px;
-                }
+                    max-width: 260px;
+                }   
                 .wpf-notification-counter__btn {
                     font-size: 16px;
                     padding: 12px 20px;
@@ -1083,17 +1092,17 @@ class SpecialOccasionBanner {
 
             @media only screen and (max-width: 1024px) {
                 .wpf-notification-counter__container {
-                    max-width: 750px;
+                    max-width: 770px;
                 }
                 .wpf-notification-counter__figure-logo {
-                    max-width: 150px;
+                    max-width: 130px;
                     margin:0;
                 }
                 .wpf-notification-counter__figure-occasion {
                     max-width: 90px;
                 }
                 .wpf-notification-counter__figure-percentage {
-                    max-width: 140px;
+                    max-width: 225px;
                 }
                 .wpf-notification-counter__btn {
                     font-size: 15px;
@@ -1104,11 +1113,18 @@ class SpecialOccasionBanner {
                     padding: 10px 14px !important;
                     border-radius: 10px !important;
                 }
+                .wpf-notification-counter__time {
+                    width: 38px;
+                    height: 30px;
+                }
+                .wpf-notification-counter__item {
+                    font-size: 12px;
+                }
             }
 
             @media only screen and (max-width: 991px) {
                 .wpf-notification-counter__container {
-                    max-width: 680px;
+                    max-width: 700px;
                 }
                 .wpf-notification-counter__stroke-font {
                     font-size: 20px;
@@ -1120,11 +1136,12 @@ class SpecialOccasionBanner {
                     max-width: 80px;
                 }
                 .wpf-notification-counter__figure-percentage {
-                    max-width: 130px;
+                    max-width: 185px;
+                    margin-top: -7px;
                 }
                 .wpf-notification-counter__btn {
-                    font-size: 14px;
-                    padding: 10px 12px;
+                    font-size: 14px !important;
+                    padding: 10px 12px !important;
                 }
                 .wpf-notification-counter__time {
                     font-size: 16px;

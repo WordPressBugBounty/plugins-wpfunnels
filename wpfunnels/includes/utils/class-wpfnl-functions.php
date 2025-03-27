@@ -5123,6 +5123,32 @@ class Wpfnl_functions {
 			'previous_year'					  			  => __('Previous year', 'wpfnl'),
 
 			// -------Funnel dashboard-------
+
+			// tour text
+			'add_product_on_canvas'					  	  => __('Add Product', 'wpfnl'),
+			'add_product_on_canvas_des'					  => __('To add a product to this funnel, click the cart icon. You can select an existing product from your store or create a new one. This will add the product to your funnel and allow you to adjust its quantity, price, and other details.', 'wpfnl'),
+			'update_funnel_name'					      => __('Update Funnel Name', 'wpfnl'),
+			'update_funnel_name_des'					  => __('To give your funnel a unique and recognizable name, simply click the Funnel Name field at the top. Enter your new name and make sure to Save your changes to update the funnel details.', 'wpfnl'),
+			'view_funnel_stats'					  => __('View Funnel Stats', 'wpfnl'),
+			'view_funnel_stats_des'					  => __("To monitor the performance of your funnel, click on the Stats button or navigate to the Analytics section. Here, you'll see key metrics like total leads, conversions, and revenue, helping you track and optimize your funnel's success.", 'wpfnl'),
+			'preview_funnel'					  => __("Preview Funnel", 'wpfnl'),
+			'preview_funnel_des'					  => __("Click the Preview button to see how your funnel looks in real-time. This allows you to review each step and ensure everything is set up as you want before going live.", 'wpfnl'),
+			'ab_testing_on_canvas'					  => __("Enable A/B Testing", 'wpfnl'),
+			'ab_testing_on_canvas_des'					  => __("Activate A/B Testing to compare different versions of your funnel steps. This feature allows you to test variations in content, design, and calls to action to determine which version performs better. Use the insights gained to optimize your funnel for maximum conversions.", 'wpfnl'),
+			'condition_on_canvas'					  => __("Enable Conditional Funnel", 'wpfnl'),
+			'condition_on_canvas_des'					  => __("To create a tailored experience for your users, enable the Conditional Funnel feature. This allows you to set specific conditions that determine which steps users will see based on their actions or selections. Customize your funnel flow to increase engagement and conversion rates.", 'wpfnl'),
+			'add_new_step'					  => __("Add New Step", 'wpfnl'),
+			'add_new_step_des'					  => __("To enhance your funnel, click the + Add New Step button. You can create various types of steps, such as landing pages, product pages, or thank-you pages. Each step allows you to customize content and settings to guide your customers effectively through the funnel.", 'wpfnl'),
+			'search_ob'					  => __("Search and Select Order Bump Product", 'wpfnl'),
+			'search_ob_des'					  => __("Use the search bar to find an existing product to offer as an order bump. Once you've found the product, select it to include it as an optional add-on during checkout. This will help increase your average order value.", 'wpfnl'),
+			'modify_ob_title'					  => __("Modify Product Title", 'wpfnl'),
+			'modify_ob_title_des'					  => __("To edit the product title, click on the product name field and enter a new title that accurately describes the product. A clear and concise title helps customers quickly understand what you're offering.", 'wpfnl'),
+			'choose_ob_style'					  => __("Choose Order Bump Style", 'wpfnl'),
+			'choose_ob_style_des'					  => __("Customize the appearance of your order bump by selecting a style that fits your funnel’s design. You can choose from various layout options and adjust colors, fonts, and other visual elements to make your order bump stand out during checkout.", 'wpfnl'),
+			'select_ob_position'					  => __("Select Order Bump Position", 'wpfnl'),
+			'select_ob_position_des'					  => __("Select where you want the order bump to appear during checkout. You can position it above or below the payment details to ensure maximum visibility and encourage customers to add the extra product.", 'wpfnl'),
+			'save_ob'					  => __("Save Your Order Bump", 'wpfnl'),
+			'save_ob_des'					  => __("Make sure to click the Save button to keep your order bump settings. This ensures that your changes are applied and your order bump is active for your funnel. Don’t forget to review all details before saving!", 'wpfnl'),
 		);
 	}
 
@@ -5472,6 +5498,37 @@ class Wpfnl_functions {
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Get Guided tour
+	 *
+	 * @return false|mixed|null
+	 * @since 3.4.16
+	 */
+
+	public static function get_guided_tour() {
+		$guided_tour_default = apply_filters('wpfnl_guided_tour_default', [
+			'checkout',
+			'upsell',
+			'downsell',
+			'orderbump',
+			'condition',
+			'add-step',
+			'a/b-testing',
+			'mm-automation',
+			'canvas-step',
+			'view-step',
+			'edit-step',
+		]);
+		$guided_tour = get_option('wpfnl_guided_tour');
+		// Check if the option is not found and return the default
+		if (false === $guided_tour) {
+			update_option('wpfnl_guided_tour',$guided_tour_default);
+			return $guided_tour_default;
+		}
+		return $guided_tour;
 	}
 }
 

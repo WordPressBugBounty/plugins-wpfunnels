@@ -754,7 +754,8 @@ class Wpfnl_Admin
 				'ld_currency'				=> $ld_currency_symbol,
 				'getText'					=> Wpfnl_functions::get_text(),
 				'user_role_manager_data'	=> Wpfnl_functions::get_user_role_settings(),
-				'availableGateways'			=> Wpfnl_functions::get_enabled_payment_gateways()
+				'availableGateways'			=> Wpfnl_functions::get_enabled_payment_gateways(),
+				'guidedTour'				=> Wpfnl_functions::get_guided_tour(),
 			));
 			wp_localize_script( $this->plugin_name, 'template_library_object',
 				array(
@@ -1474,4 +1475,5 @@ class Wpfnl_Admin
 		$mail_mint_object = new \WPFunnels\Integrations\MailMint( $user_data );
 		$mail_mint_object->create_or_update_contact();
 	}
+
 }
