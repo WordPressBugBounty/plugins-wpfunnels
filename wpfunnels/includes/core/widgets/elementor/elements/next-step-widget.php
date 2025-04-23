@@ -700,7 +700,7 @@ class Step_Pointer extends Widget_Base
 	protected function render()
 	{
 		$settings = $this->get_settings();
-		
+		// error_log('Next Step Button Settings: ' . print_r($settings, true));
 		$this->add_render_attribute('wrapper', 'class', 'elementor-button-wrapper');
 		$this->add_render_attribute('button', 'class', 'elementor-button');
 		$products = '';

@@ -78,7 +78,11 @@ class Wpfnl_Plugin_Compatibility {
             [
 				'name'          => 'Google Site Kit',
 				'class_name'    => 'GoogleSiteKit'
-			]
+			],
+            [
+                'name'          => 'Fox Currency Switcher',
+                'class_name'    => 'FoxCurrencySwitcher'
+            ]
         ];
         return $plugins;
     }

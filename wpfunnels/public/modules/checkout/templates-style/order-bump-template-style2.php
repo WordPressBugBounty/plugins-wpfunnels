@@ -48,6 +48,7 @@ if( $type === 'lms' ){
         if (isset($settings['discountOption'])) {
             if ($settings['discountOption'] == "discount-price" || $settings['discountOption'] == "discount-percentage") {
                 $discount_price = preg_replace('/[^\d.]/', '', $settings['discountPrice'] );
+                $discount_price = apply_filters('wpfunnels/modify_order_bump_product_price', $discount_price);
                 if ($settings['discountapply'] == 'regular') {
                     $price = wc_format_sale_price( $regular_price * $quantity, $discount_price );
                 } else {

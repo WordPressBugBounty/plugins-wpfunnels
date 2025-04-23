@@ -3,9 +3,9 @@ Contributors: coderexltd, getwpfunnels, coderexco
 Donate link: https://getwpfunnels.com/
 Tags: funnel builder, order bump, sales funnels, lead generation, custom checkout
 Requires at least: 6.1
-Tested up to:  6.7.2
+Tested up to:  6.8.0
 Requires PHP: 7.4
-Stable tag:  3.5.18
+Stable tag:  3.5.19
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,9 +28,6 @@ Automate lead generation and customer engagement effortlessly within WordPress.
 ✅  Set up automated email workflows for follow-ups and conversions. (<a href="https://youtu.be/_LUTTPGZsKk?si=QAqqt97SlItKXOIA" target="_blank">See how</a>)
 
 Use WPFunnels and Mail Mint to grow your business on autopilot.
-
-Eid Mubarak! Here's A Special Gift: 🎉
-<a href="https://getwpfunnels.com/pricing/?utm_source=plugin-mm&utm_medium=banner-cta&utm_campaign=eid25" target="_blank"> 👉 Enjoy 25% OFF on Mail Mint Pro!</a>
 
 == The Best Sales Funnel Builder To Increase Revenue ==
 
@@ -583,6 +580,14 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.5.19 (2025-04-23) =
+* Compatibility: Compatible with the Latest WordPress
+* Compatibility: Fox Currency Switcher Plugin
+* Improvement: New Attributes on the Next Step Button Shortcode
+* Improvement: New Attributes on the Opt-in Form Shortcode
+* Bugfix: PHP Object Vulnerability Issues
+* Bugfix: Order Bump Product Discount Price not Showing on Order Details
 
 = 3.5.18 (2025-03-27) =
 * New: Initial Guided Assistance on the Funnel Canvas

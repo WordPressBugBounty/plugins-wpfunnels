@@ -11,9 +11,13 @@ if( $product ){
         $signUpFee = \WC_Subscriptions_Product::get_sign_up_fee( $product );
         $regular_price = $regular_price + $signUpFee;
     }
-    $sale_price 		= $product->get_sale_price() ? $product->get_sale_price() : $product->get_regular_price();
-    $price 				= $product->get_price_html();
-    $quantity			= $settings['quantity'];
+    
+    // $regular_price = apply_filters('wpfunnels/modify_order_bump_product_price', $regular_price);
+
+    $sale_price = $product->get_sale_price() ? $product->get_sale_price() : $product->get_regular_price();
+    // $sale_price = apply_filters('wpfunnels/modify_order_bump_product_price', $sale_price);
+    $price      = $product->get_price_html();
+    $quantity   = $settings['quantity'];
 
     $orderbump_color 	= isset( $settings['obPrimaryColor'] ) ? $settings['obPrimaryColor'] : '#6E42D2'; //getting order-bump color
     $orderbump_bgcolor 	= isset( $settings['obBgColor'] ) ? $settings['obBgColor'] : ''; //getting order-bump background color
@@ -33,6 +37,8 @@ if( $product ){
     if (isset($settings['discountOption'])) {
         if ($settings['discountOption'] == "discount-price" || $settings['discountOption'] == "discount-percentage") {
             $discount_price = preg_replace('/[^\d.]/', '', $settings['discountPrice'] );
+            $discount_price = apply_filters('wpfunnels/modify_order_bump_product_price', $discount_price);
+
             if ($settings['discountapply'] == 'regular') {
                 $price = wc_format_sale_price( $regular_price * $quantity, $discount_price);
             } else {

@@ -374,6 +374,7 @@ return array(
     'WPFunnels\\Compatibility\\Plugin\\CartLift' => $baseDir . '/includes/core/compatibility/plugin/class-wpfnl-cart-lift.php',
     'WPFunnels\\Compatibility\\Plugin\\ElectroExtension' => $baseDir . '/includes/core/compatibility/plugin/class-wpfnl-electro-extension.php',
     'WPFunnels\\Compatibility\\Plugin\\ElementorPro' => $baseDir . '/includes/core/compatibility/plugin/class-wpfnl-elementor-pro.php',
+    'WPFunnels\\Compatibility\\Plugin\\FoxCurrencySwitcher' => $baseDir . '/includes/core/compatibility/plugin/class-wpfnl-fax-currency.php',
     'WPFunnels\\Compatibility\\Plugin\\GoogleSiteKit' => $baseDir . '/includes/core/compatibility/plugin/class-wpfnl-google-site-kit.php',
     'WPFunnels\\Compatibility\\Plugin\\PluginCompatibility' => $baseDir . '/includes/core/compatibility/plugin/abstract-wpfnl-plugin-compatiblity.php',
     'WPFunnels\\Compatibility\\Plugin\\ProductAddon' => $baseDir . '/includes/core/compatibility/plugin/class-wpfnl-product-addon.php',

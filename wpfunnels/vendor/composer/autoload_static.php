@@ -483,6 +483,7 @@ class ComposerStaticInit31025b690649f5246b1ff28b2d828cdc
         'WPFunnels\\Compatibility\\Plugin\\CartLift' => __DIR__ . '/../..' . '/includes/core/compatibility/plugin/class-wpfnl-cart-lift.php',
         'WPFunnels\\Compatibility\\Plugin\\ElectroExtension' => __DIR__ . '/../..' . '/includes/core/compatibility/plugin/class-wpfnl-electro-extension.php',
         'WPFunnels\\Compatibility\\Plugin\\ElementorPro' => __DIR__ . '/../..' . '/includes/core/compatibility/plugin/class-wpfnl-elementor-pro.php',
+        'WPFunnels\\Compatibility\\Plugin\\FoxCurrencySwitcher' => __DIR__ . '/../..' . '/includes/core/compatibility/plugin/class-wpfnl-fax-currency.php',
         'WPFunnels\\Compatibility\\Plugin\\GoogleSiteKit' => __DIR__ . '/../..' . '/includes/core/compatibility/plugin/class-wpfnl-google-site-kit.php',
         'WPFunnels\\Compatibility\\Plugin\\PluginCompatibility' => __DIR__ . '/../..' . '/includes/core/compatibility/plugin/abstract-wpfnl-plugin-compatiblity.php',
         'WPFunnels\\Compatibility\\Plugin\\ProductAddon' => __DIR__ . '/../..' . '/includes/core/compatibility/plugin/class-wpfnl-product-addon.php',
