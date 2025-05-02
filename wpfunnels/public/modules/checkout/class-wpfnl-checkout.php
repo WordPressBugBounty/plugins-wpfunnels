@@ -351,7 +351,7 @@ class Module extends Wpfnl_Frontend_Module
                     if( $_product instanceof \WC_Product ) {
                         //check if product type is variable or not from $_product object.
 
-                        if( 'variable' === $_product->get_type() ) {
+                        if( 'variable' === $_product->get_type() || 'variable-subscription' === $_product->get_type() ) {
                             $this->add_default_variation( $product_id, $_product, $quantity, $price_type );
                             continue;
                         }

@@ -11,7 +11,7 @@ class FoxCurrencySwitcher extends PluginCompatibility{
      * Constructor: Initialize class and hook into price conversion.
      */
     public function init(){
-        add_filter('wpfunnels/modify_main_product_price_data', array($this,'maybe_convert_product_price'));
+        add_filter('wpfunnels/modify_order_bump_price_on_main_order', array($this,'maybe_convert_product_price'));
         add_filter('wpfunnels/modify_order_bump_product_price', array($this, 'maybe_convert_order_bump_price'));
     }
 

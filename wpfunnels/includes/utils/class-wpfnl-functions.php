@@ -1189,7 +1189,7 @@ class Wpfnl_functions {
 				'order_bump'          => 'off',
 				'ab_testing'          => 'off',
 				'allow_funnels'       => array( 'administrator' => 'true' ),
-				'funnel_type'         => 'lead',
+				'funnel_type'         => 'sales',
 				'create_child_order'  => 'off',
 				'disable_theme_style' => 'off',
 				'enable_log_status'   => 'off',

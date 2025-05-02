@@ -38,14 +38,13 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
             if( 'discount-percentage' === $discount_type || 'discount-price' === $discount_type ) {
                 $discount_apply_to 	= isset($order_bump_settings['discountapply']) ? $order_bump_settings['discountapply'] : 'regular';
                 $discount_value 	= isset($order_bump_settings['discountValue']) ? $order_bump_settings['discountValue'] : 0;
-                $product_price		= $order_bump_settings['discountPrice'];
+                $product_price		= $this->get_product_price( $_product, $discount_apply_to );
 				if( 'discount-price' === $discount_type && 1 < $quantity ){
 					$discount_value = $this->get_percentage( $product_price, $discount_value, $quantity );
 					$discount_type  = 'discount-percentage';
 				}
 
                 $product_price = $this->calculate_custom_price( $discount_type, $discount_value, $product_price );
-				$product_price = apply_filters('wpfunnels/modify_main_product_price_data', $order_bump_settings['discountPrice']);
             }
 
             $ob_cart_item_data = [
@@ -470,7 +469,7 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 	private function get_product_price( \WC_Product $product, $discount_apply = 'regular' ) {
 		$price       = $product->get_regular_price();
 		$final_price = $discount_apply === 'sale' && $product->get_sale_price() ? $product->get_sale_price() : $price;
-		return apply_filters('wpfunnels/modify_main_product_price_data', $final_price);
+		return apply_filters('wpfunnels/modify_order_bump_price_on_main_order', $final_price);
 	}
 
 

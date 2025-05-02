@@ -569,27 +569,38 @@ class SettingsController extends Wpfnl_REST_Controller {
         $response = $activatePluginInstance->activate_plugins();
         return rest_ensure_response( $response );
     }
-    
-    
+
+
     /**
      * Save setup wizard settings
      *
-     * @param WP_REST_Request $request The REST request object.
+     * @param WP_REST_Request $request The REST request object containing name and value.
+     * 
+     * @return WP_REST_Response Response object with success status and message.
+     * @since 2.5.20
      */
     public function save_setup_wizard_settings( $request ){
         $response = [
             'success' => false,
         ];
         
+        // Validate required parameters.
         if( !isset( $request['name'],$request['value'] )){
             rest_ensure_response( $response );
         }
 
         if( 'builder'  === $request['name'] || 'funnel_type' === $request['name'] ){
-            $name = sanitize_text_field($request['name']);
+            // Get and process the value using the appropriate method.
+            $name  = sanitize_text_field($request['name']);
             $value = sanitize_text_field($request['value']);
-            $value = 'qubely' === $value ? 'gutenberg' : $value;
-            $settings = Wpfnl_functions::get_general_settings();
+
+            // Process the value based on the name.
+            if( 'builder' === $name ){
+                $value = 'qubely' === $value ? 'gutenberg' : $value;
+            }
+
+            // Update the setting.
+            $settings        = Wpfnl_functions::get_general_settings();
             $settings[$name] = $value;
             update_option('_wpfunnels_general_settings', $settings );
             
@@ -605,7 +616,6 @@ class SettingsController extends Wpfnl_REST_Controller {
                 'success' => true,
             ];
         }
-        
         return rest_ensure_response( $response );
     }
 
