@@ -5,7 +5,7 @@ Tags: funnel builder, order bump, sales funnels, lead generation, custom checkou
 Requires at least: 6.1
 Tested up to:  6.8.1
 Requires PHP: 7.4
-Stable tag:  3.5.20
+Stable tag:  3.5.21
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -580,6 +580,9 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.5.21 (2025-05-02) =
+* Compatibility: Compatible with the Latest WordPress
 
 = 3.5.20 (2025-05-02) =
 * Improvement: Add Support for 'Variable Subscription' Products on the Checkout Step

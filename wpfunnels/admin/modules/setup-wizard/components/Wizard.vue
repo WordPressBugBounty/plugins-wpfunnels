@@ -447,19 +447,41 @@ apiFetch.use(apiFetch.createNonceMiddleware(nonce))
 				const installPlugin = (plugin) => {
 					return new Promise((resolve, reject) => {
 						if (plugin.status === 'uninstalled') {
-							wp.updates.installPlugin({
-								slug: plugin.slug,
-							}).done(() => {
-								plugin.status = 'installed';
-								resolve(plugin);
-							}).fail((error) => {
-								if( "folder_exists" === error.errorCode){
+							// Check if wp.updates exists
+							if (typeof wp !== 'undefined' && wp.updates && typeof wp.updates.installPlugin === 'function') {
+								wp.updates.installPlugin({
+									slug: plugin.slug,
+									success: () => {
+										plugin.status = 'installed';
+										resolve(plugin);
+									},
+									error: (error) => {
+										if (error.errorCode === "folder_exists") {
+											plugin.status = 'installed';
+											resolve(plugin);
+										} else {
+											reject(error);
+										}
+									}
+								});
+							} else {
+								// Fallback to REST API if wp.updates is not available
+								apiFetch({
+									path: '/wp-json/wp/v2/plugins',
+									method: 'POST',
+									data: { slug: plugin.slug }
+								}).then(() => {
 									plugin.status = 'installed';
 									resolve(plugin);
-								}else{
-									reject(error);
-								}
-							});
+								}).catch((error) => {
+									if (error.code === "folder_exists") {
+										plugin.status = 'installed';
+										resolve(plugin);
+									} else {
+										reject(error);
+									}
+								});
+							}
 						} else {
 							resolve(plugin);
 						}
