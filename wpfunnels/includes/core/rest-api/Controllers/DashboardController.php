@@ -93,8 +93,119 @@ class DashboardController extends Wpfnl_REST_Controller {
 				),
 			)
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/show-banner',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array($this, 'should_show_banner'),
+					'permission_callback' => function () {
+						return current_user_can('manage_options');
+					},
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/hide-banner-temporarily',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array($this, 'hide_community_banner_temporarily'),
+					'permission_callback' => function () {
+						return current_user_can('manage_options');
+					},
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/hide-banner-permanently',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array($this, 'hide_community_banner_permanently'),
+					'permission_callback' => function () {
+						return current_user_can('manage_options');
+					},
+				),
+			)
+		);
 	}
 
+	/**
+	 * Check if community banner should be shown.
+	 * 
+	 * Description:
+	 * - If the user has permanently hidden the banner, it will not be shown.
+	 * - If the banner is temporarily hidden, it will not be shown.
+	 * - If neither of the above conditions are met, the banner will be shown.
+	 *
+	 * @return bool
+	 * @since 3.5.21
+	 */
+	public function should_show_banner(){
+		// Check if user has permanently hidden the banner.
+		$permanently_hidden = get_transient('wpfnl_community_banner_permanently_hidden');
+		if ($permanently_hidden) {
+			return rest_ensure_response(array(
+				'success' => true,
+				'show_banner' => false
+			));
+		}
+
+		// Check if banner is temporarily hidden
+		$temporarily_hidden = get_transient('wpfnl_community_banner_temporarily_hidden');
+		if ($temporarily_hidden) {
+			return rest_ensure_response(array(
+				'success' => true,
+				'show_banner' => false
+			));
+		}
+
+		return rest_ensure_response(array(
+			'success' => true,
+			'show_banner' => true
+		));
+	}
+
+	/**
+	 * Hide community banner temporarily.
+	 * 
+	 * Description:
+	 * - Set a transient for 7 days to hide the banner.
+	 *
+	 * @return \WP_REST_Response
+	 * @since 3.5.21
+	 */
+	public function hide_community_banner_temporarily(){
+		// Set transient for 7 days.
+		set_transient('wpfnl_community_banner_temporarily_hidden', true, 7 * DAY_IN_SECONDS);
+		return rest_ensure_response([
+			'success' => true
+		]);
+	}
+
+	/**
+	 * Hide community banner permanently.
+	 *
+	 * Description:
+	 * - Set a permanent transient to hide the banner.
+	 *
+	 * @return \WP_REST_Response
+	 * @since 3.5.21
+	 */
+	public function hide_community_banner_permanently(){
+		// Set permanent transient (0 = no expiration).
+		set_transient('wpfnl_community_banner_permanently_hidden', true, 0);
+		return rest_ensure_response([
+			'success' => true
+		]);
+	}
 
 	/**
 	 * Get stats arguments
