@@ -1,4 +1,5 @@
 <?php
+
 namespace WPFunnels\Admin\Banner;
 
 /**
@@ -8,7 +9,8 @@ namespace WPFunnels\Admin\Banner;
  *
  * @package WPFunnels\Admin\Banner
  */
-class SpecialOccasionBanner {
+class SpecialOccasionBanner
+{
 
     /**
      * The occasion identifier.
@@ -16,7 +18,7 @@ class SpecialOccasionBanner {
      * @var string
      */
     private $occasion;
-    
+
     /**
      * The button link.
      *
@@ -45,13 +47,14 @@ class SpecialOccasionBanner {
      * @param string $start_date The start date and time for displaying the banner.
      * @param string $end_date   The end date and time for displaying the banner.
      */
-    public function __construct($occasion, $start_date, $end_date, $btn_link = '#' ) {
+    public function __construct($occasion, $start_date, $end_date, $btn_link = '#')
+    {
         $this->occasion     = $occasion;
         $this->btn_link     = $btn_link;
         $this->start_date   = strtotime($start_date);
         $this->end_date     = strtotime($end_date);
 
-        if ( !defined('WPFNL_PRO_VERSION') && 'yes' === get_option('_is_wpfnl_eid_25', 'yes' )) {
+        if (!defined('WPFNL_PRO_VERSION') && 'yes' === get_option('_is_wpfnl_wp_anniversary_25', 'yes')) {
             // Hook into the admin_notices action to display the banner
             add_action('admin_notices', [$this, 'display_banner']);
             add_action('admin_head', array($this, 'add_styles'));
@@ -63,8 +66,9 @@ class SpecialOccasionBanner {
      *
      * @return array Time remaining in days, hours, and minutes
      */
-    public function wpf_get_halloween_countdown() {
-        $halloween = strtotime('2025-03-27 11:30:00'); // Set this to the next Halloween
+    public function wpf_get_halloween_countdown()
+    {
+        $halloween = strtotime('2025-05-26 08:00:00'); // Set this to the next Halloween
         $now = current_time('timestamp');
         $diff = $halloween - $now;
 
@@ -79,11 +83,12 @@ class SpecialOccasionBanner {
     /**
      * Displays the special occasion banner if the current date and time are within the specified range.
      */
-    public function display_banner() {
+    public function display_banner()
+    {
         $screen                     = get_current_screen();
         $promotional_notice_pages   = ['dashboard', 'plugins', 'wpfunnels_page_wp_funnels', 'wpfunnels_page_edit_funnel', 'wp-funnels_page_wpfnl_settings'];
         $current_date_time          = current_time('timestamp');
-       
+
         if (!in_array($screen->id, $promotional_notice_pages)) {
             return;
         }
@@ -93,12 +98,12 @@ class SpecialOccasionBanner {
         }
 
         // Calculate the time remaining in seconds
-        $time_remaining = $this->end_date - $current_date_time; 
+        $time_remaining = $this->end_date - $current_date_time;
 
         $countdown = $this->wpf_get_halloween_countdown();
-        ?>
-            <!-- Name: WordPress Anniversary Notification Banner -->
-            <div class="<?php echo esc_attr($this->occasion); ?>-banner notice">
+?>
+        <!-- Name: WordPress Anniversary Notification Banner -->
+        <div class="<?php echo esc_attr($this->occasion); ?>-banner notice">
             <div class="gwpf-tb__notification" id="rex_deal_notification">
 
                 <div class="banner-overflow">
@@ -107,22 +112,23 @@ class SpecialOccasionBanner {
                             <div class="wpf-notification-counter__content">
 
                                 <figure class="wpf-notification-counter__figure-logo">
-                                    <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/eid-banner/eid-mubarak.webp'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
+                                    <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/wp-anniversary/wpf-wp-anniversary.png'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
                                 </figure>
 
                                 <!-- <figure class="wpf-notification-counter__figure-occasion">
-                                    <img src="<?php //echo esc_url(WPFNL_URL . 'admin/assets/images/valentine-image/event-img.png'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
+                                    <img src="<?php //echo esc_url(WPFNL_URL . 'admin/assets/images/valentine-image/event-img.png'); 
+                                                ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
                                 </figure> -->
 
                                 <figure class="wpf-notification-counter__figure-percentage">
-                                    <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/eid-banner/discount-funnel.webp'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
+                                    <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/wp-anniversary/wpf-22-p-off.png'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
                                 </figure>
 
                                 <div id="wpf-halloween-countdown" class="wpf-notification-counter__countdown" aria-live="polite">
                                     <h3 class="screen-reader-text"><?php echo __('Offer Countdown', 'wpfnl'); ?></h3>
                                     <ul class="wpf-notification-counter__list">
 
-                                            <?php foreach (['days', 'hours', 'mins', 'secs'] as $unit): ?>
+                                        <?php foreach (['days', 'hours', 'mins', 'secs'] as $unit): ?>
                                             <li class="wpf-notification-counter__item ">
                                                 <span id="wpf-halloween-<?php echo esc_attr($unit); ?>" class="wpf-notification-counter__time">
                                                     <?php echo esc_html($countdown[$unit]); ?>
@@ -138,11 +144,11 @@ class SpecialOccasionBanner {
                                 <div class="wpf-notification-counter__btn-area">
                                     <a target="_blank" href="<?php echo esc_url($this->btn_link); ?>" class="wpf-notification-counter__btn" role="button">
 
-                                    <span class="wpf-btn-inner">
-                                        <span class="screen-reader-text"><?php echo __('Click to view Halloween sale products', 'wpfnl'); ?></span>
-                                        <span aria-hidden="true" class="wpf-notification-counter__mint-button"> <?php echo __('Get The Deal Now', 'wpfnl'); ?></span>
-                                    </span>
-                                        
+                                        <span class="wpf-btn-inner">
+                                            <span class="screen-reader-text"><?php echo __('Click to view Halloween sale products', 'wpfnl'); ?></span>
+                                            <span aria-hidden="true" class="wpf-notification-counter__mint-button"> <?php echo __('Get The Deal Now', 'wpfnl'); ?></span>
+                                        </span>
+
                                     </a>
                                 </div>
                             </div>
@@ -152,20 +158,22 @@ class SpecialOccasionBanner {
                 </div>
 
                 <button class="close-promotional-banner" type="button" aria-label="close banner">
-                    <svg width="12" height="13" fill="none" viewBox="0 0 12 13" xmlns="http://www.w3.org/2000/svg"><path stroke="#7A8B9A" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 1.97L1 11.96m0-9.99l10 9.99"/></svg>
+                    <svg width="12" height="13" fill="none" viewBox="0 0 12 13" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke="#7A8B9A" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 1.97L1 11.96m0-9.99l10 9.99" />
+                    </svg>
                 </button>
 
 
             </div>
-    </div>
-            <!-- .gwpf-tb-notification end -->
+        </div>
+        <!-- .gwpf-tb-notification end -->
 
-            
-  
+
+
 
         <script>
             function updateCountdown() {
-                var endDate = new Date("2025-04-15 12:00:00").getTime();
+                var endDate = new Date("2025-05-30 23:59:59").getTime();
                 var now = new Date().getTime();
                 var timeLeft = endDate - now;
 
@@ -200,19 +208,20 @@ class SpecialOccasionBanner {
                 setInterval(updateCountdown, 1000); // Update every minute
             });
         </script>
-        <?php
+    <?php
     }
 
     /**
      * Adds internal CSS styles for the special occasion banners.
      */
-    public function add_styles() {
-        ?>
+    public function add_styles()
+    {
+    ?>
         <style type="text/css">
             @font-face {
                 font-family: "Circular Std Book";
-                src: url(<?php echo plugin_dir_url(__FILE__).'assets/fonts/CircularStd-Book.woff2'; ?>) format("woff2"), 
-                url(<?php echo plugin_dir_url(__FILE__).'assets/fonts/CircularStd-Book.woff'; ?>) format("woff");
+                src: url(<?php echo plugin_dir_url(__FILE__) . 'assets/fonts/CircularStd-Book.woff2'; ?>) format("woff2"),
+                    url(<?php echo plugin_dir_url(__FILE__) . 'assets/fonts/CircularStd-Book.woff'; ?>) format("woff");
                 font-weight: 400;
                 font-style: normal;
                 font-display: swap;
@@ -220,8 +229,8 @@ class SpecialOccasionBanner {
 
             @font-face {
                 font-family: 'Lexend Deca';
-                src: url(<?php echo plugin_dir_url(__FILE__).'assets/fonts/LexendDeca-Bold.woff2'; ?>) format("woff2"), 
-                url(<?php echo plugin_dir_url(__FILE__).'assets/fonts/LexendDeca-Bold.woff'; ?>) format("woff");
+                src: url(<?php echo plugin_dir_url(__FILE__) . 'assets/fonts/LexendDeca-Bold.woff2'; ?>) format("woff2"),
+                    url(<?php echo plugin_dir_url(__FILE__) . 'assets/fonts/LexendDeca-Bold.woff'; ?>) format("woff");
                 font-weight: 700;
                 font-style: normal;
                 font-display: swap;
@@ -229,8 +238,8 @@ class SpecialOccasionBanner {
 
             @font-face {
                 font-family: 'Lexend Deca';
-                src: url(<?php echo plugin_dir_url(__FILE__).'assets/fonts/LexendDeca-ExtraBold.woff.woff2'; ?>) format("woff2"), 
-                url(<?php echo plugin_dir_url(__FILE__).'assets/fonts/LexendDeca-ExtraBold.woff.woff'; ?>) format("woff");
+                src: url(<?php echo plugin_dir_url(__FILE__) . 'assets/fonts/LexendDeca-ExtraBold.woff.woff2'; ?>) format("woff2"),
+                    url(<?php echo plugin_dir_url(__FILE__) . 'assets/fonts/LexendDeca-ExtraBold.woff.woff'; ?>) format("woff");
                 font-weight: 800;
                 font-style: normal;
                 font-display: swap;
@@ -822,11 +831,11 @@ class SpecialOccasionBanner {
                 }
             }
 
-             /* funnel anniversary */
+            /* funnel anniversary */
 
             .wpf-notification-counter {
                 position: relative;
-                background-image: url(<?php echo esc_url(WPFNL_URL . 'admin/assets/images/eid-banner/banner-bg.webp'); ?>);
+                background-image: url(<?php echo esc_url(WPFNL_URL . 'admin/assets/images/wp-anniversary/wpf-banner-bg.png'); ?>);
                 background-position: center;
                 background-repeat: no-repeat;
                 background-size: cover;
@@ -839,7 +848,7 @@ class SpecialOccasionBanner {
             .wpf-notification-counter__container {
                 position: relative;
                 width: 100%;
-                max-width:1280px;
+                max-width: 1280px;
                 margin: 0 auto;
                 max-height: 100%;
                 overflow: hidden;
@@ -857,9 +866,10 @@ class SpecialOccasionBanner {
                 margin: 0;
                 line-height: 0;
             }
+
             .wpf-notification-counter__figure-occasion {
                 max-width: 112px;
-                margin:0;
+                margin: 0;
                 line-height: 0;
             }
 
@@ -955,26 +965,33 @@ class SpecialOccasionBanner {
                 .wpf-notification-counter__container {
                     max-width: 1200px;
                 }
+
                 .wpf-notification-counter__figure-logo {
-                    max-width: 220px;   
+                    max-width: 220px;
                 }
+
                 .wpf-notification-counter__figure-percentage {
                     max-width: 363px;
                 }
             }
+
             @media only screen and (max-width: 1550px) {
                 .wpf-notification-counter__container {
                     max-width: 1080px;
                 }
+
                 .wpf-notification-counter__figure-logo {
                     max-width: 200px;
                 }
+
                 .wpf-notification-counter__figure-occasion {
                     max-width: 100px;
                 }
+
                 .wpf-notification-counter__figure-percentage {
                     max-width: 329px;
                 }
+
                 .wpf-notification-counter__btn {
                     padding: 12px 18px;
                     font-size: 17px;
@@ -986,20 +1003,25 @@ class SpecialOccasionBanner {
                 .wpf-notification-counter__container {
                     max-width: 1040px;
                 }
+
                 .wpf-notification-counter__figure-logo {
                     max-width: 170px;
                 }
+
                 .wpf-notification-counter__figure-occasion {
                     max-width: 100px;
                 }
+
                 .wpf-notification-counter__figure-percentage {
                     max-width: 300px;
-                }   
+                }
+
                 .wpf-notification-counter__btn {
                     font-size: 17px;
                     padding: 12px 18px;
                     border-radius: 12px;
                 }
+
                 .wpf-notification-counter__time {
                     display: flex;
                     width: 50px;
@@ -1009,28 +1031,35 @@ class SpecialOccasionBanner {
                     margin: 0 auto 7px;
                     font-size: 24px;
                 }
-                .wpf-notification-counter__list{
+
+                .wpf-notification-counter__list {
                     gap: 5px;
                 }
             }
+
             @media only screen and (max-width: 1399px) {
                 .wpf-notification-counter__container {
                     max-width: 860px;
                 }
+
                 .wpf-notification-counter__figure-logo {
                     max-width: 160px;
                 }
+
                 .wpf-notification-counter__figure-occasion {
                     max-width: 80px;
                 }
+
                 .wpf-notification-counter__figure-percentage {
                     max-width: 265px;
                 }
+
                 .wpf-notification-counter__btn {
                     font-size: 16px !important;
                     padding: 12px 18px !important;
-                    border-radius: 10px  !important;
+                    border-radius: 10px !important;
                 }
+
                 .wpf-notification-counter__time {
                     display: flex;
                     width: 40px;
@@ -1038,9 +1067,11 @@ class SpecialOccasionBanner {
                     font-size: 20px;
                     border-radius: 8px;
                 }
-                .wpf-notification-counter__list{
+
+                .wpf-notification-counter__list {
                     gap: 5px;
                 }
+
                 .wpf-notification-counter__item {
                     font-size: 14px;
                     align-items: center;
@@ -1052,31 +1083,40 @@ class SpecialOccasionBanner {
                 .wpf-notification-counter {
                     background-size: cover;
                 }
+
                 .wpf-notification-counter__container {
                     max-width: 840px;
                 }
+
                 .wpf-notification-counter__stroke-font {
                     font-size: 20px;
                 }
+
                 .wpf-notification-counter__figure-logo {
                     max-width: 150px;
                 }
+
                 .wpf-notification-counter__figure-occasion {
                     max-width: 90px;
                 }
+
                 .wpf-notification-counter__figure-percentage {
                     max-width: 260px;
-                }   
+                }
+
                 .wpf-notification-counter__btn {
                     font-size: 16px;
                     padding: 12px 20px;
                 }
+
                 .wpf-notification-counter__time {
                     font-size: 18px;
                 }
+
                 .wpf-notification-counter__list {
                     gap: 0;
                 }
+
                 .wpf-notification-counter__time {
                     display: flex;
                     width: 40px;
@@ -1085,7 +1125,8 @@ class SpecialOccasionBanner {
                     justify-content: center;
                     margin: 0 auto 6px;
                 }
-                .wpf-notification-counter__item{
+
+                .wpf-notification-counter__item {
                     font-size: 14px;
                 }
             }
@@ -1094,29 +1135,36 @@ class SpecialOccasionBanner {
                 .wpf-notification-counter__container {
                     max-width: 770px;
                 }
+
                 .wpf-notification-counter__figure-logo {
                     max-width: 130px;
-                    margin:0;
+                    margin: 0;
                 }
+
                 .wpf-notification-counter__figure-occasion {
                     max-width: 90px;
                 }
+
                 .wpf-notification-counter__figure-percentage {
                     max-width: 225px;
                 }
+
                 .wpf-notification-counter__btn {
                     font-size: 15px;
                     padding: 10px 16px;
                 }
+
                 .wpf-notification-counter__btn {
                     font-size: 16px !important;
                     padding: 10px 14px !important;
                     border-radius: 10px !important;
                 }
+
                 .wpf-notification-counter__time {
                     width: 38px;
                     height: 30px;
                 }
+
                 .wpf-notification-counter__item {
                     font-size: 12px;
                 }
@@ -1126,29 +1174,37 @@ class SpecialOccasionBanner {
                 .wpf-notification-counter__container {
                     max-width: 700px;
                 }
+
                 .wpf-notification-counter__stroke-font {
                     font-size: 20px;
                 }
+
                 .wpf-notification-counter__figure-logo {
                     max-width: 130px;
                 }
+
                 .wpf-notification-counter__figure-occasion {
                     max-width: 80px;
                 }
+
                 .wpf-notification-counter__figure-percentage {
                     max-width: 185px;
                     margin-top: -7px;
                 }
+
                 .wpf-notification-counter__btn {
                     font-size: 14px !important;
                     padding: 10px 12px !important;
                 }
+
                 .wpf-notification-counter__time {
                     font-size: 16px;
                 }
+
                 .wpf-notification-counter__list {
                     gap: 0;
                 }
+
                 .wpf-notification-counter__time {
                     display: flex;
                     width: 35px;
@@ -1157,43 +1213,41 @@ class SpecialOccasionBanner {
                     justify-content: center;
                     margin: 0 auto 6px;
                 }
+
                 .wpf-notification-counter__item {
                     font-size: 12px;
                     width: 45px;
                 }
             }
-
-
-
-          
         </style>
-        <?php
+    <?php
     }
 
 
     /**
      * Displays the special occasion banner if the current date and time are within the specified range.
      */
-    public function display_new_ui_notice(){
+    public function display_new_ui_notice()
+    {
         $screen                     = get_current_screen();
         $promotional_notice_pages   = ['dashboard', 'plugins', 'toplevel_page_wp_funnels', 'wp-funnels_page_wpfnl_settings'];
 
         if (!in_array($screen->id, $promotional_notice_pages)) {
             return;
         }
-        ?>
+    ?>
         <div class="wpfunnels-newui-notice notice">
             <a href="https://youtu.be/OrDQg-XcOLY" target="_blank">
                 <div class="newui-notice-wrapper">
                     <figure class="newui-template-img">
-                        <img src="<?php echo esc_url( WPFNL_URL.'admin/assets/images/newui-template-img-2x.webp' ); ?>" alt="newui-template-img" />
+                        <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/newui-template-img-2x.webp'); ?>" alt="newui-template-img" />
                     </figure>
 
                     <h4 class="newui-notice-title">
                         <span class="highlighted">WPFunnels 3.0 Is Here!</span>
 
                         <figure class="newui-version">
-                            <img src="<?php echo esc_url( WPFNL_URL.'admin/assets/images/wpfunnel-version.svg' ); ?>" alt="wpfunnel-version" />
+                            <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/wpfunnel-version.svg'); ?>" alt="wpfunnel-version" />
                         </figure>
                     </h4>
                     <p class="newui-notice-description">Now experience a better funnel-building experience with a better and more intuitive canvas for designing your funnel journey easily.</p>
@@ -1201,18 +1255,22 @@ class SpecialOccasionBanner {
             </a>
 
             <button class="close-newui-notice" type="button" aria-label="close banner">
-                <svg width="20" height="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="9.5" fill="#fff" stroke="#FE9A1B"/><path stroke="#FE9A1B" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.5 7.917l-5 5m0-5l5 5"/></svg>
+                <svg width="20" height="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="10" cy="10" r="9.5" fill="#fff" stroke="#FE9A1B" />
+                    <path stroke="#FE9A1B" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.5 7.917l-5 5m0-5l5 5" />
+                </svg>
             </button>
         </div>
-        <?php
+    <?php
     }
 
 
     /**
      * Adds internal CSS styles for new ui notice.
      */
-    public function add_new_ui_notice_styles() {
-        ?>
+    public function add_new_ui_notice_styles()
+    {
+    ?>
         <style type="text/css">
             .wpfunnels-newui-notice * {
                 box-sizing: border-box;
@@ -1227,7 +1285,7 @@ class SpecialOccasionBanner {
                 background: #ffffff;
                 box-shadow: 0px 1px 2px 0px rgba(39, 25, 72, 0.10);
                 box-sizing: border-box;
-                background-image: url(<?php echo WPFNL_URL.'admin/assets/images/new-ui-notice-bg.svg'; ?>);
+                background-image: url(<?php echo WPFNL_URL . 'admin/assets/images/new-ui-notice-bg.svg'; ?>);
                 background-repeat: no-repeat;
                 background-size: cover;
                 background-position: right center;
@@ -1261,6 +1319,7 @@ class SpecialOccasionBanner {
                 display: block;
                 margin: 0;
             }
+
             .wpfunnels-newui-notice figure.newui-template-img img {
                 max-width: 482px;
                 margin: 0;
@@ -1294,7 +1353,7 @@ class SpecialOccasionBanner {
                 color: #6E42D3;
                 font-weight: 600;
             }
-            
+
             .wpfunnels-newui-notice .newui-notice-description {
                 color: #7A8B9A;
                 font-size: 14px;
@@ -1338,16 +1397,16 @@ class SpecialOccasionBanner {
                 .wpfunnels-newui-notice .newui-notice-wrapper {
                     padding: 24px 24px;
                 }
+
                 .wpfunnels-newui-notice .newui-notice-description {
                     max-width: 532px;
                 }
+
                 .wpfunnels-newui-notice .newui-template-img {
                     right: -226px;
                 }
             }
         </style>
-        <?php
+<?php
     }
-
-
 }

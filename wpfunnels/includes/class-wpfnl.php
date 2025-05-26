@@ -404,7 +404,7 @@ class Wpfnl
         $this->widget_manager           = Widget_Manager::getInstance()->init();
         $this->page_templates           = new PageTemplates\Manager();
         $this->admin_notice             = new Notice();
-        $this->admin_banner             = new SpecialOccasionBanner('wp-anniversary', '2025-03-27 11:30:00', '2025-04-15 12:00:00', 'https://getwpfunnels.com/pricing/?utm_source=plugin-wpf&utm_medium=banner-cta&utm_campaign=eid25');
+        $this->admin_banner             = new SpecialOccasionBanner('wp-anniversary', '2025-05-26 08:00:00', '2025-05-30 23:59:59', 'https://getwpfunnels.com/pricing/?utm_source=website&utm_medium=plugin-ban-wpf&utm_campaign=wpanniv25');
         $this->order_bump_actions       = new Wpfnl_Order_Bump_Action();
         $this->meta                     = new Wpfnl_Default_Meta();
         $this->shortcodes				= Wpfnl_Shortcodes::getInstance()->init();

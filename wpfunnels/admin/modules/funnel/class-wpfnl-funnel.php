@@ -702,25 +702,19 @@ class Module extends Wpfnl_Admin_Module
 	 * @return array
 	 * @since 3.4.16
 	 */
-
 	public function wpfnl_guided_tour($payload)
 	{
 		if(isset($payload['security']) && !wp_verify_nonce($payload['security'], 'wpfnl-admin')) {
 			return [
 				'success' => false,
-				'data'    => 'You do not have permission to perform this action',
+				'data'    => 'You do not have permission to perform this action.',
 			];
 		}
-		if(!current_user_can('manage_options')){
-			return [
-				'success' => false,
-				'data'    => 'You do not have permission to perform this action',
-			];
-		}
+
 		if (empty($payload)) {
 			return [
 				'success' => false,
-				'data'    => 'Required value is missing',
+				'data'    => 'Required value is missing.',
 			];
 		}
 
