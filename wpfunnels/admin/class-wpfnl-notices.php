@@ -576,7 +576,7 @@ class Notice {
      * @since  2.6.1
      */
     public function wpfnl_delete_promotional_banner( $payload ){
-        update_option('_is_wpfnl_wp_anniversary_25', 'no' );
+        update_option('_is_wpfnl_adha_25', 'no' );
         return [
             'success' => true,
         ];
