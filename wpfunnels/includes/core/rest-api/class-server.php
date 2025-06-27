@@ -90,6 +90,7 @@ class Server
 			'gutenberg'         	=> 'GutenbergCSSController',
             'checkout'              => 'CheckoutController',
             'report'              	=> 'DashboardController',
+            'plugin_installer'      => 'PluginInstallerController',
 		));
     }
 

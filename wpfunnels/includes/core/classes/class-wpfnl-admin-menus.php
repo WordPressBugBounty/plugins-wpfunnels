@@ -354,6 +354,6 @@ class Wpfnl_Menus
 	 * Remove admin notices
 	 */
 	public function remove_admin_notices() {
-		echo '<style>.update-nag, .updated, .error, .is-dismissible, .notice { display: none; } .wpfunnels-notice {display: block;}</style>';
+		echo '<style>.update-nag, .updated, .error, .is-dismissible, .notice { display: none; } .wpfnl-import-notice {display: block!important; margin: 15px 15px 15px 0px;} .wpfunnels-notice {display: block;}</style>';
 	}
 }

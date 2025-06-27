@@ -3235,6 +3235,12 @@ class Wpfnl_functions {
 		return apply_filters( 'is_mail_mint_pro_active', false );
 	}
 
+	public static function is_mail_mint_free_active() {
+		if ( is_plugin_active( 'mail-mint/mail-mint.php' ) ) {
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * Check if mint automation exist for a funnel by funnel id.

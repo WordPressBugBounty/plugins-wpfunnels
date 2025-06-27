@@ -3,7 +3,7 @@
 
     var product_option = window.WPFunnelVars.products
     var selectedIds = []
-
+    console.log(product_option)
     /**
      * All of the code for your admin-facing JavaScript source
      * should reside in this file.
@@ -382,23 +382,21 @@
          */
         FunnelHandler.prototype.cloneFunnel = function (event) {
             event.preventDefault()
-            var funnel_id = $(this).attr('data-id'),
-                loader = $(this).find('.wpfnl-loader')
-            var payload = {
-                funnel_id: funnel_id,
-            }
-
-            $(this).css('pointer-events', 'none')
+        
+            const $this = $(this)
+            const funnel_id = $this.attr('data-id')
+            const loader = $this.find('.wpfnl-loader')
+        
+            $this.css('pointer-events', 'none')
             loader.show()
-
-            wpAjaxHelperRequest('clone-funnel', payload)
-                .success(function (response) {
+        
+            wpAjaxHelperRequest('clone-funnel', { funnel_id })
+                .success(response => {
+                    localStorage.setItem('wpfnl_show_toast', 'clone_success')
                     window.location.href = response.redirectUrl
-                    loader.hide()
                 })
-                .error(function (response) {
-                    loader.hide()
-                })
+                .error(handleAjaxError('Clone failed'))
+                .always(() => loader.hide())
         }
 
         /**
@@ -408,20 +406,72 @@
          * @param event
          * @since 1.0.0
          */
+
         FunnelHandler.prototype.deleteFunnel = function (event) {
             event.preventDefault()
-            var funnel_id = $(this).attr('data-id')
-            var payload = {
-                funnel_id: funnel_id,
+        
+            const funnel_id = $(this).attr('data-id')
+            if (!confirm('Are you sure?')) return
+        
+            wpAjaxHelperRequest('trash-funnel', { funnel_id })
+                .success(response => {
+                    localStorage.setItem('wpfnl_show_toast', 'trash_success')
+                    window.location.href = response.redirectUrl
+                })
+                .error(handleAjaxError('Trash failed'))
+        }
+
+        // Toast logic on page load
+        function showToast(type, message) {
+            const icons = {
+                success: '<svg width="26" height="26" fill="none" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg"><path fill="#4BAE4F" fill-rule="evenodd" d="M13 0C5.83 0 0 5.83 0 13s5.83 13 13 13 13-5.83 13-13S20.17 0 13 0z" clip-rule="evenodd"/><path fill="#fff" fill-rule="evenodd" d="M19.287 8.618a.815.815 0 010 1.148l-7.617 7.617a.812.812 0 01-1.148 0l-3.808-3.809a.815.815 0 010-1.147.815.815 0 011.147 0l3.235 3.234 7.044-7.043a.806.806 0 011.147 0z" clip-rule="evenodd"/></svg>',
+                error: '<svg width="26" height="26" fill="none" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg"><path fill="#EC5956" fill-rule="evenodd" d="M26 13c0 7.18-5.82 13-13 13S0 20.18 0 13 5.82 0 13 0s13 5.82 13 13zm-11.375 6.5a1.625 1.625 0 11-3.25 0 1.625 1.625 0 013.25 0zM13 4.875c-.898 0-1.625.728-1.625 1.625V13a1.625 1.625 0 103.25 0V6.5c0-.897-.727-1.625-1.625-1.625z" clip-rule="evenodd"/></svg>'
             }
-            if (confirm('Are you sure?')) {
-                wpAjaxHelperRequest('trash-funnel', payload)
-                    .success(function (response) {
-                        window.location.href = response.redirectUrl
-                    })
-                    .error(function (response) {})
+        
+            const toastClass = type === 'success'
+                ? 'quick-toastify-successful-notification'
+                : 'quick-toastify-warn-notification'
+        
+            $('#wpfnl-toaster-wrapper')
+                .removeClass()
+                .addClass(toastClass)
+                .show()
+        
+            $('#wpfnl-toaster-icon').html(icons[type])
+            $('#wpfnl-toaster-message').html(message)
+        
+            setTimeout(() => {
+                $('#wpfnl-toaster-wrapper').removeClass(toastClass).hide()
+            }, 3000)
+        }
+        function handleAjaxError(message = 'Something went wrong') {
+            return function () {
+                console.error(message)
+                showToast('error', message)
             }
         }
+        function showToastFromStorage() {
+            const toastMap = {
+                trash_success: 'The funnel has been moved to Trash.',
+                clone_success: 'The funnel has been duplicated successfully.',
+                status_updated: 'Funnel status has been updated successfully.',
+                bulk_trash_success: 'The selected funnels have been moved to Trash.',
+                bulk_delete_success: 'The selected funnels have been deleted permanently.',
+                bulk_restore_success: 'The selected funnels have been restored successfully.',
+            }
+        
+            const toastKey = localStorage.getItem('wpfnl_show_toast')
+            if (!toastKey || !toastMap[toastKey]) return
+        
+            localStorage.removeItem('wpfnl_show_toast')
+            showToast('success', toastMap[toastKey])
+        }
+        
+        $(showToastFromStorage)
+        
+        
+        
+        
 
         /**
          * delete funnel and all the related
@@ -497,6 +547,7 @@
                     .then((response) => response.json())
                     .then((data) => {
                         if (data.success) {
+                            localStorage.setItem('wpfnl_show_toast', 'bulk_delete_success'),
                             window.location.href = data.redirectUrl
                         }
                     })
@@ -537,11 +588,12 @@
                     .then((response) => response.json())
                     .then((data) => {
                         if (data.success) {
+                            localStorage.setItem('wpfnl_show_toast', 'bulk_trash_success')
                             window.location.href = data.redirectUrl
                         }
                     })
                     .catch((error) => {
-                        console.error('Error:', error)
+                        handleAjaxError('Trash failed')
                     })
             }
             selectedIds = []
@@ -577,6 +629,7 @@
                     .then((response) => response.json())
                     .then((data) => {
                         if (data.success) {
+                            localStorage.setItem('wpfnl_show_toast', 'bulk_restore_success')
                             window.location.href = data.redirectUrl
                         }
                     })
@@ -596,19 +649,17 @@
          */
         FunnelHandler.prototype.UpdateFunnelStatus = function (event) {
             event.preventDefault()
-            var funnel_id = $(this).attr('data-id')
-            var new_status = $(this).attr('data-status')
-            var payload = {
-                funnel_id: funnel_id,
-                status: new_status,
-            }
-            if (confirm('Are you sure?')) {
-                wpAjaxHelperRequest('update-funnel-status', payload)
-                    .success(function (response) {
-                        window.location.href = response.redirect_url
-                    })
-                    .error(function (response) {})
-            }
+        
+            const funnel_id = $(this).attr('data-id')
+            const new_status = $(this).attr('data-status')
+            if (!confirm('Are you sure?')) return
+        
+            wpAjaxHelperRequest('update-funnel-status', { funnel_id, status: new_status })
+                .success(response => {
+                    localStorage.setItem('wpfnl_show_toast', 'status_updated')
+                    window.location.href = response.redirect_url
+                })
+                .error(handleAjaxError('Status update failed'))
         }
 
         /**
@@ -838,9 +889,7 @@
                         processData: false,
                         data: formData,
                         success: function (response) {
-                            if (response.success) {
-                                window.location.reload()
-                            }
+                            window.location.reload();
                             $('#wpfnl-import-funnel .wpfnl-loader').css('display', 'none')
                             $('.import-funnel-modal').removeClass('show-modal')
                         },

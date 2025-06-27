@@ -434,6 +434,7 @@ return array(
     'WPFunnels\\Rest\\Controllers\\FunnelController' => $baseDir . '/includes/core/rest-api/Controllers/class-funnel-controller.php',
     'WPFunnels\\Rest\\Controllers\\GutenbergCSSController' => $baseDir . '/includes/core/rest-api/Controllers/class-gutenberg-css-controller.php',
     'WPFunnels\\Rest\\Controllers\\OrderBumpController' => $baseDir . '/includes/core/rest-api/Controllers/class-orderbump-controller.php',
+    'WPFunnels\\Rest\\Controllers\\PluginInstallerController' => $baseDir . '/includes/core/rest-api/Controllers/PluginInstallerController.php',
     'WPFunnels\\Rest\\Controllers\\ProductsController' => $baseDir . '/includes/core/rest-api/Controllers/class-products-controller.php',
     'WPFunnels\\Rest\\Controllers\\RemoteFunnelsController' => $baseDir . '/includes/core/rest-api/Controllers/class-remotefunnels-controller.php',
     'WPFunnels\\Rest\\Controllers\\SettingsController' => $baseDir . '/includes/core/rest-api/Controllers/class-settings-controller.php',

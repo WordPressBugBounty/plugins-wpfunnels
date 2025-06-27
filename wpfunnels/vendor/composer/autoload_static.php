@@ -543,6 +543,7 @@ class ComposerStaticInit61cab55d03354544feca9f569cfbe183
         'WPFunnels\\Rest\\Controllers\\FunnelController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-funnel-controller.php',
         'WPFunnels\\Rest\\Controllers\\GutenbergCSSController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-gutenberg-css-controller.php',
         'WPFunnels\\Rest\\Controllers\\OrderBumpController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-orderbump-controller.php',
+        'WPFunnels\\Rest\\Controllers\\PluginInstallerController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/PluginInstallerController.php',
         'WPFunnels\\Rest\\Controllers\\ProductsController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-products-controller.php',
         'WPFunnels\\Rest\\Controllers\\RemoteFunnelsController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-remotefunnels-controller.php',
         'WPFunnels\\Rest\\Controllers\\SettingsController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-settings-controller.php',

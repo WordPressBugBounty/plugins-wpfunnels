@@ -7,9 +7,11 @@
  *
  * @package
  */
-$is_pro_active = apply_filters( 'wpfunnels/is_pro_license_activated', false );
-$count_funnels = wp_count_posts('wpfunnels')->publish + wp_count_posts('wpfunnels')->draft;
+$is_pro_active         = apply_filters( 'wpfunnels/is_pro_license_activated', false );
+$count_funnels         = wp_count_posts('wpfunnels')->publish + wp_count_posts('wpfunnels')->draft;
 $total_allowed_funnels = 3;
+$is_limit_reached      = ($count_funnels >= 3);
+
 if ( $is_pro_active ) {
 	$total_allowed_funnels = -1;
 }
@@ -181,17 +183,54 @@ $live_redirect_link = add_query_arg(
                 <?php
                     if( (count($this->funnels) || !empty($_GET['s'] )) && isset($_GET['page']) && 'trash_funnels' !== sanitize_text_field( $_GET['page'] ) ){
                 ?>
-                <a href="#" class="btn-default add-new-funnel-btn">
+                <?php
+                    $classes = 'btn-default add-new-funnel-btn';
+                    if ( $is_limit_reached && !$is_pro_active ) {
+                        $classes .= ' disabled';
+                    }
+                ?>
+
+                <a href="#" class="<?php echo esc_attr($classes); ?>">
                     <?php
-                        require WPFNL_DIR . '/admin/partials/icons/plus-icon.php';
-                        echo __('Add new Funnel', 'wpfnl');
+                        if ( $is_limit_reached && !$is_pro_active ) {
+                            require WPFNL_DIR . '/admin/partials/icons/lock-icon.php';
+                        } else {
+                            require WPFNL_DIR . '/admin/partials/icons/plus-icon.php';
+                        }
+
+                        echo esc_html__('Add new Funnel', 'wpfnl');
                     ?>
                 </a>
+
                 <?php
                 }
 
                 ?>
             </div>
+            <?php if ( $is_limit_reached && !$is_pro_active ) : ?>
+            <!-- upgrader to pro -->
+            <div class="upgrade-to-pro">
+                <div class="upgrade-to-pro-wrapper">
+                    <div class="warning-icon-wrapper">
+                        <span class="warning-icon">
+                            <?php
+                                require WPFNL_DIR . '/admin/partials/icons/warning-icon.php';
+                            ?>
+                        </span>
+                    </div>
+                    <div class="upgrade-to-pro-content">
+                        <div class="upgrade-to-pro-message">
+                            <h3>You have hit the limit! Upgrade To Pro for Unlimited Funnels!</h3>
+                            
+                            <p>You are using the free version of WPFunnels which allows you to create up to 3 funnels. To build more funnels, either move one funnel to trash or Upgrade To Pro.</p>
+                        </div>
+                    </div>
+                    <div class="upgrade-to-pro-action">
+                        <a href="https://getwpfunnels.com/pricing/" target="_blank" class="btn-upgrade-to-pro">Upgrade to Pro</a>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <div class="wpfnl-dashboard__inner-content <?php echo count($this->funnels) ? '' : 'no-funnel' ?>">
                 <div class="funnel-list__wrapper">
@@ -758,7 +797,22 @@ $live_redirect_link = add_query_arg(
                 <!-- /funnel-list__wrapper -->
 
             </div>
-
+        <!-- Toaster Starts-->
+        <div id="wpfnl-toaster-wrapper">
+            <div class="quick-toastify-alert-toast">
+                <div class="quick-toastify-alert-container">
+                    <div class="quick-toastify-successfull-icon" id="wpfnl-toaster-icon"></div>
+                    <p id="wpfnl-toaster-message"></p>
+                    <div class="quick-toastify-cross-icon" id="wpfnl-toaster-close-btn">
+                        <svg width="10" height="10" fill="none" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#686f7f" d="M.948 9.995a.94.94 0 01-.673-.23.966.966 0 010-1.352L8.317.278a.94.94 0 011.339.045c.323.35.342.887.044 1.258L1.611 9.765a.94.94 0 01-.663.23z" />
+                            <path fill="#686f7f" d="M8.98 9.995a.942.942 0 01-.664-.278L.275 1.582A.966.966 0 01.378.23a.939.939 0 011.232 0L9.7 8.366a.966.966 0 010 1.399.94.94 0 01-.72.23z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Toaster End -->
 
         <!-- Pro Modal -->
         <div class="wpfnl-pro-modal-overlay" id="wpfnl-pro-modal">
