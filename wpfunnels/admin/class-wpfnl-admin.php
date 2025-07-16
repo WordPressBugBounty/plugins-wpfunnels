@@ -671,17 +671,17 @@ class Wpfnl_Admin
 			],
 			[
 				'title'    => 'Total Revenue',
-				'amount'   => wc_price((int)$wpdb->get_var($wpdb->prepare("SELECT SUM(total_sales) FROM {$wpdb->prefix}wpfnl_stats WHERE status = %s", 'completed'))),
+				'amount'   => Wpfnl_functions::is_wc_active() ? wc_price((int)$wpdb->get_var($wpdb->prepare("SELECT SUM(total_sales) FROM {$wpdb->prefix}wpfnl_stats WHERE status = %s", 'completed'))) : number_format(0, 2),
 				'show_pro' => false
 			],
 			[
 				'title'    => 'Order Bump Revenue',
-				'amount'   => wc_price((int)$wpdb->get_var($wpdb->prepare("SELECT SUM(orderbump_sales) FROM {$wpdb->prefix}wpfnl_stats WHERE status = %s", 'completed'))),
+				'amount'   => Wpfnl_functions::is_wc_active() ? wc_price((int)$wpdb->get_var($wpdb->prepare("SELECT SUM(orderbump_sales) FROM {$wpdb->prefix}wpfnl_stats WHERE status = %s", 'completed'))) : number_format(0, 2),
 				'show_pro' => false
 			],
 			[
 				'title'    => 'Upsell/Downsell Revenue',
-				'amount'   => Wpfnl_functions::is_pro_license_activated() ? wc_price((int)$wpdb->get_var($wpdb->prepare("SELECT SUM(upsell_sales + downsell_sales) FROM {$wpdb->prefix}wpfnl_stats WHERE status = %s", 'completed'))) : wc_price(0),
+				'amount'   => ( Wpfnl_functions::is_pro_license_activated() && Wpfnl_functions::is_wc_active() ) ? wc_price((int)$wpdb->get_var($wpdb->prepare("SELECT SUM(upsell_sales + downsell_sales) FROM {$wpdb->prefix}wpfnl_stats WHERE status = %s", 'completed'))) : number_format(0, 2),
 				'show_pro' => true
 			],
 			[

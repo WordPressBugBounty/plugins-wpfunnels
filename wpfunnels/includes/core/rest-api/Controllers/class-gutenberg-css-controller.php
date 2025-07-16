@@ -112,7 +112,7 @@ class GutenbergCSSController extends Wpfnl_REST_Controller {
 				require_once ABSPATH . 'wp-admin/includes/file.php';
 			}
 			$params  = $request->get_params();
-			$css     = $params['css'];
+			$css     = $this->sanitize_css_content( $params['css'] );
 			$post_id = (int) sanitize_text_field( $params['post_id'] );
 			if ( $post_id ) {
 				$filename   = "wpfnl-gb-css-{$post_id}.css";
@@ -164,10 +164,10 @@ class GutenbergCSSController extends Wpfnl_REST_Controller {
 			$is_previewing = $params['isPreviewing'];
 
 			if ($params['is_remain']) {
-				$qubely_block_css = $params['block_css'];
+				$qubely_block_css = $this->sanitize_css_content($params['block_css']);
 				$filename         = "wpfnl-css-{$post_id}.css";
 
-				$qubely_block_json = $params['interaction'];
+				$qubely_block_json = $this->sanitize_json_content($params['interaction']);
 				$jsonfilename      = "wpfnl-json-{$post_id}.json";
 
 				$upload_dir = wp_upload_dir();
@@ -281,5 +281,121 @@ class GutenbergCSSController extends Wpfnl_REST_Controller {
 			}
 		}
 		return $get_css;
+	}
+
+	/**
+	 * Sanitize CSS content to prevent XSS attacks
+	 * 
+	 * @param string $css The CSS content to sanitize
+	 * @return string Sanitized CSS content
+	 * @since 3.5.27
+	 */
+	private function sanitize_css_content($css){
+		if (!is_string($css)) {
+			return '';
+		}
+
+		// Remove potentially dangerous CSS functions and properties
+		$dangerous_patterns = array(
+			'/javascript\s*:/i',           // Remove javascript: URLs
+			'/expression\s*\(/i',          // Remove CSS expressions
+			'/behavior\s*:/i',             // Remove IE behavior property
+			'/@import\s+(?!url\()/i',      // Remove @import except url() imports
+			'/binding\s*:/i',              // Remove binding property
+			'/-moz-binding\s*:/i',         // Remove -moz-binding
+			'/data\s*:\s*text\/html/i',    // Remove data:text/html
+			'/vbscript\s*:/i',             // Remove vbscript: URLs
+			'/on\w+\s*=/i',                // Remove event handlers
+			'/<script/i',                  // Remove script tags
+			'/<\/script/i',                // Remove closing script tags
+			'/&lt;script/i',               // Remove encoded script tags
+			'/&lt;\/script/i',             // Remove encoded closing script tags
+		);
+
+		// Apply sanitization patterns
+		$sanitized_css = preg_replace($dangerous_patterns, '', $css);
+
+		// Strip any remaining HTML/XML tags that might have sneaked in
+		$sanitized_css = strip_tags($sanitized_css);
+
+		// Additional validation for CSS structure
+		$sanitized_css = $this->validate_css_structure($sanitized_css);
+
+		return $sanitized_css;
+	}
+
+	/**
+	 * Validate CSS structure and remove potentially malicious content
+	 * 
+	 * @param string $css The CSS content to validate
+	 * @return string Validated CSS content
+	 * @since 3.5.27
+	 */
+	private function validate_css_structure($css){
+		// Remove any content that looks like HTML/XML
+		$css = preg_replace('/<[^>]*>/', '', $css);
+
+		// Remove any remaining HTML entities that could be used for XSS
+		$css = html_entity_decode($css, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		$css = preg_replace('/&[#\w]+;/', '', $css);
+
+		return $css;
+	}
+
+	/**
+	 * Sanitize JSON content to prevent XSS attacks
+	 * 
+	 * @param mixed $json The JSON content to sanitize
+	 * @return string Sanitized JSON content
+	 * @since 3.5.27
+	 */
+	private function sanitize_json_content($json){
+		if (is_string($json)) {
+			// Decode JSON to validate structure
+			$decoded = json_decode($json, true);
+			if (json_last_error() === JSON_ERROR_NONE) {
+				// Recursively sanitize the decoded data
+				$sanitized = $this->sanitize_json_data($decoded);
+				return wp_json_encode($sanitized);
+			}
+		} elseif (is_array($json) || is_object($json)) {
+			// Sanitize array/object data
+			$sanitized = $this->sanitize_json_data($json);
+			return wp_json_encode($sanitized);
+		}
+
+		return '{}'; // Return empty JSON object if invalid
+	}
+
+	/**
+	 * Recursively sanitize JSON data
+	 * 
+	 * @param mixed $data The data to sanitize
+	 * @return mixed Sanitized data
+	 * @since 3.5.27
+	 */
+	private function sanitize_json_data($data){
+		if (is_array($data)) {
+			$sanitized = array();
+			foreach ($data as $key => $value) {
+				$sanitized_key = sanitize_text_field($key);
+				$sanitized[$sanitized_key] = $this->sanitize_json_data($value);
+			}
+			return $sanitized;
+		} elseif (is_object($data)) {
+			$sanitized = new \stdClass();
+			foreach ($data as $key => $value) {
+				$sanitized_key = sanitize_text_field($key);
+				$sanitized->$sanitized_key = $this->sanitize_json_data($value);
+			}
+			return $sanitized;
+		} elseif (is_string($data)) {
+			// For strings, remove potential XSS vectors
+			$data = wp_kses($data, array());
+			$data = sanitize_text_field($data);
+			return $data;
+		}
+
+		return $data;
 	}
 }

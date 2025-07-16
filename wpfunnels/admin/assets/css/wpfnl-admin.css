@@ -72,6 +72,10 @@
   margin: 0;
 }
 
+#wpfunnels-app:has([data-tour=yes]) {
+  pointer-events: none;
+}
+
 .discount .wpfnl-form-group {
   display: flex;
   flex-flow: row;
@@ -6427,6 +6431,13 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 .steps-settings .step-settings__single-tab-content {
   display: none;
 }
+.steps-settings .step-settings__single-tab-content #wpfnl-choose-offer[data-tour=yes],
+.steps-settings .step-settings__single-tab-content #gbf-product-quantity[data-tour=yes],
+.steps-settings .step-settings__single-tab-content #discount-options[data-tour=yes] {
+  position: relative;
+  z-index: 4;
+  border: 1px solid #FFF;
+}
 .steps-settings .step-settings__single-tab-content:first-child {
   display: block;
 }
@@ -6589,7 +6600,6 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   align-items: center;
   justify-content: flex-end;
   gap: 14px;
-  position: relative;
 }
 .steps-settings .settings-content__footer .back2-edit {
   background: #fff;
@@ -6597,6 +6607,9 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 }
 .steps-settings .settings-content__footer .back2-edit:hover {
   background: rgba(0, 0, 0, 0.04);
+}
+.steps-settings .settings-content__footer #save-order-bump[hide-btn=yes] {
+  display: none;
 }
 .steps-settings .settings-content__footer .btn-default {
   display: flex;
@@ -7365,8 +7378,8 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   display: block;
   border: 1px solid #E5E8F3;
 }
-.step-settings__single-tab-content .discount-settings[data-tour=yes],
-.checkout-product-setting-tab__content-wrapper .discount-settings[data-tour=yes] {
+.step-settings__single-tab-content .discount-settings[data-tour=yes] #discount-options,
+.checkout-product-setting-tab__content-wrapper .discount-settings[data-tour=yes] #discount-options {
   z-index: 4;
   position: relative;
 }
@@ -7499,6 +7512,34 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 .checkout-product-setting-tab__content-wrapper .wpfnl-additional-replacement-options .options-wrapper .single-option .wpfnl-radiobtn input[type=radio]:checked + label::before,
 .checkout-product-setting-tab__content-wrapper .checkout-product-options .options-wrapper .single-option .wpfnl-radiobtn input[type=radio]:checked + label::before {
   border-color: #6E42D3;
+}
+.step-settings__single-tab-content .wpfnl-additional-replacement-options .options-wrapper #checkout-coupon[data-tour=yes],
+.step-settings__single-tab-content .wpfnl-additional-replacement-options .options-wrapper #auto-coupon[data-tour=yes],
+.step-settings__single-tab-content .wpfnl-additional-replacement-options .options-wrapper #enable-quantity-selection[data-tour=yes],
+.step-settings__single-tab-content .checkout-product-options .options-wrapper #checkout-coupon[data-tour=yes],
+.step-settings__single-tab-content .checkout-product-options .options-wrapper #auto-coupon[data-tour=yes],
+.step-settings__single-tab-content .checkout-product-options .options-wrapper #enable-quantity-selection[data-tour=yes],
+.checkout-product-setting-tab__content-wrapper .wpfnl-additional-replacement-options .options-wrapper #checkout-coupon[data-tour=yes],
+.checkout-product-setting-tab__content-wrapper .wpfnl-additional-replacement-options .options-wrapper #auto-coupon[data-tour=yes],
+.checkout-product-setting-tab__content-wrapper .wpfnl-additional-replacement-options .options-wrapper #enable-quantity-selection[data-tour=yes],
+.checkout-product-setting-tab__content-wrapper .checkout-product-options .options-wrapper #checkout-coupon[data-tour=yes],
+.checkout-product-setting-tab__content-wrapper .checkout-product-options .options-wrapper #auto-coupon[data-tour=yes],
+.checkout-product-setting-tab__content-wrapper .checkout-product-options .options-wrapper #enable-quantity-selection[data-tour=yes] {
+  position: relative;
+  z-index: 4;
+}
+.step-settings__single-tab-content .wpfnl-additional-replacement-options .options-wrapper #disable-payments[data-tour=yes],
+.step-settings__single-tab-content .checkout-product-options .options-wrapper #disable-payments[data-tour=yes],
+.checkout-product-setting-tab__content-wrapper .wpfnl-additional-replacement-options .options-wrapper #disable-payments[data-tour=yes],
+.checkout-product-setting-tab__content-wrapper .checkout-product-options .options-wrapper #disable-payments[data-tour=yes] {
+  position: relative;
+  z-index: 4;
+}
+.step-settings__single-tab-content .wpfnl-additional-replacement-options .options-wrapper #disable-payments[data-tour=yes] label,
+.step-settings__single-tab-content .checkout-product-options .options-wrapper #disable-payments[data-tour=yes] label,
+.checkout-product-setting-tab__content-wrapper .wpfnl-additional-replacement-options .options-wrapper #disable-payments[data-tour=yes] label,
+.checkout-product-setting-tab__content-wrapper .checkout-product-options .options-wrapper #disable-payments[data-tour=yes] label {
+  color: #fff;
 }
 .step-settings__single-tab-content .wpfnl-additional-replacement-options select#choose-coupon,
 .step-settings__single-tab-content .checkout-product-options select#choose-coupon,
@@ -7939,6 +7980,8 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 .order-bump-accordion-wrapper .order-bump-body .checkout-order-bump-setting-tab__content-wrapper.single-order-bump.expanded-orderbump #wpfnl-save-ob[data-tour=yes] {
   z-index: 4;
   position: relative;
+  opacity: 1;
+  border: 1px solid #fff;
 }
 .order-bump-accordion-wrapper .order-bump-body .checkout-order-bump-setting-tab__content-wrapper.single-order-bump.expanded-orderbump #ob-position-select[data-tour=yes] {
   z-index: 4;
@@ -11770,6 +11813,12 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   display: flex;
 }
 
+.add-step-wrapper[data-tour=yes] {
+  background: #fff;
+  z-index: 4;
+  position: relative;
+}
+
 .ab-testing-drawer .single-ab-step .step-body .step-stats, .wpfnl-drawing-window .drawflow .drawflow-node .node-wrapper .node-stats {
   display: flex;
   flex-flow: row wrap;
@@ -12676,7 +12725,6 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   justify-content: space-between;
   padding: 20px 30px 4px;
   position: relative;
-  z-index: 1;
 }
 .wpfnl-step-settings-drawer .drawer-header .drawer-title {
   display: flex;
@@ -15160,6 +15208,17 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 .gbf-product-area .single-condition-wrapper .add-condition svg path {
   stroke: #fff;
 }
+.gbf-product-area .single-condition-wrapper .add-condition[data-tour=yes] {
+  position: relative;
+  z-index: 4;
+}
+.gbf-product-area .single-condition-wrapper .add-condition[data-tour=yes] circle {
+  fill: #6e42d3;
+  stroke: #6e42d3;
+}
+.gbf-product-area .single-condition-wrapper .add-condition[data-tour=yes] path {
+  stroke: #fff;
+}
 .gbf-product-area .single-condition-wrapper:not(:last-child) .add-condition {
   display: none;
 }
@@ -15216,6 +15275,12 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   position: absolute;
   opacity: 0;
   visibility: hidden;
+}
+.gbf-product-area .single-condition #gbf-select-box[data-tour=yes] select {
+  position: relative;
+  z-index: 4;
+  border: 1px solid #FFF;
+  background: #ffffff;
 }
 .gbf-product-area .single-condition label {
   cursor: default;
@@ -16159,6 +16224,17 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   bottom: -25px;
   opacity: 1;
   visibility: visible;
+}
+.ab-testing-drawer .header-right .traffic-distribution[data-tour=yes],
+.ab-testing-drawer .header-right .start[data-tour=yes],
+.ab-testing-drawer .header-right .stats[data-tour=yes] {
+  z-index: 4;
+  position: relative;
+}
+.ab-testing-drawer .header-right .more-options[data-tour=yes] {
+  z-index: 4;
+  position: relative;
+  background: #fff;
 }
 .ab-testing-drawer .header-right .btn-default {
   height: auto;
