@@ -8,6 +8,12 @@
 		wpAjaxHelperRequest("delete_promotional_banner")
 	});
 
+    $(document).on('click', '.wpfnl-notification-counter__btn-area', function (event) {
+        event.preventDefault()
+        $('.wp-anniversary-banner').attr('style', 'display: none !important');
+        wpAjaxHelperRequest('delete_promotional_banner')
+    })
+
     // ---delete new UI notice permanently ------
     $(document).on("click", ".wpfunnels-newui-notice .close-newui-notice", function(event) {
 		event.preventDefault();

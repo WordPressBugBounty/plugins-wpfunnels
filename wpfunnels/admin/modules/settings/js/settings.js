@@ -16,6 +16,22 @@ jQuery(function ($) {
             }
         });
 
+        function toggleLogOptions() {
+            const $checkbox = $('#enable-log-status');
+            const $logOptionsWrapper = $('.log-options-wrapper');
+
+            if (!$checkbox.length || !$logOptionsWrapper.length) return;
+
+            $checkbox.on('change', function () {
+                if ($(this).is(':checked')) {
+                    $logOptionsWrapper.show();
+                } else {
+                    $logOptionsWrapper.hide();
+                }
+            });
+        }
+        toggleLogOptions();
+
         function enable_disable_recapcha() {
             if ($("input[name='wpfnl-recapcha-enable']").prop("checked")) {
                 $("#wpfnl-recapcha").show()
@@ -334,9 +350,12 @@ jQuery(function ($) {
 
         GeneralSettingsHandler.prototype.clearTemplates = function (e) {
             e.preventDefault();
-            var sync_icon = $(this).find('.icon-sync');
-            var check_icon = $(this).find('.check-icon');
-            var thisAlert = $(this).siblings('.wpfnl-alert');
+
+            var $btn = $(this);
+            var sync_icon = $btn.find('.icon-sync');
+            var check_icon = $btn.find('.check-icon');
+            var $textSpan = $btn.find('.sync-btn-text');
+            var thisAlert = $btn.siblings('.wpfnl-alert');
 
             sync_icon.addClass('sync-icon');
 
@@ -346,23 +365,36 @@ jQuery(function ($) {
                     sync_icon.hide();
                     check_icon.fadeIn();
 
+                    // Change text and add success style
+                    $textSpan.addClass('success');
+                    $textSpan.text('Templates synced successfully');
+                    $btn.css({
+                        'border-color': '#239654',
+                    });
+
                     setTimeout(function () {
-                        sync_icon.removeClass('sync-icon');
-                        sync_icon.show();
+                        sync_icon.removeClass('sync-icon').show();
                         check_icon.hide();
+
+                        // Restore original text and style
+                        $textSpan.text('Sync Templates');
+                        $textSpan.removeClass('success');
+                        $btn.css({
+                            'border-color': '',
+                        });
                     }, 2000);
+
                     $("#wpfnl-update-global-settings").trigger("click");
                 })
 
                 .error(function (response) {
-
                     setTimeout(function () {
                         thisAlert.fadeOut().text('').removeClass('wpfnl-error');
                     }, 2000);
-
                     console.log('error');
                 });
         };
+
 
 
         /**
@@ -443,6 +475,15 @@ jQuery(function ($) {
         };
 
         new GeneralSettingsHandler();
+
+        $('.inner-tab').on('click', function () {
+            $('.inner-tab').removeClass('active');
+            $('.wpfnl-tab-content').removeClass('active');
+
+            $(this).addClass('active');
+            var tabId = $(this).data('tab');
+            $('#' + tabId).addClass('active');
+        });
 
     });
 

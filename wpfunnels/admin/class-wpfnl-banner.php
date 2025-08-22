@@ -47,14 +47,20 @@ class SpecialOccasionBanner
      * @param string $start_date The start date and time for displaying the banner.
      * @param string $end_date   The end date and time for displaying the banner.
      */
-    public function __construct($occasion, $start_date, $end_date, $btn_link = '#')
+    public function __construct($occasion, $start_date, $end_date, $btn_link = 'https://getwpfunnels.com/creatorlms-early-access/?utm_source=plugin-CTA&utm_medium=wpf-plugin&utm_campaign=clms-early-bird')
     {
         $this->occasion     = $occasion;
         $this->btn_link     = $btn_link;
         $this->start_date   = strtotime($start_date);
         $this->end_date     = strtotime($end_date);
 
-        if (!defined('WPFNL_PRO_VERSION') && 'yes' === get_option('_is_wpfnl_4thofjuly_25', 'yes')) {
+        // if (!defined('WPFNL_PRO_VERSION') && 'yes' === get_option('_is_wpfnl_4thofjuly_25', 'yes')) {
+        //     // Hook into the admin_notices action to display the banner
+        //     add_action('admin_notices', [$this, 'display_banner']);
+        //     add_action('admin_head', array($this, 'add_styles'));
+        // }
+
+        if ('yes' === get_option('_hide_clms_early_access', 'yes')) {
             // Hook into the admin_notices action to display the banner
             add_action('admin_notices', [$this, 'display_banner']);
             add_action('admin_head', array($this, 'add_styles'));
@@ -68,7 +74,7 @@ class SpecialOccasionBanner
      */
     public function wpf_get_halloween_countdown()
     {
-        $end_date = strtotime('2025-07-14 12:00:01');
+        $end_date = strtotime('2025-08-25 23:59:59');
         $now      = current_time('timestamp');
         $diff     = $end_date - $now;
 
@@ -108,52 +114,95 @@ class SpecialOccasionBanner
                 <div class="gwpf-tb__notification" id="rex_deal_notification">
 
                     <div class="banner-overflow">
-                        <section class="wpf-notification-counter default-notification" aria-labelledby="wpf-halloween-offer-title">
+                        <!-- <section class="wpf-notification-counter default-notification" aria-labelledby="wpf-halloween-offer-title">
                             <div class="wpf-notification-counter__container">
                                 <div class="wpf-notification-counter__content">
 
                                     <figure class="wpf-notification-counter__figure-logo">
-                                        <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/independence-day/occation-img.webp'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
+                                        <img src="<//?php echo esc_url(WPFNL_URL . 'admin/assets/images/independence-day/occation-img.webp'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
                                     </figure>
 
                                     <figure class="wpf-notification-counter__figure-occasion">
-                                        <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/independence-day/parcentage.webp'); ?>?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
+                                        <img src="<//?php echo esc_url(WPFNL_URL . 'admin/assets/images/independence-day/parcentage.webp'); ?>?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
                                     </figure>
 
                                     <figure class="wpf-notification-counter__figure-percentage">
-                                        <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/independence-day/logo-wpf.webp'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
+                                        <img src="<//?php echo esc_url(WPFNL_URL . 'admin/assets/images/independence-day/logo-wpf.webp'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
                                     </figure>
 
                                     <div id="wpf-halloween-countdown" class="wpf-notification-counter__countdown" aria-live="polite">
-                                        <h3 class="screen-reader-text"><?php echo __('Offer Countdown', 'wpfnl'); ?></h3>
+                                        <h3 class="screen-reader-text"><//?php echo __('Offer Countdown', 'wpfnl'); ?></h3>
                                         <ul class="wpf-notification-counter__list">
 
-                                            <?php foreach (['days', 'hours', 'mins', 'secs'] as $unit): ?>
+                                            <//?php foreach (['days', 'hours', 'mins', 'secs'] as $unit): ?>
                                                 <li class="wpf-notification-counter__item ">
-                                                    <span id="wpf-halloween-<?php echo esc_attr($unit); ?>" class="wpf-notification-counter__time">
-                                                        <?php echo esc_html($countdown[$unit]); ?>
+                                                    <span id="wpf-halloween-<//?php echo esc_attr($unit); ?>" class="wpf-notification-counter__time">
+                                                        <//?php echo esc_html($countdown[$unit]); ?>
                                                     </span>
                                                     <span class="wpf-notification-counter__label">
-                                                        <?php echo esc_html($unit); ?>
+                                                        <//?php echo esc_html($unit); ?>
                                                     </span>
                                                 </li>
-                                            <?php endforeach; ?>
+                                            <//?php endforeach; ?>
                                         </ul>
                                     </div>
 
                                     <div class="wpf-notification-counter__btn-area">
-                                        <a target="_blank" href="<?php echo esc_url($this->btn_link); ?>" class="wpf-notification-counter__btn" role="button">
+                                        <a target="_blank" href="<//?php echo esc_url($this->btn_link); ?>" class="wpf-notification-counter__btn" role="button">
 
                                             <span class="wpf-btn-inner">
-                                                <span class="screen-reader-text"><?php echo __('Click to view Halloween sale products', 'wpfnl'); ?></span>
-                                                <span aria-hidden="true" class="wpf-notification-counter__mint-button"> <?php echo __('Get The Deal Now', 'wpfnl'); ?></span>
+                                                <span class="screen-reader-text"><//?php echo __('Click to view Halloween sale products', 'wpfnl'); ?></span>
+                                                <span aria-hidden="true" class="wpf-notification-counter__mint-button"> <//?php echo __('Get The Deal Now', 'wpfnl'); ?></span>
                                             </span>
 
                                         </a>
                                     </div>
                                 </div>
                             </div>
+                        </section> -->
+
+                        <!-- Creator lms early bird banner starts -->
+                        <section class="wpfnl-lms-earlybird-banner">
+                            <div class="wpfnl-lms-earlybird-banner-container">
+                                <div class="funnel-banner__icon">
+                                    <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/creator-lms-logo.webp'); ?>" alt="creator-lms-logo.webp" class="">
+                                </div>
+
+                                <div class="funnel-banner__content">
+                                <p>📢 Introducing <strong>Creator LMS Pro</strong> — a powerful upgrade to Creator LMS with a sleek new UI, Cohorts, Communities, built-in checkout, gamification, AI Assistant, advanced analytics, and more! 🚀 <strong>Get a special discount</strong> as an Early Adopter — available for a limited time only!</p>
+
+                                <div class="funnel-banner__actions">
+                                    <div class="wpfnl-notification-counter__btn-area">
+                                    <a href="<?php echo esc_url($this->btn_link); ?>"
+                                        target="_blank"
+                                        class="wpfnl-notification-counter__btn btn btn-primary"
+                                        role="button">
+                                        <span class="wpfnl-btn-inner">
+                                        <span class="screen-reader-text">Click to upgrade to Mail Mint Pro</span>
+                                        <span aria-hidden="true" class="wpfnl-notification-counter__mint-button">
+                                            Sign Up
+                                        </span>
+                                        </span>
+                                    </a>
+                                    </div>
+
+                                    <div class="wpfnl-notification-counter__btn-area">
+                                    <a href="#"
+                                        class="wpfnl-notification-counter__btn btn btn-secondary"
+                                        role="button">
+                                        <span class="wpfnl-btn-inner">
+                                        <span class="screen-reader-text">Dismiss this offer</span>
+                                        <span aria-hidden="true" class="wpfnl-notification-counter__mint-button">
+                                            No, Thanks
+                                        </span>
+                                        </span>
+                                    </a>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
                         </section>
+                        <!-- Creator lms early bird banner ends -->
 
                     </div>
 
@@ -174,7 +223,7 @@ class SpecialOccasionBanner
 
         <script>
             function updateCountdown() {
-                var endDate = new Date("2025-07-14 12:00:01").getTime();
+                var endDate = new Date("2025-08-25 23:59:59").getTime();
                 var now = new Date().getTime();
                 var timeLeft = endDate - now;
 
@@ -634,7 +683,7 @@ class SpecialOccasionBanner
 
             @media only screen and (max-width: 1024px) {
                 .gwpf-tb__notification {
-                    max-height: 110px;
+                    max-height: 115px;
                 }
 
                 .gwpf-anniv__image--left img {
@@ -701,6 +750,9 @@ class SpecialOccasionBanner
             }
 
             @media only screen and (max-width: 768px) {
+                .gwpf-tb__notification {
+                    max-height: 195px !important;
+                }
 
                 .gwpf-tb__notification {
                     margin: 60px 0 20px;
@@ -1224,6 +1276,198 @@ class SpecialOccasionBanner
                     width: 45px;
                 }
             }
+
+
+            /* Creator LMS early bird banner design */
+            .wpfnl-lms-earlybird-banner {
+                .wpfnl-lms-earlybird-banner-container {
+                    display: flex;
+                    align-items: center;
+                    background: #F7F7FF;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 6px;
+                    padding: 14px 18px;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+                    position: relative;
+                    font-family: 'Inter', sans-serif;
+                    position: relative;
+
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        left: 0px;
+                        top: 0;
+                        height: 100%;
+                        width: 6px;
+                        background: #6E42D3;
+                        border-radius: 30px;
+                    }
+
+                    .funnel-banner__icon {
+                        flex-shrink: 0;
+                        margin-right: 20px;
+
+                        img {
+                            max-width: 85px;
+                            width: 100%;
+                        }
+                    }
+
+                    .funnel-banner__content {
+                        flex: 1;
+
+                        p {
+                            margin: 0;
+                            font-size: 14px;
+                            color: #374151;
+                            font-weight: 500;
+
+                            strong {
+                                color: #6E42D3;
+                            }
+                        }
+
+                        .funnel-banner__actions {
+                            margin-top: 8px;
+                            display: flex;
+                            flex-wrap: wrap;
+
+                            .wpfnl-notification-counter__btn-area {
+                                margin-right: 8px;
+                                margin-bottom: 6px;
+                            }
+
+                            .btn {
+                                font-size: 13px;
+                                font-weight: 500;
+                                padding: 6px 14px;
+                                border-radius: 4px;
+                                cursor: pointer;
+                                border: none;
+                                text-decoration: none;
+                                display: inline-block;
+                                transition: all 0.2s ease;
+
+                                &:focus {
+                                    box-shadow: none;
+                                    outline: none;
+                                }
+
+                                &.btn-primary {
+                                    background: #6E42D3;
+                                    color: #fff;
+
+                                    &:hover {
+                                        background: darken(#ef4444, 8%);
+                                    }
+                                }
+
+                                &.btn-secondary {
+                                    background: #f0f1f3ff;
+                                    color: #374151;
+
+                                    &:hover {
+                                        background: darken(#f3f4f6, 5%);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    .funnel-banner__close {
+                        position: absolute;
+                        top: 8px;
+                        right: 10px;
+                        border: none;
+                        background: transparent;
+                        font-size: 18px;
+                        color: #9ca3af;
+                        cursor: pointer;
+
+                        &:hover {
+                            color: #4b5563;
+                        }
+                    }
+                }
+
+                /* ================== RESPONSIVENESS ================== */
+                @media (max-width: 1550px) {
+                    .wpfnl-lms-earlybird-banner-container {
+                        padding: 12px 16px;
+
+                        .funnel-banner__content p {
+                            font-size: 13.5px;
+                        }
+                    }
+                }
+
+                @media (max-width: 1399px) {
+                    .wpfnl-lms-earlybird-banner-container {
+                        .funnel-banner__content p {
+                            font-size: 13px;
+                        }
+
+                        .funnel-banner__actions .btn {
+                            font-size: 12.5px;
+                            padding: 6px 12px;
+                        }
+                    }
+                }
+
+                @media (max-width: 1199px) {
+                    .wpfnl-lms-earlybird-banner-container {
+                        .funnel-banner__content p {
+                            font-size: 12px;
+                        }
+
+                        .funnel-banner__icon {
+                            margin-right: 15px;
+                            margin-bottom: 0;
+                        }
+
+                        .funnel-banner__actions {
+                            margin-top: 6px !important;
+
+                            .btn {
+                                margin-right: 6px;
+                                font-size: 12px !important;
+                                padding: 5px 14px !important;
+                            }
+                        }
+                    }
+                }
+
+                @media (max-width: 991px) {
+                    .wpfnl-lms-earlybird-banner-container {
+                        padding: 12px 30px;
+                        flex-direction: column;
+                        text-align: center;
+
+                        .funnel-banner__content p {
+                            font-size: 12px;
+                            line-height: 1.4;
+                        }
+
+                        .funnel-banner__icon {
+                            img {
+                                max-width: 65px;
+                                width: 100%;
+                            }
+                        }
+
+                        .funnel-banner__actions {
+                            margin-top: 10px !important;
+                            align-items: center;
+                            justify-content: center;
+
+                            .btn {
+                                width: 100%;
+                                margin-right: 0;
+                            }
+                        }
+                    }
+                }
+            }
         </style>
     <?php
     }
@@ -1411,6 +1655,7 @@ class SpecialOccasionBanner
                     right: -226px;
                 }
             }
+
         </style>
 <?php
     }

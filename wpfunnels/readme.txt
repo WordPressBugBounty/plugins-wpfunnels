@@ -1,11 +1,11 @@
-=== Easiest Funnel Builder For WordPress & WooCommerce, Specialized For Digital Creators - WPFunnels ===
+=== Leads & Sales Funnel Builder For WordPress & WooCommerce, Specialized For Digital Creators - WPFunnels ===
 Contributors: coderexltd, getwpfunnels, coderexco
 Donate link: https://getwpfunnels.com/
-Tags: funnel builder, order bump, sales funnels, lead generation, custom checkout
+Tags: funnel builder, order bump, sales funnels, lead generation, custom checkout, sales funnel builder, one click offer
 Requires at least: 6.1
 Tested up to:  6.8.2
 Requires PHP: 7.4
-Stable tag:  3.5.27
+Stable tag:  3.5.28
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,8 +37,8 @@ Use a visual canvas to plan a complete sales funnel journey and leverage exclusi
 - Custom landing pages
 - Optimized checkout pages
 - Exclusive discounts
-- Order bumps at the checkout
-- One click upsell offers after checkout (Pro)
+- <a href="https://getwpfunnels.com/woocommerce-order-bump/?utm_source=repo-CTA&utm_medium=wordpress-repo&utm_campaign=repo-to-landing" target="_blank">Order bumps at the checkout</a> 
+- <a href="https://getwpfunnels.com/one-click-upsell/?utm_source=repo-CTA&utm_medium=wordpress-repo&utm_campaign=repo-to-landing" target="_blank">One click upsell offers after checkout (Pro) </a>
 - Conditional funnel steps & offers (Pro)
 - Email automation campaigns (via Mail Mint integration) (Pro)
 - Detailed funnel analytics (Pro)
@@ -57,22 +57,22 @@ No matter what type of funnel you need - course funnels, tripwire funnels, SLO f
 
 == 💥 Why Use WPFunnels In Your WordPress Website 💥==
 
-WPFunnels is the easiest funnel builder for WordPress & WooCommerce to help you create complete sales funnels easily, on your own, within minutes.
+WPFunnels is the easiest leads and sales funnel builder for WordPress & WooCommerce to help you create complete sales funnels easily, on your own, within minutes.
 
-It is specially built for digital creators (such as online coaches, educators, trainers, course creators, etc.), entrepreneurs, and marketers like yourself to craft conversion-optimized WordPress funnel journeys that will help you generate more leads and sales.
+It is specially built for digital creators (such as <a href="https://getwpfunnels.com/high-ticket-coaching-funnel/?utm_source=repo-CTA&utm_medium=wordpress-repo&utm_campaign=repo-to-landing" target="_blank">online coaches</a> , educators, trainers, course creators, etc.), entrepreneurs, and marketers like yourself to craft conversion-optimized WordPress funnel journeys that will help you generate more leads and sales.
 
 You will get everything you need to automate your sales process and stay in control of every stage of the buyer’s journey.
 
-**Easy Lead Generation In WordPress**
+👉  **Easy Lead Generation In WordPress**
 Build lead generation funnels in minutes, collect & segment leads, and run automated email campaigns easily.
 
-**Features Focused On Revenue Growth**
+👉 **Features Focused On Revenue Growth**
 Use key features such as order bumps, upsells, exclusive discounts, and automated coupons to increase revenue growth through your sales funnel.
 
-**Funnel Builder To Streamline Marketing Automation**
+👉 **Funnel Builder To Streamline Marketing Automation**
 Use a powerful funnel builder to set up a complete funnel journey with the necessary pages and automated email campaigns to maximize conversions.
 
-**Analytics For Data-Driven Funnel Optimizations**
+👉 **Analytics For Data-Driven Funnel Optimizations**
 Access detailed analytics and A/B testing options for your sales funnel pages to track performance and optimize for better results.
 
 Getting Started is Easy:
@@ -117,7 +117,7 @@ No need to use multiple tools to create or track your funnels.
 
 - Offline payments support
 - Post-purchase upsell support for any payment gateway (Pro).
-- One-click upsells support for major payment gateways such as Stripe, PayPal, Mollie, etc. (<a href="https://getwpfunnels.com/docs/supported-payment-gateways/?utm_source=repo&utm_medium=repo&utm_campaign=supported-payment-gateways" target="_blank">View all.</a>)
+- One click upsells support for major payment gateways such as Stripe, PayPal, Mollie, etc. (<a href="https://getwpfunnels.com/docs/supported-payment-gateways/?utm_source=repo&utm_medium=repo&utm_campaign=supported-payment-gateways" target="_blank">View all.</a>)
 
 Get everything from planning your funnel journey to launching a live campaign—all in one place—no complexity.
 
@@ -236,10 +236,10 @@ For <a href="https://getwpfunnels.com/docs/supported-payment-gateways/?utm_sourc
 
 ✅ Post-purchase offer
 ✅ Exclusive discount
-✅ One-click offer acceptance
+✅ One click offer acceptance
 ✅ Conditional offer
 
-Since these are one-click offers, customers won’t need to re-enter payment details—just a single click to accept and complete the purchase.
+Since these are one click offers, customers won’t need to re-enter payment details—just a single click to accept and complete the purchase.
 
 > Learn More About Using <a href="https://getwpfunnels.com/one-click-upsell/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-one-click-upsell" target="_blank">One Click Upsell Offers</a>
 
@@ -580,6 +580,10 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.5.28 (2025-08-22) =
+* Improvement: UI Improvement on the Global Settings
+* Compatibility: Compatible with the Latest WooCommerce
 
 = 3.5.27 (2025-07-16) =
 * Improvement: Guided Assistance on the Funnel Steps

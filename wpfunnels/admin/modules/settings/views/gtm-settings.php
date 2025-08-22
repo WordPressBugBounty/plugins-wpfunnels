@@ -6,41 +6,49 @@
  */
 $is_pro_active = apply_filters( 'wpfunnels/is_pro_license_activated', false );
 ?>
-<div class="wpfnl-box">
+<div class="wpfnl-box gtm">
 	<!-- /field-wrapper -->
-		<div class="wpfnl-field-wrapper analytics-stats">
-			<label>
-				<?php esc_html_e('Track Events Using Google Tag Manager', 'wpfnl'); ?>
-				<?php
-					if (!$is_pro_active) {
-						echo '<span class="pro-tag-icon">';
-						require WPFNL_DIR . '/admin/partials/icons/pro-icon.php';
-						echo '</span>';
-					}
-				?>
-			</label>
-			<?php if ($is_pro_active) { ?>
-				<div class="wpfnl-fields">
-					<span class="wpfnl-checkbox no-title">
-						<input type="checkbox" name="wpfnl-gtm-enable"  id="gtm-enable" <?php if($this->gtm_settings['gtm_enable'] == 'on'){echo 'checked'; } ?>/>
-						<label for="gtm-enable"></label>
-					</span>
-				</div>
-			<?php } else { ?>
-				<div class="wpfnl-fields">
-					<span class="wpfnl-checkbox no-title">
-						<input type="checkbox" name="wpfnl-gtm-enable"  id="gtm-enable-pro"/>
-						<label for="gtm-enable-pro"></label>
-					</span>
-				</div>
-			<?php } ?>
+		<div class="gtm-field-wrapper">
+			<div class="wpfnl-field-wrapper analytics-stats">
+				<label class="gtm-label">
+					<?php esc_html_e('Track Events Using Google Tag Manager', 'wpfnl'); ?>
+					<?php
+						if (!$is_pro_active) {
+							echo '<span class="pro-tag-icon">';
+							require WPFNL_DIR . '/admin/partials/icons/pro-icon.php';
+							echo '</span>';
+						}
+					?>
+				</label>
+				<?php if ($is_pro_active) { ?>
+					<div class="wpfnl-fields enable-gtm">
+						<span class="wpfnl-switcher extra-sm no-title">
+							<input type="checkbox" name="wpfnl-gtm-enable"  id="gtm-enable" <?php if($this->gtm_settings['gtm_enable'] == 'on'){echo 'checked'; } ?>/>
+							<label for="gtm-enable"></label>
+						</span>
+					</div>
+				<?php } else { ?>
+					<div class="wpfnl-fields enable-gtm">
+						<span class="wpfnl-switcher extra-sm no-title">
+							<input type="checkbox" name="wpfnl-gtm-enable"  id="gtm-enable-pro"/>
+							<label for="gtm-enable-pro"></label>
+						</span>
+					</div>
+				<?php } ?>
+			</div>
+			<div>
+				<a class="guide-btn" href="https://getwpfunnels.com/docs/funnel-integrations/google-tag-manager-integration/" target="_blank" title="Guide On Google Tag Manager Integration">
+					<?php include WPFNL_DIR . '/admin/partials/icons/doc-icon.php'; ?>
+					<span>Doc</span>
+				</a>
+			</div>
 		</div>
 		<div id="wpfnl-gtm">
 			<div class="wpfnl-field-wrapper gtm-snippet-head" id="gtm-snippet-head">
 				<label>
 					<?php esc_html_e('GTM Container ID', 'wpfnl'); ?>
 					<span class="wpfnl-tooltip">
-						<?php require WPFNL_DIR . '/admin/partials/icons/question-tooltip-icon.php'; ?>
+						<?php require WPFNL_DIR . '/admin/partials/icons/settings-tooltip-icon.php'; ?>
 						<p><?php esc_html_e('In your Google Tab Manager Workspace, near the top of the window, you will find your container ID, formatted as “GTM-XXXXXX“.', 'wpfnl'); ?></p>
 					</span>
 				</label>
@@ -52,11 +60,11 @@ $is_pro_active = apply_filters( 'wpfunnels/is_pro_license_activated', false );
 				<label>
 					<?php esc_html_e('GTM Events', 'wpfnl'); ?>
 					<span class="wpfnl-tooltip">
-						<?php require WPFNL_DIR . '/admin/partials/icons/question-tooltip-icon.php'; ?>
+						<?php require WPFNL_DIR . '/admin/partials/icons/settings-tooltip-icon.php'; ?>
 						<p><?php esc_html_e('Choose what events to track in your funnels via Google Tag Manager.', 'wpfnl'); ?></p>
 					</span>
 				</label>
-				<div class="wpfnl-fields">
+				<div class="wpfnl-fields gtm-events-wrapper">
 					<?php foreach( $this->gtm_events as $key => $events ) { ?>
 						<span class="wpfnl-checkbox">
                         <input type="checkbox" name="wpfnl-gtm-events[]"  id="<?php echo $key; ?>-gtm-events" data-role="<?php echo $key; ?>"

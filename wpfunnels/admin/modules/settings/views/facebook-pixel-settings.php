@@ -7,44 +7,52 @@
 
  $is_pro_active = apply_filters( 'wpfunnels/is_pro_license_activated', false );
 ?>
-<div class="wpfnl-box">
+<div class="wpfnl-box facebook-pixel">
 	<!-- /field-wrapper -->
-		<div class="wpfnl-field-wrapper analytics-stats">
-			<label>
-				<?php esc_html_e('Track Events Using Facebook Pixel', 'wpfnl'); ?>
-				<?php
-					if (!$is_pro_active) {
-						echo '<span class="pro-tag-icon">';
-						require WPFNL_DIR . '/admin/partials/icons/pro-icon.php';
-						echo '</span>';
-					}
-				?>
-			</label>
-			<?php if ($is_pro_active) { ?>
-				<div class="wpfnl-fields">
-					<span class="wpfnl-checkbox no-title">
-						<input type="checkbox" name="wpfnl-facebook-pixel-enable" id="facebook-pixel-enable" <?php if ($this->facebook_pixel_settings['enable_fb_pixel'] == 'on') {
-							echo 'checked';
-						} ?>/>
-						<label for="facebook-pixel-enable"></label>
-					</span>
-				</div>
-			<?php } else { ?>
-				<div class="wpfnl-fields">
-					<span class="wpfnl-checkbox no-title">
-						<input type="checkbox" name="wpfnl-facebook-pixel-enable" id="facebook-pixel-enable-pro"/>
-						<label for="facebook-pixel-enable-pro"></label>
-					</span>
-				</div>
-			<?php } ?>
-
+	 	<div class="pixel-field-wrapper">
+			<div class="wpfnl-field-wrapper analytics-stats">
+				<label class="facebook-pixel-label">
+					<?php esc_html_e('Track Events Using Facebook Pixel', 'wpfnl'); ?>
+					<?php
+						if (!$is_pro_active) {
+							echo '<span class="pro-tag-icon">';
+							require WPFNL_DIR . '/admin/partials/icons/pro-icon.php';
+							echo '</span>';
+						}
+					?>
+				</label>
+				<?php if ($is_pro_active) { ?>
+					<div class="wpfnl-fields enable-facebook-pixel">
+						<span class="wpfnl-switcher extra-sm no-title">
+							<input type="checkbox" name="wpfnl-facebook-pixel-enable" id="facebook-pixel-enable" <?php if ($this->facebook_pixel_settings['enable_fb_pixel'] == 'on') {
+								echo 'checked';
+							} ?>/>
+							<label for="facebook-pixel-enable"></label>
+						</span>
+					</div>
+				<?php } else { ?>
+					<div class="wpfnl-fields enable-facebook-pixel">
+						<span class="wpfnl-switcher extra-sm no-title">
+							<input type="checkbox" name="wpfnl-facebook-pixel-enable" id="facebook-pixel-enable-pro"/>
+							<label for="facebook-pixel-enable-pro"></label>
+						</span>
+					</div>
+				<?php } ?>
+			</div>
+			<div>
+				<a class="guide-btn" href="https://getwpfunnels.com/docs/funnel-integrations/facebook-pixel-integration/" target="_blank" title="Guide On Facebook Pixel Integration">
+					<?php include WPFNL_DIR . '/admin/partials/icons/doc-icon.php'; ?>
+					<span>Doc</span>
+				</a>
+			</div>
 		</div>
+
 		<div id="wpfnl-facebook-pixel">
 			<div class="wpfnl-field-wrapper facebook-tracking-code" id="facebook-tracking-code">
 				<label>
 					<?php esc_html_e('Facebook Pixel ID', 'wpfnl'); ?>
 					<span class="wpfnl-tooltip">
-						<?php require WPFNL_DIR . '/admin/partials/icons/question-tooltip-icon.php'; ?>
+						<?php require WPFNL_DIR . '/admin/partials/icons/settings-tooltip-icon.php'; ?>
 						<p><?php esc_html_e('Enter your Facebook Pixel ID.', 'wpfnl'); ?></p>
 					</span>
 				</label>
@@ -56,11 +64,11 @@
 				<label>
 					<?php esc_html_e('Facebook Pixel Events', 'wpfnl'); ?>
 					<span class="wpfnl-tooltip">
-						<?php require WPFNL_DIR . '/admin/partials/icons/question-tooltip-icon.php'; ?>
+						<?php require WPFNL_DIR . '/admin/partials/icons/settings-tooltip-icon.php'; ?>
 						<p><?php esc_html_e('Choose what events to track in your funnels via Facebook Pixel.', 'wpfnl'); ?></p>
 					</span>
 				</label>
-				<div class="wpfnl-fields">
+				<div class="wpfnl-fields pixel-events-wrapper">
 					<?php foreach( $this->facebook_pixel_events as $key => $events ) { ?>
 						<span class="wpfnl-checkbox">
                         <input type="checkbox" name="wpfnl-facebook_pixel_events[]"  id="<?php echo $key; ?>-facebook_pixel_events" data-role="<?php echo $key; ?>"
@@ -72,8 +80,5 @@
 				</div>
 			</div>
 		</div>
-
-
-
 </div>
 <!-- /settings-box -->

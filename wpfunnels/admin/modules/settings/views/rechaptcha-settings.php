@@ -5,12 +5,11 @@
  * @package
  */
 ?>
-<div class="wpfnl-box">
-    <hr>
-    <div class="wpfnl-field-wrapper analytics-stats">
-        <label><?php esc_html_e('Connect reCAPTCHA (v3)', 'wpfnl'); ?></label>
-        <div class="wpfnl-fields">
-            <span class="wpfnl-checkbox no-title">
+<div class="wpfnl-box recapcha-settings">
+    <div class="wpfnl-field-wrapper analytics-stats recapcha-wrapper">
+        <label class="recaptcha-label"><?php esc_html_e('Connect reCAPTCHA (v3)', 'wpfnl'); ?></label>
+        <div class="wpfnl-fields connect-recaptcha">
+            <span class="wpfnl-switcher extra-sm no-title">
                 <input type="checkbox" name="wpfnl-recapcha-enable" id="recapcha-pixel-enable" <?php if ($this->recaptcha_settings['enable_recaptcha'] == 'on') {
                                                                                                     echo 'checked';
                                                                                                 } ?> />
@@ -21,9 +20,9 @@
     <div id="wpfnl-recapcha">
         <div class="wpfnl-field-wrapper recaptcha-tracking" id="recaptcha-tracking">
             <label>
-                <?php esc_html_e('reCAPTCHA Site Key', 'wpfnl'); ?>
+                <?php esc_html_e('Site Key', 'wpfnl'); ?>
                 <span class="wpfnl-tooltip">
-                    <?php require WPFNL_DIR . '/admin/partials/icons/question-tooltip-icon.php'; ?>
+                    <?php require WPFNL_DIR . '/admin/partials/icons/settings-tooltip-icon.php'; ?>
                     <p><?php esc_html_e('Collect the Site Key from your Google reCAPTCHA site settings under the reCAPTCHA keys.', 'wpfnl'); ?></p>
                 </span>
             </label>
@@ -33,9 +32,9 @@
         </div>
         <div class="wpfnl-field-wrapper analytics-stats">
             <label>
-                <?php esc_html_e('reCAPTCHA Site Secret', 'wpfnl'); ?>
+                <?php esc_html_e('Site Secret', 'wpfnl'); ?>
                 <span class="wpfnl-tooltip">
-                    <?php require WPFNL_DIR . '/admin/partials/icons/question-tooltip-icon.php'; ?>
+                    <?php require WPFNL_DIR . '/admin/partials/icons/settings-tooltip-icon.php'; ?>
                     <p><?php esc_html_e('Collect the Secrect Key from your Google reCAPTCHA site settings under the reCAPTCHA keys.', 'wpfnl'); ?></p>
                 </span>
             </label>

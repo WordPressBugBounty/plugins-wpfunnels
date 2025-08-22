@@ -1,6 +1,1 @@
-<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0.999878 14V2.44444C0.999878 1.64675 1.68467 1 2.52929 1H4.67467H12.4705C13.3155 1 13.9999 1.64675 13.9999 2.44444V12.5556C13.9999 13.3532 13.3155 14 12.4705 14H3.64155" stroke="#7A8B9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M4.68713 10.0097H6.63255" stroke="#7A8B9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M4.68713 7.49989H10.2156" stroke="#7A8B9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M4.68713 4.9911H10.3131" stroke="#7A8B9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
+<svg width="12" height="15" fill="none" viewBox="0 0 12 15" xmlns="http://www.w3.org/2000/svg"><path fill="#7A8B9A" d="M2.25 12h7.5A2.25 2.25 0 0012 9.75v-7.5A2.25 2.25 0 009.75 0h-7.5A2.25 2.25 0 000 2.25v10.5A2.25 2.25 0 002.25 15h9a.75.75 0 100-1.5h-9a.75.75 0 110-1.5zM1.5 2.25a.75.75 0 01.75-.75h7.5a.75.75 0 01.75.75v7.5a.75.75 0 01-.75.75h-7.5c-.255 0-.51.043-.75.128V2.25zm3.75 6V6a.75.75 0 011.5 0v2.25a.75.75 0 01-1.5 0zm0-4.5a.75.75 0 111.5 0 .75.75 0 01-1.5 0z"/></svg>

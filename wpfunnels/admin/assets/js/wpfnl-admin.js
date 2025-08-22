@@ -1952,15 +1952,25 @@
      * @since 1.0.0
      */
     $('.wpfn-settings__nav .nav-li:not(.disabled)').on('click', function (e) {
-        var dataID = $(this).attr('data-id')
-        $(this).addClass('active')
-        $(this).siblings('.nav-li').removeClass('active')
+        var dataID = $(this).attr('data-id');
+        
+        $(this).addClass('active').siblings('.nav-li').removeClass('active');
 
-        $('#' + dataID).show()
-        $('#' + dataID)
-            .siblings('.wpfnl-funnel__single-settings')
-            .hide()
-    })
+        // Show the selected panel, hide others
+        $('#' + dataID).show().siblings('.wpfnl-funnel__single-settings').hide();
+
+        // Inside the visible panel, activate the first inner-tab
+        var $container = $('#' + dataID);
+        $container.find('.inner-tab').removeClass('active');
+        $container.find('.wpfnl-tab-content').removeClass('active');
+
+        var $firstInnerTab = $container.find('.inner-tab').first();
+        var tabId = $firstInnerTab.data('tab');
+
+        $firstInnerTab.addClass('active');
+        $('#' + tabId).addClass('active');
+    });
+
 
     /**
      * Checkout Edit Field delete alert modal
@@ -2134,15 +2144,19 @@
      * rollback feature for WPF
      */
     $('select#wpfnl-rollback')
-        .on('change', function () {
-            var $this = $(this),
-                $rollbackButton = $this.next('.wpfnl-rollback-button'),
-                placeholderText = $rollbackButton.data('placeholder-text'),
-                placeholderUrl = $rollbackButton.data('placeholder-url')
-            $rollbackButton.html(placeholderText.replace('{VERSION}', $this.val()))
-            $rollbackButton.attr('href', placeholderUrl.replace('VERSION', $this.val()))
-        })
-        .trigger('change')
+    .on('change', function () {
+        var $this = $(this),
+            $rollbackButton = $this.next('.wpfnl-rollback-button'),
+            originalHref = $rollbackButton.attr('href'),
+            selectedVersion = $this.val();
+
+        if (originalHref && originalHref.includes('VERSION')) {
+            var updatedHref = originalHref.replace('VERSION', selectedVersion);
+            $rollbackButton.attr('href', updatedHref);
+        }
+    })
+    .trigger('change');
+
 
     $('.wpfnl-rollback-button').on('click', function (event) {
         event.preventDefault()
@@ -2156,6 +2170,12 @@
 
     // ---delete promotional-banner notice permanently ------
     $(document).on('click', '.wp-anniversary-banner .close-promotional-banner', function (event) {
+        event.preventDefault()
+        $('.wp-anniversary-banner').attr('style', 'display: none !important');
+        wpAjaxHelperRequest('delete_promotional_banner')
+    })
+
+    $(document).on('click', '.wpfnl-notification-counter__btn-area', function (event) {
         event.preventDefault()
         $('.wp-anniversary-banner').attr('style', 'display: none !important');
         wpAjaxHelperRequest('delete_promotional_banner')

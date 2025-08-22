@@ -795,7 +795,6 @@ abstract class WP_Background_Process extends WP_Async_Request {
 	 * and data exists in the queue.
 	 */
 	public function handle_cron_healthcheck() {
-		error_log( sprintf( 'Running cron healthcheck for %s', $this->identifier ) );
 		if ( $this->is_processing() ) {
 			// Background process already running.
 			exit;
