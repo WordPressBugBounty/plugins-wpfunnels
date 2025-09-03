@@ -102,13 +102,9 @@ class MailMint {
             }
 
 			$exist = ContactModel::is_contact_exist( $this->contact_data['email'] );
-			if( $exist ){
-				$this->contact_id = ContactModel::get_id_by_email( $this->contact_data['email'] );
-				$this->contact_id = ContactModel::update( $this->contact_data, $this->contact_id );
-			} else {
-                    
-				$contact    = new ContactData( $this->contact_data['email'], $this->contact_data );
-				$this->contact_id = ContactModel::insert( $contact );
+			if( ! $exist ){
+				$contact = new ContactData( $this->contact_data['email'], $this->contact_data );
+				ContactModel::insert( $contact );
 			}
 
 			if ( isset( $this->contact_data['status'] ) && 'pending' === $this->contact_data['status'] ) {

@@ -5,7 +5,7 @@ Tags: funnel builder, order bump, sales funnels, lead generation, custom checkou
 Requires at least: 6.1
 Tested up to:  6.8.2
 Requires PHP: 7.4
-Stable tag:  3.5.28
+Stable tag:  3.5.29
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -580,6 +580,12 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.5.29 (2025-09-03) =
+* Bugfix: Order Status Conflict Issue with Tutor LMS
+* Bugfix: Contact Information Update Issue with Mail Mint
+* Bugfix: Automation Save and Delete not Working
+* Bugfix: PHP Deprecated Warnings
 
 = 3.5.28 (2025-08-22) =
 * Improvement: UI Improvement on the Global Settings

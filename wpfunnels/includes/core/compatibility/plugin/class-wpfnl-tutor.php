@@ -83,13 +83,13 @@ class Tutor extends PluginCompatibility{
                 $product_id = $offer_product['id'];
                 $order_id      = $order->get_id();
 				$order->update_meta_data( '_is_tutor_order_for_course', tutor_time() );
-				$order->update_status('completed');
-				$order->save();
 				
 				$if_has_course = tutor_utils()->product_belongs_with_course( $product_id );
 				if ( $if_has_course ) {
+					$order->update_status('completed');
+					$order->save();
+
 					$course_id   = $if_has_course->post_id;
-					
 					$is_enrolled = tutor_utils()->is_enrolled( $course_id, $customer_id );
 					if( !$is_enrolled ){
 						tutor_utils()->do_enroll( $course_id, $order_id, $customer_id );

@@ -576,7 +576,7 @@ class Notice {
      * @since  2.6.1
      */
     public function wpfnl_delete_promotional_banner( $payload ){
-        update_option('_hide_clms_early_access', 'no' );
+        update_option('_is_show_lms_banner', 'no' );
         return [
             'success' => true,
         ];
