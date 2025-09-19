@@ -4052,6 +4052,15 @@ body.rtl .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-colu
   border-color: #ffffff;
 }
 
+.wpfnl-order-bump__template-style1 .template-preview-wrapper .template-content .product-options {
+  margin: 10px 0px;
+}
+
+.wpfnl-order-bump__template-style1 .template-preview-wrapper .template-content .product-options .option-selector  {
+  cursor: pointer;
+  font-size: 14px;
+}
+
 .oderbump-loader {
   position: absolute;
   top: 0;

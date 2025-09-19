@@ -176,6 +176,18 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 					}
 				}
             } else {
+				$product = wc_get_product($product_id);
+				if ('variable' === $product->get_type()) {
+					$variations = $product->get_available_variations();
+					$quantity = $main_product['quantity'];
+					$this->add_default_variation($funnel_id, $step_id, $product_id, $product, $variations, $quantity);
+				} else {
+					if ('variation' === $product->get_type()) {
+						WC()->cart->add_to_cart($main_product['id'], $main_product['quantity'], isset($main_product['variation_id']) ? $main_product['variation_id'] : '', isset($main_product['variations']) ? $main_product['variations'] : [], $custom_price);
+					} else {
+						WC()->cart->add_to_cart($main_product['id'], $main_product['quantity'], 0, [], $custom_price);
+					}
+				}
                 \WC()->cart->add_to_cart( $product_id, $quantity, 0, [], $ob_cart_item_data);
             }
 
@@ -467,8 +479,15 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 	 * @since 2.0.5
 	 */
 	private function get_product_price( \WC_Product $product, $discount_apply = 'regular' ) {
-		$price       = $product->get_regular_price();
+		$price = $product->get_regular_price();
+		if ($product->get_type() == 'variable' || $product->get_type() == 'variable-subscription') {
+			$price = $product->get_variation_regular_price('min') ? $product->get_variation_regular_price('min') : $product->get_price();
+		} else {
+			$price = $product->get_regular_price() ? $product->get_regular_price() : $product->get_price();
+		}
+
 		$final_price = $discount_apply === 'sale' && $product->get_sale_price() ? $product->get_sale_price() : $price;
+
 		return apply_filters('wpfunnels/modify_order_bump_price_on_main_order', $final_price);
 	}
 

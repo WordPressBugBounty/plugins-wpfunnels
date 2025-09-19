@@ -173,6 +173,7 @@ class ProductsController extends Wpfnl_REST_Controller {
             'htmlPrice'         => '',
             'salePrice'         => '',
 			'regularPrice'      => '',
+			'isVariable'        => false,
         ];
         if( !empty( $data[ 'product' ] ) ) {
             $product = wc_get_product( $data[ 'product' ] );
@@ -210,11 +211,9 @@ class ProductsController extends Wpfnl_REST_Controller {
 		$data_quantity = !empty($data['quantity']) ? intval($data['quantity']) : 1;
 	
         // Determine the regular price based on product type.
-        $regular_price = $product->get_type() == 'variable' ? $product->get_price() : $product->get_regular_price();
-		
+        $regular_price = ($product->get_type() == 'variable' || $product->get_type() == 'variable-subscription') ? $product->get_price() : $product->get_regular_price();
 		$regular_price = floatval($regular_price);
 		$regular_price = $regular_price * $data_quantity;
-
 
         // Check if WooCommerce Subscriptions plugin is active and adjust the regular price if needed.
         if (is_plugin_active('woocommerce-subscriptions/woocommerce-subscriptions.php')) {
@@ -223,7 +222,7 @@ class ProductsController extends Wpfnl_REST_Controller {
         }
 
         // Determine the sale price based on product type.
-        $sale_price = $product->get_type() == 'variable' ? $product->get_price() : $product->get_sale_price();
+        $sale_price = ($product->get_type() == 'variable' || $product->get_type() == 'variable-subscription') ? $product->get_price() : $product->get_sale_price();
 		$sale_price = floatval($sale_price);
 		$sale_price = $sale_price * $data_quantity;
 
@@ -255,6 +254,7 @@ class ProductsController extends Wpfnl_REST_Controller {
             'htmlPrice'         => $sale_price ? wc_format_sale_price($regular_price, $sale_price) : wc_price($regular_price),
             'salePrice'         => wc_price(floatval($sale_price)),
             'regularPrice'      => wc_price(floatval($regular_price)),
+			'isVariable'        => $product->get_type() == 'variable' || $product->get_type() == 'variable-subscription'? true : false,
         ];
     }
 
@@ -359,7 +359,7 @@ class ProductsController extends Wpfnl_REST_Controller {
 				$product = wc_get_product($id);
 				if( $product ){
 					$type = $product->get_type();
-					if ($type == 'variable') {
+					if ($type == 'variable' || $type == 'variable-subscription') {
 						$variations = $product->get_available_variations();
 						foreach ($variations as $variation) {
 							$product = wc_get_product($variation['variation_id']);
@@ -421,7 +421,7 @@ class ProductsController extends Wpfnl_REST_Controller {
 		if( $product_objects ){
 			foreach ($product_objects as $product_object) {
 				$formatted_name = $product_object->get_formatted_name();
-				if($product_object->get_type() == 'variable') {
+				if($product_object->get_type() == 'variable' || $product_object->get_type() == 'variable-subscription') {
 					$variations = $product_object->get_available_variations();
 					if( !empty($variations) ){
 						foreach ($variations as $variation) {

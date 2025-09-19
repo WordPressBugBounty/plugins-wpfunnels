@@ -138,6 +138,19 @@ class Wpfunnels_Wc_Checkout extends Wpfnl_Funnel_Type
 
                             if ($product_object->get_type() == 'variable' || $product_object->get_type() == 'variable-subscription') {
                                 $variations = $product_object->get_available_variations();
+                                // Add parent product first
+                                $products[$product_object->get_id()] = [
+                                    'name' => rawurldecode($formatted_name),
+                                    'price' => wc_price($product_object->get_regular_price()),
+                                    'sale_price' => $product_object->get_sale_price() ? wc_price($product_object->get_sale_price()) : wc_price($product_object->get_regular_price()),
+                                    'html_price' => $product_object->get_price_html(),
+                                    'title' => $product_object->get_title(),
+                                    'img' => array(
+                                        'id' => $product_image_id,
+                                        'url' => $product_image_src,
+                                    ),
+                                    'description' => $product_object->get_short_description()
+                                ];
                                 if( !empty($variations) ){
                                     foreach ($variations as $variation) {
                                         $variation_product = wc_get_product($variation['variation_id']);

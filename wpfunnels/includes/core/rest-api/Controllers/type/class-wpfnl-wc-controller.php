@@ -165,6 +165,11 @@ class Wpfnl_Controller_Wc extends Wpfnl_Controller_Type
                     $_product = wc_get_product($settings['product']);
                     if( $_product ){
                         $regular_price = $_product->get_regular_price();
+                        if ($_product->get_type() == 'variable' || $_product->get_type() == 'variable-subscription') {
+                            $regular_price = $_product->get_variation_regular_price('min') ? $_product->get_variation_regular_price('min') : $_product->get_price();
+                        } else {
+                            $regular_price = $_product->get_regular_price() ? $_product->get_regular_price() : $_product->get_price();
+                        }
                         $regular_price = floatval($regular_price);
 		                $regular_price = $regular_price * $quantity;
                         $sale_price = $_product->get_sale_price();

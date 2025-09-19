@@ -438,6 +438,12 @@ class OrderBumpController extends Wpfnl_REST_Controller
             if( !isset($settings['obDescriptionColor']) || !$settings['obDescriptionColor'] ){
                 $all_settings[$key]['obDescriptionColor'] = '#7A8B9A';
             }
+            if(!isset($settings['obChooseVariantColor']) ||!$settings['obChooseVariantColor'] ){
+                $all_settings[$key]['obChooseVariantColor'] = '#F34D01';
+            }
+            if(!isset($settings['chooseVariantName']) ||!$settings['chooseVariantName'] ){
+                $all_settings[$key]['chooseVariantName'] = 'Choose an Option';
+            }
             
             if( !isset($settings['replaceSettings']) || !$settings['replaceSettings'] ){
                 $all_settings[$key]['replaceSettings'] = [

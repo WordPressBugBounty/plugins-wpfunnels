@@ -1043,6 +1043,7 @@ class Wpfnl_Admin
 				'user_role_manager_data'	=> Wpfnl_functions::get_user_role_settings(),
 				'availableGateways'			=> Wpfnl_functions::get_enabled_payment_gateways(),
 				'guidedTour'				=> Wpfnl_functions::get_guided_tour(),
+				'isWPFIntegrationActive' 	=> Wpfnl_functions::is_integrations_addon_active(),
 			));
 			wp_localize_script(
 				$this->plugin_name,

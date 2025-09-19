@@ -5,7 +5,7 @@ Tags: funnel builder, order bump, sales funnels, lead generation, custom checkou
 Requires at least: 6.1
 Tested up to:  6.8.2
 Requires PHP: 7.4
-Stable tag:  3.5.29
+Stable tag:  3.5.30
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -580,6 +580,14 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.5.30 (2025-09-19) =
+* Bugfix: WooCommerce Subscription Renewal Issue for Upsell/Downsell
+* Bugfix: Unsupported Payment Gateway Compatibility Issue
+* Bugfix: Fatal Error on Upsell Product
+* Bugfix: Skip Cart Settings UX Issue
+* Bugfix: Automation Step Settings Panel not Showing
+* Bugfix: Integrations Showing without Integration Plugin
 
 = 3.5.29 (2025-09-03) =
 * Bugfix: Order Status Conflict Issue with Tutor LMS

@@ -8223,10 +8223,6 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 .checkout-order-bump-setting-tab__content-wrapper .wpfnl-field-wrapper.no-title-checkbox .hints.mobile {
   display: none;
 }
-.checkout-order-bump-setting-tab__content-wrapper .product-select-wrapper {
-  border-top: 1px solid #E5E8F3;
-  padding-top: 25px;
-}
 .checkout-order-bump-setting-tab__content-wrapper .wpfnl-field-wrapper > label {
   width: 250px;
   position: relative;
@@ -8495,6 +8491,37 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   border-radius: 6px;
   border: 1px solid #EBEDF0;
   background: #F6F5FA;
+}
+.checkout-order-bump-setting-tab__content-wrapper .order-bump-settings-area .template-select-wrapper {
+  padding: 30px;
+  border: none;
+  border-top: 1px solid #E5E8F3;
+}
+.checkout-order-bump-setting-tab__content-wrapper .order-bump-settings-area .template-select-wrapper .wpfnl-field-wrapper .vc-color-wrap {
+  border-radius: 50%;
+}
+.checkout-order-bump-setting-tab__content-wrapper .order-bump-settings-area .template-select-wrapper .wpfnl-fields-with-color {
+  border-radius: 6px;
+  border: 1px solid #EBEDF0;
+  display: flex;
+  align-items: center;
+  padding: 0 1px;
+}
+.checkout-order-bump-setting-tab__content-wrapper .order-bump-settings-area .template-select-wrapper .wpfnl-fields-with-color .color-picker {
+  display: inline-block;
+  padding: 8px 11px;
+  border-right: 1px solid #EBEDF0;
+  padding-right: 1px;
+}
+.checkout-order-bump-setting-tab__content-wrapper .order-bump-settings-area .template-select-wrapper .wpfnl-fields-with-color .color-picker .vc-color-wrap {
+  border-radius: 50%;
+}
+.checkout-order-bump-setting-tab__content-wrapper .order-bump-settings-area .template-select-wrapper .wpfnl-fields-with-color input {
+  border-radius: 0;
+  border: none;
+}
+.checkout-order-bump-setting-tab__content-wrapper .order-bump-settings-area .template-select-wrapper .wpfnl-fields-with-color.wpfnl-description-color {
+  margin-bottom: 14px;
 }
 .checkout-order-bump-setting-tab__content-wrapper .wpfnl-pre-purchase-upsell .pro-tag-icon {
   transform: translateY(7px);
@@ -21492,6 +21519,14 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 }
 .wpfnl-order-bump__template-style1 .template-preview-wrapper .product-price ins {
   text-decoration: none;
+}
+.wpfnl-order-bump__template-style1 .template-preview-wrapper .product-options {
+  margin: 10px 0;
+}
+.wpfnl-order-bump__template-style1 .template-preview-wrapper .product-options .option-selector {
+  color: #F34D01;
+  cursor: pointer;
+  font-size: 14px;
 }
 .wpfnl-order-bump__template-style1 .offer-checkbox {
   background-color: #6E42D3;
