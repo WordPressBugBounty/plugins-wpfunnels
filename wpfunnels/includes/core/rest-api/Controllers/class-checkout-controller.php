@@ -84,6 +84,12 @@ class CheckoutController extends Wpfnl_REST_Controller {
 							'sanitize_callback' => 'sanitize_text_field',
 							'default'			=> 'wc',
 							'validate_callback' => 'rest_validate_request_arg'
+						),
+						'lms_provider'	  => array(
+							'type'				=> 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+							'default'			=> '',
+							'validate_callback' => 'rest_validate_request_arg'
 						)
 					),
 					'permission_callback' => array(

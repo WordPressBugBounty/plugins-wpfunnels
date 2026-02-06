@@ -78,7 +78,7 @@ class Wpfnl_Funnel_Store_Data extends Wpfnl_Abstract_Store_data implements Wpfnl
 			$this->set_id($funnel_id);
 		}
 
-		do_action('wpfunnels_after_funnel_creation');
+		do_action( 'wpfunnels_after_funnel_creation', $funnel_id );
 		return $funnel_id;
 	}
 

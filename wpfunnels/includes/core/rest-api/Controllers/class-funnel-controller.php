@@ -1023,7 +1023,8 @@ class FunnelController extends Wpfnl_REST_Controller
 				if (Wpfnl_functions::is_wc_active()) {
 					update_post_meta($funnel_id, '_wpfnl_funnel_type', 'wc');
 				} else {
-					if (Wpfnl_functions::is_lms_addon_active()) {
+					// Check if LMS add-on is active AND at least one LMS plugin (LearnDash or CreatorLMS) is active
+					if (Wpfnl_functions::is_lms_addon_active() && Wpfnl_functions::is_any_lms_plugin_active()) {
 						update_post_meta($funnel_id, '_wpfnl_funnel_type', 'lms');
 					}
 				}

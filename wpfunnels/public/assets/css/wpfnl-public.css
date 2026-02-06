@@ -1214,6 +1214,29 @@ body.wpfnl-theme-style-removed {
   border-radius: 2px;
 }
 
+.wpfunnel_steps-template .creator-lms-order-review-table-wrapper .creator-lms-course-thumbnail {
+  width: 60px;
+}
+.wpfunnel_steps-template .creator-lms-order-review-table-wrapper table .creator-lms-course-info-wrapper .creator-lms-course-thumbnail img {
+  width: 60px;
+}
+.wpfunnel_steps-template .creator-lms-order-review-table-wrapper table .creator-lms-course-info-wrapper .creator-lms-course-title {
+  width: calc(100% - 72px);
+}
+.wpfunnel_steps-template .creator-lms-order-review-table-wrapper table th:first-child,
+.wpfunnel_steps-template .creator-lms-order-review-table-wrapper table td:first-child {
+  width: 160px;
+}
+.wpfunnel_steps-template .wpfnl-lms-offer-checkout-modal-inner {
+  max-width: 1170px;
+}
+.wpfunnel_steps-template .creator-lms-checkout-coupon {
+  text-align: left;
+}
+.wpfunnel_steps-template .creator-lms-checkout-coupon .apply-coupon-btn {
+  text-align: center;
+}
+
 .wpfnl-checkout.floating-label #customer_details .form-row:not(.create-account) input.input-text:not(#billing_address_2, #shipping_address_2), .wpfnl-checkout.floating-label form.woocommerce-form-login .form-row-last input.input-text:not(#billing_address_2, #shipping_address_2),
 .wpfnl-checkout.floating-label form.woocommerce-form-login .form-row-first input.input-text:not(#billing_address_2, #shipping_address_2),
 .wpfnl-checkout.floating-label #customer_details .form-row:not(.create-account) textarea,

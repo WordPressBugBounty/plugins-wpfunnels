@@ -121,7 +121,8 @@ class Wpfnl_Public
 		add_action('wp', [$this, 'remove_woodmart_hook'], 150);
 
 		add_action( 'wp_footer', array( $this, 'load_variable_product_modal' ) );
-
+		
+		
 	}
 
 	/**
@@ -795,6 +796,7 @@ class Wpfnl_Public
 			$next_node 				= Wpfnl_functions::get_next_conditional_step($funnel_id, $current_page_id, $order);
 			$next_node       		= apply_filters('wpfunnels/next_step_data', $next_node);
 			$next_node       		= apply_filters('wpfunnels/modify_next_step_based_on_order', $next_node, $order);
+			
 			if (isset($next_node['step_type']) && 'thankyou' === $next_node['step_type']) {
 				if( Wpfnl_functions::is_global_thank_you_page_enabled() ){
 					return home_url() . '/checkout/order-received/' . $order_id . '/?key=' . $order_key;
@@ -811,6 +813,7 @@ class Wpfnl_Public
 			);
 			$query_args = apply_filters('wpfunnels/order_meta', $query_args, $order);
 			$next_step_url = $this->get_thankyou_step_url($funnel_id, $next_node['step_id'], $order);
+			error_log( 'Next Step URL after Thankyou check: ' . $next_step_url );
 			if ($next_step_url) {
 				return add_query_arg($query_args, $next_step_url);
 			}
@@ -838,6 +841,10 @@ class Wpfnl_Public
 		 */
 
 		$next_step_url 		= get_permalink($step_id);
+		$step_type 		= get_post_meta($step_id, '_step_type', true);
+		
+		
+
 		$thankyou_step_url  = '';
 		if (Wpfnl_functions::check_if_this_is_step_type_by_id($step_id, 'thankyou')) {
 			return apply_filters('wpfunnels/funnel_thankyou_page_url', $next_step_url, $order);
@@ -847,6 +854,10 @@ class Wpfnl_Public
 				$thankyou_step_url = get_permalink($thankyou_page_id);
 			}
 		}
+		if( ! defined( 'WPFNL_PRO_DIR' ) ){
+			$thankyou_step_url = $next_step_url;
+		}
+		
 		return apply_filters('wpfunnels/next_step_url', $thankyou_step_url, $next_step_url, $order);
 	}
 

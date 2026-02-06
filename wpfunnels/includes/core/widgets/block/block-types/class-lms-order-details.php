@@ -42,14 +42,14 @@ class LmsOrderDetails extends AbstractDynamicBlock {
 			$course_status_enable = isset($attributes['courseStatus']) ? $attributes['courseStatus']: 'on';
 
 			$globalTextColor = isset($attributes['globalTextColor']) ? $attributes['globalTextColor'] : '';
-			$lmsOrderDetailsHeaderBg = $attributes['lmsOrderDetailsHeaderBg'];
-			$lmsOrderDetailsHeaderColor = $attributes['lmsOrderDetailsHeaderColor'];
-			$lmsOrderDetailsHeaderBorderColor = $attributes['lmsOrderDetailsHeaderBorderColor'];
+			$lmsOrderDetailsHeaderBg = $attributes['lmsOrderDetailsHeaderBg'] ?? '';
+			$lmsOrderDetailsHeaderColor = $attributes['lmsOrderDetailsHeaderColor'] ?? '';
+			$lmsOrderDetailsHeaderBorderColor = $attributes['lmsOrderDetailsHeaderBorderColor'] ?? '';
 
-			$lmsOrderDetailsBodyBg = $attributes['lmsOrderDetailsBodyBg'];
-			$lmsOrderDetailsBodyTextColor = $attributes['lmsOrderDetailsBodyTextColor'];
-			$lmsOrderDetailsBodyLinkColor = $attributes['lmsOrderDetailsBodyLinkColor'];
-			$lmsOrderDetailsBodyBorderColor = $attributes['lmsOrderDetailsBodyBorderColor'];
+			$lmsOrderDetailsBodyBg = $attributes['lmsOrderDetailsBodyBg'] ?? '';
+			$lmsOrderDetailsBodyTextColor = $attributes['lmsOrderDetailsBodyTextColor'] ?? '';
+			$lmsOrderDetailsBodyLinkColor = $attributes['lmsOrderDetailsBodyLinkColor'] ?? '';
+			$lmsOrderDetailsBodyBorderColor = $attributes['lmsOrderDetailsBodyBorderColor'] ?? '';
 
 			ob_start();
 			$step_id  = isset($_POST['post_id']) ? $_POST['post_id'] : get_the_ID();
@@ -59,18 +59,18 @@ class LmsOrderDetails extends AbstractDynamicBlock {
 				$order_details = Wpfnl_lms_learndash_functions::get_lms_order_details( get_current_user_id() ,$funnel_id );
 				if (!empty($order_details)){
 					foreach($order_details as $details){
-						$course_details =  $details['course_details'];
-						$payment_method =  $details['payment_method'];
+						$course_details =  isset($details['course_details']) ? $details['course_details'] : [];
+						$payment_method =  isset($details['payment_method']) ? $details['payment_method'] : '';
 
-						$course_type 		= $course_details['type'];
-						$billing_cycle 		= $course_details['billing_cycle'];
-						$recurring_time 	= $course_details['recurring_time'];
-						$price 				= $course_details['price'];
-						$trial_price 		= $course_details['trial_price'];
-						$trial_period 		= $course_details['trial_period'];
-						$is_expire 			= $course_details['is_expire'];
-						$expire_days 		= $course_details['expire_days'];
-						$currency  = $course_details['currency'];
+						$course_type 		= (isset($course_details['type']) ? $course_details['type'] : '');
+						$billing_cycle 		= isset($course_details['billing_cycle']) ? $course_details['billing_cycle'] : '';
+						$recurring_time 	= isset($course_details['recurring_time']) ? $course_details['recurring_time'] : '';
+						$price 				= isset($course_details['price']) ? $course_details['price'] : '';
+						$trial_price 		= isset($course_details['trial_price']) ? $course_details['trial_price'] : '';
+						$trial_period 		= isset($course_details['trial_period']) ? $course_details['trial_period'] : '';
+						$is_expire 			= isset($course_details['is_expire']) ? $course_details['is_expire'] : '';
+						$expire_days 		= isset($course_details['expire_days']) ? $course_details['expire_days'] : '';
+						$currency  			= isset($course_details['currency']) ? $course_details['currency'] : '';
 						$price  			= isset($details['amount']) ? $details['amount'] : $price;
 
 						//----course type------
@@ -88,13 +88,13 @@ class LmsOrderDetails extends AbstractDynamicBlock {
 						}
 
 						//----billing cycle unit------
-						if( $course_details['billing_cycle_unit'] == 'Y' ) {
+						if( isset($course_details['billing_cycle_unit']) && $course_details['billing_cycle_unit'] == 'Y' ) {
 							$billing_cycle_unit_text = 'year';
 
-						}else if( $course_details['billing_cycle_unit'] == 'M' ){
+						}else if( isset($course_details['billing_cycle_unit']) && $course_details['billing_cycle_unit'] == 'M' ){
 							$billing_cycle_unit_text = 'month';
 
-						}else if( $course_details['billing_cycle_unit'] == 'W' ){
+						}else if( isset($course_details['billing_cycle_unit']) && $course_details['billing_cycle_unit'] == 'W' ){
 							$billing_cycle_unit_text = 'week';
 
 						}else {
@@ -102,13 +102,13 @@ class LmsOrderDetails extends AbstractDynamicBlock {
 						}
 
 						//----trial period unit------
-						if( $course_details['trial_period_unit'] == 'Y' ) {
+						if( isset($course_details['trial_period_unit']) && $course_details['trial_period_unit'] == 'Y' ) {
 							$trial_period_unit_text = 'year';
 
-						}else if( $course_details['trial_period_unit'] == 'M' ){
+						}else if( isset($course_details['trial_period_unit']) && $course_details['trial_period_unit'] == 'M' ){
 							$trial_period_unit_text = 'month';
 
-						}else if( $course_details['trial_period_unit'] == 'W' ){
+						}else if( isset($course_details['trial_period_unit']) && $course_details['trial_period_unit'] == 'W' ){
 							$trial_period_unit_text = 'week';
 
 						}else {
@@ -139,8 +139,8 @@ class LmsOrderDetails extends AbstractDynamicBlock {
 								<?php if($course_details_enable == 'on') {?>
 									<div class="order-item course-info">
 								<span class="course-name">
-									<span><?php echo $course_details['title']; ?></span>
-									<a href="<?php echo get_post_permalink($course_details['id']) ?>">View Course</a>
+									<span><?php echo isset($course_details['title']) ? $course_details['title'] : ''; ?></span>
+									<a href="<?php echo isset($course_details['id']) ? get_post_permalink($course_details['id']) : '#'; ?>">View Course</a>
 								</span>
 
 										<span class="price-total">
@@ -212,7 +212,7 @@ class LmsOrderDetails extends AbstractDynamicBlock {
 										}elseif( !empty( $trial_period ) ){
 											echo $currency.$trial_price;
 										}else{
-											echo $course_details['currency'].$price;
+											echo isset($course_details['currency']) ? $course_details['currency'] : '' . $price;
 										}
 
 										?>

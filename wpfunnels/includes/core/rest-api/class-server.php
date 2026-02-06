@@ -84,13 +84,16 @@ class Server
 			'templates_library'     => 'TemplateLibraryController',
 			'order_bump'            => 'OrderBumpController',
 			'funnel_control'        => 'FunnelController',
+			'offer'                 => 'OfferController',
 			'step_control'        	=> 'StepController',
 			'remote_funnel'         => 'RemoteFunnelsController',
 			'products'         		=> 'ProductsController',
 			'gutenberg'         	=> 'GutenbergCSSController',
             'checkout'              => 'CheckoutController',
+            'importexport'          => 'ImportExportController',
             'report'              	=> 'DashboardController',
             'plugin_installer'      => 'PluginInstallerController',
+            'setup_wizard'          => 'SetupWizardController',
 		));
     }
 

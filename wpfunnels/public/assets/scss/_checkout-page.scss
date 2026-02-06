@@ -764,7 +764,33 @@
         }
 
     }
+}
 
+.wpfunnel_steps-template {
+	.creator-lms-order-review-table-wrapper .creator-lms-course-thumbnail {
+		width: 60px;
+	}
+	.creator-lms-order-review-table-wrapper table .creator-lms-course-info-wrapper .creator-lms-course-thumbnail img {
+		width: 60px;
+	}
+	.creator-lms-order-review-table-wrapper table .creator-lms-course-info-wrapper .creator-lms-course-title {
+		width: calc(100% - 72px);
+	}
+	.creator-lms-order-review-table-wrapper table th:first-child, 
+	.creator-lms-order-review-table-wrapper table td:first-child {
+		width: 160px;
+	}
+
+	.wpfnl-lms-offer-checkout-modal-inner {
+		max-width: 1170px;
+	}
+	.creator-lms-checkout-coupon {
+		text-align: left;
+	}
+	.creator-lms-checkout-coupon .apply-coupon-btn {
+		text-align: center;
+	}
+	
 }
 
 

@@ -638,6 +638,7 @@ class SettingsController extends Wpfnl_REST_Controller {
         $name =  isset($request['name']) ? sanitize_text_field($request['name']) : '';
         $createContactInstance = new \WPFunnels\Admin\SetupWizard\CreateContact($email, $name );
         $response = $createContactInstance->create_contact_via_webhook();
+        update_option( 'wpfunnels_activation_email', $email );
         $createContactInstance->send_contact_to_appsero();
         return rest_ensure_response( $response );
     }

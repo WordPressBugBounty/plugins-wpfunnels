@@ -92,6 +92,11 @@ class WPFNL_DiviModules {
             if ($step_type == 'thankyou') {
                 new WPFNL_Order_details;
             }
+            
+            // Add OfferButton for upsell/downsell steps only if Pro is not active
+            if ( ! Wpfnl_functions::is_wpfnl_pro_activated() && ( $step_type == 'upsell' || $step_type == 'downsell' ) ) {
+                require_once __DIR__ . '/modules/OfferButton/OfferButton.php';
+            }
         }
 
         if ($step_type == 'checkout') {

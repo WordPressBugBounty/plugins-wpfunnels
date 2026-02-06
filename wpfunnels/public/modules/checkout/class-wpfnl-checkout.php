@@ -99,7 +99,7 @@ class Module extends Wpfnl_Frontend_Module
 	 */
 	public function checkout_flag($is_checkout)
 	{
-		if (Wpfnl_functions::check_if_this_is_step_type('checkout')) {
+		if (Wpfnl_functions::check_if_this_is_step_type('checkout') && ! Wpfnl_functions::check_if_this_is_lms_step() ) {
 			$is_checkout = true;
 		}
 		return $is_checkout;

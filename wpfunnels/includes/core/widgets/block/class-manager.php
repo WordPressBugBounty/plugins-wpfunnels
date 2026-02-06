@@ -64,6 +64,7 @@ final class Manager {
         add_action( 'init', array( $this, 'register_blocks' ) );
 		add_action( 'wp_footer', array( $this, 'wpfnl_inline_footer_scripts' ) );
 		add_action( 'wp_head', array( $this, 'add_block_inline_css' ), 100 );
+		add_filter( 'block_categories_all', array( $this, 'register_block_category' ), 10, 2 );
 		new Wpfnl_Gutenberg_Editor();
 	}
 
@@ -94,12 +95,19 @@ final class Manager {
      * @return array
      */
     protected function get_block_types() {
-        return apply_filters('wpfunnels/gutenberg_block_types', array(
+        $block_types = array(
             'NextStepButton',
             'CheckoutForm',
             'OrderDetails',
             'OptinForm',
-        ));
+        );
+        
+        // Add OfferButton only if Pro is not active
+        if ( ! Wpfnl_functions::is_wpfnl_pro_activated() ) {
+            $block_types[] = 'OfferButton';
+        }
+        
+        return apply_filters('wpfunnels/gutenberg_block_types', $block_types);
     }
 
 
@@ -162,5 +170,25 @@ final class Manager {
 				echo '<style type="text/css">' . get_post_meta( get_the_ID(), '_wpfunnels_gb_css', true ) . '</style>';
 			}
 		}
+	}
+
+	/**
+	 * Register WPFunnels block category
+	 *
+	 * @param array $categories Block categories.
+	 * @param object $post Post object.
+	 * @return array Modified block categories.
+	 */
+	public function register_block_category( $categories, $post ) {
+		return array_merge(
+			$categories,
+			array(
+				array(
+					'slug'  => 'wpfunnels',
+					'title' => __( 'WPFunnels', 'wpfnl' ),
+					'icon'  => null,
+				),
+			)
+		);
 	}
 }

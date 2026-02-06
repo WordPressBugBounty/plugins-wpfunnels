@@ -51,7 +51,13 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
             }
 
             // Get custom product title from order bump settings
-            $custom_product_title = isset($order_bump_settings['productName']) ? $order_bump_settings['productName'] : '';
+            // For auto-match mode, use actual product name instead of placeholder
+            $is_auto_match = isset($order_bump_settings['offerSelectionMode']) && $order_bump_settings['offerSelectionMode'] === 'auto-match';
+            if( $is_auto_match ) {
+                $custom_product_title = $_product->get_name();
+            } else {
+                $custom_product_title = isset($order_bump_settings['productName']) ? $order_bump_settings['productName'] : '';
+            }
             
             // Clean and store prices for cart and display
             $discounted_price = preg_replace('/[^\d.]/', '', $product_price );
@@ -249,10 +255,18 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 			}
 
             // Get custom description from order bump settings, fallback to WooCommerce product description
+            // For auto-match mode, always use actual product description
             $product_description = '';
-            if ( !empty($order_bump_settings['productDescriptionText']) ) {
+            $is_auto_match = isset($order_bump_settings['offerSelectionMode']) && $order_bump_settings['offerSelectionMode'] === 'auto-match';
+            
+            if( $is_auto_match && $product ) {
+                // For auto-match, use actual product description
+                $product_description = $product->get_description() ?: $product->get_short_description();
+            } elseif ( !empty($order_bump_settings['productDescriptionText']) ) {
+                // For manual mode, use custom description from settings
                 $product_description = $order_bump_settings['productDescriptionText'];
             } elseif ( $product ) {
+                // Fallback to product description
                 $product_description = $product->get_short_description() ?: $product->get_description();
             }
 

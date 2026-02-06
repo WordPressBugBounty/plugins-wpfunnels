@@ -48,10 +48,10 @@ abstract class Wpfnl_Source_Base
 		// update the funnel metadata with newly created step
 		$this->save_steps_meta_data( $payload['funnelID'], $imported_steps );
 
-        // Reinitialize the funnel data if freemium steps are exists on funnel data. Because free user only can
-		// import the free steps of a freemium funnel.
+        // Reinitialize the funnel data if Pro is not active and template contains downsell
+		// This removes downsell nodes from the canvas for free users
 		$is_pro_active = apply_filters( 'wpfunnels/is_pro_license_activated', false );
-        if ( !$is_pro_active && 'freemium' === $payload['templateType'] ) {
+        if ( !$is_pro_active ) {
 			$node_data 									= $funnel_data['drawflow']['Home']['data'];
 			$filter_data 								= $this->filter_node_data($node_data);
 			$funnel_data['drawflow']['Home']['data'] 	= $filter_data;
@@ -121,10 +121,9 @@ abstract class Wpfnl_Source_Base
 		}
 		$filtered_array = [];
 		$thank_you_found = false;
-
 		foreach ($steps_array as $key => $step) {
-			// Skip upsell and downsell steps
-			if ($step['data']['step_type'] === 'upsell' || $step['data']['step_type'] === 'downsell') {
+			// Skip downsell steps
+			if ( $step['data']['step_type'] === 'downsell') {
 				continue;
 			}
 
@@ -134,8 +133,8 @@ abstract class Wpfnl_Source_Base
 				$thank_you_found = true;
 			}
 
-			// If it's not an upsell, downsell, or the first thankyou, add it
-			if ( ($step['data']['step_type'] !== 'upsell' && $step['data']['step_type'] !== 'downsell' && !$thank_you_found) || in_array($step['data']['step_type'], array('landing', 'checkout')) ) {
+			// If it's not an downsell, or the first thankyou, add it
+			if ( ( $step['data']['step_type'] !== 'downsell' && !$thank_you_found) || in_array($step['data']['step_type'], array('landing', 'checkout', 'upsell' )) ) {
 				$filtered_array[$key] = $step;
 			}
 		}
@@ -143,37 +142,92 @@ abstract class Wpfnl_Source_Base
 		// Find the checkout and thankyou steps
 		$checkout_id = null;
 		$thank_you_id = null;
+		$upsell_id = null;
+		$upsell_step_id = null;
 
 		foreach ($filtered_array as $key => $step) {
 			if ($step['data']['step_type'] === 'checkout') {
 				$checkout_id = $key;
 			} elseif ($step['data']['step_type'] === 'thankyou') {
 				$thank_you_id = $key;
+			} elseif ($step['data']['step_type'] === 'upsell') {
+				$upsell_id = $key;
+				$upsell_step_id = $step['data']['step_id'];
 			}
 		}
 
-		// Update inputs of thankyou and outputs of checkout
-		$filtered_array[$thank_you_id]['inputs'] = [
-			'input_1' => [
-				'connections' => [
-					[
-						'node' => $checkout_id,
-						'input' => 'output_1'
+		if( $upsell_id === null  ) {
+			// Update inputs of thankyou and outputs of checkout
+			$filtered_array[$thank_you_id]['inputs'] = [
+				'input_1' => [
+					'connections' => [
+						[
+							'node' => $checkout_id,
+							'input' => 'output_1'
+						]
 					]
 				]
-			]
-		];
+			];
 
-		$filtered_array[$checkout_id]['outputs'] = [
-			'output_1' => [
-				'connections' => [
-					[
-						'node' => $thank_you_id,
-						'output' => 'input_1'
+			$filtered_array[$checkout_id]['outputs'] = [
+				'output_1' => [
+					'connections' => [
+						[
+							'node' => $thank_you_id,
+							'output' => 'input_1'
+						]
 					]
 				]
-			]
-		];
+			];
+		}else{
+			$filtered_array[$upsell_id]['inputs'] = [
+				'input_1' => [
+					'connections' => [
+						[
+							'node' => $checkout_id,
+							'input' => 'output_1'
+						]
+					]
+				]
+			];
+
+			$filtered_array[$upsell_id]['outputs'] = [
+				'output_1' => [
+					'connections' => [
+						[
+							'node' => $thank_you_id,
+							'output' => 'input_1'
+						]
+					]
+				]
+			];
+			
+			$filtered_array[$checkout_id]['outputs'] = [
+				'output_1' => [
+					'connections' => [
+						[
+							'node' => $upsell_id,
+							'output' => 'input_1'
+						]
+					]
+				]
+			];
+
+			// Update inputs of thankyou and outputs of checkout
+			$filtered_array[$thank_you_id]['inputs'] = [
+				'input_1' => [
+					'connections' => [
+						[
+							'node' => $upsell_id,
+							'input' => 'output_1'
+						]
+					]
+				]
+			];
+
+			delete_post_meta( $upsell_step_id, '_wpfnl_maybe_enable_condition' );
+		}
+		
 
 		return $filtered_array;
 	}

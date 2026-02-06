@@ -25,6 +25,153 @@ class SetupWizard
     }
 
     /**
+     * Register AJAX handlers
+     * This should be called early, not just when rendering the wizard
+     *
+     * @since 3.3.1
+     */
+    public static function register_ajax_handlers() {
+        add_action('wp_ajax_wpfnl_activate_plugin', array(__CLASS__, 'ajax_activate_plugin_static'));
+        add_action('wp_ajax_wpfnl_update_step_meta', array(__CLASS__, 'ajax_update_step_meta'));
+        add_action('wp_ajax_wpfnl_activate_mail_mint', array(__CLASS__, 'ajax_activate_mail_mint'));
+    }
+
+    /**
+     * AJAX handler for updating step meta
+     *
+     * @since 3.3.1
+     */
+    public static function ajax_update_step_meta() {
+        // Check user capabilities
+        if (!current_user_can('wpf_manage_funnels')) {
+            wp_send_json_error(array('message' => 'Insufficient permissions'));
+            wp_die();
+        }
+
+        $step_id = isset($_POST['step_id']) ? absint($_POST['step_id']) : 0;
+        $meta_key = isset($_POST['meta_key']) ? sanitize_text_field($_POST['meta_key']) : '';
+        $meta_value = isset($_POST['meta_value']) ? $_POST['meta_value'] : '';
+
+        if (!$step_id || !$meta_key) {
+            wp_send_json_error(array('message' => 'Invalid parameters'));
+            wp_die();
+        }
+
+        // Decode JSON if it's a JSON string
+        if (is_string($meta_value) && (substr($meta_value, 0, 1) === '{' || substr($meta_value, 0, 1) === '[')) {
+            $decoded = json_decode(stripslashes($meta_value), true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $meta_value = $decoded;
+            }
+        }
+
+        update_post_meta($step_id, $meta_key, $meta_value);
+
+        wp_send_json_success(array(
+            'message' => 'Meta updated successfully',
+            'step_id' => $step_id,
+            'meta_key' => $meta_key
+        ));
+        wp_die();
+    }
+
+    /**
+     * Static AJAX handler for plugin activation
+     *
+     * @since 3.3.1
+     */
+    public static function ajax_activate_plugin_static() {
+        // Check user capabilities first
+        if (!current_user_can('activate_plugins')) {
+            wp_send_json_error(array('message' => 'Insufficient permissions'));
+            wp_die();
+        }
+
+        // Get the plugin parameter
+        $plugin = isset($_POST['plugin']) ? sanitize_text_field($_POST['plugin']) : '';
+
+        if (empty($plugin)) {
+            wp_send_json_error(array('message' => 'Plugin parameter is required'));
+            wp_die();
+        }
+
+        // Check if plugin file exists
+        $plugin_file = WP_PLUGIN_DIR . '/' . $plugin;
+        if (!file_exists($plugin_file)) {
+            wp_send_json_error(array('message' => 'Plugin file not found: ' . $plugin));
+            wp_die();
+        }
+
+        // Check if already active
+        if (is_plugin_active($plugin)) {
+            wp_send_json_success(array('message' => 'Plugin is already active'));
+            wp_die();
+        }
+
+        // Activate the plugin
+        $result = activate_plugin($plugin, '', false, true);
+
+        if (is_wp_error($result)) {
+            wp_send_json_error(array('message' => $result->get_error_message()));
+            wp_die();
+        }
+
+        // Special handling for WooCommerce
+        if (strpos($plugin, 'woocommerce') !== false) {
+            delete_transient('_wc_activation_redirect');
+        }
+
+        // Special handling for Elementor
+        if (strpos($plugin, 'elementor') !== false) {
+            update_option('elementor_onboarded', true);
+        }
+
+        wp_send_json_success(array('message' => 'Plugin activated successfully', 'plugin' => $plugin));
+        wp_die();
+    }
+
+    /**
+     * AJAX handler for Mail Mint activation with explicit database initialization
+     * This ensures Mail Mint databases are created even on PHP 7.4
+     *
+     * @since 3.3.1
+     */
+    public static function ajax_activate_mail_mint() {
+        // Check user capabilities first
+        if (!current_user_can('activate_plugins')) {
+            wp_send_json_error(array('message' => 'Insufficient permissions'));
+            wp_die();
+        }
+
+        // Activate the Mail Mint plugin
+        $mail_mint_plugin = 'mail-mint/mail-mint.php';
+        
+        if (!is_plugin_active($mail_mint_plugin)) {
+            $result = activate_plugin($mail_mint_plugin, '', false, true);
+            
+            if (is_wp_error($result)) {
+                wp_send_json_error(array('message' => $result->get_error_message()));
+                wp_die();
+            }
+        }
+
+        // Explicitly trigger Mail Mint activation logic to ensure database creation
+        $mail_mint_file = WP_PLUGIN_DIR . '/' . $mail_mint_plugin;
+        if (file_exists($mail_mint_file)) {
+            require_once WP_PLUGIN_DIR . '/mail-mint/includes/MrmActivator.php';
+            
+            // Call the activation method directly to ensure databases are created
+            \MrmActivator::activate();
+            
+            // Remove the Mail Mint setup wizard transient to prevent it from showing
+            delete_transient('mailmint_show_setup_wizard');
+        }
+
+        wp_send_json_success(array('message' => 'Mail Mint activated and initialized successfully'));
+        wp_die();
+    }
+
+    /**
      * Initialize setup wizards
      *
      * @since 1.0.0
@@ -91,6 +238,16 @@ class SetupWizard
         }
         $installed_plugins = get_plugins();
 
+        $product_url = esc_url_raw(
+            add_query_arg(
+                array(
+                    'post_type'      => 'product',
+                    'wpfunnels' => 'yes',
+                ),
+                admin_url('post-new.php')
+            )
+        );
+
         // Admin Name & Email Finding Starts
         $admin_email = get_option('admin_email');
         $admin_user = get_user_by('email', $admin_email);
@@ -103,11 +260,17 @@ class SetupWizard
         wp_localize_script('setup-wizard', 'setup_wizard_obj',
             array(
                 'rest_api_url'          => esc_url_raw(get_rest_url()),
+                'ajax_url'              => esc_url_raw(admin_url('admin-ajax.php')),
+                'admin_url'             => esc_url_raw(admin_url()),
                 'dashboard_url'         => esc_url_raw(admin_url('admin.php?page=' . WPFNL_MAIN_PAGE_SLUG)),
                 'settings_url'          => class_exists( 'WooCommerce' ) ? esc_url_raw(admin_url('admin.php?page=wpfnl_settings')) : esc_url_raw(admin_url()),
                 'wizard_url'            => esc_url_raw(admin_url('admin.php?page=wpfunnels-setup')),
                 'home_url'              => esc_url_raw(home_url()),
                 'nonce'                 => wp_create_nonce('wp_rest'),
+                'product_url' 				=> $product_url,
+                'admin_nonce'           => wp_create_nonce('wpfnl-admin'),
+                'currency_symbol'       => class_exists( 'WooCommerce' ) ? get_woocommerce_currency_symbol() : '$',
+                'currency_position'     => class_exists( 'WooCommerce' ) ? get_option('woocommerce_currency_pos', 'left') : 'left',
                 'current_step'          => $this->step_name,
                 'steps'                 => $this->steps,
                 'next_step_link'        => $this->get_next_step_link(),
@@ -125,6 +288,7 @@ class SetupWizard
                 'is_ff_active'          => is_plugin_active( 'fluentform/fluentform.php' ) ? 'yes' : 'no',
                 'is_cl_active'          => is_plugin_active( 'cart-lift/cart-lift.php' ) ? 'yes' : 'no',
                 'is_qb_active'          => is_plugin_active( 'qubely/qubely.php' ) ? 'yes' : 'no',
+                'is_pro_active'         => Wpfnl_functions::is_wpfnl_pro_activated() ? 'yes' : 'no',
                 'funnel_type'           => $this->get_funnel_type(),
                 'getPlugins'            => $this->get_essential_plugins(),
                 'defaultSettings'       => Wpfnl_functions::get_general_settings(),

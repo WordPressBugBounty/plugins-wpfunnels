@@ -872,6 +872,7 @@ export default {
 
             wpAjaxHelperRequest("wpfunnel-import-funnel", data)
                 .success(function (response) {
+                    console.log("Funnel Created Successfully!");
                     let looper = j.Deferred().resolve(),
                         first_step_id = 0;
                     j.when.apply(j, j.map(that.steps, function (step, index) {

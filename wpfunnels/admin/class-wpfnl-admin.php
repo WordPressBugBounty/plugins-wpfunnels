@@ -1009,10 +1009,12 @@ class Wpfnl_Admin
 				'shippingMethod' 			=> $this->get_shipping_method(),
 				'isGbf' 					=> $this->maybe_gbf($funnel_id),
 				'isLms' 					=> $this->maybe_lms($funnel_id),
+				'lmsProvider' 				=> $this->get_lms_provider(),
 				'isLmsActivated' 			=> Wpfnl_functions::is_lms_addon_active(),
+				'isAnyLmsPluginActive' 		=> Wpfnl_functions::is_any_lms_plugin_active(),
 				'isLmsSettings' 			=> Wpfnl_functions::is_enable_lms_settings(),
 				'isLmsDisbaled' 	        => $this->maybe_lms_settings_disbaled(),
-				'lmsVersion'				=> defined('WPFNL_PRO_LMS_VERSION') || defined('WPFUNNELS_PRO_LMS_VERSION') ? version_compare(LEARNDASH_VERSION, '4.2.1.1', '>=') : false,
+				'lmsVersion'				=>( defined('WPFNL_PRO_LMS_VERSION') || defined('WPFUNNELS_PRO_LMS_VERSION') ) && defined('LEARNDASH_VERSION') ? version_compare(LEARNDASH_VERSION, '4.2.1.1', '>=') : false,
 				'global_funnel_type' 		=> Wpfnl_functions::get_global_funnel_type(),
 				'individual_funnel_type' 	=> get_post_meta($funnel_id, '_wpfnl_funnel_type', true),
 				'gbf_set_condition_steps'	=> $this->get_gbf_steps($funnel_id),
@@ -1138,6 +1140,14 @@ class Wpfnl_Admin
 
 			do_action('wpfunnels_after_scripts_loaded');
 		}
+	}
+
+
+	public function get_lms_provider()
+	{	
+		$lms_settings = get_option( '_wpfunnels_lms_settings', array() );
+		$provider_id  = isset( $lms_settings['lms_provider'] ) ? $lms_settings['lms_provider'] : 'learndash';
+		return $provider_id;
 	}
 
 

@@ -145,7 +145,6 @@ export default {
 							if ( that.shouldImportStep( step.step_type ) ) {
 								looper = looper.then(function() {
 									return that.createStep( step, response.funnelID, index, that ).then(function( response ) {
-										console.log(response)
 										stepCount++;
 										importedSteps.push( response.stepID )
 									});
@@ -167,7 +166,7 @@ export default {
 			if ( isProActivated ) {
 				return true
 			}
-			return !['upsell', 'downsell'].includes(stepType);
+			return !['downsell'].includes(stepType);
 		},
 		filterSteps: function(steps) {
 			let isProActivated = window.WPFunnelVars.isProActivated == 1;
@@ -175,7 +174,7 @@ export default {
 				return steps;
 			} else {
 				return steps.filter((step, index, self) => {
-					return step.step_type !== 'upsell' && step.step_type !== 'downsell' &&
+					return step.step_type !== 'downsell' &&
 						index === self.findIndex(s => s.step_type === step.step_type);
 				});
 			}

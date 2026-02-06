@@ -474,9 +474,13 @@ class OrderBumpController extends Wpfnl_REST_Controller
                 }
             }
         }
+        // Add global funnel status to response
+        $funnel_id = get_post_meta($step_id, '_funnel_id', true);
+        $is_global_funnel = get_post_meta($funnel_id, 'is_global_funnel', true);
        
         $response['success']     = true;
         $response['data']        = $all_settings;
+        $response['isEnableGbf'] = $is_global_funnel === 'yes' ? true : false;
         $response['ob_position'] = $step_id ? Wpfnl_functions::supported_orderbump_position( $step_id ) : [];
         return rest_ensure_response($response);
         

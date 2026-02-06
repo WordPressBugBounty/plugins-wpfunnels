@@ -9,7 +9,7 @@ namespace WPFunnels\Admin\SetupWizard;
 class CreateContact {
     
     protected $webHookUrl = [
-        'https://useraccount.getwpfunnels.com/?mailmint=1&route=webhook&topic=contact&hash=20319037-b98b-4566-a327-921e0878eb2a'
+        'https://useraccount.getwpfunnels.com/?mailmint=1&route=webhook&topic=contact&hash=4ac0c970-adcb-42da-a64d-17620b35baa7',
     ];
 
     /**
@@ -116,10 +116,10 @@ class CreateContact {
 
         $json_body_data = json_encode([
             'email'         => $this->email,
-            'first_name'    => $this->name
+            'first_name'    => $this->name,
         ]);
 
-        try{
+        try{ 
             if( !empty($this->webHookUrl ) ){
                 foreach( $this->webHookUrl as $url ){
                     $response = wp_remote_request($url, [
@@ -167,6 +167,65 @@ class CreateContact {
         $data['admin_email'] = $this->email;
         $data['first_name'] = $this->name;
         return $data;
+    }
+
+    public function update_contact_via_webhook($funnel_data) {
+        if( !$this->email ){
+            return false;
+        }
+
+        $json_body_data = json_encode([
+            'email'               => $this->email,
+            'wpfunnel_id'         => $funnel_data['funnel_id'],
+            'wpfunnel_title'      => $funnel_data['funnel_title'],
+            'wpfunnel_status'     => $funnel_data['funnel_status'],
+            'wpfunnel_created_at' => $funnel_data['created_date'],
+        ]);
+
+        try{
+            $response = wp_remote_request('https://useraccount.getwpfunnels.com/?mailmint=1&route=webhook&topic=contact&hash=227a9d2a-10e0-47ba-a729-ddbb0c9b87c3', [
+                'method'  => 'POST',
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'body' => $json_body_data
+            ]);
+        }catch(\Exception $e){
+            $response = [
+                'suceess' => false,
+            ];
+        }
+        
+        return $response;
+    }
+
+    public function update_contact_order_via_webhook($order_data) {
+        if( !$this->email ){
+            return false;
+        }
+
+        $json_body_data = json_encode([
+            'email'                    => $this->email,
+            'wpfunnel_total_orders'    => $order_data['total_orders'],
+            'wpfunnel_total_revenue'   => $order_data['total_revenue'],
+            'wpfunnel_last_order_date' => $order_data['last_order_date'],
+        ]);
+
+        try{
+            $response = wp_remote_request('https://useraccount.getwpfunnels.com/?mailmint=1&route=webhook&topic=contact&hash=3bdd62ee-05a2-4ab3-9d24-48b6e74b2c06', [
+                'method'  => 'POST',
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'body' => $json_body_data
+            ]);
+        }catch(\Exception $e){
+            $response = [
+                'suceess' => false,
+            ];
+        }
+        
+        return $response;
     }
 }
 ?>

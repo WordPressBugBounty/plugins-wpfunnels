@@ -211,10 +211,37 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 	 *
 	 * @return WP_REST_Response
 	 */
+	/**
+	 * Prepare a single setting object for response.
+	 *
+	 * @param $request
+	 *
+	 * @return WP_REST_Response
+	 */
 	public function get_templates( $request ) {
-		$funnel_template_type = isset( $_GET['type'] ) ? $_GET['type'] : 'wc';
+		// Determine available template types based on active plugins
+		$default_type = 'lead'; // Default to lead gen which is always available
+		
+		// Check if WooCommerce is active - prioritize it
+		if ( Wpfnl_functions::is_wc_active() ) {
+			$default_type = 'wc';
+		}
+		// Check if LMS add-on and at least one LMS plugin (LearnDash or CreatorLMS) is active
+		elseif ( Wpfnl_functions::is_lms_addon_active() && Wpfnl_functions::is_any_lms_plugin_active() ) {
+			$default_type = 'lms';
+		}
+		
+		$funnel_template_type = isset( $_GET['type'] ) ? $_GET['type'] : $default_type;
+
+        // Map 'sales' to 'wc' if passed, as API uses 'wc'
+        if ( 'sales' === $funnel_template_type ) {
+            $funnel_template_type = 'wc';
+        }
+
 		$step                 = isset( $_GET['step'] ) ? $_GET['step'] : false;
-		$templates            = $this->get_funnels_data( $funnel_template_type, $step, array(), false );
+		$builder              = isset( $_GET['builder'] ) ? $_GET['builder'] : false;
+
+		$templates            = $this->get_funnels_data( $funnel_template_type, $step, array(), false, $builder );
 		$templates			  = $this->prepare_custom_step($templates);
 		$templates['success'] = true;
 		return $this->prepare_item_for_response( $templates, $request );
@@ -292,12 +319,13 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 	 * @param bool  $isStep
 	 * @param array $args
 	 * @param bool  $force_update
+	 * @param bool  $builder
 	 *
 	 * @return bool|mixed|void
 	 */
-	public static function get_funnels( $type = false, $isStep = false, $args = array(), $force_update = false ) {
-		$builder_type = Wpfnl_functions::get_builder_type();
-		$cache_key    = 'wpfunnels_remote_template_data_' . $type . '_' . WPFNL_VERSION;
+	public static function get_funnels( $type = false, $isStep = false, $args = array(), $force_update = false, $builder = false ) {
+		$builder_type = $builder ? $builder : Wpfnl_functions::get_builder_type();
+		$cache_key    = 'wpfunnels_remote_template_data_' . $type . '_' . $builder_type . '_' . WPFNL_VERSION;
 		$data         = get_transient( $cache_key );
 		if ( $data ) {
 			return;
@@ -307,18 +335,26 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 				$data = array();
 			}
 			$timeout = ( $force_update ) ? 40 : 55;
+			
+			$template_url = self::$all_funnels_api_url;
+			if ( 'oxygen' === $builder_type ) {
+				$template_url = 'https://oxygentemplates.getwpfunnels.com/wp-json/wpfunnels/v1/get_all_funnels/';
+			} elseif ( 'bricks' === $builder_type ) {
+				$template_url = 'https://brickstemplates.getwpfunnels.com/wp-json/wpfunnels/v1/get_all_funnels/';
+			}
+
 			// get all templates
 			$params = array(
 				'per_page'      => 100,
 				'offset'        => 0,
 				'builder'       => $builder_type,
 				'template_type' => $type,
-				'template_url'  => self::get_all_templates_api_url(),
+				'template_url'  => $template_url,
 			);
 			if( !defined('QUBELY_VERSION') ){
 				$params['gutenberg_type'] = 'wpf_native_gutenberg';
 			}
-			$url    = add_query_arg( $params, self::get_all_templates_api_url() );
+			$url    = add_query_arg( $params, $template_url );
 
 			$template_data = self::remote_get(
 				$url,
@@ -375,12 +411,19 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 			}
 
 			// fetch the funnel categories from the remote server
+			$cat_url = self::$funnel_categories_api_url;
+			if ( 'oxygen' === $builder_type ) {
+				$cat_url = 'https://oxygentemplates.getwpfunnels.com/wp-json/wp/v2/template_industries/';
+			} elseif ( 'bricks' === $builder_type ) {
+				$cat_url = 'https://brickstemplates.getwpfunnels.com/wp-json/wp/v2/template_industries/';
+			}
+
 			$params          = array(
 				'per_page' => 100,
-				'category_url' => self::get_remote_funnel_categories_api_url(),
+				'category_url' => $cat_url,
 			);
 
-			$url             = add_query_arg( $params, self::get_remote_funnel_categories_api_url() );
+			$url             = add_query_arg( $params, $cat_url );
 			$categories_data = self::remote_get(
 				$url,
 				array(
@@ -406,7 +449,7 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 			$data['templates']  = $templates;
 			$data['steps']      = $steps;
 			$data['categories'] = $categories_data['data'];
-			update_option( WPFNL_TEMPLATES_OPTION_KEY . '_' . $type, $data, 'no' );
+			update_option( WPFNL_TEMPLATES_OPTION_KEY . '_' . $type . '_' . $builder_type, $data, 'no' );
 			set_transient( $cache_key, $data, 24 * HOUR_IN_SECONDS );
 			return false;
 		}
@@ -423,10 +466,16 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 	 * @return array|mixed|void
 	 * @since  1.0.0
 	 */
-	public function get_funnels_data( $type = false, $step = false, $args = array(), $force_update = false ) {
+	public function get_funnels_data( $type = false, $step = false, $args = array(), $force_update = false, $builder = false ) {
 
-		self::get_funnels( $type, $step, $args, $force_update );
-		$template_data = get_option( WPFNL_TEMPLATES_OPTION_KEY . '_' . $type );
+		self::get_funnels( $type, $step, $args, $force_update, $builder );
+		$builder_type = $builder ? $builder : Wpfnl_functions::get_builder_type();
+		$template_data = get_option( WPFNL_TEMPLATES_OPTION_KEY . '_' . $type . '_' . $builder_type );
+		
+		// Fallback for backward compatibility if data is not found with builder
+		if ( empty( $template_data ) && !$builder ) {
+			$template_data = get_option( WPFNL_TEMPLATES_OPTION_KEY . '_' . $type );
+		}
 
 		if ( empty( $template_data ) ) {
 			return array();
@@ -516,6 +565,7 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 			'timeout' => $timeout,
 		);
 		$response = ( new TemplateLibraryController() )->remote_get( $url, $api_args );
+		
 		if (is_array($response) && isset( $response['success'] )) {
 			$funnel = $response['data'];
 			return array(

@@ -8,6 +8,7 @@ namespace WPFunnels;
 
 use ElementorPro\Modules\WpCli\Update;
 use WPFunnels\Metas\Wpfnl_Step_Meta_keys;
+use WPFunnels\Discount\WpfnlDiscount;
 
 class Wpfnl_functions {
 
@@ -635,6 +636,31 @@ class Wpfnl_functions {
 
 
 	/**
+	 * Check if the cpt is step or not
+	 *
+	 * @param string $type
+	 *
+	 * @return bool
+	 * @since  1.0.0
+	 */
+	public static function check_if_this_is_lms_step() {
+		global $post;
+		if( ! $post ) {
+			return false;
+		}
+		$funnel_id = get_post_meta( $post->ID, '_funnel_id', true );
+
+		if (! $funnel_id ) {
+			return false;
+		}
+
+		$funnel_type = get_post_meta( $funnel_id, '_wpfnl_funnel_type', true );
+		
+		return $funnel_type === 'lms';
+	}
+
+
+	/**
 	 * Hooks for start and end the journey
 	 * of a funnel
 	 */
@@ -976,7 +1002,7 @@ class Wpfnl_functions {
 
 			$next_step_id   = self::get_step_by_node( $funnel_id, $next_node_id );
 			$next_step_type = self::get_node_type( $node_data, $next_node_id );
-
+			
 			return apply_filters(
 				'wpfunnels/next_step_data',
 				array(
@@ -1635,6 +1661,9 @@ class Wpfnl_functions {
 	 * @since  1.0.0
 	 */
 	public static function is_module_registered( $module_name, $type = 'admin', $step = false, $pro = false ) {
+		if ( empty( $module_name ) ) {
+			return false;
+		}
 		$class_name = str_replace( '-', ' ', $module_name );
 		$class_name = str_replace( ' ', '', ucwords( $class_name ) );
 		if ( $pro ) {
@@ -2226,7 +2255,8 @@ class Wpfnl_functions {
 		$_title          = '';
 		if ( $_product ) {
 			if ( ! $formatted_attr ) {
-				if ( 'variable' === $_product->get_type() || 'variation' === $_product->get_type() || 'subscription_variation' === $_product->get_type() || 'variable-subscription' === $_product->get_type() ) {
+				// get_attribute_summary() only exists on variation products, not variable products
+				if ( 'variation' === $_product->get_type() || 'subscription_variation' === $_product->get_type() ) {
 					$attr_summary = $_product->get_attribute_summary();
 					$attr_array   = explode( ',', $attr_summary );
 
@@ -2415,10 +2445,12 @@ class Wpfnl_functions {
 			$product_categories = get_terms( 'product_cat', $cat_args );
 			if ( ! empty( $product_categories ) ) {
 				foreach ( $product_categories as $category ) {
+					
 					$categories[ $category->slug ] = $category->name;
 				}
 			}
 		}
+
 		return $categories;
 	}
 
@@ -2784,6 +2816,28 @@ class Wpfnl_functions {
 		return false;
 	}
 
+	/**
+	 * Check if any LMS plugin is active (LearnDash or CreatorLMS)
+	 *
+	 * @return Bool
+	 * @since  2.0.0
+	 */
+	public static function is_any_lms_plugin_active() {
+		// Check LearnDash
+		$is_learndash = in_array( 'sfwd-lms/sfwd_lms.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) );
+		
+		// Check CreatorLMS
+		$is_creatorlms = in_array( 'creatorlms/creatorlms.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) );
+		
+		// For multisite
+		if ( function_exists( 'is_plugin_active' ) && ! $is_learndash && ! $is_creatorlms ) {
+			$is_learndash = is_plugin_active( 'sfwd-lms/sfwd_lms.php' );
+			$is_creatorlms = is_plugin_active( 'creatorlms/creatorlms.php' );
+		}
+		
+		return $is_learndash || $is_creatorlms;
+	}
+
 
 	/**
 	 * Get checkout tabs column name
@@ -2941,26 +2995,31 @@ class Wpfnl_functions {
 	 */
 	public static function get_template_types() {
 		$general_settings = self::get_general_settings();
+		$types = array();
+		
+		// Add WooCommerce templates if WooCommerce is active
 		if ( self::is_wc_active() ) {
-			$types = array(
-				array(
-					'slug'  => 'wc',
-					'label' => 'Woo Templates',
-				),
-				array(
-					'slug'  => 'lead',
-					'label' => 'Lead Gen Templates',
-				),
-			);
-		} else {
-			$types = array(
-				array(
-					'slug'  => 'lead',
-					'label' => 'Lead Gen Templates',
-				),
+			$types[] = array(
+				'slug'  => 'wc',
+				'label' => 'Woo Templates',
 			);
 		}
+		
+		// Add LMS templates if LMS add-on and at least one LMS plugin (LearnDash or CreatorLMS) is active
+		if ( self::is_lms_addon_active() && self::is_any_lms_plugin_active() ) {
+			$types[] = array(
+				'slug'  => 'lms',
+				'label' => 'LMS Templates',
+			);
+		}
+		
+		// Lead generation templates are always available
+		$types[] = array(
+			'slug'  => 'lead',
+			'label' => 'Lead Gen Templates',
+		);
 
+		// If funnel type is set to lead only, show only lead templates
 		if ( isset( $general_settings['funnel_type'] ) && 'lead' === $general_settings['funnel_type'] ) {
 			$types = array(
 				array(
@@ -2969,6 +3028,7 @@ class Wpfnl_functions {
 				),
 			);
 		}
+		
 		return apply_filters( 'wpfunnels/modify_template_type', $types );
 
 	}
@@ -3249,6 +3309,10 @@ class Wpfnl_functions {
 			array(
 				'type' => 'checkout',
 				'name' => 'Checkout',
+			),
+			array(
+				'type' => 'upsell',
+				'name' => 'Upsell',
 			),
 			array(
 				'type' => 'thankyou',
@@ -4610,6 +4674,23 @@ class Wpfnl_functions {
 			'use_this_funnel_for_lms_only_tooltip'        => __( 'Enable this option to turn this funnel into a sales funnel for LMS. You can use it when you have a supported LMS activated such as LearnDash.', 'wpfnl' ),
 			'save_changes'                                => __( 'Save Changes', 'wpfnl' ),
 
+			// ----Global Funnel Offer Mode------
+			'offer_selection_mode'                        => __( 'Offer Selection Mode:', 'wpfnl' ),
+			'manual'                                      => __( 'Manual', 'wpfnl' ),
+			'auto_match'                                  => __( 'Auto-match', 'wpfnl' ),
+			'recommended'                                 => __( 'Recommended', 'wpfnl' ),
+			'add_existing_product'                        => __( 'Add Existing Product', 'wpfnl' ),
+			'create_product'                              => __( 'Create Product', 'wpfnl' ),
+			'product'                                     => __( 'PRODUCT', 'wpfnl' ),
+			'total_price'                                 => __( 'TOTAL PRICE', 'wpfnl' ),
+			'no_product_yet'                              => __( 'No Product Yet', 'wpfnl' ),
+			'fallback_behavior'                           => __( 'Fallback Behavior', 'wpfnl' ),
+			'fallback_description'                        => __( 'What should happen when no rules match the main product?', 'wpfnl' ),
+			'dont_show_upsell'                            => __( "Don’t show this offer", 'wpfnl' ),
+			'skip_upsell_description'                     => __( 'Skip the offer if no rules match.', 'wpfnl' ),
+			'show_default_product'                        => __( 'Show a default product', 'wpfnl' ),
+			'default_product_description'                 => __( 'Offer a specific product when no rules match.', 'wpfnl' ),
+
 			// ----AB testing------
 			'running'                                     => __( 'Running', 'wpfnl' ),
 			'draft'                                       => __( 'Draft', 'wpfnl' ),
@@ -4909,7 +4990,7 @@ class Wpfnl_functions {
 			'ob_product_details'                          => __( 'Get this scratch proof 6D Tempered Glass Screen Protector for your iPhone. Keep your phone safe and sound just like a new one.', 'wpfnl' ),
 			'ob_preview_tooltip'                          => __( 'The width of the order bump may vary depending on the page/container size on the Checkout Page or the device screen size.', 'wpfnl' ),
 			'choose_offers'                               => __( 'Choose Offers', 'wpfnl' ),
-			'choose_offers_condition'                     => __( 'Choose offer condition', 'wpfnl' ),
+			'choose_offers_condition'                     => __( 'Select the rule that determines which product(s) will be automatically recommended as the upsell.', 'wpfnl' ),
 			'select_product'                              => __( 'Select Product', 'wpfnl' ),
 			'select_product_tooltip'                      => __( 'Choose the product that you want to offer as order bump at the checkout.', 'wpfnl' ),
 			'search_for_product'                          => __( 'Search for product', 'wpfnl' ),
@@ -5061,7 +5142,7 @@ class Wpfnl_functions {
 			'choose_offer_category'                       => __( 'Choose offer category', 'wpfnl' ),
 			'choose_offer_tag'                            => __( 'Choose offer tag', 'wpfnl' ),
 			'selected_price_is_less_than1'                => __( 'Selected price is less than 1', 'wpfnl' ),
-			'gbf_product_quantity_tooltip'                => __( 'The value you input here will be added to the quantity of the product that triggered the funnel, which will be offered to the buyer as the downsell offer. For example, if someone purchases 2 t-shirts, and you input 3 here, the buyer will be offered 2+3 = 5 t-shirts as the downsell offer.', 'wpfnl' ),
+			'gbf_product_quantity_tooltip'                => __( 'The number of this upsell product to add to the cart when the customer accepts the offer.', 'wpfnl' ),
 			'selected_quantity_is_less_than1'             => __( 'Selected quantity is less than 1', 'wpfnl' ),
 			'enable_replace_settings'                     => __( 'Enable Replace Settings', 'wpfnl' ),
 			'enable_replace_settings_tooltip'             => __( 'Enabling this will mean that if a buyer accepts the downsell offer, then the downsell offer product will replace the main product in the checkout and the buyer will just have to pay for the downsell offer product.', 'wpfnl' ),
@@ -5592,6 +5673,558 @@ class Wpfnl_functions {
             return 'on' == $offer_settings['enable_global_thankyou'] ? true : false;
         }
         return false;
+	}
+
+
+	/**
+	 * Retrieves the product type of an offer.
+	 *
+	 * @param string $step_id The ID of the step.
+	 * @return string The product type of the offer.
+	 */
+	public static function get_offer_product_type( $step_id = '' ) {
+
+		if ( $step_id ) {
+			$step_type = get_post_meta( $step_id, '_step_type', true );
+			if ( $step_type == 'upsell' || $step_type == 'downsell' ) {
+				$offer_product = self::get_offer_product( $step_id, $step_type );
+				if ( is_array( $offer_product ) ) {
+					$product_type = '';
+					foreach ( $offer_product as $pr_index => $pr_data ) {
+						$product_id = $pr_data['id'];
+						$product    = wc_get_product( $product_id );
+						if ( $product ) {
+							$product_type = $product->get_type();
+							break;
+						}
+					}
+					return $product_type;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Retrieves the offer product for a given step ID.
+	 *
+	 * @param int    $step_id The ID of the funnel step.
+	 * @param string $type    The type of offer product (default is 'upsell').
+	 * @param mixed  $default The default value to return if no offer product is found.
+	 *
+	 * @return mixed The offer product data or the default value if not found.
+	 *
+	 * @since 1.0.0
+	 */
+	public static function get_offer_product( $step_id, $type = 'upsell', $default = false ) {
+		if ( $default ) {
+			return $default;
+		}
+		$value = get_post_meta( $step_id, "_wpfnl_{$type}_products", true );
+		if ( ! $value ) {
+			return array();
+		}
+		return $value;
+	}
+
+
+	/**
+	 * Get product data for widget
+	 *
+	 * @param String
+	 *
+	 * @return Array
+	 * @since 1.6.8
+	 */
+	public static function get_product_data_for_widget( $step_id = '' ) {
+
+		if ( $step_id && Wpfnl_functions::is_wc_active() ) {
+			$funnel_id     = get_post_meta( $step_id, '_funnel_id', true );
+			$step_type     = get_post_meta( $step_id, '_step_type', true );
+			$is_gbf        = get_post_meta( $funnel_id, 'is_global_funnel', true );
+			$offer_product = '';
+			if ( 'yes' === $is_gbf && ( 'upsell' === $step_type || 'downsell' === $step_type ) ) {
+				if ( is_plugin_active( 'wpfunnels-pro-gbf/wpfnl-pro-gb.php' ) ) {
+					$instance    = new Wpfnl_Pro_GB_Functions();
+					$offer_rules = get_post_meta( $step_id, 'global_funnel_' . $step_type . '_rules', true );
+					$quantity    = isset( $offer_rules['quantity'] ) ? $offer_rules['quantity'] : 1;
+					$rules_type  = isset( $offer_rules['type'] ) ? $offer_rules['type'] : '';
+					if ( 'moreQuantity' == $rules_type ) {
+						$rand_product_id  = self::get_random_product();
+						$offer_product    = wc_get_product( $rand_product_id );
+						$get_product_type = $offer_product ? $offer_product->get_type() : '';
+						$quantity         = isset( $gbf_product[0]['quantity'] ) ? $quantity + $gbf_product[0]['quantity'] : $quantity;
+
+					} elseif ( 'specificProduct' == $rules_type ) {
+						$rules         = get_post_meta( $step_id, 'global_funnel_' . $step_type . '_rules', true );
+						$offer_product = '';
+						if ( is_array( $rules ) ) {
+							if ( isset( $rules['show'] ) && $rules['show'] ) {
+								$offer_product = wc_get_product( $rules['show'] );
+							}
+						}
+						$get_product_type = $offer_product ? $offer_product->get_type() : '';
+
+					} elseif ( 'randomProduct' == $rules_type ) {
+						$offer_mappings = get_post_meta( $step_id, 'global_funnel_' . $step_type . '_rules', true );
+						if ( $offer_mappings ) {
+							$category       = isset( $offer_mappings['category'] ) ? $offer_mappings['category'] : null;
+							$function_exist = is_callable( array( $instance, 'get_random_product_in_category_for_offer' ) );
+							if ( $function_exist ) {
+								$id = '';
+								if ( is_admin() ) {
+									$dynamic_product = Wpfnl_Pro_GB_Functions::get_random_product_in_shop_for_widget( 1 );
+									if ( isset( $dynamic_product[0]->ID ) ) {
+										$id = $dynamic_product[0]->ID;
+									}
+								} else {
+									$dynamic_product = json_decode( wp_unslash( get_option( 'wpfunnels_dynamic_offer_data' ) ), true );
+									if ( is_array( $dynamic_product ) && isset( $dynamic_product[0]['ID'] ) ) {
+										$id = $dynamic_product[0]['ID'];
+									}
+								}
+
+								if ( $id ) {
+									$offer_product    = wc_get_product( $id );
+									$get_product_type = $offer_product ? $offer_product->get_type() : '';
+								}
+							}
+						}
+					} elseif ( 'randomProductInsideCategoryWithinPrice' == $rules_type ) {
+						$offer_mappings = get_post_meta( $step_id, 'global_funnel_' . $step_type . '_rules', true );
+						if ( $offer_mappings ) {
+							$category       = isset( $offer_mappings['category'] ) ? $offer_mappings['category'] : null;
+							$function_exist = is_callable( array( $instance, 'get_random_product_in_category_within_price_for_offer_for_widget' ) );
+
+							if ( $function_exist ) {
+								$id = '';
+								if ( is_admin() ) {
+									$dynamic_product = Wpfnl_Pro_GB_Functions::get_random_product_in_category_within_price_for_offer_for_widget( 1 );
+									if ( isset( $dynamic_product[0]->ID ) ) {
+										$id = $dynamic_product[0]->ID;
+									}
+								} else {
+									$dynamic_product = json_decode( wp_unslash( get_option( 'wpfunnels_dynamic_offer_data' ) ), true );
+									if ( is_array( $dynamic_product ) && isset( $dynamic_product[0]['ID'] ) ) {
+										$id = $dynamic_product[0]['ID'];
+									}
+								}
+
+								if ( $id ) {
+									$offer_product    = wc_get_product( $id );
+									$get_product_type = $offer_product ? $offer_product->get_type() : '';
+								}
+							}
+						}
+					} elseif ( 'highestSoldInsideCategory' == $rules_type ) {
+						$offer_mappings = get_post_meta( $step_id, 'global_funnel_' . $step_type . '_rules', true );
+						if ( $offer_mappings ) {
+							$category       = isset( $offer_mappings['category'] ) ? $offer_mappings['category'] : null;
+							$function_exist = is_callable( array( $instance, 'get_highest_sold_product_in_category_for_offer' ) );
+							if ( $function_exist ) {
+								$highestSoldInsideCategory = Wpfnl_Pro_GB_Functions::get_highest_sold_product_in_category_for_offer( 1, $category );
+								if ( is_array( $highestSoldInsideCategory ) && isset( $highestSoldInsideCategory['posts'][0]->ID ) ) {
+									$id               = $highestSoldInsideCategory['posts'][0]->ID;
+									$offer_product    = wc_get_product( $id );
+									$get_product_type = $offer_product ? $offer_product->get_type() : '';
+								}
+							}
+						}
+					} elseif ( 'highestSoldInsideTag' == $rules_type ) {
+						$offer_mappings = get_post_meta( $step_id, 'global_funnel_' . $step_type . '_rules', true );
+						if ( $offer_mappings ) {
+							$tag            = isset( $offer_mappings['tag'] ) ? $offer_mappings['tag'] : null;
+							$function_exist = is_callable( array( $instance, 'get_highest_sold_product_in_tag_for_offer' ) );
+							if ( $function_exist ) {
+								$highestSoldInsideTag = Wpfnl_Pro_GB_Functions::get_highest_sold_product_in_tag_for_offer( $tag, 1 );
+								if ( is_array( $highestSoldInsideTag ) && isset( $highestSoldInsideTag['posts'][0]->ID ) ) {
+									$id               = $highestSoldInsideTag['posts'][0]->ID;
+									$offer_product    = wc_get_product( $id );
+									$get_product_type = $offer_product ? $offer_product->get_type() : '';
+								}
+							}
+						}
+					} elseif ( 'highestSold' == $rules_type ) {
+						$function_exist = is_callable( array( $instance, 'get_highest_sold_product_for_offer' ) );
+						if ( $function_exist ) {
+							$highestSold = Wpfnl_Pro_GB_Functions::get_highest_sold_product_for_offer( 1 );
+							if ( is_array( $highestSold ) && isset( $highestSold['posts'][0]->ID ) ) {
+								$id               = $highestSold['posts'][0]->ID;
+								$offer_product    = wc_get_product( $id );
+								$get_product_type = $offer_product ? $offer_product->get_type() : '';
+							}
+						}
+					} elseif ( 'randomProductInTag' == $rules_type ) {
+						$function_exist = is_callable( array( $instance, 'get_random_product_in_tag_for_offer_for_widget' ) );
+						if ( $function_exist ) {
+							$id = '';
+							if ( is_admin() ) {
+								$dynamic_product = Wpfnl_Pro_GB_Functions::get_random_product_in_tag_for_offer_for_widget( 1 );
+								if ( isset( $dynamic_product[0]->ID ) ) {
+									$id = $dynamic_product[0]->ID;
+								}
+							} else {
+								$dynamic_product = json_decode( wp_unslash( get_option( 'wpfunnels_dynamic_offer_data' ) ), true );
+								if ( is_array( $dynamic_product ) && isset( $dynamic_product[0]['ID'] ) ) {
+									$id = $dynamic_product[0]['ID'];
+								}
+							}
+							if ( $id ) {
+								$offer_product    = wc_get_product( $id );
+								$get_product_type = $offer_product ? $offer_product->get_type() : '';
+							}
+						}
+					} elseif ( 'randomProductInsideTagWithinPrice' == $rules_type ) {
+						$function_exist = is_callable( array( $instance, 'get_random_product_in_tag_within_price_for_offer_for_widget' ) );
+						if ( $function_exist ) {
+							$id = '';
+							if ( is_admin() ) {
+								$dynamic_product = Wpfnl_Pro_GB_Functions::get_random_product_in_tag_within_price_for_offer_for_widget( 1 );
+
+								if ( isset( $dynamic_product[0]->ID ) ) {
+									$id = $dynamic_product[0]->ID;
+								}
+							} else {
+								$dynamic_product = json_decode( wp_unslash( get_option( 'wpfunnels_dynamic_offer_data' ) ), true );
+								if ( is_array( $dynamic_product ) && isset( $dynamic_product[0]['ID'] ) ) {
+									$id = $dynamic_product[0]['ID'];
+								}
+							}
+							if ( $id ) {
+								$offer_product    = wc_get_product( $id );
+								$get_product_type = $offer_product ? $offer_product->get_type() : '';
+							}
+						}
+					} elseif ( 'randomInShop' == $rules_type ) {
+						$id = '';
+						if ( is_admin() ) {
+							$dynamic_product = Wpfnl_Pro_GB_Functions::get_random_product_in_shop_for_widget( 1 );
+							if ( isset( $dynamic_product[0]->ID ) ) {
+								$id = $dynamic_product[0]->ID;
+							}
+						} else {
+							$dynamic_product = json_decode( wp_unslash( get_option( 'wpfunnels_dynamic_offer_data' ) ), true );
+							if ( is_array( $dynamic_product ) && isset( $dynamic_product[0]['ID'] ) ) {
+								$id = $dynamic_product[0]['ID'];
+							}
+						}
+						if ( $id ) {
+							$offer_product    = wc_get_product( $id );
+							$get_product_type = $offer_product ? $offer_product->get_type() : '';
+						}
+					}
+				}
+			} else {
+				$offer_product_data = self::get_offer_product( $step_id, $step_type );
+				$quantity           = isset( $offer_product_data['quantity'] ) ? $offer_product_data['quantity'] : 1;
+				$product            = null;
+				if ( is_array( $offer_product_data ) ) {
+					foreach ( $offer_product_data as $pr_index => $pr_data ) {
+						$product_id = $pr_data['id'];
+						$product    = wc_get_product( $product_id );
+						break;
+					}
+				}
+
+				$offer_product    = $product;
+				$get_product_type = $offer_product ? $offer_product->get_type() : '';
+			}
+
+			if ( $offer_product && $get_product_type ) {
+
+				return array(
+					'offer_product'    => $offer_product,
+					'get_product_type' => $get_product_type,
+					'is_gbf'           => $is_gbf,
+					'quantity'         => $quantity,
+				);
+			}
+		}
+
+		return array(
+			'offer_product'    => '',
+			'get_product_type' => '',
+			'is_gbf'           => 'no',
+			'quantity'         => 1,
+		);
+	}
+
+
+	/**
+	 * Checks if a payment gateway is potentially unsupported.
+	 *
+	 * @return bool
+	 * @since  2.0.5
+	 */
+	public static function maybe_unsupported_payment_gateway() {
+
+		if ( ! Wpfnl_functions::is_wc_active() || ! isset( $_GET['wpfnl-order'] ) ) {
+			return false;
+		}
+
+		$order_id = ( isset( $_GET['wpfnl-order'] ) ) ? intval( $_GET['wpfnl-order'] ) : 0;
+		$order    = wc_get_order( $order_id );
+		if ( false === is_a( $order, 'WC_Order' ) ) {
+			return false;
+		}
+		$payment_method = $order->get_payment_method();
+
+		if ( $payment_method ) {
+			// First check if Pro version's factory exists (for backward compatibility)
+			if ( class_exists( '\WPFunnelsPro\Frontend\Modules\Gateways\Payment_Gateways_Factory' ) ) {
+				$payment_gateways = \WPFunnelsPro\Frontend\Modules\Gateways\Payment_Gateways_Factory::getInstance()->get_supported_payment_gateways();
+			} 
+			// Otherwise use the free version's factory
+			elseif ( class_exists( '\WPFunnels\Gateway\Payment_Gateways_Factory' ) ) {
+				$payment_gateways = \WPFunnels\Gateway\Payment_Gateways_Factory::getInstance()->get_supported_payment_gateways();
+			} else {
+				// If neither exists, assume unsupported
+				return true;
+			}
+
+			if ( ! isset( $payment_gateways[ $payment_method ] ) ) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		return true;
+	}
+
+
+	/**
+	 * Checks if an offer exists in a funnel.
+	 *
+	 * @param int $funnel_id The ID of the funnel to check.
+	 *
+	 * @return bool True if an offer exists, false otherwise.
+	 *
+	 * @since 2.0.5
+	 */
+	public static function is_offer_exists_in_funnel( $funnel_id ) {
+		$is_offer_exists = false;
+		$steps           = Wpfnl_functions::get_steps( $funnel_id );
+		if ( is_array( $steps ) ) {
+			foreach ( $steps as $index => $step ) {
+				$step_type = $step['step_type'];
+				if ( in_array( $step_type, array( 'upsell', 'downsell' ) ) ) {
+					$is_offer_exists = true;
+					break;
+				}
+			}
+		}
+		return $is_offer_exists;
+	}
+
+
+	/**
+	 * Get upsell/downsell offer product information
+	 *
+	 * @param $step_id
+	 * @param string  $selected_product_id
+	 * @param string  $input_qty
+	 * @param int     $order_id
+	 * @return array
+	 *
+	 * @since 1.0.0
+	 */
+	public static function get_offer_product_data( $step_id, $selected_product_id = '', $input_qty = '', $order_id = 0 ) {
+		$funnel_id = get_post_meta( $step_id, '_funnel_id', true );
+
+		return apply_filters( 'wpfunnels/offer_product_data', self::get_offer_data( $step_id, $selected_product_id, $input_qty, $order_id = 0 ), $funnel_id, $step_id );
+	}
+
+
+	/**
+	 * Retrieves offer data based on the provided parameters.
+	 *
+	 * @param int    $step_id            The ID of the step.
+	 * @param string $selected_product_id The ID of the selected product.
+	 * @param string $input_qty          The quantity input.
+	 * @param int    $order_id           The ID of the order.
+	 *
+	 * @return mixed The offer data.
+	 *
+	 * @since 1.0.0
+	 */
+	public static function get_offer_data( $step_id, $selected_product_id = '', $input_qty = '', $order_id = 0 ) {
+		$data              = array();
+		$amount_diff       = 0;
+		$cancel_main_order = false;
+		$product_id        = 0;
+		$product_qty       = 0;
+
+		$step_type     = get_post_meta( $step_id, '_step_type', true );
+		$offer_product = get_post_meta( $step_id, '_wpfnl_' . $step_type . '_products', true );
+		$discount      = get_post_meta( $step_id, '_wpfnl_' . $step_type . '_discount', true );
+		if ( isset( $offer_product[0] ) && ! $selected_product_id ) {
+			$product_id  = $offer_product[0]['id'];
+			$product_qty = $offer_product[0]['quantity'];
+		} else {
+			$product_id  = $selected_product_id;
+			$product_qty = ! empty( $input_qty ) ? intval( $input_qty ) : ( isset( $offer_product[0]['quantity'] ) ? $offer_product[0]['quantity'] : 1 );
+		}
+
+		if ( $product_id ) {
+
+			$product = wc_get_product( $product_id );
+			if ( $product ) {
+				$main_qty = $product->get_stock_quantity();
+				if ( $main_qty <= 0 && $product->get_manage_stock() == true ) {
+					$product_qty = 0;
+				}
+				$product_qty = intval( $product_qty );
+				$order       = wc_get_order( $order_id );
+
+				$product_type   = $product->get_type();
+				$original_price = $product->get_price( 'edit' );
+				$custom_price   = $original_price;
+
+				if ( is_a( $product, 'WC_Product_Bundle' ) ) {
+					$custom_price = $product->get_bundle_price( 'min' );
+				}
+				if ( 'composite' === $product->get_type() ) {
+					$custom_price = Wpfnl_functions::get_composite_product_price( $product->get_id(), false );
+				}
+
+				$custom_price = apply_filters( 'wpfunnels/modify_offer_product_price_data_without_discount', $custom_price );
+
+				if ( is_plugin_active( 'woocommerce-subscriptions/woocommerce-subscriptions.php' ) ) {
+					if ( 'subscription_variation' === $product->get_type() || 'subscription' === $product->get_type() ) {
+						$signUpFee    = \WC_Subscriptions_Product::get_sign_up_fee( $product );
+						$custom_price = $custom_price + $signUpFee;
+					}
+				}
+
+				$unit_price     = $custom_price;
+				$unit_price_tax = $custom_price;
+				$product_price  = floatval( $custom_price ) * intval( $product_qty );
+
+				/** tax calculation */
+				$tax_enabled          = get_option( 'woocommerce_calc_taxes' );
+				$shipping_fee         = 0;
+				$shipping_incl_tax    = 0;
+				$shipping_excl_tax    = 0;
+				$shipping_method_name = 0;
+				if ( $order ) {
+					$shipping_fee         = $order->get_shipping_total();
+					$shipping_method_name = $order->get_shipping_method();
+				}
+
+				if ( 'yes' === $tax_enabled ) {
+					if ( ! wc_prices_include_tax() ) {
+						$product_price     = wc_get_price_including_tax( $product, array( 'price' => $custom_price ) ) * floatval( $product_qty );
+						$shipping_excl_tax = wc_get_price_including_tax( $product, array( 'price' => $shipping_fee ) );
+					} else {
+						$custom_price      = wc_get_price_excluding_tax( $product, array( 'price' => $custom_price ) ) * floatval( $product_qty );
+						$shipping_incl_tax = wc_get_price_excluding_tax( $product, array( 'price' => $shipping_fee ) );
+					}
+					$unit_price_tax = $custom_price;
+				}
+
+				$shipping_incl_tax = $shipping_incl_tax ? $shipping_incl_tax : $shipping_fee;
+				$shipping_excl_tax = $shipping_excl_tax ? $shipping_excl_tax : $shipping_fee;
+
+				/** if offer product has discount */
+				if ( is_array( $discount ) ) {
+					$discount_instance = new WpfnlDiscount();
+
+					if ( ! $discount_instance->maybe_time_bound_discount( $step_id ) || ( $discount_instance->maybe_time_bound_discount( $step_id ) && $discount_instance->maybe_validate_discount_time( $step_id ) ) ) {
+
+						$discount_type     = $discount['discountType'];
+						$discount_apply_to = $discount['discountApplyTo'];
+						$discount_value    = $discount['discountValue'];
+						if ( 'discount-percentage' === $discount_type || 'discount-price' === $discount_type ) {
+							$regular_price = $product->get_regular_price();
+							if ( is_plugin_active( 'woocommerce-subscriptions/woocommerce-subscriptions.php' ) ) {
+								if ( 'subscription_variation' === $product->get_type() || 'subscription' === $product->get_type() ) {
+									$signUpFee     = \WC_Subscriptions_Product::get_sign_up_fee( $product );
+									$regular_price = $regular_price + $signUpFee;
+								}
+							}
+
+							$product_price = $discount_apply_to === 'sale' ? $product->get_sale_price() : $regular_price;
+							$product_price = $product_price ? $product_price : $product->get_price();
+
+							if ( is_a( $product, 'WC_Product_Bundle' ) ) {
+								$custom_price = $discount_apply_to === 'sale' ? $product->get_bundle_price( 'min' ) : $product->get_bundle_regular_price( 'max' );
+							}
+							if ( 'composite' === $product->get_type() ) {
+								$custom_price = Wpfnl_functions::get_composite_product_price( $product->get_id(), false );
+							}
+
+							$product_price = self::calculate_discount_price_for_widget( $discount_type, $discount_value, floatval( $product_price ) * floatval( $product_qty ) );
+							$product_price = apply_filters( 'wpfunnels/modify_offer_product_price_data_with_discount', $product_price );
+
+							$custom_price   = $product_price;
+							$unit_price     = $product_price;
+							$unit_price_tax = $product_price;
+						}
+					}
+				}
+
+				$data = array(
+					'step_id'                 => $step_id,
+					'id'                      => $product_id,
+					'name'                    => $product->get_title(),
+					'desc'                    => self::get_item_description( $product ),
+					'qty'                     => $product_qty,
+					'original_price'          => $original_price,
+					'regular_price'           => $product->get_regular_price(),
+					'sale_price'              => $product->get_sale_price(),
+					'unit_price'              => $unit_price,
+					'unit_price_tax'          => $unit_price_tax,
+					'args'                    => array(
+						'subtotal' => $custom_price,
+						'total'    => $custom_price,
+					),
+					'shipping_fee'            => $shipping_excl_tax,
+					'shipping_fee_incl_tax'   => $shipping_incl_tax,
+					'shipping_method_name'    => $shipping_method_name,
+					'price'                   => wc_prices_include_tax() ? $custom_price : $product_price,
+					'url'                     => $product->get_permalink(),
+					'total_unit_price_amount' => floatval( preg_replace( '/[^\d.]/', '', $unit_price_tax ) ) * floatval( $product_qty ),
+					'total'                   => wc_prices_include_tax() ? $custom_price : $product_price,
+					'cancel_main_order'       => $cancel_main_order,
+					'amount_diff'             => $amount_diff,
+					'discount'                => $discount ? true : false,
+					'discount_type'           => isset( $discount['discountType'] ) ? $discount['discountType'] : '',
+					'discount_apply_to'       => isset( $discount['discountApplyTo'] ) ? $discount['discountApplyTo'] : '',
+					'discount_value'          => isset( $discount['discountValue'] ) ? $discount['discountValue'] : '',
+				);
+			}
+		}
+		return $data;
+	}
+
+	/**
+	 * Helper method to return the item description, which is composed of item
+	 * meta flattened into a comma-separated string, if available. Otherwise the
+	 * product SKU is included.
+	 *
+	 * The description is automatically truncated to the 127 char limit.
+	 *
+	 * @param array       $item cart or order item
+	 * @param \WC_Product $product product data
+	 *
+	 * @return string
+	 * @since 1.0.0
+	 */
+	public static function get_item_description( $product ) {
+
+		if ( is_string( $product ) ) {
+			$str = $product;
+		} else {
+			$str = $product->get_short_description();
+		}
+		$item_desc = wp_strip_all_tags( wp_specialchars_decode( wp_staticize_emoji( $str ) ) );
+		$item_desc = preg_replace( '/[\x00-\x1F\x80-\xFF]/', '', $item_desc );
+		$item_desc = str_replace( "\n", ', ', rtrim( $item_desc ) );
+		if ( strlen( $item_desc ) > 127 ) {
+			$item_desc = substr( $item_desc, 0, 124 ) . '...';
+		}
+
+		return html_entity_decode( $item_desc, ENT_NOQUOTES, 'UTF-8' );
 	}
 }
 

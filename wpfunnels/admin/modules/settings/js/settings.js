@@ -324,6 +324,7 @@ jQuery(function ($) {
                 'user_role_management': { roles: userRoleManagement },
                 'google_map_api_key'        : $('#wpfnl-google-map-api-key').val(),
                 'enable_global_thankyou'    : $('#wpfnl-enable-global-thankyou').is(':checked') ? 'on' : 'off',
+                'lms_provider'              : $('#lms-provider-select').val(),
                 'enable_revenue_report'     : $('#wpfnl-enable-revenue-report').is(':checked') ? 'yes' : 'no',
                 'revenue_report_frequency'  : $('input[name="wpfnl-revenue-report-frequency"]:checked').val(),
                 'revenue_report_recipient'  : $('#wpfnl-revenue-report-recipient').val(),

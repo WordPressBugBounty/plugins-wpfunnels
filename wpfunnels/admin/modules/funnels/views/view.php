@@ -143,7 +143,7 @@ $live_redirect_link = add_query_arg(
 
 
                 <!-- Export import -->
-                <?php if ( (count($this->funnels) || !empty($_GET['s'])) && $is_pro_active &&  isset($_GET['page']) && 'trash_funnels' != sanitize_text_field( $_GET['page'] ) ) : ?>
+                <?php if ( (count($this->funnels) || !empty($_GET['s'])) &&  isset($_GET['page']) && 'trash_funnels' != sanitize_text_field( $_GET['page'] ) ) : ?>
                     <a href="#" class="import-export wpfnl-export-all-funnels">
                         <?php
                             require WPFNL_DIR . '/admin/partials/icons/export-icon.php';
@@ -157,26 +157,6 @@ $live_redirect_link = add_query_arg(
                             echo __('Import', 'wpfnl');
                         ?>
                     </a>
-                    <?php endif; ?>
-
-                    <?php if( (count($this->funnels) || !empty($_GET['s'])) && !$is_pro_active &&  isset($_GET['page']) && 'trash_funnels' != sanitize_text_field( $_GET['page'] ) ) : ?>
-                        <a id="wpfnl-export-all-pro" class="import-export">
-                        <?php
-                            require WPFNL_DIR . '/admin/partials/icons/export-icon.php';
-                            echo __('Export All', 'wpfnl');
-                        ?>
-                        <span class="pro-tag-icon"><?php require WPFNL_DIR . '/admin/partials/icons/pro-icon.php'; ?></span>
-                    </a>
-
-                    <a id="wpfnl-import-funnels-pro" class="import-export ">
-                        <?php
-                            require WPFNL_DIR . '/admin/partials/icons/import-icon.php';
-                            echo __('Import', 'wpfnl');
-                        ?>
-                        <span class="pro-tag-icon"><?php require WPFNL_DIR . '/admin/partials/icons/pro-icon.php'; ?></span>
-                    </a>
-
-                    <!-- Export import -->
                     <?php endif; ?>
 
 
@@ -552,7 +532,7 @@ $live_redirect_link = add_query_arg(
 												</li>
 											<?php endif; ?>
 
-                                            <?php if( $is_pro_active && isset($_GET['page']) && 'trash_funnels' !== sanitize_text_field( $_GET['page'] )): ?>
+                                            <?php if( isset($_GET['page']) && 'trash_funnels' !== sanitize_text_field( $_GET['page'] )): ?>
 												<li>
 													<a href="#" class="duplicate wpfnl-export-funnel" id="wpfnl-export-funnel" data-id="
                                                         <?php
@@ -564,23 +544,6 @@ $live_redirect_link = add_query_arg(
                                                             echo __('Export', 'wpfnl');
                                                         ?>
 														<span class="wpfnl-loader"></span>
-													</a>
-												</li>
-											<?php endif; ?>
-
-                                            <?php if( !$is_pro_active && isset($_GET['page']) && 'trash_funnels' !== sanitize_text_field( $_GET['page'] )): ?>
-												<li>
-													<a class="duplicate wpfnl-export-funnel-pro" data-id="
-                                                        <?php
-                                                            echo $funnel_id;
-                                                        ?>
-                                                    ">
-														<?php
-                                                            require WPFNL_DIR . '/admin/partials/icons/export-icon.php';
-                                                            echo __('Export', 'wpfnl');
-                                                        ?>
-
-                                                        <span class="pro-tag-icon"><?php require WPFNL_DIR . '/admin/partials/icons/pro-icon.php';?></span>
 													</a>
 												</li>
 											<?php endif; ?>

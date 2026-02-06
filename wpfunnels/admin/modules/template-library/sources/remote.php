@@ -67,6 +67,14 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
         $funnel 	= Wpfnl::$instance->funnel_store;
         $funnel_id 	= $funnel->create();
         $funnel->update_meta($funnel_id, '_is_imported', 'yes');
+        
+        // Set funnel status to draft if specified
+        if (isset($args['status']) && $args['status'] === 'draft') {
+            wp_update_post([
+                'ID' => $funnel_id,
+                'post_status' => 'draft'
+            ]);
+        }
 
 		if( $funnel_id ){
 			$general_settings = get_option( '_wpfunnels_general_settings' );
@@ -76,7 +84,8 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
 					update_option( '_wpfunnels_general_settings', $general_settings );
 				}
 				if( 'sales' == $general_settings['funnel_type'] ){
-					if( Wpfnl_functions::is_lms_addon_active() && isset($args['type']) && 'lms' === $args['type'] ){
+					// Check if LMS add-on is active AND at least one LMS plugin (LearnDash or CreatorLMS) is active
+					if( Wpfnl_functions::is_lms_addon_active() && Wpfnl_functions::is_any_lms_plugin_active() && isset($args['type']) && 'lms' === $args['type'] ){
 						update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lms' );
 					} elseif( Wpfnl_functions::is_wc_active() && isset($args['type']) && 'wc' === $args['type'] ){
 						update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'wc' );
@@ -100,7 +109,7 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
 		}
 		$response		= TemplateLibraryController::get_funnel( $remote_id );
 		$funnel_data 	= isset($response['_funnel_data']) ? $response['_funnel_data'] : $response['funnel_data'];
-
+        
 		update_post_meta( $funnel_id, '_funnel_data', $funnel_data );
 
         $funnel_title = isset($args['name']) ? $args['name'] : '';

@@ -230,6 +230,17 @@ abstract class AbstractBlock {
 					$this->get_block_type_editor_script( 'path' ),
 					$this->get_block_type_editor_script( 'dependencies' )
 				);
+			}  
+
+           
+			// Register offer-button script only if Pro is not active
+			// Register on all step types so block appears in inserter, but it's only useful on upsell/downsell
+			if ( ! Wpfnl_functions::is_wpfnl_pro_activated() && $handle === 'wpfnl-offer-button' ) {
+				$this->register_script(
+					$handle,
+					$this->get_block_type_editor_script( 'path' ),
+					$this->get_block_type_editor_script( 'dependencies' )
+				);
 			}
 
         }
@@ -253,6 +264,7 @@ abstract class AbstractBlock {
             $src        = $this->get_asset_url( $relative_src );
             $version    = $this->get_file_version( $relative_src );
         }
+        
         wp_register_script( $handle, $src, apply_filters( 'wpfunnels/gutenberg_blocks_register_script_dependencies', $dependencies, $handle ), $version, true );
 		$step_id = 0;
 		if ( is_admin() && isset( $_REQUEST['action'] ) ) {
@@ -280,35 +292,34 @@ abstract class AbstractBlock {
                 }
             }
 
-			wp_localize_script(
-				$handle,
-				'wpfnl_block_object',
-				array(
-					'plugin'  			=> WPFNL_DIR_URL,
-					'image_dir_url'     => WPFNL_DIR_URL.'includes/core/widgets/block/assets/dist/images/',
-					'optin_icon_dir_url'=> WPFNL_DIR_URL.'public/assets/images/',
-					'siteUrl'           => get_site_url(),
-					'ajaxUrl'           => admin_url('admin-ajax.php'),
-					'orderBumpImg'      => WPFNL_URL . 'admin/assets/images/placeholder.jpg',
-					'data_post_id'      => $step_id,
-					// 'wpfnl_ob_data'     => get_post_meta( $step_id, 'order-bump-settings', true ),
-					'wpfnl_ob_data'     => Wpfnl_functions::get_ob_settings( $step_id ),
-					'nonce'             => wp_create_nonce('wp_rest'),
-					'isProActivated'	=> Wpfnl_functions::is_wpfnl_pro_activated(),
-					'obSettings'	    => Wpfnl_functions::get_ob_settings( $step_id ),
-					'isGbf'	            => Wpfnl_functions::maybe_global_funnel( $step_id ),
-					'recaptcha_setting' => Wpfnl_functions::get_recaptcha_settings(),
-					'funnel_list'       => $this->get_funnel_list(),
-					'admin_email'       => Wpfnl_functions::get_optin_settings( 'sender_email' ),
-					'email_subject'     => Wpfnl_functions::get_optin_settings( 'email_subject' ),
-                    'mintForms'         => $forms,
-                    'mmLists'           => \WPFunnels\Integrations\Helper::get_lists_for_gutenberg(),
-                    'mmTags'            => \WPFunnels\Integrations\Helper::get_tags_for_gutenberg(),
-                    'isMMActive'        => defined( 'MAILMINT' ) ? 'yes' : 'no',
-				)
-			);
-
-		}
+		// Localize for all blocks
+		wp_localize_script(
+			$handle,
+			'wpfnl_block_object',
+			array(
+				'plugin'  			=> WPFNL_DIR_URL,
+				'image_dir_url'     => WPFNL_DIR_URL.'includes/core/widgets/block/assets/dist/images/',
+				'optin_icon_dir_url'=> WPFNL_DIR_URL.'public/assets/images/',
+				'siteUrl'           => get_site_url(),
+				'ajaxUrl'           => admin_url('admin-ajax.php'),
+				'orderBumpImg'      => WPFNL_URL . 'admin/assets/images/placeholder.jpg',
+				'data_post_id'      => $step_id,
+				// 'wpfnl_ob_data'     => get_post_meta( $step_id, 'order-bump-settings', true ),
+				'wpfnl_ob_data'     => Wpfnl_functions::get_ob_settings( $step_id ),
+				'nonce'             => wp_create_nonce('wp_rest'),
+				'isProActivated'	=> Wpfnl_functions::is_wpfnl_pro_activated(),
+				'obSettings'	    => Wpfnl_functions::get_ob_settings( $step_id ),
+				'isGbf'	            => Wpfnl_functions::maybe_global_funnel( $step_id ),
+				'recaptcha_setting' => Wpfnl_functions::get_recaptcha_settings(),
+				'funnel_list'       => $this->get_funnel_list(),
+				'admin_email'       => Wpfnl_functions::get_optin_settings( 'sender_email' ),
+				'email_subject'     => Wpfnl_functions::get_optin_settings( 'email_subject' ),
+                'mintForms'         => $forms,
+                'mmLists'           => \WPFunnels\Integrations\Helper::get_lists_for_gutenberg(),
+                'mmTags'            => \WPFunnels\Integrations\Helper::get_tags_for_gutenberg(),
+                'isMMActive'        => defined( 'MAILMINT' ) ? 'yes' : 'no',
+			)
+		);		}
 
     }
 

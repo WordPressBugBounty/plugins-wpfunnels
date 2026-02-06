@@ -93,6 +93,11 @@ final class Manager {
 		new Checkout();
 		new OrderDetails();
 		new Optin();
+		
+		// Add OfferButton only if Pro is not active
+		if ( ! Wpfnl_functions::is_wpfnl_pro_activated() ) {
+			require_once __DIR__ . '/elements/class-offer-button.php';
+		}
 	}
 
 

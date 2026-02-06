@@ -12,6 +12,8 @@ use WPFunnels\Meta\Wpfnl_Default_Meta;
 use WPFunnels\Wpfnl;
 use WPFunnels\Wpfnl_functions;
 
+use function \CodeRex\Ecommerce\ecommerce;
+
 /**
  * FeaturedProduct class.
  */
@@ -34,6 +36,7 @@ class LmsCheckout extends AbstractDynamicBlock {
 		parent::__construct($block_name);
 		add_action('wp_ajax_show_lms_checkout_markup', [$this, 'show_checkout_markup']);
 		add_action( 'wpfunnels/gutenberg_checkout_dynamic_filters', array($this, 'dynamic_filters') );
+		
 	}
 
 
@@ -60,10 +63,78 @@ class LmsCheckout extends AbstractDynamicBlock {
 			echo __('Sorry, Please place the element in WPFunnels Checkout page','wpfnl');
 		}else{
 			$funnel_id = get_post_meta($step_id,'_funnel_id',true);
-			$get_learn_dash_setting = Wpfnl_lms_learndash_functions::get_learndash_settings($funnel_id);
-			if($get_learn_dash_setting == 'yes'){
-				$course = Wpfnl_lms_learndash_functions::get_course_details($step_id);
-				if (!empty($course)){
+			$funnel_type = get_post_meta($funnel_id, '_wpfnl_funnel_type', true);
+			
+			// Check if this is an LMS funnel
+			if($funnel_type === 'lms'){
+				// Get course from step and determine provider
+				$course = $this->get_course_from_step($step_id);
+				$provider_id = isset($course['provider']) ? $course['provider'] : 'learndash';
+				$course_id = isset($course['id']) ? $course['id'] : 0;
+				$user_id = get_current_user_id();
+				
+				// Check if user is already enrolled in the course
+				$is_enrolled = false;
+				if ($user_id && $course_id) {
+					if ($provider_id === 'creatorlms') {
+						// Check CreatorLMS enrollment
+						if (class_exists('\WPFunnels\lms\providers\CreatorLMS_Provider')) {
+							$provider = new \WPFunnels\lms\providers\CreatorLMS_Provider();
+							$is_enrolled = $provider->is_enrolled($user_id, $course_id);
+						}
+					} else {
+						// Check LearnDash enrollment
+						$is_enrolled = $this->has_course_access($course_id, $user_id, $provider_id);
+					}
+				}
+				
+				// If already enrolled, show message and next step button
+				if ($is_enrolled) {
+					$next_step_url = $this->get_next_step_url($funnel_id, $step_id);
+					?>
+					<div class="wpfnl-already-enrolled-message" style="padding: 40px 20px; text-align: center; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; margin: 20px 0;">
+						<svg style="width: 64px; height: 64px; margin: 0 auto 20px; color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+						</svg>
+						<h3 style="margin: 0 0 10px; color: #1e40af; font-size: 24px;"><?php echo __('Already Enrolled', 'wpfnl'); ?></h3>
+						<p style="margin: 0 0 20px; color: #475569; font-size: 16px;">
+							<?php echo sprintf(__('You are already enrolled in "%s". No need to purchase again.', 'wpfnl'), esc_html($course['title'])); ?>
+						</p>
+						<?php if ($next_step_url) : ?>
+							<a href="<?php echo esc_url($next_step_url); ?>" class="btn-default" style="display: inline-block; padding: 12px 32px; background: #3b82f6; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600;">
+								<?php echo __('Continue', 'wpfnl'); ?>
+							</a>
+						<?php endif; ?>
+					</div>
+					<?php
+					return ob_get_clean();
+				}
+				
+				// For CreatorLMS, render their native checkout form
+				// Course is added to cart in maybe_add_course_to_cart() hook
+				if ($provider_id === 'creatorlms' && !empty($course)) {
+					// Enqueue CreatorLMS checkout scripts and styles
+					
+					try {
+						$cart = ecommerce()->cart;
+						if ($cart) {
+							// Empty cart first (CreatorLMS only allows 1 item)
+							// $cart->empty_cart(true);
+						
+							// Add course to cart
+							$added = $cart->add_to_cart($course_id, 1, array());
+							$cart->calculate_totals();
+						
+						}
+					} catch (\Exception $e) {
+						error_log( 'Error adding course to cart: ' . $e->getMessage() );
+					}
+					set_transient( 'creatorlms_step_id', $step_id );
+					// Render CreatorLMS checkout shortcode which shows the full checkout form
+					echo do_shortcode('[creator_lms_checkout]');
+					
+				} elseif (!empty($course)){
+					// For LearnDash, use custom checkout layout
 
 					$course_title 		= $course['title'];
 					$description 		= $course['description'];
@@ -222,24 +293,50 @@ class LmsCheckout extends AbstractDynamicBlock {
 
 							<!-- buy now button -->
 							<?php
+							$provider_id = isset($course['provider']) ? $course['provider'] : 'learndash';
+							
 							if (is_user_logged_in() ){
-								$course_access = sfwd_lms_has_access( $course['id'], get_current_user_id() );
-								$next_step_url = Wpfnl_lms_learndash_functions::get_next_step_url($funnel_id,$step_id).'?wpfnl_ld_payment=free';
-								$lms_button_text 		= get_option( 'learndash_settings_custom_labels' );
-								$button_text 			= !empty($lms_button_text['button_take_this_course']) ? $lms_button_text['button_take_this_course'] : 'Take This Course';
+								$course_access = $this->has_course_access($course['id'], get_current_user_id(), $provider_id);
+								$next_step_url = $this->get_next_step_url($funnel_id,$step_id);
+								
+								// Get button text based on provider
+								if ($provider_id === 'learndash') {
+									$lms_button_text = get_option( 'learndash_settings_custom_labels' );
+									$button_text = !empty($lms_button_text['button_take_this_course']) ? $lms_button_text['button_take_this_course'] : 'Take This Course';
+								} else {
+									$button_text = 'Enroll Now';
+								}
+								
 								if ($course_access ){
-									echo '<a class="btn-default" href="'.$next_step_url.'" id="wpfnl-lms-access-course">'.$button_text.'</a>';
+									echo '<a class="btn-default" href="'.$next_step_url.'?wpfnl_lms_payment=free" id="wpfnl-lms-access-course">'.$button_text.'</a>';
 									echo '<span class="wpfnl-lms-access-course-message"></span>';
-								}else if($course_type == 'free'){
-									$next_step_url = Wpfnl_lms_learndash_functions::get_next_step_url($funnel_id,$step_id);
+								}else if($course_type == 'free' || $course_type == 'open'){
 									echo '<a class="btn-default" href="'.$next_step_url.'" user_id="'.get_current_user_id().'" step_id="'.$step_id.'" course_id="'.$course['id'].'" id="wpfnl-lms-free-course">'.$button_text.'</a>';
 									echo '<span class="wpfnl-lms-free-course-message"></span>';
 								}else{
-									echo do_shortcode('[learndash_payment_buttons course_id='.$course['id'].']');
-
+									// Provider-specific payment buttons
+									if ($provider_id === 'learndash') {
+										echo do_shortcode('[learndash_payment_buttons course_id='.$course['id'].']');
+									} else {
+										// CreatorLMS and other providers - show WooCommerce add to cart
+										if (function_exists('crlms_get_course')) {
+											$course_obj = crlms_get_course($course['id']);
+											if ($course_obj && method_exists($course_obj, 'get_product_id')) {
+												$product_id = $course_obj->get_product_id();
+												if ($product_id) {
+													echo do_shortcode('[add_to_cart id="'.$product_id.'" show_price="false"]');
+												}
+											}
+										}
+									}
 								}
 							}else{
-								echo do_shortcode('[learndash_login]');
+								// Provider-specific login
+								if ($provider_id === 'learndash') {
+									echo do_shortcode('[learndash_login]');
+								} else {
+									echo '<p>Please <a href="'.wp_login_url(get_permalink()).'">login</a> to enroll in this course.</p>';
+								}
 							}
 							?>
 						</div>
@@ -425,10 +522,27 @@ class LmsCheckout extends AbstractDynamicBlock {
 		ob_start();
 
 			$funnel_id = get_post_meta($step_id,'_funnel_id',true);
-			$get_learn_dash_setting = Wpfnl_lms_learndash_functions::get_learndash_settings($funnel_id);
-			if($get_learn_dash_setting == 'yes'){
-				$course = Wpfnl_lms_learndash_functions::get_course_details($step_id);
-				if (!empty($course)){
+			$funnel_type = get_post_meta($funnel_id, '_wpfnl_funnel_type', true);
+			
+			// Check if this is an LMS funnel
+			if($funnel_type === 'lms'){
+				$course = $this->get_course_from_step($step_id);
+				$provider_id = isset($course['provider']) ? $course['provider'] : 'learndash';
+				
+				// For CreatorLMS, use their native checkout
+				if ($provider_id === 'creatorlms' && !empty($course)) {
+					$course_id = $course['id'];
+					// Store step info for redirect after checkout
+					set_transient('wpfnl_creatorlms_checkout_' . $course_id, array(
+						'funnel_id' => $funnel_id,
+						'step_id' => $step_id,
+					), HOUR_IN_SECONDS);
+					
+					// Render CreatorLMS checkout shortcode
+					echo do_shortcode('[creator_lms_checkout course_id="' . $course_id . '"]');
+					
+				} elseif (!empty($course)){
+					// For LearnDash, use custom checkout layout
 
 					$course_title 		= $course['title'];
 					$description 		= $course['description'];
@@ -554,6 +668,7 @@ class LmsCheckout extends AbstractDynamicBlock {
 								</div>
 							</div>
 						</div>
+						
 						<div class="lms-checkout-footer">
 							<?php
 							if( $course_type == 'subscribe' ){
@@ -578,25 +693,51 @@ class LmsCheckout extends AbstractDynamicBlock {
 
 							<!-- buy now button -->
 							<?php
-								if (is_user_logged_in() ){
-									$course_access = sfwd_lms_has_access( $course['id'], get_current_user_id() );
-									$next_step_url = Wpfnl_lms_learndash_functions::get_next_step_url($funnel_id,$step_id).'?wpfnl_ld_payment=free';
-									$lms_button_text 		= get_option( 'learndash_settings_custom_labels' );
-									$button_text 			= !empty($lms_button_text['button_take_this_course']) ? $lms_button_text['button_take_this_course'] : 'Take This Course';
-									if ($course_access ){
-										echo '<a class="btn-default" href="'.$next_step_url.'" id="wpfnl-lms-access-course">'.$button_text.'</a>';
-										echo '<span class="wpfnl-lms-access-course-message"></span>';
-									}else if($course_type == 'free'){
-										$next_step_url = Wpfnl_lms_learndash_functions::get_next_step_url($funnel_id,$step_id);
-										echo '<a class="btn-default" href="'.$next_step_url.'" user_id="'.get_current_user_id().'" step_id="'.$step_id.'" course_id="'.$course['id'].'" id="wpfnl-lms-free-course">'.$button_text.'</a>';
-										echo '<span class="wpfnl-lms-free-course-message"></span>';
-									}else{
-										echo do_shortcode('[learndash_payment_buttons course_id='.$course['id'].']');
-
-									}
-								}else{
-									echo do_shortcode('[learndash_login]');
+							$provider_id = isset($course['provider']) ? $course['provider'] : 'learndash';
+							
+							if (is_user_logged_in() ){
+								$course_access = $this->has_course_access($course['id'], get_current_user_id(), $provider_id);
+								$next_step_url = $this->get_next_step_url($funnel_id,$step_id);
+								
+								// Get button text based on provider
+								if ($provider_id === 'learndash') {
+									$lms_button_text = get_option( 'learndash_settings_custom_labels' );
+									$button_text = !empty($lms_button_text['button_take_this_course']) ? $lms_button_text['button_take_this_course'] : 'Take This Course';
+								} else {
+									$button_text = 'Enroll Now';
 								}
+								
+								if ($course_access ){
+									echo '<a class="btn-default" href="'.$next_step_url.'?wpfnl_lms_payment=free" id="wpfnl-lms-access-course">'.$button_text.'</a>';
+									echo '<span class="wpfnl-lms-access-course-message"></span>';
+								}else if($course_type == 'free' || $course_type == 'open'){
+									echo '<a class="btn-default" href="'.$next_step_url.'" user_id="'.get_current_user_id().'" step_id="'.$step_id.'" course_id="'.$course['id'].'" id="wpfnl-lms-free-course">'.$button_text.'</a>';
+									echo '<span class="wpfnl-lms-free-course-message"></span>';
+								}else{
+									// Provider-specific payment buttons
+									if ($provider_id === 'learndash') {
+										echo do_shortcode('[learndash_payment_buttons course_id='.$course['id'].']');
+									} else {
+										// CreatorLMS and other providers - show WooCommerce add to cart
+										if (function_exists('crlms_get_course')) {
+											$course_obj = crlms_get_course($course['id']);
+											if ($course_obj && method_exists($course_obj, 'get_product_id')) {
+												$product_id = $course_obj->get_product_id();
+												if ($product_id) {
+													echo do_shortcode('[add_to_cart id="'.$product_id.'" show_price="false"]');
+												}
+											}
+										}
+									}
+								}
+							}else{
+								// Provider-specific login
+								if ($provider_id === 'learndash') {
+									echo do_shortcode('[learndash_login]');
+								} else {
+									echo '<p>Please <a href="'.wp_login_url(get_permalink()).'">login</a> to enroll in this course.</p>';
+								}
+							}
 							?>
 						</div>
 
@@ -614,4 +755,168 @@ class LmsCheckout extends AbstractDynamicBlock {
 			}
 		wp_send_json_success(ob_get_clean());
 	}
+
+	/**
+	 * Get course details from step using provider system
+	 *
+	 * @param int $step_id Step ID
+	 * @return array|false Course details array or false
+	 * @since 2.0.0
+	 */
+	private function get_course_from_step( $step_id ) {
+		if ( ! $step_id ) {
+			return false;
+		}
+
+		// Get products from step meta
+		$step_type = get_post_meta( $step_id, '_step_type', true );
+		$products  = get_post_meta( $step_id, '_wpfnl_' . $step_type . '_products', true );
+
+		if ( empty( $products ) || ! isset( $products[0]['id'] ) ) {
+			return false;
+		}
+
+		$course_id   = $products[0]['id'];
+		$provider_id = isset( $products[0]['lms_provider'] ) ? $products[0]['lms_provider'] : null;
+
+		// If no provider ID in product, try to detect from funnel settings
+		if ( ! $provider_id ) {
+			$funnel_id   = get_post_meta( $step_id, '_funnel_id', true );
+			$lms_settings = get_option( '_wpfunnels_lms_settings', array() );
+			$provider_id  = isset( $lms_settings['lms_provider'] ) ? $lms_settings['lms_provider'] : 'learndash';
+		}
+
+		// Get provider instance
+		if ( ! function_exists( 'wpfunnels_lms' ) ) {
+			// Fallback to old LearnDash method if provider system not available
+			if ( class_exists( 'WPFunnels\lms\helper\Wpfnl_lms_learndash_functions' ) ) {
+				return Wpfnl_lms_learndash_functions::get_course_details( $step_id );
+			}
+			return false;
+		}
+
+		$lms_manager = wpfunnels_lms();
+		$provider    = $lms_manager->get_provider( $provider_id );
+
+		if ( ! $provider ) {
+			return false;
+		}
+
+		// Get course details from provider
+		$course_details = $provider->get_course_details( $course_id );
+		
+		// Add discount price if applicable
+		if ( ! empty( $course_details ) ) {
+			$discount_price = $this->get_discounted_course_price( $step_id, $provider_id );
+			if ( $discount_price ) {
+				$course_details['discount_price'] = $discount_price;
+			}
+			
+			// Add provider ID to course details
+			$course_details['provider'] = $provider_id;
+		}
+
+		return $course_details;
+	}
+
+	/**
+	 * Get discounted price for a course
+	 *
+	 * @param int    $step_id     Step ID
+	 * @param string $provider_id Provider ID
+	 * @return string|false Discounted price or false
+	 * @since 2.0.0
+	 */
+	private function get_discounted_course_price( $step_id, $provider_id = 'learndash' ) {
+		if ( ! $step_id ) {
+			return false;
+		}
+
+		$step_type = get_post_meta( $step_id, '_step_type', true );
+		
+		// For LearnDash, use the existing helper
+		if ( $provider_id === 'learndash' && class_exists( 'WPFunnels\lms\helper\Wpfnl_lms_learndash_functions' ) ) {
+			return Wpfnl_lms_learndash_functions::get_discounted_course_price( $step_id );
+		}
+
+		// Generic discount calculation for other providers
+		$discount = get_post_meta( $step_id, '_wpfnl_checkout_discount_main_product', true );
+		
+		if ( ! is_array( $discount ) ) {
+			return false;
+		}
+
+		if ( isset( $discount['discountOptions'] ) && 
+			 isset( $discount['mutedDiscountValue'] ) && 
+			 'original' !== $discount['discountOptions'] && 
+			 $discount['mutedDiscountValue'] ) {
+			
+			if ( isset( $discount['discountedPrice'] ) ) {
+				return $discount['discountedPrice'];
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if user has access to course
+	 *
+	 * @param int    $course_id   Course ID
+	 * @param int    $user_id     User ID
+	 * @param string $provider_id Provider ID
+	 * @return bool
+	 * @since 2.0.0
+	 */
+	private function has_course_access( $course_id, $user_id, $provider_id ) {
+		if ( ! $course_id || ! $user_id ) {
+			return false;
+		}
+
+		// For LearnDash
+		if ( $provider_id === 'learndash' && function_exists( 'sfwd_lms_has_access' ) ) {
+			return sfwd_lms_has_access( $course_id, $user_id );
+		}
+
+		// Use provider system
+		if ( function_exists( 'wpfunnels_lms' ) ) {
+			$lms_manager = wpfunnels_lms();
+			$provider    = $lms_manager->get_provider( $provider_id );
+			
+			if ( $provider && method_exists( $provider, 'is_enrolled' ) ) {
+				return $provider->is_enrolled( $user_id, $course_id );
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get next step URL
+	 *
+	 * @param int $funnel_id Funnel ID
+	 * @param int $step_id   Current step ID
+	 * @return string Next step URL
+	 * @since 2.0.0
+	 */
+	private function get_next_step_url( $funnel_id, $step_id ) {
+		if ( class_exists( 'WPFunnels\lms\helper\Wpfnl_lms_learndash_functions' ) ) {
+			return Wpfnl_lms_learndash_functions::get_next_step_url( $funnel_id, $step_id );
+		}
+		
+		// Fallback - get next step in funnel
+		$steps = get_post_meta( $funnel_id, '_steps', true );
+		if ( ! is_array( $steps ) ) {
+			return home_url();
+		}
+
+		$current_index = array_search( $step_id, $steps );
+		if ( $current_index !== false && isset( $steps[ $current_index + 1 ] ) ) {
+			return get_permalink( $steps[ $current_index + 1 ] );
+		}
+
+		return home_url();
+	}
+	
+	
 }

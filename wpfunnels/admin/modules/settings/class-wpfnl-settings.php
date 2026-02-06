@@ -257,6 +257,7 @@ class Module extends Wpfnl_Admin_Module
 		$this->save_recaptcha_settings($payload);
 		$this->save_user_role_management_data($payload);
 		$this->save_google_map_key($payload);
+		$this->save_lms_settings($payload);
 		$this->save_notification_settings($payload);
 
         delete_option(WPFNL_TEMPLATES_OPTION_KEY.'_74');
@@ -355,6 +356,22 @@ class Module extends Wpfnl_Admin_Module
 	}
 
 
+	/**
+	 * Save LMS provider settings
+	 *
+	 * @param $payload
+	 *
+	 * @since 2.0.0
+	 */
+	public function save_lms_settings( $payload ) {
+		if ( isset($payload['lms_provider']) ) {
+			$lms_settings = array(
+				'lms_provider' => sanitize_text_field( $payload['lms_provider'] )
+			);
+			update_option( '_wpfunnels_lms_settings', $lms_settings );
+		}
+	}
+	
 	/**
 	 * Save notification settings
 	 *

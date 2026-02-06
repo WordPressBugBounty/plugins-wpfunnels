@@ -41,6 +41,13 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
                                 <span><?php esc_html_e('Opt-in Settings', 'wpfnl'); ?></span>
                             </li>
 
+                            <?php if (\WPFunnels\Wpfnl_functions::is_lms_addon_active()) { ?>
+                            <li class="nav-li" data-id="lms-settings">
+                                <svg width="20" height="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill="#7A8B9A" d="M10 2L2 7v6c0 4.97 3.5 9 8 10 4.5-1 8-5.03 8-10V7l-8-5zm0 2.18l5.5 3.3V13c0 3.5-2.45 6.58-5.5 7.71-3.05-1.13-5.5-4.21-5.5-7.71V7.48l5.5-3.3zm-1.5 5.32v5h2v-5h-2zm-1-3v2h4V6.5h-4z"/></svg>
+                                <span><?php esc_html_e('LMS Settings', 'wpfnl'); ?></span>
+                            </li>
+                            <?php } ?>
+
                             <?php if (\WPFunnels\Wpfnl_functions::is_wc_active() && 'lead' !== $global_funnel_type) { ?>
                                 <li class="nav-li <?php echo !$is_pro_active ? ' disabled' : '' ?>" <?php echo $is_pro_active ? ' data-id="offer-settings" ' : '' ?> <?php echo !$is_pro_active ? ' id="wpfnl-offer-settings" ' : '' ?>>
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -132,6 +139,20 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
                         </div>
                         <?php do_action('wpfunnels_after_optin_settings'); ?>
                     </div>
+
+                    <!-- LMS Settings -->
+                    <?php if (\WPFunnels\Wpfnl_functions::is_lms_addon_active()) { ?>
+                        <div class="wpfnl-funnel__single-settings lms-settings" id="lms-settings">
+                            <?php do_action('wpfunnels_before_lms_settings'); ?>
+
+                            <h4 class="settings-title"><?php esc_html_e('LMS Settings', 'wpfnl'); ?></h4>
+
+                            <?php require WPFNL_DIR . '/admin/modules/settings/views/lms-settings.php'; ?>
+
+                            <?php do_action('wpfunnels_after_lms_settings'); ?>
+                        </div>
+                    <?php } ?>
+                    <!-- /LMS Settings -->
 
                     <!-- Event and other integration Settings -->
 

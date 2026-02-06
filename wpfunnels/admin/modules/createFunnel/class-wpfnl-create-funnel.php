@@ -56,7 +56,8 @@ class Module extends Wpfnl_Admin_Module
                 }
                 
                 if( 'sales' == $general_settings['funnel_type'] ){
-                    if( Wpfnl_functions::is_lms_addon_active() && isset($payload['type']) && 'lms' === $payload['type'] ){
+                    // Check if LMS add-on is active AND at least one LMS plugin (LearnDash or CreatorLMS) is active
+                    if( Wpfnl_functions::is_lms_addon_active() && Wpfnl_functions::is_any_lms_plugin_active() && isset($payload['type']) && 'lms' === $payload['type'] ){
                         update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lms' );
                         $funnel_type = 'lms';
                     }elseif( Wpfnl_functions::is_wc_active() && isset($payload['type']) && 'wc' === $payload['type'] ){

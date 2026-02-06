@@ -102,6 +102,14 @@ class Manager {
             ]
         ];
         
+        // Add OfferButton only if Pro is not active
+        if ( ! Wpfnl_functions::is_wpfnl_pro_activated() ) {
+            $elements[] = [
+                'file'  => __DIR__. '/class-offer-button.php',
+                'class' => '\WPFunnels\Widgets\Bricks\OfferButton',
+            ];
+        }
+        
         $elements = apply_filters('wpfunels/bricks_elements', $elements );
         if ( class_exists( '\Bricks\Elements' ) ) {
             foreach ( $elements as $element ) {

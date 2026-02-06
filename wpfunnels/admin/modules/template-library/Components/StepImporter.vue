@@ -44,13 +44,7 @@
                 <li :class="{ active : activeItem == 'thankyou' }" id="create-step-thankyou" data-filter="thankyou" @click="doStepFilter" >Thankyou</li>
 
                 <!-- for upsell check if pro activated or not -->
-                <li v-if="!isPro" class="disabled">
-                    Upsell
-                    <a :href="proUrl " target="_blank" title="Click to Upgrade Pro">
-                        <span class="pro-tag">coming soon</span>
-                    </a>
-                </li>
-                <li v-else :class="{ active : activeItem == 'upsell' }" data-filter="upsell" :id="isPro ? 'create-step-upsell' : ''" @click="doStepFilter" :disabled="'lead'==this.funnelType">Upsell</li>
+                <li :class="{ active : activeItem == 'upsell' }" data-filter="upsell" :id="'create-step-upsell'" @click="doStepFilter" :disabled="'lead'==this.funnelType">Upsell</li>
 
                 <!-- for downsell check if pro activated or not -->
                 <li v-if="!isPro" class="disabled">

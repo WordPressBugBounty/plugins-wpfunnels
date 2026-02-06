@@ -239,6 +239,15 @@ final class Manager
                             \Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Order_Details());
                         }
                     }
+                    
+                    // Register Offer Button only if Pro is not active
+                    if( ( $step_type == 'upsell' || $step_type == 'downsell' ) && ! Wpfnl_functions::is_wpfnl_pro_activated() ) {
+                        if ( version_compare(ELEMENTOR_VERSION, '3.5.0', '>=') ) {
+                            \Elementor\Plugin::instance()->widgets_manager->register( new Offer_Button() );
+                        } else {
+                            \Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Offer_Button());
+                        }
+                    }
                 }
                 
 			}
@@ -248,12 +257,20 @@ final class Manager
 				\Elementor\Plugin::instance()->widgets_manager->register(new OptinForm());
 				\Elementor\Plugin::instance()->widgets_manager->register(new Checkout_Form());
 				\Elementor\Plugin::instance()->widgets_manager->register(new Order_Details());
+				// Register Offer Button only if Pro is not active
+				if ( ! Wpfnl_functions::is_wpfnl_pro_activated() ) {
+					\Elementor\Plugin::instance()->widgets_manager->register(new Offer_Button());
+				}
 			} else {
 				// for older version of elementor
 				\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Step_Pointer());
 				\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new OptinForm());
 				\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Checkout_Form());
 				\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Order_Details());
+				// Register Offer Button only if Pro is not active
+				if ( ! Wpfnl_functions::is_wpfnl_pro_activated() ) {
+					\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Offer_Button());
+				}
 			}
 		}
 
