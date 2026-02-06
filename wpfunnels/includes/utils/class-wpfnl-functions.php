@@ -1528,6 +1528,19 @@ class Wpfnl_functions {
 		return false;
 	}
 
+	/**
+	 * Check if woocommerce payment is activated or not
+	 *
+	 * @return bool
+	 * @since  1.9.0
+	 */
+	public static function is_wc_payment_active() {
+		if ( defined( 'WCPAY_PLUGIN_FILE' ) ) {
+			return true;
+		}
+		return false;
+	}
+
 
 	/**
 	 * Check if elementor is installed

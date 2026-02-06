@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
+class ComposerStaticInitaef534bdc43903ec6470c022a88667be
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -546,8 +546,8 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'WPFunnels\\Gateway\\Wpfnl_Gateway_Paypal_WooCommerce' => __DIR__ . '/../..' . '/includes/core/gateways/class-wpfnl-gateway-paypal-woocommerce.php',
         'WPFunnels\\Gateway\\Wpfnl_Gateway_Square' => __DIR__ . '/../..' . '/includes/core/gateways/class-wpfnl-gateway-square.php',
         'WPFunnels\\Gateway\\Wpfnl_Pro_Mollie_Helper' => __DIR__ . '/../..' . '/includes/core/gateways/class-wpfnl-gateway-mollie-helper.php',
-        'WPFunnels\\Gateway\\Wpfnl_Pro_Woocommerce_Payments' => __DIR__ . '/../..' . '/includes/core/gateways/class-wpfnl-gateway-woocommerce-payments.php',
         'WPFunnels\\Gateway\\Wpfnl_Stripe_payment_process' => __DIR__ . '/../..' . '/includes/core/gateways/class-wpfnl-gateway-stripe.php',
+        'WPFunnels\\Gateway\\Wpfnl_Woocommerce_Payments' => __DIR__ . '/../..' . '/includes/core/gateways/class-wpfnl-gateway-woocommerce-payments.php',
         'WPFunnels\\Import\\Wpfnl_Import' => __DIR__ . '/../..' . '/includes/core/import-export/class-wpfnl-import-funnel.php',
         'WPFunnels\\Importer\\Image\\Wpfnl_Image_Importer' => __DIR__ . '/../..' . '/admin/import-export/class-wpfnl-image-import.php',
         'WPFunnels\\Importer\\Wpfnl_Importer_Helper' => __DIR__ . '/../..' . '/admin/import-export/class-wpfnl-importer-helper.php',
@@ -671,9 +671,9 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit459024df4339810735dc6d69dc2d09d1::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit459024df4339810735dc6d69dc2d09d1::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit459024df4339810735dc6d69dc2d09d1::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitaef534bdc43903ec6470c022a88667be::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitaef534bdc43903ec6470c022a88667be::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitaef534bdc43903ec6470c022a88667be::$classMap;
 
         }, null, ClassLoader::class);
     }

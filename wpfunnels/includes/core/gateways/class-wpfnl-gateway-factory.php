@@ -70,9 +70,10 @@ class Payment_Gateways_Factory {
         $gateways = $this->get_supported_payment_gateways();
         if(isset($gateways[$gateway])) {
             $gateway_class = "WPFunnels\\Gateway\\".$gateways[$gateway];
-            $this->payment_gateway = new $gateway_class();
-            
-            return $this->payment_gateway;
+            if ( class_exists( $gateway_class ) ) {
+                $this->payment_gateway = new $gateway_class();
+                return $this->payment_gateway;
+            }
         }
 
         return false;

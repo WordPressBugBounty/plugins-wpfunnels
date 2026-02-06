@@ -1,7 +1,7 @@
 <?php
 namespace WPFunnels\Gateway;
 /**
- * Wpfnl_Pro_Woocommerce_Payments class.
+ * Wpfnl_Woocommerce_Payments class.
  *
  * @extends WFOCU_Gateway
  */
@@ -11,7 +11,7 @@ use WCPay\Payment_Information;
 use WCPay\Constants\Payment_Type;
 use WCPay\Constants\Payment_Initiated_By;
 
-class Wpfnl_Pro_Woocommerce_Payments {
+class Wpfnl_Woocommerce_Payments {
 
   /**
    * Class instance
@@ -715,5 +715,5 @@ class Wpfnl_Pro_Woocommerce_Payments {
 }
 
 if( Wpfnl_functions::is_wc_payment_active() ){
-  Wpfnl_Pro_Woocommerce_Payments::get_instance();
+  Wpfnl_Woocommerce_Payments::get_instance();
 }
