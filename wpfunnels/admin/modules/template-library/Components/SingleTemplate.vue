@@ -35,6 +35,16 @@
 					>
 						Import
 					</a>
+					
+					<a 
+						v-show="!isProActivated && isPro" 
+						href="https://getwpfunnels.com/pricing/" 
+						class="btn-default upgrade-to-pro"
+						style="width:max-content;" 
+						target="_blank"
+					>
+						Upgrade to Pro
+					</a>
 
 					<a href="#" class="btn-default steps-preview" @click="toggleStepsPreview"> Preview </a>
 				</div>

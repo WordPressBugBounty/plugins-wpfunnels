@@ -110,6 +110,9 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
             'post_name' => sanitize_title($funnel_title),
         );
         wp_update_post($params);
+        
+        do_action('wpfunnels_after_funnel_imported', $funnel_id, $args['type'], $general_settings['builder']);
+
         return [
             'success' => true,
             'funnelID' => $funnel_id,

@@ -8,6 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'a4a119a56e50fbb293281d9a48007e0e' => $vendorDir . '/symfony/polyfill-php80/bootstrap.php',
     '7b11c4dc42b3b3023073cb14e519683c' => $vendorDir . '/ralouphie/getallheaders/src/getallheaders.php',
+    'ff3063ba1525be89739a1851bfba6fcb' => $vendorDir . '/coderexltd/telemetry/src/helpers.php',
     'db1766888a4f96ab813d6f6a38125eb9' => $vendorDir . '/philipnewcomer/wp-ajax-helper/src/functions.php',
     '42ecdafac508117107920039c80ecc5f' => $baseDir . '/includes/wpf-formatting-functions.php',
     '7cd7c1cdfee0818e6494720c7224cf83' => $baseDir . '/includes/wpf-update-functions.php',

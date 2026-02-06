@@ -15,6 +15,7 @@ $offer_settings = \WPFunnels\Wpfnl_functions::get_offer_settings();
         <?php } ?>
         <li class="inner-tab" data-tab="tab-order-management"><?php esc_html_e('Order Management', 'wpfnl'); ?></li>
         <li class="inner-tab" data-tab="tab-payment-management"><?php esc_html_e('Payment Management', 'wpfnl'); ?></li>
+        <li class="inner-tab" data-tab="tab-thank-you-page"><?php esc_html_e('Global Thank You', 'wpfnl'); ?></li>
     </ul>
 </div>
 
@@ -179,3 +180,28 @@ $offer_settings = \WPFunnels\Wpfnl_functions::get_offer_settings();
 	</div>
 </div>
 <!-- /settings-box -->
+
+<!-- Thank You Page Tab -->
+<div class="wpfnl-tab-content" id="tab-thank-you-page">
+	<div class="wpfnl-box payment-management">
+		<div class="wpfnl-field-wrapper">
+			<label class="has-tooltip">
+				<?php esc_html_e('Enable global thank you', 'wpfnl'); ?>
+				<span class="wpfnl-tooltip">
+					<?php require WPFNL_DIR . '/admin/partials/icons/settings-tooltip-icon.php'; ?>
+					<p><?php esc_html_e('Enable this option to redirect users to the WooCommerce order confirmation page for all funnels. If disabled, each funnel will use its own thank you page.', 'wpfnl'); ?></p>
+				</span>
+			</label>
+			<div class="wpfnl-fields">
+					<span class="wpfnl-switcher extra-sm no-title">
+						<input type="checkbox" name="wpfnl-enable-global-thankyou"
+							id="wpfnl-enable-global-thankyou" <?php if ($this->offer_settings['enable_global_thankyou'] == 'on') {
+							echo 'checked';
+						} ?>/>
+						<label for="wpfnl-enable-global-thankyou"></label>
+					</span>
+			</div>
+		</div>
+		<!-- /field-wrapper -->
+	</div>
+</div>

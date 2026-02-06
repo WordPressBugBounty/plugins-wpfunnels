@@ -96,6 +96,9 @@ class Wpfnl_Public
 		add_action('wpfunnels/funnel_journey_end', array($this, 'end_journey'), 10, 2);
 
 		add_filter('woocommerce_add_cart_item_data', [$this, 'namespace_force_individual_cart_items'], 10, 2);
+		add_filter('woocommerce_cart_item_name', [$this, 'wpfnl_order_bump_cart_item_name'], 10, 3);
+		add_filter('woocommerce_checkout_cart_item_quantity', [$this, 'wpfnl_order_bump_cart_item_quantity'], 10, 3);
+		add_action('woocommerce_checkout_create_order_line_item', [$this, 'wpfnl_order_bump_order_line_item'], 10, 4);
 		add_filter('wpfunnels/funnel_order_placed', [$this, 'add_order_details_to_logger'], 10, 3);
 		add_action('wpfunnels/after_optin_submit', array($this, 'add_optin_data_to_logger'), 10, 4);
 		add_action('wpfunnels/after_optin_submit', array($this, 'get_optin_data'), 10, 4);
@@ -116,6 +119,8 @@ class Wpfnl_Public
 
 		// remove woodmart hook for funnel checkout
 		add_action('wp', [$this, 'remove_woodmart_hook'], 150);
+
+		add_action( 'wp_footer', array( $this, 'load_variable_product_modal' ) );
 
 	}
 
@@ -178,9 +183,9 @@ class Wpfnl_Public
 	public function posts_join($join)
 	{
 		if (class_exists('PLL_Model') && class_exists('PLL_Translated_Post')) {
-			$pll_options     = get_option('polylang', []);
-			$model       = new PLL_Model($pll_options);
-			$post        = new PLL_Translated_Post($model);
+			$options = new \WP_Syntex\Polylang\Options\Options();
+			$model = new PLL_Model($options);
+			$post = new PLL_Translated_Post($model);
 			$custom_join = $post->join_clause();
 			return str_replace($custom_join, '', $join);
 		}
@@ -252,6 +257,54 @@ class Wpfnl_Public
 	}
 
 
+
+	/**
+	 * Display custom product title for order bump items in cart
+	 *
+	 * @param string $product_name
+	 * @param array $cart_item
+	 * @param string $cart_item_key
+	 * @return string
+	 */
+	public function wpfnl_order_bump_cart_item_name($product_name, $cart_item, $cart_item_key)
+	{
+		if (isset($cart_item['wpfnl_order_bump']) && $cart_item['wpfnl_order_bump'] && isset($cart_item['wpfnl_ob_title']) && !empty($cart_item['wpfnl_ob_title'])) {
+			return $cart_item['wpfnl_ob_title'];
+		}
+		return $product_name;
+	}
+
+	/**
+	 * Display custom quantity for order bump items in cart
+	 *
+	 * @param string $quantity
+	 * @param array $cart_item
+	 * @param string $cart_item_key
+	 * @return string
+	 */
+	public function wpfnl_order_bump_cart_item_quantity($quantity, $cart_item, $cart_item_key)
+	{
+		if (isset($cart_item['wpfnl_order_bump']) && $cart_item['wpfnl_order_bump'] && isset($cart_item['wpfnl_ob_quantity'])) {
+			// Return the quantity with the order bump quantity
+			return sprintf('&times;&nbsp;%s', $cart_item['quantity']);
+		}
+		return $quantity;
+	}
+
+	/**
+	 * Add custom product title to order line item meta
+	 *
+	 * @param \WC_Order_Item_Product $item
+	 * @param string $cart_item_key
+	 * @param array $values
+	 * @param \WC_Order $order
+	 */
+	public function wpfnl_order_bump_order_line_item($item, $cart_item_key, $values, $order)
+	{
+		if (isset($values['wpfnl_order_bump']) && $values['wpfnl_order_bump'] && isset($values['wpfnl_ob_title']) && !empty($values['wpfnl_ob_title'])) {
+			$item->set_name($values['wpfnl_ob_title']);
+		}
+	}
 
 	/**
 	 * Initialize function
@@ -331,6 +384,7 @@ class Wpfnl_Public
 			add_filter('astra_theme_woocommerce_dynamic_css', '__return_empty_string');
 
 			wp_enqueue_style('wpfnl-public', plugin_dir_url(__FILE__) . 'assets/css/wpfnl-public.css', [], WPFNL_VERSION, 'all');
+			wp_enqueue_style('wpfnl-order-bump-modal', plugin_dir_url(__FILE__) . 'assets/css/order-bump-modal.css', [], WPFNL_VERSION, 'all');
 			//$this->load_googlefonts();
 		}
 	}
@@ -359,6 +413,23 @@ class Wpfnl_Public
 			$compatibility = Wpfnl_Theme_Compatibility::getInstance();
 
 			wp_enqueue_script('wpfnl-public', plugin_dir_url(__FILE__) . 'assets/js/wpfnl-public.js', ['jquery'], WPFNL_VERSION, false);
+			if ( Wpfnl_functions::is_funnel_step_page( 'checkout' ) ) {
+				$checkout_id = get_the_ID();
+				$order_bump_settings = get_post_meta( $checkout_id, 'order-bump-settings', true );
+
+				if ( ! empty( $order_bump_settings ) ) {
+					foreach ( $order_bump_settings as $key => $settings ) {
+						if ( isset( $settings['product'] ) ) {
+							$product = wc_get_product( $settings['product'] );
+							if ( $product && $product->is_type( 'variable' ) ) {
+								wp_enqueue_script( 'wc-single-product' );
+								break;
+							}
+						}
+					}
+				}
+			}
+			wp_enqueue_script('wpfnl-order-bump-variable', plugin_dir_url(__FILE__) . 'assets/js/order-bump-variable.js', array( 'jquery', 'wc-add-to-cart-variation' ), WPFNL_VERSION, true);
 			wp_localize_script(
 				'wpfnl-public',
 				'wpfnl_obj',
@@ -709,7 +780,6 @@ class Wpfnl_Public
 	{
 
 		if ($order && Wpfnl_functions::check_if_funnel_order($order)) {
-
 			$order_key       = $order->get_order_key();
 			$order_id        = $order->get_id();
 			$link            = '#';
@@ -726,6 +796,9 @@ class Wpfnl_Public
 			$next_node       		= apply_filters('wpfunnels/next_step_data', $next_node);
 			$next_node       		= apply_filters('wpfunnels/modify_next_step_based_on_order', $next_node, $order);
 			if (isset($next_node['step_type']) && 'thankyou' === $next_node['step_type']) {
+				if( Wpfnl_functions::is_global_thank_you_page_enabled() ){
+					return home_url() . '/checkout/order-received/' . $order_id . '/?key=' . $order_key;
+				}
 				$custom_url = Wpfnl_functions::custom_url_for_thankyou_page($next_node['step_id']);
 				if ($custom_url) {
 					return $custom_url;
@@ -1127,8 +1200,11 @@ class Wpfnl_Public
 		// Extract user's email for potential login and registration.
 		$login = $user_info['email'] ? strstr($user_info['email'], '@', true) : '';
 
+		// Check WordPress site-wide registration setting FIRST.
+    	$can_register = get_option('users_can_register');
+
 		// Check if opt-in registration is allowed and perform related actions.
-		if (!empty($post_data['optin_allow_registration']) && $post_data['optin_allow_registration'] == 'yes') {
+		if ( $can_register && !empty($post_data['optin_allow_registration']) && $post_data['optin_allow_registration'] == 'yes') {
 			// Create user account based on the extracted login and post data.
 			Ajax_Handler::create_user_optin_allow_registration($login, $post_data);
 		}
@@ -1214,6 +1290,38 @@ class Wpfnl_Public
 			echo '<!-- Custom WPFunnels Script -->';
 			echo html_entity_decode($script); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo '<!-- End Custom WPFunnels Script -->';
+		}
+	}
+
+
+
+	/**
+	 * Load variable product modal
+	 *
+	 * @return void
+	 */
+	public function load_variable_product_modal() {
+		if ( Wpfnl_functions::is_funnel_step_page( 'checkout' ) ) {
+			$checkout_id = get_the_ID();
+			$order_bump_settings = get_post_meta( $checkout_id, 'order-bump-settings', true );
+			if ( ! empty( $order_bump_settings ) ) {
+				foreach ( $order_bump_settings as $key => $settings ) {
+					if ( isset( $settings['product'] ) ) {
+						$product = wc_get_product( $settings['product'] );
+						if ( $product && $product->is_type( 'variable' ) ) {
+							wc_get_template(
+								'variable-product-modal.php',
+								array(
+									'product' => $product,
+									'key'     => $key,
+								),
+								'',
+								WPFNL_DIR . 'public/modules/checkout/templates/'
+							);
+						}
+					}
+				}
+			}
 		}
 	}
 }

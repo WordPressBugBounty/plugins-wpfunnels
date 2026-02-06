@@ -553,6 +553,17 @@ class Wpfunnels_Wc_Checkout extends Wpfnl_Funnel_Type
             $response[ 'disableGateways' ]        = $disableGateways;
             $response[ 'discount' ]          = $discount;
             $response[ 'time_bound_discount_settings' ]          = $time_bound_discount_settings;
+            
+            // Get Product Options settings
+            $productOptions = get_post_meta($step_id, '_wpfnl_checkout_product_options', true);
+            if (!$productOptions) {
+                $productOptions = [
+                    'isEnabled' => 'no',
+                    'condition' => 'restrict_all'
+                ];
+            }
+            $response['productOptions'] = $productOptions;
+            
             $response[ 'success' ]           = true;
             $response['columns'] = Wpfnl_functions::get_checkout_columns( $step_id );
         }

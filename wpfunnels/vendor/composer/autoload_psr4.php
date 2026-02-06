@@ -20,5 +20,6 @@ return array(
     'League\\Flysystem\\' => array($vendorDir . '/league/flysystem/src'),
     'Intervention\\Image\\' => array($vendorDir . '/intervention/image/src/Intervention/Image'),
     'GuzzleHttp\\Psr7\\' => array($vendorDir . '/guzzlehttp/psr7/src'),
+    'CodeRex\\Telemetry\\' => array($vendorDir . '/coderexltd/telemetry/src'),
     'Appsero\\' => array($vendorDir . '/appsero/client/src'),
 );

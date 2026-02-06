@@ -44,8 +44,7 @@ use WPFunnels\Widgets\Wpfnl_Widgets_Manager as Widget_Manager;
 use WPFunnels\Batch\Elementor\Wpfnl_Batch;
 use WPFunnels\Meta\Wpfnl_Default_Meta;
 use WPFunnels\Compatibility\Wpfnl_Compatibility;
-
-
+use WPFunnels\Tracking\EventTracker;
 
 /**
  * The file that defines the core plugin class
@@ -214,6 +213,14 @@ class Wpfnl
      * @since 3.2.0
      */
     protected $optin_recorder;
+
+    /**
+	 * EventTracker object
+	 * 
+	 * @var object|EventTracker
+	 * @since 3.6.4
+	 */
+	public $event_tracker;
 
     /**
      * Instance.
@@ -404,7 +411,7 @@ class Wpfnl
         $this->widget_manager           = Widget_Manager::getInstance()->init();
         $this->page_templates           = new PageTemplates\Manager();
         $this->admin_notice             = new Notice();
-        $this->admin_banner             = new SpecialOccasionBanner('wp-anniversary', '2025-09-02 12:00:01', '2025-10-16 23:59:59', 'https://getwpfunnels.com/creatorlms/?utm_source=plugin-cta&utm_medium=wpf-plugin-notification-banner&utm_campaign=clms-launch#pricing');
+        $this->admin_banner             = new SpecialOccasionBanner('newyear2026', '2025-01-01 00:00:00', '2025-01-07 23:59:59', 'https://getwpfunnels.com/pricing/?utm_source=plugin&utm_medium=dashboard-banner-wpf&utm_campaign=welcome2026');
         $this->order_bump_actions       = new Wpfnl_Order_Bump_Action();
         $this->meta                     = new Wpfnl_Default_Meta();
         $this->shortcodes				= Wpfnl_Shortcodes::getInstance()->init();
@@ -415,6 +422,7 @@ class Wpfnl
 
         $this->stat_hooks_handler		= new StatHookHandler();
         $this->optin_recorder		    = new OptinRecorder();
+        $this->event_tracker            = EventTracker::init();
 
 		Wpfnl_Activator::init();
     }

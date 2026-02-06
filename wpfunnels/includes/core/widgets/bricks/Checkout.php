@@ -13,6 +13,7 @@ use \Bricks\Element;
 use WPFunnels\Wpfnl_functions;
 use WPFunnels\Traits\SingletonTrait;
 use WPFunnels\Wpfnl;
+use WPFunnels\Modules\Frontend\Checkout\Wpfnl_Order_Bump_Rules;
 
 
 if (! defined('ABSPATH')) {
@@ -2235,7 +2236,10 @@ class Checkout extends Element
         $order_bump_settings = get_post_meta($step_id, 'order-bump-settings', true);
         foreach( $order_bump_settings as $key=>$ob_settings ){
             if ( $ob_settings['isEnabled'] && isset($ob_settings['product']) && $ob_settings['product'] != '' ) {
-                $this->render_order_bump_template($ob_settings);
+                // Check conditional rules before displaying
+                if ( Wpfnl_Order_Bump_Rules::should_display_order_bump( $ob_settings ) ) {
+                    $this->render_order_bump_template($ob_settings);
+                }
             }
         }
     }

@@ -131,26 +131,26 @@ class Wpfnl_Menus
             [$this, 'render_email_builder_page']
         );
 
-        if ( !Wpfnl_functions::is_wpfnl_pro_activated() ) {
+        // if ( !Wpfnl_functions::is_wpfnl_pro_activated() ) {
 
-            add_submenu_page(
-                WPFNL_MAIN_PAGE_SLUG,
-                __('Free vs Pro', 'wpfnl'),
-                __('Free vs Pro', 'wpfnl'),
-                Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
-                'wpf_feature_comparison',
-                [$this, 'render_feature_comparison_page']
-            );
+        //     add_submenu_page(
+        //         WPFNL_MAIN_PAGE_SLUG,
+        //         __('Free vs Pro', 'wpfnl'),
+        //         __('Free vs Pro', 'wpfnl'),
+        //         Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
+        //         'wpf_feature_comparison',
+        //         [$this, 'render_feature_comparison_page']
+        //     );
 
 
-            add_submenu_page(
-				WPFNL_MAIN_PAGE_SLUG,
-				__('Go Pro', 'wpfnl'),
-				'<span class="dashicons dashicons-star-filled" style="font-size: 17px; color:#1fb3fb;"></span> ' . __('Go Pro', 'wpfnl'),
-				Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
-				'https://getwpfunnels.com/pricing/'
-			);
-        }
+        //     add_submenu_page(
+		// 		WPFNL_MAIN_PAGE_SLUG,
+		// 		__('Go Pro', 'wpfnl'),
+		// 		'<span id="wpfnl-go-pro" class="dashicons dashicons-star-filled" style="font-size: 17px; color:#1fb3fb;"></span> ' . __('Go Pro', 'wpfnl'),
+		// 		Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
+		// 		'https://getwpfunnels.com/pricing/'
+		// 	);
+        // }
 
 		/**
 		 * After setup menu of WPFunnels.
@@ -339,6 +339,7 @@ class Wpfnl_Menus
             jQuery(document).ready(function($) {
                 $('#wpfnl-documentation').parent().attr('target','_blank');
                 $('#wpfnl-request-feature').parent().attr('target','_blank');
+                $('#wpfnl-go-pro').parent().attr('target','_blank');
             });
         </script>
         <?php

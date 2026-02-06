@@ -234,6 +234,21 @@ class Wpfnl_functions {
 
 
 	/**
+	 * Check product option is selected or not from post data
+	 *
+	 * @return bool True|False
+	 * @since 2.8.0
+	 */
+	public static function is_product_option_from_post_data() {
+		if ( ! empty( $_POST['post_data'] ) ) {
+			wp_parse_str( $_POST['post_data'], $post_data );
+			return ! empty( $post_data['_wpfunnels_product_option'] ) && 'selected' === $post_data['_wpfunnels_product_option'];
+		}
+		return ! empty( $_POST['_wpfunnels_product_option'] ) && 'selected' === $_POST['_wpfunnels_product_option'];
+	}
+
+
+	/**
 	 * Check variation is selected or not from post data
 	 *
 	 * @return bool True|False
@@ -1257,6 +1272,7 @@ class Wpfnl_functions {
 				'show_supported_payment_gateway' => 'off',
 				'skip_offer_step'                => 'off',
 				'skip_offer_step_for_free'       => 'off',
+				'enable_global_thankyou'         => 'off',
 			)
 		);
 		$saved_settings   = self::get_admin_settings( '_wpfunnels_offer_settings' );
@@ -1382,6 +1398,26 @@ class Wpfnl_functions {
 	 */
 	public static function get_google_map_api_key() {
 		return self::get_admin_settings( '_wpfunnels_google_map_api_key', '' );
+	}
+
+
+	/**
+	 * Get notification settings
+	 *
+	 * @return array
+	 * @since 3.2.0
+	 */
+	public static function get_notification_settings() {
+		$default_notification_settings = array(
+			'enable_revenue_report' => 'no',
+			'revenue_report_frequency' => 'weekly',
+			'revenue_report_recipient' => get_option('admin_email'),
+			'revenue_report_subject' => 'Store Revenue Report - {period}',
+			'send_time' => '10:00',
+		);
+
+		$notification_settings = self::get_admin_settings( '_wpfunnels_notification_settings' );
+		return wp_parse_args( $notification_settings, $default_notification_settings );
 	}
 
 
@@ -2760,8 +2796,7 @@ class Wpfnl_functions {
 		$funnel_id = get_post_meta( $step_id, '_funnel_id', true );
 		$columns   = array(
 			'product-name'       => 'Product',
-			'product-price'      => 'Unit Price',
-			'calculate-operator' => '',
+			'product-price'      => 'Price',
 			'product-quantity'   => 'Quantity',
 			'total-price'        => 'Total Price',
 			'product-action'     => 'Actions',
@@ -4724,6 +4759,8 @@ class Wpfnl_functions {
 			'new_rule'                                    => __( 'New Rule', 'wpfnl' ),
 			'enter_a_value'                               => __( 'Enter a value', 'wpfnl' ),
 			'select_date'                                 => __( 'Select Date', 'wpfnl' ),
+			'mark_this_email_as_transactional'          => __( 'Mark this email as transactional', 'wpfnl' ),
+			'mark_this_email_as_transactional_tooltip'   => __( 'Unsubscribed contacts will still receive transactional emails like Order Summaries, Renewal Reminders, and Admin notifications.', 'wpfnl' ),
 
 			// -----step importer------
 			'enter_step_name'                             => __( 'Enter A Step Name', 'wpfnl' ),
@@ -4836,7 +4873,7 @@ class Wpfnl_functions {
 
 			'enter_funnel_if'                             => __( 'Enter Funnel If', 'wpfnl' ),
 			'add_category'                                => __( 'Add Category', 'wpfnl' ),
-			'add_product'                                 => __( 'Add Product', 'wpfnl' ),
+			'add_product'                                 => __( 'Add Existing Product', 'wpfnl' ),
 			'amount'                                      => __( 'Amount', 'wpfnl' ),
 			'ammount_must_be_greater_than_1'              => __( 'Amount must be greater than 1', 'wpfnl' ),
 			'ammount_must_be_greater_than_0'              => __( 'Amount must be greater than 0', 'wpfnl' ),
@@ -4897,18 +4934,18 @@ class Wpfnl_functions {
 			'enable_order_bump'                           => __( 'Enable Order Bump', 'wpfnl' ),
 			'delete_order_bump'                           => __( 'Delete Order Bump', 'wpfnl' ),
 			'ob_name'                                     => __( 'Order Bump Name', 'wpfnl' ),
-			'select_template'                             => __( 'Select Template', 'wpfnl' ),
+			'select_template'                             => __( 'Template Style', 'wpfnl' ),
 			'select_template_tooltip'                     => __( 'Choose a suitable template for your Order bump design.', 'wpfnl' ),
-			'ob_position'                                 => __( 'Order Bump Position', 'wpfnl' ),
+			'ob_position'                                 => __( 'Display Position', 'wpfnl' ),
 			'ob_position_tooltip'                         => __( 'Decide where the order bump offer should be placed in the checkout page.', 'wpfnl' ),
-			'ob_arrow_color'                              => __( 'Order Bump Arrow Color', 'wpfnl' ),
+			'ob_arrow_color'                              => __( 'Arrow Color', 'wpfnl' ),
 			'ob_remove_arrow_color'                       => __( 'Remove arrow color', 'wpfnl' ),
-			'ob_bg_color'                                 => __( 'Order Bump Background Color', 'wpfnl' ),
+			'ob_bg_color'                                 => __( 'Background Color', 'wpfnl' ),
 			'ob_bg_color_tooltip'                         => __( 'Change the color of the Checkbox bar if you want to.', 'wpfnl' ),
 			'ob_remove_bg_color'                          => __( 'Remove background color', 'wpfnl' ),
-			'ob_main_color'                               => __( 'Order Bump Main Color', 'wpfnl' ),
+			'ob_main_color'                               => __( 'Main Color', 'wpfnl' ),
 			'ob_main_color_tooltip'                       => __( 'Change the color of the Checkbox bar if you want to.', 'wpfnl' ),
-			'ob_price_color'                              => __( 'Order Bump Price Color', 'wpfnl' ),
+			'ob_price_color'                              => __( 'Price Color', 'wpfnl' ),
 			'ob_choose_variant_text'                      => __( 'Order Bump Choose Variant Text', 'wpfnl' ),
 			'select_color_for_variant_text'               => __( 'Select Color for Variant Text', 'wpfnl' ),
 			'price'                                       => __( 'Price', 'wpfnl' ),
@@ -5537,6 +5574,24 @@ class Wpfnl_functions {
 			return $guided_tour_default;
 		}
 		return $guided_tour;
+	}
+
+	/**
+	 * Check if the Global Thank You Page feature is enabled.
+	 *
+	 * This method retrieves the `_wpfunnels_offer_settings` option from the database 
+	 * and checks whether the `enable_global_thankyou` setting is set to `'on'`.
+	 *
+	 * @since 3.5.31
+	 *
+	 * @return bool True if the Global Thank You Page is enabled, false otherwise.
+	 */
+	public static function is_global_thank_you_page_enabled() {
+		$offer_settings = get_option('_wpfunnels_offer_settings');
+		if( isset($offer_settings['enable_global_thankyou']) && $offer_settings['enable_global_thankyou'] ){
+            return 'on' == $offer_settings['enable_global_thankyou'] ? true : false;
+        }
+        return false;
 	}
 }
 

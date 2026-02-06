@@ -21,6 +21,17 @@
         flex-flow: row wrap;
         align-items: flex-start;
 
+        .template-content{
+            .option-selector {
+                color: #F34D01;
+                cursor: pointer;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 18px;
+                margin-top: 10px;
+            }
+        }
+
         .template-img {
             width: 150px;
             height: 150px;
@@ -81,6 +92,18 @@
         padding: 11px 20px;
         margin-bottom: 20px;
         border-radius: 10px;
+
+        .wpfnl-checkbox{
+            .option-selector{
+                color: $primary-color;
+                font-weight: 500;
+                font-size: 15px;
+                line-height: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
 
         .wpfnl-checkbox label {
             font-weight: 600;

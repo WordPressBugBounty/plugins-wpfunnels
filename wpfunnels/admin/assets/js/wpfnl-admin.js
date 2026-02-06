@@ -3,7 +3,6 @@
 
     var product_option = window.WPFunnelVars.products
     var selectedIds = []
-    console.log(product_option)
     /**
      * All of the code for your admin-facing JavaScript source
      * should reside in this file.
@@ -879,6 +878,7 @@
                 if ('json' === fileExtension) {
                     formData.append('action', 'wpfnl_import_funnels')
                     formData.append('is_ajax', 'yes')
+                    formData.append('nonce', WPFunnelVars.import_nonce)
                     formData.append('uploaded_file', importFile)
 
                     $.ajax({
@@ -2169,15 +2169,15 @@
     })
 
     // ---delete promotional-banner notice permanently ------
-    $(document).on('click', '.wp-anniversary-banner .close-promotional-banner', function (event) {
+    $(document).on('click', '.gwpf-promotional-notice .close-promotional-banner', function (event) {
         event.preventDefault()
-        $('.wp-anniversary-banner').attr('style', 'display: none !important');
+        $('.gwpf-promotional-notice').attr('style', 'display: none !important');
         wpAjaxHelperRequest('delete_promotional_banner')
     })
 
     $(document).on('click', '.wpfnl-notification-counter__btn-area', function (event) {
         event.preventDefault()
-        $('.wp-anniversary-banner').attr('style', 'display: none !important');
+        $('.gwpf-promotional-notice').attr('style', 'display: none !important');
         wpAjaxHelperRequest('delete_promotional_banner')
     })
 
@@ -2615,14 +2615,14 @@
     $(document).on('click', '#wpfnl-pro-modal-close', function (e) { 
         const html = '<strong>Small</strong> <span>License for 1 site</span>';
         $('#pro-modal-package-type').html(html)
-        $('.wpfnl-footer-btn-wrapper .btn-default.confirmed').attr('href', 'https://useraccount.getwpfunnels.com/wpfunnels-annual/steps/annual-small-checkout/');
+        $('.wpfnl-footer-btn-wrapper .btn-default.confirmed').attr('href', 'https://useraccount.getwpfunnels.com/wpf-small-annual-brand-new/steps/wpf-sa-checkout/');
         $('#wpfnl-pro-modal').hide()
     })
 
     $(document).on('click', '#wpfnl-pro-modal-close-btn', function (e) {
         const html = '<strong>Small</strong> <span>License for 1 site</span>';
         $('#pro-modal-package-type').html(html)
-        $('.wpfnl-footer-btn-wrapper .btn-default.confirmed').attr('href', 'https://useraccount.getwpfunnels.com/wpfunnels-annual/steps/annual-small-checkout/');
+        $('.wpfnl-footer-btn-wrapper .btn-default.confirmed').attr('href', 'https://useraccount.getwpfunnels.com/wpf-small-annual-brand-new/steps/wpf-sa-checkout/');
         $('#wpfnl-pro-modal').hide()
     })
     // close modal ends
@@ -2672,7 +2672,7 @@
         if (confirmLink) {
             confirmBtnElement.setAttribute('href', confirmLink)
         } else {
-            confirmBtnElement.setAttribute('href', 'https://useraccount.getwpfunnels.com/wpfunnels-annual/steps/annual-small-checkout/')
+            confirmBtnElement.setAttribute('href', 'https://useraccount.getwpfunnels.com/wpf-small-annual-brand-new/steps/wpf-sa-checkout/')
         }
 
         // features setting
@@ -2707,7 +2707,7 @@
         const config = {
             showSubHeading: true,
             subHeading: 'Upgrade to Export Funnels.',
-            confirmLink: 'https://useraccount.getwpfunnels.com/wpfunnels-annual/steps/annual-small-checkout/',
+            confirmLink: 'https://useraccount.getwpfunnels.com/wpf-small-annual-brand-new/steps/wpf-sa-checkout/',
             features: [
                 {
                     label: 'Export Funnels',
@@ -2734,7 +2734,7 @@
         const config = {
             showSubHeading: true,
             subHeading: 'Upgrade to Import Funnels.',
-            confirmLink: 'https://useraccount.getwpfunnels.com/wpfunnels-annual/steps/annual-small-checkout/',
+            confirmLink: 'https://useraccount.getwpfunnels.com/wpf-small-annual-brand-new/steps/wpf-sa-checkout/',
             features: [
                
                 {
@@ -2758,7 +2758,7 @@
         const config = {
             showSubHeading: true,
             subHeading: 'Upgrade to Unlock Offer Settings.',
-            confirmLink: 'https://useraccount.getwpfunnels.com/wpfunnels-annual/steps/annual-small-checkout/',
+            confirmLink: 'https://useraccount.getwpfunnels.com/wpf-small-annual-brand-new/steps/wpf-sa-checkout/',
             features: [
                 {
                     label: 'Create Child Order',
@@ -2781,7 +2781,7 @@
         const config = {
             showSubHeading: true,
             subHeading: 'Upgrade to Export Funnels.',
-            confirmLink: 'https://useraccount.getwpfunnels.com/wpfunnels-annual/steps/annual-small-checkout/',
+            confirmLink: 'https://useraccount.getwpfunnels.com/wpf-small-annual-brand-new/steps/wpf-sa-checkout/',
             features: [
                 {
                     label: 'Export Funnels',
@@ -2809,7 +2809,7 @@
             showSubHeading: true,
             subHeading:
                 'This feature is only available in the Pro version. Upgrade Now to continue all these awesome features',
-            confirmLink: 'https://useraccount.getwpfunnels.com/wpfunnels-annual/steps/annual-small-checkout/',
+            confirmLink: 'https://useraccount.getwpfunnels.com/wpf-small-annual-brand-new/steps/wpf-sa-checkout/',
             features: [
                 {
                     label: 'Unlimited Contacts k',
@@ -2842,7 +2842,7 @@
         const config = {
             showSubHeading: true,
             subHeading: 'Upgrade to Pro for FB Pixel Tracking.',
-            confirmLink: 'https://useraccount.getwpfunnels.com/wpfunnels-annual/steps/annual-small-checkout/',
+            confirmLink: 'https://useraccount.getwpfunnels.com/wpf-small-annual-brand-new/steps/wpf-sa-checkout/',
             features: [
                 {
                     label: 'FB Pixel Tracking',
@@ -2879,7 +2879,7 @@
         const config = {
             showSubHeading: true,
             subHeading: 'Upgrade to Pro for GTM Tracking.',
-            confirmLink: 'https://useraccount.getwpfunnels.com/wpfunnels-annual/steps/annual-small-checkout/',
+            confirmLink: 'https://useraccount.getwpfunnels.com/wpf-small-annual-brand-new/steps/wpf-sa-checkout/',
             features: [
                 {
                     label: 'GTM Tracking',

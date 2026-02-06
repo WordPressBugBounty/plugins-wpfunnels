@@ -18,6 +18,16 @@
             align-items: flex-start;
             justify-content: space-between;
 
+            .option-selector {
+                color: #F34D01;
+                cursor: pointer;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 18px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+
             .template-title {
                 margin-bottom: 5px;
                 color: #fff;
@@ -36,6 +46,7 @@
             }
 
             .wpfnl-checkbox {
+
                 label {
                     padding: 0;
                     width: 50px;

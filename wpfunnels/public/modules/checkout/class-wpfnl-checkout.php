@@ -25,6 +25,9 @@ use WPFunnels\Conditions\Wpfnl_Condition_Checker;
 use WPFunnels\Discount\WpfnlDiscount;
 use WPFunnels\Modules\Frontend\CheckoutHelper\CheckoutHelper;
 
+// Include Product Selection class
+require_once WPFNL_DIR . 'public/modules/checkout/class-wpfnl-product-selection.php';
+
 class Module extends Wpfnl_Frontend_Module
 {
 	public $funnel_id;
@@ -281,6 +284,7 @@ class Module extends Wpfnl_Frontend_Module
             || !Wpfnl_functions::check_if_this_is_step_type( 'checkout' )
 			|| Wpfnl_functions::is_orderbump_clicked_from_post_data()
 			|| Wpfnl_functions::is_checkoutify_orderbump_clicked_from_post_data()
+			|| Wpfnl_functions::is_product_option_from_post_data()
 			|| Wpfnl_functions::is_variation_selected_from_post_data()
 			|| Wpfnl_functions::maybe_select_quantity_from_post_data()
 			// || Wpfnl_functions::is_coupon_applied_from_post_data()
@@ -1027,6 +1031,7 @@ class Module extends Wpfnl_Frontend_Module
 	public function wpfnl_order_bump_ajax() {
 		$step_id      = filter_input( INPUT_POST, 'step_id', FILTER_VALIDATE_INT );
 		$product_id   = filter_input( INPUT_POST, 'product', FILTER_VALIDATE_INT );
+		$variation_id = filter_input( INPUT_POST, 'variation_id', FILTER_VALIDATE_INT );
 		$checker      = filter_input( INPUT_POST, 'checker', FILTER_SANITIZE_SPECIAL_CHARS );
 		$quantity     = filter_input( INPUT_POST, 'quantity', FILTER_SANITIZE_SPECIAL_CHARS );
 		$key          = filter_input( INPUT_POST, 'key', FILTER_SANITIZE_SPECIAL_CHARS );
@@ -1035,9 +1040,19 @@ class Module extends Wpfnl_Frontend_Module
 		$funnel_id    = Wpfnl_functions::get_funnel_id_from_step( $step_id );
 		$type         = get_post_meta( $funnel_id, '_wpfnl_funnel_type', true );
 		$type         = !$type ? 'wc' : $type;
+
+		// Validate quantity - must be a positive integer
+		$quantity = absint( $quantity );
+		if ( $quantity < 1 ) {
+			$quantity = 1;
+		}
+
+		// If variation_id exists, use it as product_id for cart functions.
+		$cart_product_id = $variation_id ? $variation_id : $product_id;
+
 		$class_object = Wpfnl_Public_Type_Factory::build( $type );
 		if( $class_object ) {
-			$data = $class_object->wpfnl_order_bump_trigger( $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $checker );
+			$data = $class_object->wpfnl_order_bump_trigger( $step_id, $cart_product_id, $quantity, $key, $user_id, $funnel_id, $checker );
 			if( $type === 'lms' ) {
 				wp_send_json( $data );
 			}
@@ -1215,9 +1230,6 @@ class Module extends Wpfnl_Frontend_Module
 		if($isQuantity === 'yes'){
 			if(isset($order_bump_product['product']) && isset($order_bump_product['isEnabled'])){
 
-				if( ($order_bump_product['product'] == $cart_item["product_id"]) && $order_bump_product['isEnabled'] == 'yes' ){
-					return $quantity;
-				}
 				$variations = json_encode($cart_item['variation']);
 				$product_id = $cart_item["product_id"];
 				$quantity = $cart_item["quantity"];
@@ -1230,13 +1242,11 @@ class Module extends Wpfnl_Frontend_Module
 					$isQuantityLimit = true;
 				}
 
-				if( $isQuantityLimit ){
-					$quantity = "× <input type='number' min='1' max='".$set_quantity."'  value='".$quantity."' class='wpfnl-quantity-setect' data-product-id='".$product_id."' data-variation='".$variations."' data-variation-id='".$variation_id."' data-quantity-limit='".$set_quantity."' data-set-quantity='yes'/>";
-				}else{
-					$quantity = "× <input type='number' min='1' value='".$quantity."' class='wpfnl-quantity-setect' data-product-id='".$product_id."' data-variation='".$variations."' data-variation-id='".$variation_id."' data-set-quantity='no' />";
-				}
-
-			}
+			if( $isQuantityLimit ){
+				$quantity = "× <input type='number' min='1' step='1' max='".$set_quantity."'  value='".$quantity."' class='wpfnl-quantity-setect' data-product-id='".$product_id."' data-variation='".$variations."' data-variation-id='".$variation_id."' data-quantity-limit='".$set_quantity."' data-set-quantity='yes'/>";
+			}else{
+				$quantity = "× <input type='number' min='1' step='1' value='".$quantity."' class='wpfnl-quantity-setect' data-product-id='".$product_id."' data-variation='".$variations."' data-variation-id='".$variation_id."' data-set-quantity='no' />";
+			}			}
 		}
 		return $quantity;
 

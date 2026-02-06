@@ -329,7 +329,6 @@ class Wpfnl_Admin
 							e.preventDefault();
 							var btn = $('#pro-modal-dropdown-btn');
 							var loader = btn.find('.loader');
-							console.log(btn);
 							var btnText = btn.find('.btn-text');
 							loader.show();
 							btn.prop('disabled', true);
@@ -349,7 +348,6 @@ class Wpfnl_Admin
 							}).catch((e) => {
 								btn.replaceWith(btnPrevState);
 								addClickEvent();
-								console.log(e.responseJSON);
 							})
 						});
 					});
@@ -978,6 +976,7 @@ class Wpfnl_Admin
 				'ajaxurl' 					=> admin_url('admin-ajax.php'),
 				'rest_api_url' 				=> get_rest_url(),
 				'security' 					=> wp_create_nonce('wpfnl-admin'),
+				'import_nonce' 				=> wp_create_nonce('wpfnl_import_funnels_nonce'),
 				'admin_url' 				=> admin_url(),
 				'edit_funnel_url' 			=> admin_url('admin.php?page=edit_funnel'),
 				'i18n'                      => array('wpfnl' => $this->get_jed_locale_data('wpfnl')),

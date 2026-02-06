@@ -206,56 +206,61 @@ class ProductsController extends Wpfnl_REST_Controller {
      *               - 'htmlPrice' (string): An HTML representation of the product price.
      */
     private function calculate_wc_discount_price($data, $product) {
-
 		// Get the quantity of the product from data.
 		$data_quantity = !empty($data['quantity']) ? intval($data['quantity']) : 1;
-	
-        // Determine the regular price based on product type.
-        $regular_price = ($product->get_type() == 'variable' || $product->get_type() == 'variable-subscription') ? $product->get_price() : $product->get_regular_price();
+
+		// Determine the regular price and sale price based on product type.
+		if ($product->get_type() == 'variable' || $product->get_type() == 'variable-subscription') {
+			// For variable products, get minimum variation prices
+			$regular_price = $product->get_variation_regular_price('min');
+			$sale_price = $product->get_variation_sale_price('min');
+		} else {
+			$regular_price = $product->get_regular_price();
+			$sale_price = $product->get_sale_price();
+		}
+		
 		$regular_price = floatval($regular_price);
-		$regular_price = $regular_price * $data_quantity;
-
-        // Check if WooCommerce Subscriptions plugin is active and adjust the regular price if needed.
-        if (is_plugin_active('woocommerce-subscriptions/woocommerce-subscriptions.php')) {
-            $signUpFee = \WC_Subscriptions_Product::get_sign_up_fee($product);
-            $regular_price = $signUpFee + $regular_price;
-        }
-
-        // Determine the sale price based on product type.
-        $sale_price = ($product->get_type() == 'variable' || $product->get_type() == 'variable-subscription') ? $product->get_price() : $product->get_sale_price();
 		$sale_price = floatval($sale_price);
+		
+		// Apply quantity
+		$regular_price = $regular_price * $data_quantity;
 		$sale_price = $sale_price * $data_quantity;
 
+		// Check if WooCommerce Subscriptions plugin is active and adjust the prices if needed.
+		if (is_plugin_active('woocommerce-subscriptions/woocommerce-subscriptions.php')) {
+			$signUpFee = \WC_Subscriptions_Product::get_sign_up_fee($product);
+			$regular_price = $signUpFee + $regular_price;
+			if ($sale_price > 0) {
+				$sale_price = $signUpFee + $sale_price;
+			}
+		}
 
-        if ($data['discount_type'] === 'original') {
-            $calculable_price = $regular_price;
-            $discount_price = $sale_price ?: $regular_price;
-        } else {
-            if ($data['applyto'] == 'sale') {
-                $calculable_price = $sale_price != "" ? $sale_price : $regular_price;
-            } else {
-                $calculable_price = $regular_price;
-            }
-            $discount_instance = new WpfnlDiscount();
-            $discount_price = $discount_instance->calculate_discount($data['discount_type'], $data['discount_value'], $calculable_price);
-        }
+		if ($data['discount_type'] === 'original') {
+			$calculable_price = $regular_price;
+			$discount_price = $sale_price > 0 ? $sale_price : $regular_price;
+		} else {
+			if ($data['applyto'] == 'sale') {
+				$calculable_price = $sale_price > 0 ? $sale_price : $regular_price;
+			} else {
+				$calculable_price = $regular_price;
+			}
+			$discount_instance = new WpfnlDiscount();
+			$discount_price = $discount_instance->calculate_discount($data['discount_type'], $data['discount_value'], $calculable_price);
+		}
 
-        // Remove non-numeric characters from prices.
-        $calculable_price = preg_replace('/[^\d.]/', '', $calculable_price);
-        $discount_price = preg_replace('/[^\d.]/', '', $discount_price);
-
-        // Get the quantity of the product from data.
-        $data_quantity = !empty($data['quantity']) ? $data['quantity'] : 1;
+		// Remove non-numeric characters from prices.
+		$calculable_price = preg_replace('/[^\d.]/', '', $calculable_price);
+		$discount_price = preg_replace('/[^\d.]/', '', $discount_price);
 		
-        return [
-            'success'           => true,
-            'discountPrice'     => wc_price($discount_price),
-            'discountPriceHtml' => wc_format_sale_price($calculable_price, $discount_price),
-            'htmlPrice'         => $sale_price ? wc_format_sale_price($regular_price, $sale_price) : wc_price($regular_price),
-            'salePrice'         => wc_price(floatval($sale_price)),
-            'regularPrice'      => wc_price(floatval($regular_price)),
+		return [
+			'success'           => true,
+			'discountPrice'     => wc_price($discount_price),
+			'discountPriceHtml' => wc_format_sale_price($calculable_price, $discount_price),
+			'htmlPrice'         => $sale_price > 0 ? wc_format_sale_price($regular_price, $sale_price) : wc_price($regular_price),
+			'salePrice'         => wc_price(floatval($sale_price)),
+			'regularPrice'      => wc_price(floatval($regular_price)),
 			'isVariable'        => $product->get_type() == 'variable' || $product->get_type() == 'variable-subscription'? true : false,
-        ];
+		];
     }
 
     /**

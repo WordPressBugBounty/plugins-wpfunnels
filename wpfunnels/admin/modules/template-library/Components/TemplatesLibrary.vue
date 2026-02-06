@@ -64,6 +64,15 @@
                                         v-bind:style="{ width: globalImportProgress }"></span>
                                     <span class="btn-text">{{loaderMessage}}</span>
                                 </a>
+
+                                <a
+                                    href="https://getwpfunnels.com/pricing/"
+                                    target="_blank"
+                                    class="btn-default update-to-pro"
+                                    v-show="(!isProActivated && activeTemplate.is_pro)"
+                                >
+                                    Upgrade to Pro
+                                </a>
                             </div>
                         </div>
                     </div>

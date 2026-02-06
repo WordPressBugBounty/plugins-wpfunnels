@@ -6823,22 +6823,7 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 .checkout-product-setting-tab__content-wrapper .accordion-head .product-quantity {
   width: 80px;
 }
-.step-settings__single-tab-content .accordion-footer .calculate-operator,
-.step-settings__single-tab-content .product-single__accordion-head .calculate-operator,
-.step-settings__single-tab-content .accordion-head .calculate-operator,
-.checkout-product-setting-tab__content-wrapper .accordion-footer .calculate-operator,
-.checkout-product-setting-tab__content-wrapper .product-single__accordion-head .calculate-operator,
-.checkout-product-setting-tab__content-wrapper .accordion-head .calculate-operator {
-  width: 15px;
-}
-.step-settings__single-tab-content .accordion-footer .calculate-operator svg,
-.step-settings__single-tab-content .product-single__accordion-head .calculate-operator svg,
-.step-settings__single-tab-content .accordion-head .calculate-operator svg,
-.checkout-product-setting-tab__content-wrapper .accordion-footer .calculate-operator svg,
-.checkout-product-setting-tab__content-wrapper .product-single__accordion-head .calculate-operator svg,
-.checkout-product-setting-tab__content-wrapper .accordion-head .calculate-operator svg {
-  width: 15px;
-}
+
 .step-settings__single-tab-content .accordion-footer .total-price,
 .step-settings__single-tab-content .product-single__accordion-head .total-price,
 .step-settings__single-tab-content .accordion-head .total-price,

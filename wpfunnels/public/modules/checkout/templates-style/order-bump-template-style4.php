@@ -7,6 +7,11 @@
 $product 			= wc_get_product($settings['product']);
 if( $product ){
     $regular_price 		= $product->get_regular_price();
+    if ($product->get_type() == 'variable' || $product->get_type() == 'variable-subscription') {
+        $regular_price = $product->get_variation_regular_price('min') ? $product->get_variation_regular_price('min') : $product->get_price();
+    } else {
+        $regular_price = $product->get_regular_price() ? $product->get_regular_price() : $product->get_price();
+    }
     if( is_plugin_active( 'woocommerce-subscriptions/woocommerce-subscriptions.php' ) ){
         $signUpFee = \WC_Subscriptions_Product::get_sign_up_fee( $product );
         $regular_price = $regular_price + $signUpFee;
@@ -23,12 +28,14 @@ if( $product ){
     $ob_highlight_color 	    = isset( $settings['obHighlightColor'] ) ? $settings['obHighlightColor'] : '#6E42D3'; //getting order-bump highlight color
     $ob_checkbox_title_color 	= isset( $settings['obCheckboxTitleColor'] ) ? $settings['obCheckboxTitleColor'] : '#d9d9d9'; //getting order-bump checkbox title color
     $ob_description_color 	    = isset( $settings['obDescriptionColor'] ) ? $settings['obDescriptionColor'] : '#7A8B9A'; //getting order-bump description color
+    $ob_choose_variant_color = isset($settings['obChooseVariantColor'])? $settings['obChooseVariantColor'] : '#F34D01';
+    $ob_choose_variant_name  = isset($settings['chooseVariantName'])? $settings['chooseVariantName'] : 'Choose an Option';
 
     if( $product->is_on_sale() ) {
-        $price = wc_format_sale_price( $regular_price * $quantity, $sale_price * $quantity );
-    } else {
-        $price = wc_price( $regular_price * $quantity );
-    }
+            $price = wc_format_sale_price( (float)$regular_price * (float)$quantity, (float)$sale_price * (float)$quantity );
+        } else {
+            $price = wc_price( (float)$regular_price * (float)$quantity );
+        }
 
     if (isset($settings['discountOption'])) {
         if ($settings['discountOption'] == "discount-price" || $settings['discountOption'] == "discount-percentage") {
@@ -75,12 +82,12 @@ if( $product ){
         $average = $product->get_average_rating();
 
         ?>
-        <div class="template-img" style="background-image: url('<?php echo $img; ?>');">
+        <div class="template-img" id="wpfnl-order-bump-image-<?php echo $key; ?>" style="background-image: url('<?php echo $img; ?>');">
             <img src="<?php echo $img; ?>" alt="" class="for-mobile">
         </div>
 
         <div class="template-content">
-            <h5 class="template-title" style="color: <?php echo $ob_title_color ?>" ><?php echo $settings['productName'] ?></h5>
+            <h5 class="template-title" id="wpfnl-order-bump-title-<?php echo $key; ?>" style="color: <?php echo $ob_title_color ?>" ><?php echo $settings['productName'] ?></h5>
             <?php
                 if( $count > 0 ){
                     echo '<div class="rating">'.wc_get_rating_html( $rating, $count ).' '.$average.' ('.$count.')</div>';
@@ -90,13 +97,25 @@ if( $product ){
         </div>
 
         <div class="template-price">
-            <span class="product-price"  style="--priceColor4: <?php echo $orderbump_priceColor ?> ">
+            <span class="product-price" id="wpfnl-order-bump-price-<?php echo $key; ?>"  style="--priceColor4: <?php echo $orderbump_priceColor ?> ">
                 <?php echo $price; ?>
             </span>
         </div>
 
         <div class="offer-checkbox">
             <span class="wpfnl-checkbox">
+                <?php 
+                    $isVariable = !empty($settings['isVariable']) ? $settings['isVariable'] : false; 
+                ?>
+                <?php if ($isVariable): ?>
+                    <!-- Variable Product Option -->
+                    <!-- <label id="option-selector-<?php echo $key; ?>"  
+                        class="option-selector" 
+                        style="color: <?php echo $ob_choose_variant_color; ?>; border-color: <?php echo $ob_choose_variant_color ?>; cursor: pointer;">
+                        <?php echo $ob_choose_variant_name; ?>
+                    </label> -->
+                    <label for="wpfnl-order-bump-cb-<?php echo $key ?>" id="option-selector-<?php echo $key; ?>" class="option-selector" style="color: <?php echo $ob_checkbox_title_color ?>; border-color: <?php echo $ob_checkbox_title_color ?>" ><?php echo $settings['checkBoxLabel'] ?></label>
+                <?php else: ?>
                 <input
                     id="wpfnl-order-bump-cb-<?php echo $key ?>"
                     class="wpfnl-order-bump-cb"
@@ -106,13 +125,14 @@ if( $product ){
                     data-quantity="<?php echo $settings['quantity']; ?>"
                     data-replace="<?php echo $settings['isReplace']; ?>"
                     data-step="<?php echo get_the_ID(); ?>"
-					data-lms="<?php echo $type; ?>"
+                    data-lms="<?php echo $type; ?>"
                     value="<?php echo $settings['product'] ?>"
                 >
-
                 <label for="wpfnl-order-bump-cb-<?php echo $key ?>" style="color: <?php echo $ob_checkbox_title_color ?>; border-color: <?php echo $ob_checkbox_title_color ?>" ><?php echo $settings['checkBoxLabel'] ?></label>
+                <?php endif; ?>
             </span>
         </div>
+        
 
         <style>
             .wpfnl-order-bump__template-style4 .template-preview-wrapper .product-price span,

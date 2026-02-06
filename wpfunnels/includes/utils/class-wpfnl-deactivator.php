@@ -32,5 +32,6 @@ class Wpfnl_Deactivator
      */
     public static function deactivate()
     {
+        do_action( 'wpfunnels_plugin_deactivated' );
     }
 }

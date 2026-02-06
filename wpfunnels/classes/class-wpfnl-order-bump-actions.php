@@ -10,6 +10,7 @@ use Error;
 use WPFunnels\Meta\Wpfnl_Default_Meta;
 use WPFunnels\Traits\SingletonTrait;
 use WPFunnels\Wpfnl_functions;
+use WPFunnels\Modules\Frontend\Checkout\Wpfnl_Order_Bump_Rules;
 
 class Wpfnl_Order_Bump_Action {
 
@@ -137,7 +138,7 @@ class Wpfnl_Order_Bump_Action {
 				if( !$is_enabled ) {
 					continue;
 				}
-				
+
 				if( $position === 'before-checkout' ) {
 					add_action( 'woocommerce_before_checkout_form', [ $this, 'render_order_bump_before_checkout_form' ], 10 );
 				}
@@ -263,6 +264,12 @@ class Wpfnl_Order_Bump_Action {
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
 					}
+
+					// Check conditional rules before displaying
+					if ( ! Wpfnl_Order_Bump_Rules::should_display_order_bump( $settings ) ) {
+						continue;
+					}
+
 					if (isset($settings['product']) && $settings['product'] != '') {
 						if ( !empty($settings['selectedStyle']) ) {
 
@@ -333,6 +340,12 @@ class Wpfnl_Order_Bump_Action {
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
 					}
+
+					// Check conditional rules before displaying
+					if ( ! Wpfnl_Order_Bump_Rules::should_display_order_bump( $settings ) ) {
+						continue;
+					}
+
 					if (isset($settings['product']) && $settings['product'] != '') {
 						if ( !empty($settings['selectedStyle']) ) {
 							ob_start();
@@ -401,6 +414,12 @@ class Wpfnl_Order_Bump_Action {
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
 					}
+
+					// Check conditional rules before displaying
+					if ( ! Wpfnl_Order_Bump_Rules::should_display_order_bump( $settings ) ) {
+						continue;
+					}
+
 					if (isset($settings['product']) && $settings['product'] != '') {
 						if ( !empty($settings['selectedStyle']) ) {
 							ob_start();
@@ -469,6 +488,12 @@ class Wpfnl_Order_Bump_Action {
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
 					}
+
+					// Check conditional rules before displaying
+					if ( ! Wpfnl_Order_Bump_Rules::should_display_order_bump( $settings ) ) {
+						continue;
+					}
+
 					if (isset($settings['product']) && $settings['product'] != '') {
 						if ( !empty($settings['selectedStyle']) ) {
 							ob_start();
@@ -533,10 +558,16 @@ class Wpfnl_Order_Bump_Action {
 
 			foreach( $this->ob_settings as $key=> $settings ){
 
-				if( $settings['isEnabled'] && $settings['position'] == 'before-payment'){
+				if( $settings['isEnabled']  && $settings['position'] == 'before-payment'){
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
 					}
+
+					// Check conditional rules before displaying
+					if ( ! Wpfnl_Order_Bump_Rules::should_display_order_bump( $settings ) ) {
+						continue;
+					}
+
 					if (isset($settings['product']) && $settings['product'] != '') {
 						if ( !empty($settings['selectedStyle']) ) {
 							ob_start();
@@ -602,10 +633,16 @@ class Wpfnl_Order_Bump_Action {
 
 			foreach( $this->ob_settings as $key=> $settings ){
 
-				if( $settings['isEnabled'] && $settings['position'] == 'after-payment'){
+				if( $settings['isEnabled']  && $settings['position'] == 'after-payment'){
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
 					}
+
+					// Check conditional rules before displaying
+					if ( ! Wpfnl_Order_Bump_Rules::should_display_order_bump( $settings ) ) {
+						continue;
+					}
+
 					if (isset($settings['product']) && $settings['product'] != '') {
 						if ( !empty($settings['selectedStyle']) ) {
 							ob_start();
@@ -673,6 +710,10 @@ class Wpfnl_Order_Bump_Action {
 			foreach( $this->ob_settings as $key=> $settings ){
 				if( $settings['isEnabled'] && $settings['position'] == 'after-customer-details'){
 					if( $settings['isEnabled'] === 'no' ){
+						continue;
+					}
+					// Check conditional rules before displaying
+					if ( ! Wpfnl_Order_Bump_Rules::should_display_order_bump( $settings ) ) {
 						continue;
 					}
 					if (isset($settings['product']) && $settings['product'] != '') {
@@ -748,6 +789,11 @@ class Wpfnl_Order_Bump_Action {
 						continue;
 					}
 
+					// Check conditional rules before displaying
+					if ( ! Wpfnl_Order_Bump_Rules::should_display_order_bump( $settings ) ) {
+						continue;
+					}
+
 					if (isset($settings['product']) && $settings['product'] != '') {
 						if ( !empty($settings['selectedStyle']) ) {
 							ob_start();
@@ -818,6 +864,11 @@ class Wpfnl_Order_Bump_Action {
 
 				if( $settings['isEnabled'] && $settings['position'] == 'before-order'){
 					if( $settings['isEnabled'] === 'no' ){
+						continue;
+					}
+
+					// Check conditional rules before displaying
+					if ( ! Wpfnl_Order_Bump_Rules::should_display_order_bump( $settings ) ) {
 						continue;
 					}
 

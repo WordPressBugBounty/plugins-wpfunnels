@@ -236,7 +236,7 @@ echo esc_js($recaptch_script);
 			$button_width          = !empty($this->attributes['button_width']) ? 'width: ' . esc_attr($this->attributes['button_width']) . ';' : '';
 			$button_style          = $button_text_color . $button_bg_color . $button_font_size . $button_font_weight . $button_padding . $button_border_radius . $button_width;
 			$button_id             = !empty($this->attributes['button_id']) ? esc_attr($this->attributes['button_id']) : '';
-			$button_icon           = !empty($this->attributes['button_icon']) ? $this->attributes['button_icon'] : '';
+			$button_icon           = !empty($this->attributes['button_icon']) ? wp_kses_post($this->attributes['button_icon']) : '';
 			$icon_position         = !empty($this->attributes['button_icon_position']) ? $this->attributes['button_icon_position'] : 'before';
 			$button_align          = !empty($this->attributes['button_align']) ? esc_attr($this->attributes['button_align']) : 'center';
 			?>
@@ -248,9 +248,9 @@ echo esc_js($recaptch_script);
 					id="<?php echo $button_id; ?>">
 					<span>
 						<?php
-						if (!empty($button_icon) && $icon_position === 'before') echo $button_icon . ' ';
+						if (!empty($button_icon) && $icon_position === 'before') echo wp_kses_post($button_icon) . ' ';
 						echo $button_text;
-						if (!empty($button_icon) && $icon_position === 'after') echo ' ' . $button_icon;
+						if (!empty($button_icon) && $icon_position === 'after') echo ' ' . wp_kses_post($button_icon);
 						?>
 					</span>
 					<?php if (empty($this->attributes['button_loader_type']) || $this->attributes['button_loader_type'] !== 'none'): ?>

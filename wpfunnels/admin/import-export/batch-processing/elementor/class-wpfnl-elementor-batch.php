@@ -44,6 +44,7 @@ class Wpfnl_Elementor_Batch extends Wpfnl_Background_Task {
 	 * @since 1.0.0
 	 */
 	protected function complete() {
+		// Clear all scheduled events for this specific action before completing
 		parent::complete();
 		/***
 		 * Fires when import is completed

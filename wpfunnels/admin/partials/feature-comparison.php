@@ -1,323 +1,243 @@
 <?php
-// Define the array of objects
-$features = [
-    [
-        'label' => 'Opt-in form',
-        'free' => true,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Collect leads (via Mail Mint)',
-        'free' => true,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Order bumps at the checkout',
-        'free' => true,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Conditional steps',
-        'free' => true,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Course funnels (for course products in WooCommerce)',
-        'free' => true,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Multiple order bumps',
-        'free' => false,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'One-click upsell & downsell',
-        'free' => false,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'A/B Testing',
-        'free' => false,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Funnel Analytics',
-        'free' => false,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Multi-step checkout',
-        'free' => false,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Basic checkout field editor',
-        'free' => false,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Quantity selector during checkout',
-        'free' => false,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Replace one offer with another',
-        'free' => false,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Custom bridge steps',
-        'free' => false,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Subscription products support',
-        'free' => false,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Email automation based on buyer actions (via Mail Mint)',
-        'free' => false,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Import/Export funnels',
-        'free' => false,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Webhooks support',
-        'free' => false,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Advanced Checkout form customizer for WooCommerce',
-        'free' => false,
-        'small' => true,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Integration with external CRMs & automation tools',
-        'free' => false,
-        'small' => false,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Conditional WooCommerce funnels',
-        'free' => false,
-        'small' => false,
-        'medium' => true,
-        'large' => true,
-    ],
-    [
-        'label' => 'Funnels for LearnDash courses',
-        'free' => false,
-        'small' => false,
-        'medium' => true,
-        'large' => true,
-    ]
+/* ---------------- Plans ---------------- */
+$plans = [
+    ["name" => "Basic", "price" => "Free", "cta" => "Current plan", "currentPlan" => true],
+    ["name" => "Small", "price" => "$97", "cta" => "Upgrade", "link" => "https://useraccount.getwpfunnels.com/wpfunnels-annual/steps/annual-small-checkout/"],
+    ["name" => "Medium", "price" => "$147", "cta" => "Upgrade", "popular" => true, "link" => "https://useraccount.getwpfunnels.com/wpfunnels-annual-5-sites/steps/5-sites-annual-checkout/"],
+    ["name" => "Large", "price" => "$237", "cta" => "Upgrade", "link" => "https://useraccount.getwpfunnels.com/wpfunnels-annual-unlimited/steps/annual-unlimited-checkout/"],
 ];
 
-// Function to return the appropriate SVG based on boolean value
-function getSvgIcon($value) {
-    if ($value) {
-        return '<svg fill="none" width="22" height="22" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="10.5" fill="#F5F5F7" stroke="#00B67C"/><path stroke="#00B67C" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.182 7l-7 7L6 10.818"/></svg>';
-    } else {
-        return '<svg fill="none" width="22" height="22" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="10.5" fill="#F5F5F7" stroke="#EC813F"/><path stroke="#EC813F" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7l-8 8m0-8l8 8"/></svg>';
+/* ---------------- Features ---------------- */
+$features = [
+    [
+        "group" => "Funnels & Usage Limits",
+        "items" => [
+            [
+                "label" => "License usage (no. of sites)",
+                "tooltipText" => "Defines how many websites you can activate with this license.",
+                "values" => ["None", "1 site", "5 sites", "50 sites"],
+                "hasBorderTop" => false,
+                "isHighlighted" => false,
+            ],
+            [
+                "label" => "No. of Funnels",
+                "tooltipText" => "The total number of funnels you can create with this plan.",
+                "values" => ["3", "Unlimited", "Unlimited", "Unlimited"],
+                "hasBorderTop" => true,
+                "isHighlighted" => false,
+            ],
+            [
+                "label" => "Funnel Templates",
+                "tooltipText" => "Pre-built funnel designs you can import and customize instantly.",
+                "values" => ["Limited", "All", "All", "All"],
+                "hasBorderTop" => true,
+                "isHighlighted" => true,
+            ],
+        ],
+    ],
+    [
+        "group" => "Checkout Features",
+        "items" => [
+            ["label" => "Multi-step Checkout", "tooltipText" => "Break the checkout process into multiple easy steps for higher conversions.", "values" => [false, true, true, true], "hasBorderTop" => false, "isHighlighted" => false],
+            ["label" => "Basic Checkout Field Editor", "tooltipText" => "Easily add, remove, or edit basic checkout fields to fit your business needs.", "values" => [false, true, true, true], "hasBorderTop" => true, "isHighlighted" => false],
+            ["label" => "Quantity Selector During Checkout", "tooltipText" => "Allow customers to adjust product quantities directly on the checkout page.", "values" => [false, true, true, true], "hasBorderTop" => true, "isHighlighted" => false],
+            ["label" => "Advanced Checkout Form Customizer", "tooltipText" => "Advanced customization options for the WooCommerce checkout form.", "values" => [false, true, true, true], "hasBorderTop" => true, "isHighlighted" => false],
+            ["label" => "Order Bumps", "tooltipText" => "Smart order bumps using customer data to display most relevant products or offers.", "values" => [true, true, true, true], "hasBorderTop" => true, "isHighlighted" => false],
+        ],
+    ],
+    [
+        "group" => "One-Click Upsells / Downsells",
+        "items" => [
+            ["label" => "Dynamic One-Click Upsells", "tooltipText" => "Use cart contents or customer data to display relevant upsells for maximum conversion.", "values" => [false, true, true, true], "hasBorderTop" => false, "isHighlighted" => false],
+            ["label" => "Dynamic Upsell Templates", "tooltipText" => "Professional templates to help you sell more even if you’re not a designer.", "values" => [false, true, true, true], "hasBorderTop" => true, "isHighlighted" => false],
+            ["label" => "Replace One Offer with Another", "tooltipText" => "Easily swap out one offer for another in your funnel.", "values" => [false, true, true, true], "hasBorderTop" => true, "isHighlighted" => false],
+        ],
+    ],
+    [
+        "group" => "Order Bump Features",
+        "items" => [
+            ["label" => "Multiple Order Bumps", "tooltipText" => "Add multiple order bumps to a single checkout so customers can accept more than one offer with one click.", "values" => [false, true, true, true], "hasBorderTop" => false, "isHighlighted" => false],
+        ],
+    ],
+    [
+        "group" => "Advanced Funnel Features",
+        "items" => [
+            ["label" => "Funnel Analytics", "tooltipText" => "Analyze transactions and user behavior to refine conversions and make more profit.", "values" => [false, true, true, true], "hasBorderTop" => false, "isHighlighted" => false],
+            ["label" => "A/B Testing", "tooltipText" => "Increase conversions and sales with WPFunnels A/B Testing by running simple tests.", "values" => [false, true, true, true], "hasBorderTop" => true, "isHighlighted" => false],
+            ["label" => "Conditional WooCommerce Funnels", "tooltipText" => "Create personalized funnels based on user behavior and conditions.", "values" => [false, false, true, true], "hasBorderTop" => true, "isHighlighted" => false],
+            ["label" => "Import/Export Funnels", "tooltipText" => "Easily import and export your funnels for use on other sites or for backup purposes.", "values" => [false, true, true, true], "hasBorderTop" => true, "isHighlighted" => false],
+            ["label" => "Course Funnels", "tooltipText" => "Create funnels specifically for course products in WooCommerce.", "values" => [true, true, true, true], "hasBorderTop" => true, "isHighlighted" => false],
+            
+        ],
+    ],
+    [
+        "group" => "Integrations",
+        "items" => [
+            ["label" => "Integration With Automation Tools", "tooltipText" => "Connect your account to popular automation tools like Mail Mint, FluentCRM, MailPoet, Zapier and so on.", "values" => [false, true, true, true], "hasBorderTop" => false, "isHighlighted" => false],
+            ["label" => "Integration with External CRMs", "tooltipText" => "Sync and manage contacts with popular CRMs including MailChimp, ActiveCampaign, Constant Contact, AWeber, Sendinblue, MailerLite and so on.", "values" => [false, false, true, true], "hasBorderTop" => true, "isHighlighted" => false],
+            ["label" => "Webhooks Support", "tooltipText" => "Send real-time data from WPFunnels to any external app or service using webhooks.", "values" => [false, true, true, true], "hasBorderTop" => true, "isHighlighted" => false],
+            ["label" => "Funnels for LearnDash Courses", "tooltipText" => "Create funnels specifically for LearnDash courses to boost sales and engagement.", "values" => [false, false, true, true], "hasBorderTop" => true, "isHighlighted" => false],
+        ],
+    ],
+    [
+        "group" => "Others Benefits",
+        "items" => [
+            ["label" => "Amazing User Community", "tooltipText" => "Amazing User Community is already a great message unless you’re looking for a different meaning.", "values" => [true, true, true, true], "hasBorderTop" => false, "isHighlighted" => false],
+            ["label" => "Great Documentation & Video Tutorials", "tooltipText" => "Comprehensive guides and video tutorials to help you get the most out of WPFunnels.", "values" => [true, true, true, true], "hasBorderTop" => true, "isHighlighted" => false],
+        ],
+    ],
+];
+
+$listItems = [
+    "Regular Product Updates",
+    "Priority Support",
+    "14-Day Money-back Guarantee",
+    "Instant Download",
+];
+
+/* ---------------- Helper Functions ---------------- */
+function renderValueCell($value) {
+    if (is_bool($value)) {
+        if ($value) {
+            $icon = file_get_contents(WPFNL_DIR . '/admin/partials/icons/free-vs-pro-check-icon.php');
+            return '<span class="check">' . $icon . '</span>';
+        } else {
+            $icon = file_get_contents(WPFNL_DIR . '/admin/partials/icons/free-vs-pro-cross-icon.php');
+            return '<span class="cross">' . $icon . '</span>';
+        }
     }
+    return '<span>' . htmlspecialchars($value) . '</span>';
+}
+
+
+function renderCheckIcon() {
+    return '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>';
 }
 ?>
 
-<section class="wpfnl-pro-vs-free-page-wrapper">
-    <h1 class="wpfnl-pvf-heading"><?php echo __( 'WPFunnels Free vs Pro', 'wpfnl' ); ?></h1>
-    <p class="wpfnl-pvf-sub-heading"><?php 
-    // echo __( 'Here’s a basic overview of WPFunnels Free vs Pro.', 'wpfnl' ); 
-    ?>
-    </p>
 
-    <div class="wpfnl-pvf-table-wrapper">
-        <div class="wpfnl-pvf-table-header">
-            <div class="wpfnl-pvf-table-row plan">
-                <div class="wpfnl-pvf-head-cell col-feature"></div>
-                <div class="wpfnl-pvf-head-cell col-free">
-                    <p>Basic</p>
-                </div>
-                <div class="wpfnl-pvf-head-cell col-small">
-                    <p>Small</p>
-                </div>
-                <div class="wpfnl-pvf-head-cell col-medium">
-                    <p>Medium</p>
-                </div>
-                <div class="wpfnl-pvf-head-cell col-large">
-                    <p>Large</p>
-                </div>
+<section>
+    <div class="wpfnl-free-vs-pro-comparison-wrapper">
+        <div class="table-content-wrapper">
+            <!-- Section Header -->
+            <div class="free-vs-pro-menu">
+                <h2 class="title"><?php echo __( 'WPFunnels Free vs Pro', 'wpfnl' ); ?></h2>
+                <p class="free-pro-description"><?php echo __( 'Discover the differences between Free and Pro to decide which plan works for you.', 'wpfnl' ); ?></p>
             </div>
 
-            <div class="wpfnl-pvf-table-row price">
-                <div class="wpfnl-pvf-head-cell col-feature"></div>
-                <div class="wpfnl-pvf-head-cell col-free">
-                    <p><strong>Free</strong></p>
-                </div>
-                <div class="wpfnl-pvf-head-cell col-small">
-                    <p><strong>$97</strong>/Year</p>
-                </div>
-                <div class="wpfnl-pvf-head-cell col-medium">
-                    <p><strong>$147</strong>/Year</p>
-                </div>
-                <div class="wpfnl-pvf-head-cell col-large">
-                    <p><strong>$237</strong>/Year</p>
-                </div>
-            </div>
+            <!-- Comparison Table -->
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th class="feature-column">
+                            <h3 class="feature-header"><?php echo __( 'Features', 'wpfnl' ); ?></h3>
+                        </th>
+                        <?php foreach ($plans as $i => $plan): ?>
+                            <?php
+                            $isPopular = isset($plan['popular']) && $plan['popular'];
+                            $isCurrentPlan = isset($plan['currentPlan']) && $plan['currentPlan'];
+                            ?>
+                            <th class="<?= $isPopular ? 'popular' : 'regular' ?>">
+                                <div class="<?= $isPopular ? 'plan-card popular-card' : 'plan-card' ?>">
+                                    <?php if ($isPopular): ?>
+                                        <span class="badge"><?php echo __( 'Most Popular', 'wpfnl' ); ?></span>
+                                    <?php endif; ?>
 
-            <div class="wpfnl-pvf-table-row cta">
-                <div class="wpfnl-pvf-head-cell col-feature">
-                    <p>Features</p>
-                </div>
-                <div class="wpfnl-pvf-head-cell col-free">
-                    <p>
-                        <svg fill="none" width="22" height="22" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="11" fill="#363B4E"/><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.182 7l-7 7L6 10.818"/></svg>
-                        <span>Your current plan</span>
-                    </p>
-                </div>
-                <div class="wpfnl-pvf-head-cell col-small">
-                    <a href="https://useraccount.getwpfunnels.com/wpfunnels-annual/steps/annual-small-checkout/" target="_blank" class="wpfn-btn-upgrade">Upgrade</a>
-                </div>
-                <div class="wpfnl-pvf-head-cell col-medium">
-                    <a href="https://useraccount.getwpfunnels.com/wpfunnels-annual-5-sites/steps/5-sites-annual-checkout/" target="_blank" class="wpfn-btn-upgrade">Upgrade</a>
-                </div>
-                <div class="wpfnl-pvf-head-cell col-large">
-                    <a href="https://useraccount.getwpfunnels.com/wpfunnels-annual-unlimited/steps/annual-unlimited-checkout/" target="_blank" class="wpfn-btn-upgrade">Upgrade</a>
-                </div>
-            </div>
+                                    <div class="card-content">
+                                        <h3 class="plan-name"><?= htmlspecialchars($plan['name']) ?></h3>
+                                        <p class="price">
+                                            <?= htmlspecialchars($plan['price']) ?>
+                                            <?php if (strtolower($plan['name']) !== 'basic'): ?>
+                                                <span class="time"><?php echo __( '/year', 'wpfnl' ); ?></span>
+                                            <?php endif; ?>
+                                        </p>
+
+                                        <?php if (isset($plan['badge'])): ?>
+                                            <span class="current"><?= htmlspecialchars($plan['badge']) ?></span>
+                                        <?php else: ?>
+                                            <a href="<?= isset($plan['link']) ? htmlspecialchars($plan['link']) : 'https://getwpfunnels.com/pricing/' ?>" target="_blank" role="button" 
+                                            class="upgrade-btn <?= $isCurrentPlan ? 'current-plan-btn' : '' ?>">
+                                                <?php if ($isCurrentPlan): ?>
+                                                    <?= renderCheckIcon() ?>
+                                                <?php endif; ?>
+                                                <?= htmlspecialchars($plan['cta']) ?>
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </th>
+                        <?php endforeach; ?>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <?php foreach ($features as $gi => $group): ?>
+                        <!-- Group Title Row -->
+                        <tr class="group-row">
+                            <td colspan="<?= count($plans) + 1 ?>"><?= htmlspecialchars($group['group']) ?></td>
+                        </tr>
+
+                        <!-- Feature Rows -->
+                        <?php foreach ($group['items'] as $fi => $feature): ?>
+                            <tr class="feature-row <?= empty($feature['hasBorderTop']) ? 'no-border-top' : '' ?> <?= !empty($feature['isHighlighted']) ? 'highlight-feature' : '' ?>">
+                                <td class="feature-label">
+                                    <div class="feature-label-content">
+                                        <span><?= htmlspecialchars($feature['label']) ?></span>
+                                        <?php if (!empty($feature['tooltipText'])): ?>
+                                            <span class="tooltip-wrapper">
+                                                <?php require WPFNL_DIR . '/admin/partials/icons/tooltip-icon.php';?>
+                                                <span class="tooltip-text"><?= htmlspecialchars($feature['tooltipText']) ?></span>
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+
+                                <?php foreach ($feature['values'] as $vi => $value): ?>
+                                    <td class="feature-cell">
+                                        <?= renderValueCell($value) ?>
+                                    </td>
+                                <?php endforeach; ?>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endforeach; ?>
+                    <tr class="pro-features-link-row">
+                        <td colspan="<?= count($plans) + 1 ?>">
+                            <a href="https://getwpfunnels.com/features/" target="_blank">
+                                <span><?php echo __( 'See all WPFunnels Pro features', 'wpfnl' ); ?></span>
+                                <?php require WPFNL_DIR . '/admin/partials/icons/external-link-icon.php'; ?>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <ul class="list-item-wrapper">
+                <?php foreach ($listItems as $idx => $item): ?>
+                    <li class="list-item">
+                        <?php require WPFNL_DIR . '/admin/partials/icons/list-check-icon.php';?>
+                        <span><?= htmlspecialchars($item) ?></span>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
         </div>
 
-        <div class="wpfnl-pvf-table-content">
-            <div class="wpfnl-pvf-table-row">
-                <div class="table-col col-feature">
-                    <p>License usage (no. of sites)</p>
+        <!-- Section Footer -->
+        <div class="free-vs-pro-table-footer">
+            <div class="badges-wrapper">
+                <div class="security-badges">
+                    <div class="payment-image">
+                        <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/payment-badge.webp'); ?>?>" alt="Payment Badge" />
+                    </div>
+                    <div class="payment-image satisfaction-image">
+                        <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/satisfaction-badge.webp'); ?>?>" alt="Satisfaction Badge" />
+                    </div>
+                    <div class="review-image">
+                        <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/review-badge.webp'); ?>?>" alt="Review Badge" />
+                    </div>
                 </div>
-
-                <div class="table-col col-free">
-                    <p>None</p>
-                </div>
-
-                <div class="table-col col-small">
-                    <p>1 site</p>
-                </div>
-
-                <div class="table-col col-medium">
-                    <p>5 sites</p>
-                </div>
-
-                <div class="table-col col-large">
-                    <p>50 sites</p>
-                </div>
+                <p class="badges-description"><?php echo __( "Get access to powerful features and build high-converting funnels effortlessly — save time, boost sales, and grow without limits.", 'wpfnl' ); ?></p>
             </div>
-            <div class="wpfnl-pvf-table-row">
-                <div class="table-col col-feature">
-                    <p>No. of Funnels</p>
-                </div>
-
-                <div class="table-col col-free">
-                    <p>3</p>
-                </div>
-
-                <div class="table-col col-small">
-                    <p>Unlimited</p>
-                </div>
-
-                <div class="table-col col-medium">
-                    <p>Unlimited</p>
-                </div>
-
-                <div class="table-col col-large">
-                    <p>Unlimited</p>
-                </div>
-            </div>
-            <div class="wpfnl-pvf-table-row">
-                <div class="table-col col-feature">
-                    <p>Funnel templates</p>
-                </div>
-
-                <div class="table-col col-free">
-                    <p>Limited</p>
-                </div>
-
-                <div class="table-col col-small">
-                    <p>All</p>
-                </div>
-
-                <div class="table-col col-medium">
-                    <p>All</p>
-                </div>
-
-                <div class="table-col col-large">
-                    <p>All</p>
-                </div>
-            </div>
-
-            <?php foreach($features as $feature): ?>
-                <div class="wpfnl-pvf-table-row">
-                    <div class="table-col col-feature">
-                        <p><?php echo $feature['label']; ?></p>
-                    </div>
-
-                    <div class="table-col col-free">
-                        <p><?php echo getSvgIcon($feature['free']); ?></p>
-                    </div>
-
-                    <div class="table-col col-small">
-                        <p><?php echo getSvgIcon($feature['small']); ?></p>
-                    </div>
-
-                    <div class="table-col col-medium">
-                        <p><?php echo getSvgIcon($feature['medium']); ?></p>
-                    </div>
-
-                    <div class="table-col col-large">
-                        <p><?php echo getSvgIcon($feature['large']); ?></p>
-                    </div>
-                </div>
-            <?php endforeach;?>
-        </div>
     </div>
 </section>

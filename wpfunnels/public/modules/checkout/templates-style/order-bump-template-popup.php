@@ -16,19 +16,20 @@ if( $type === 'lms' ){
     $funnel_id = get_post_meta($step_id,'_funnel_id');
     
 }elseif( is_plugin_active( 'woocommerce/woocommerce.php' ) ){
+    global $product;
     $step_id = $checkout_id;
     $funnel_id = get_post_meta($step_id,'_funnel_id');
     $type = 'wc';
     $product 			= wc_get_product($settings['product']);
     if( $product ){
-        $regular_price 		= $product->get_regular_price();
+        $regular_price 		= floatval( $product->get_regular_price() );
         if( is_plugin_active( 'woocommerce-subscriptions/woocommerce-subscriptions.php' ) ){
             $signUpFee = \WC_Subscriptions_Product::get_sign_up_fee( $product );
-            $regular_price = $regular_price + $signUpFee;
+            $regular_price = $regular_price + floatval( $signUpFee );
         }
-        $sale_price 		= $product->get_sale_price() ? $product->get_sale_price() : $product->get_regular_price();
+        $sale_price 		= $product->get_sale_price() ? floatval( $product->get_sale_price() ) : $regular_price;
         $price 				= $product->get_price_html();
-        $quantity			= $settings['quantity'];
+        $quantity			= intval( $settings['quantity'] );
         $orderbump_color 	= isset( $settings['obPrimaryColor'] ) ? $settings['obPrimaryColor'] : '#6E42D2';
 
         if( $product->is_on_sale() ) {
@@ -39,7 +40,7 @@ if( $type === 'lms' ){
 
         if (isset($settings['discountOption'])) {
             if ($settings['discountOption'] == "discount-price" || $settings['discountOption'] == "discount-percentage") {
-                $discount_price = preg_replace('/[^\d.]/', '', $settings['discountPrice'] );
+                $discount_price = floatval( preg_replace('/[^\d.]/', '', $settings['discountPrice'] ) );
                 if ($settings['discountapply'] == 'regular') {
                     $price = wc_format_sale_price( $regular_price * $quantity, $discount_price * $quantity );
                 } else {
@@ -84,6 +85,7 @@ if( $type === 'lms' ){
         <div class="wpfnl-order-bump__content-left">
             <div class="wpfnl-order-bump__image-area">
                 <img alt="Order bump popup image" src="<?php echo $img; ?>" class="img1">
+                <?php do_action('woocommerce_before_single_product_summary'); ?>
             </div>
 
             <div class="wpfnl-order-bump__content-area">

@@ -43,6 +43,16 @@
         .template-content {
             width: calc(100% - 160px);
             padding-left: 20px;
+
+            .option-selector {
+                color: #F34D01;
+                cursor: pointer;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 18px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
         }
         .template-title {
             font-weight: 500;
@@ -59,7 +69,6 @@
             line-height: 15px;
             color: #EE8134;
             margin-left: auto;
-            margin-top: 10px;
 
             span {
                 font-size: 13px;
@@ -103,6 +112,14 @@
         .wpfnl-checkbox {
             display: block;
             line-height: 1;
+
+            .option-selector {
+                color: $primary-color;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 1.2;
+                cursor: pointer;
+            }
         }
 
         .wpfnl-checkbox label {

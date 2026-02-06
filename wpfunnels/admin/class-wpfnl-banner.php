@@ -47,14 +47,14 @@ class SpecialOccasionBanner
      * @param string $start_date The start date and time for displaying the banner.
      * @param string $end_date   The end date and time for displaying the banner.
      */
-    public function __construct($occasion, $start_date, $end_date, $btn_link = 'https://getwpfunnels.com/creatorlms/?utm_source=plugin-cta&utm_medium=wpf-plugin-notification-banner&utm_campaign=clms-launch#pricing')
+    public function __construct($occasion, $start_date, $end_date, $btn_link = '#')
     {
         $this->occasion     = $occasion;
         $this->btn_link     = $btn_link;
         $this->start_date   = strtotime($start_date);
         $this->end_date     = strtotime($end_date);
 
-        if ('yes' === get_option('_is_show_lms_banner', 'yes')) {
+        if ('yes' === get_option('_is_show_newyear2026_banner', 'yes')) {
             // Hook into the admin_notices action to display the banner
             add_action('admin_notices', [$this, 'display_banner']);
             add_action('admin_head', array($this, 'add_styles'));
@@ -66,9 +66,9 @@ class SpecialOccasionBanner
      *
      * @return array Time remaining in days, hours, and minutes
      */
-    public function wpf_get_halloween_countdown()
+    public function wpf_get_promotion_banner_countdown()
     {
-        $end_date = strtotime('2025-10-16 23:59:59');
+        $end_date = strtotime('2026-01-07 23:59:59');
         $now      = current_time('timestamp');
         $diff     = $end_date - $now;
 
@@ -93,132 +93,49 @@ class SpecialOccasionBanner
             return;
         }
 
-        // if ($current_date_time < $this->start_date || $current_date_time > $this->end_date) {
-        //     return;
-        // }
+        if ($current_date_time < $this->start_date || $current_date_time > $this->end_date) {
+            return;
+        }
 
         // Calculate the time remaining in seconds
         $time_remaining = $this->end_date - $current_date_time;
 
-        $countdown = $this->wpf_get_halloween_countdown();
+        $countdown = $this->wpf_get_promotion_banner_countdown();
     ?>
-        <!-- Name: WordPress Anniversary Notification Banner -->
-        <div class="<?php echo esc_attr($this->occasion); ?>-banner notice">
-            <div class="wpf-promotional-banner">
-                <div class="gwpf-tb__notification" id="rex_deal_notification">
-
-                    <div class="banner-overflow">
-                        <section class="wpf-notification-counter default-notification" aria-labelledby="wpf-halloween-offer-title">
-                            <div class="wpf-notification-counter__container">
-                                <div class="wpf-notification-counter__content">
-
-                                    <figure class="wpf-notification-counter__figure-logo">
-                                        <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/lms-banner/go-live.webp'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
-                                    </figure>
-
-                                    <figure class="wpf-notification-counter__figure-occasion">
-                                        <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/lms-banner/crlms-logo.webp'); ?>?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
-                                    </figure>
-
-                                    <figure class="wpf-notification-counter__figure-percentage">
-                                        <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/lms-banner/limited-offer.webp'); ?>" alt="Halloween special offer banner" class="wpf-notification-counter__img">
-                                    </figure>
-
-                                    <div id="wpf-halloween-countdown" class="wpf-notification-counter__countdown" aria-live="polite" style="display: none;">
-                                        <h3 class="screen-reader-text"><?php echo __('Offer Countdown', 'wpfnl'); ?></h3>
-                                        <ul class="wpf-notification-counter__list">
-
-                                            <?php foreach (['days', 'hours', 'mins', 'secs'] as $unit): ?>
-                                                <li class="wpf-notification-counter__item ">
-                                                    <span id="wpf-halloween-<?php echo esc_attr($unit); ?>" class="wpf-notification-counter__time">
-                                                        <?php echo esc_html($countdown[$unit]); ?>
-                                                    </span>
-                                                    <span class="wpf-notification-counter__label">
-                                                        <?php echo esc_html($unit); ?>
-                                                    </span>
-                                                </li>
-                                            <?php endforeach; ?>
-                                        </ul>
+        <div class="gwpf-promotional-notice <?php echo esc_attr($this->occasion); ?>-banner notice">
+            <div class="gwpf-tb__notification">
+                <div class="banner-overflow">
+                    <section class="gwpf-promotional-banner" aria-labelledby="wpf-halloween-offer">
+                        <div class="gwpf-container">
+                            <div class="promotional-banner">
+                                <div class="banner-content">
+                                    <div class="banner-text">
+                                        <svg style="margin-right: 5px;" width="117" height="45" fill="none" viewBox="0 0 117 45" xmlns="http://www.w3.org/2000/svg"><path fill="#EC813F" d="M15.015 7.931v7.862h-4.579V0h4.58v6.346h3.732V0h4.576v15.777h-4.576V7.915l-3.733.016zM33.208 0l4.403 15.777H33l-.944-3.418h-4.745l-1.007 3.418H24.53L29.199 0h4.01zm-5.443 10.774h3.87l-1.86-6.994-2.01 6.994zm11.072 5.003V0h6.808c3.858 0 5.788 1.545 5.79 4.635 0 3.124-2.146 4.685-6.438 4.683h-1.572v6.46h-4.588zm4.575-7.915h1.029c1.677 0 2.51-1.102 2.497-3.305 0-2.065-.833-3.098-2.497-3.098h-1.029v6.403zm9.561 7.915V0h6.808c3.858 0 5.787 1.545 5.79 4.635 0 3.124-2.146 4.685-6.438 4.683h-1.572v6.46h-4.588zm4.575-7.915h1.029c1.677 0 2.51-1.102 2.497-3.305 0-2.065-.833-3.098-2.497-3.098h-1.029v6.403zM78.134 0l-3.846 9.953v5.824h-4.579V9.953L65.454 0h4.752l3.214 7.607L76.31 0h1.824z"/><path fill="#fff" d="M24.453 33.353c-2.076-5.308-5.488-14.764-7.862-20.013C14.075 25.051 7.157 36.941.223 34.687c-.268-.176-.315-.444-.029-.384 8.953 1.66 14.5-15.724 15.479-21.884.028-.415 0-1.067.028-1.422-.028-.031 0-.06-.028-.088.028-.415 1.097.057 1.274.591 1.185 3.381 5.188 12.928 7.62 19.422.314-3.144 1.037-7.355 1.392-9.786.091-.799.24-1.6.387-2.371.77-4.063 2.46-10.793 5.752-10.29.355.032.267.359.088.387-2.311.387-3.821 4.478-4.827 10.23-.092.742-.24 1.421-.315 2.163-.446 2.934-1.258 7.862-1.544 11.595-.028.264-.84 1.038-1.047.503zm6.554-7.443a2.778 2.778 0 01-.148-.859c0-1.305.89-2.638 2.343-2.698.918 0 1.776.89 1.453 1.748-.387.944-1.66 1.66-2.699 1.66.088.564 1.126 1.513 2.164 1.513 2.786 0 4.862-2.075 6.107-3.38.683-.71.563-.028.148.802-.83 1.72-2.727 3.173-4.774 3.29-1.748.09-4.003-.237-4.594-2.076zm.918-.859c1.258-.563 2.076-1.365 1.748-1.689-.622-.622-1.776.947-1.748 1.69z"/><path fill="#fff" d="M46.752 22.856c.563-.314 1.007.535.944 1.01a3.908 3.908 0 001.72.355 7.623 7.623 0 002.85-.63c.826-.266.204.535-.268.803a5.66 5.66 0 01-2.73.739 5.223 5.223 0 01-1.512-.236c0 .918-.472 2.43-1.66 2.49-.711.06-1.778-.534-2.372-1.424-.314.89-.918 1.84-1.868 1.84a1.967 1.967 0 01-.918-.268 2.236 2.236 0 01-.83-1.157 3.27 3.27 0 01-.18-1.305 6.183 6.183 0 011.07-2.962c.056-.18.355-.12.59.056.237.176.356.475.208.63a6.032 6.032 0 00-.943 2.905 2.54 2.54 0 00.12.83.63.63 0 00.801.387c.74-.267 1.422-2.255 1.513-2.67.028-.267 0-.314.06-.383.088-.447 1.006 0 .943.474.06.06.032.117 0 .265.088.566.148 1.396.77 1.78 1.337.89 1.72-1.306 1.692-2.202-.386-.645-.298-1.12 0-1.327zm20.432 2.403c-.862 1.157-2.227 2.343-3.205 2.343-.978 0-1.927-.743-2.311-1.692a4.343 4.343 0 01-.267-1.422 3.405 3.405 0 01.207-1.217 1.04 1.04 0 01.595-.71.864.864 0 01.738.295c.24.239.24.506.092.563-.148.057-.268.207-.415.506a8.59 8.59 0 00-.18 1.098c.06.471.12 1.333.63 1.629 1.257.71 3.855-2.758 3.915-3.705 0-.06.056-.091.088-.12-.06-.03-.032-.03 0-.059a.477.477 0 01.267-.088.994.994 0 01.83.682c.137.993.206 1.993.208 2.994v.116l.028-.028c.802-.475 4.566-2.311 5.249-1.688.267.235.235.295 0 .355-1.186.355-3.145 1.421-4.387 2.163l-.862.595-.028.355-.092 2.758c-.235 3.736-1.037 7.796-3.616 8.33-.742.148-1.928-.314-2.758-1.157-.83-.843-1.274-1.887-1.126-2.965.444-2.283 2.83-5.246 5.812-7.469l.742-.535-.154-1.927zm.116 3.32l-.682.63c-2.4 2.2-4.403 4.594-4.742 6.581a2.478 2.478 0 00.628 2.076c.444.415 1.007.65 1.365.563 2.246-.45 3.463-5.698 3.428-9.85h.003z"/><path fill="#fff" d="M72.284 25.91a2.694 2.694 0 01-.15-.859c0-1.305.89-2.638 2.342-2.698.922 0 1.78.89 1.453 1.748-.383.944-1.66 1.66-2.698 1.66.091.564 1.129 1.513 2.167 1.513 2.786 0 4.862-2.075 6.107-3.38.682-.71.563-.028.148.802-.83 1.72-2.727 3.173-4.774 3.29-1.749.09-4.003-.237-4.595-2.076zm.919-.859c1.258-.563 2.075-1.365 1.748-1.689-.622-.622-1.78.947-1.748 1.69z"/><path fill="#fff" d="M80.505 25.466a2.177 2.177 0 011.066-1.808c.85-.54 1.84-.82 2.846-.802a6.006 6.006 0 012.403.506h.028l.503-.682c.18-.314 1.189.314.981.682a7.267 7.267 0 00-.475 1.541c-.031.504.117 1.098.651 1.258 1.513.296 4.063-1.217 5.13-2.402.506-.504.943.235-.683 1.868-.74.742-2.786 1.688-4.032 1.393a2.78 2.78 0 01-2.103-1.868c-.83.742-2.79 2.255-4.36 2.255a1.965 1.965 0 01-1.068-.296 2.011 2.011 0 01-.887-1.645zm5.808-1.512a4.238 4.238 0 00-1.154-.148c-1.484 0-3.44.563-3.774 1.927a.542.542 0 00.535.711c1.415-.17 3.35-1.393 4.387-2.49h.006z"/><path fill="#fff" d="M93.483 22.589c0-.208.315-.208.595-.06a.869.869 0 01.443.629l-.028 1.157c.742-.943 2.934-2.667 4.566-2.4.682.117 1.097.74.89.979-.415.475-.83.295-.802.06l.031-.24c-1.484-.028-3.943 1.78-4.657 3.825a7.063 7.063 0 00-.207 1.276c.031.384-.944 0-1.067-.446-.12-.27-.163-1.044.236-4.78z"/><path fill="#fff" stroke="#fff" stroke-width=".2" d="M101.461 23.63a.417.417 0 01.016-.305.384.384 0 01.226-.202l7.3-2.415a.38.38 0 01.3.028.415.415 0 01.179.54.38.38 0 01-.225.201l-7.3 2.415a.382.382 0 01-.301-.027.412.412 0 01-.195-.235zm-.367 3.953a.365.365 0 01-.004-.222l.028-.07h.001a.399.399 0 01.52-.172h.001l6.832 3.265a.37.37 0 01.169.51.397.397 0 01-.521.174l-6.832-3.266h-.001a.373.373 0 01-.193-.219zM97.95 30.23a.361.361 0 01.036-.298.444.444 0 01.243-.191.443.443 0 01.308.009c.098.04.174.118.207.217l2.32 7.013a.36.36 0 01-.036.298.441.441 0 01-.242.191.445.445 0 01-.31-.008.362.362 0 01-.206-.218l-2.32-7.013zm-7.586 6.428a.374.374 0 01.024-.29h.001l3.537-6.698a.394.394 0 01.226-.19.403.403 0 01.295.018.38.38 0 01.195.22.37.37 0 01-.025.292l-3.538 6.696h0a.398.398 0 01-.52.172h-.002a.374.374 0 01-.193-.22zm11.456-10.93a.376.376 0 01-.018-.145h.001a.382.382 0 01.407-.348h.001l14.099.875a.378.378 0 01.332.253.436.436 0 01.016.072l.002.073a.39.39 0 01-.134.256.389.389 0 01-.275.092l-14.098-.875a.38.38 0 01-.333-.253zm-1.854 3.507a.36.36 0 01.025-.286.39.39 0 01.222-.187.394.394 0 01.289.017.371.371 0 01.118.088l9.153 10.235v.001a.367.367 0 01.064.378.395.395 0 01-.423.236.378.378 0 01-.224-.12l-9.151-10.236-.043-.059a.356.356 0 01-.03-.067zM94.94 44.318a.371.371 0 01-.095-.258v-.005l.97-13.596a.368.368 0 01.565-.286.373.373 0 01.17.34h0l-.97 13.597v.005a.37.37 0 01-.394.324.369.369 0 01-.246-.121z"/></svg>
+                                        Get Ready To Sell More New Year With <span class="highlighted-text">30% OFF!</span>
                                     </div>
 
-                                    <div class="wpf-notification-counter__btn-area">
-                                        <a target="_blank" href="<?php echo esc_url($this->btn_link); ?>" class="wpf-notification-counter__btn" role="button">
-
-                                            <span class="wpf-btn-inner">
-                                                <span class="screen-reader-text"><?php echo __('Click to view Halloween sale products', 'wpfnl'); ?></span>
-                                                <span aria-hidden="true" class="wpf-notification-counter__mint-button"> <?php echo __(' Get Lifetime Access', 'wpfnl'); ?></span>
-                                                <svg width="14" height="14" fill="none" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M2.76.362a1 1 0 00.013 2l7.54-.054-9.667 9.666a1 1 0 101.414 1.414l9.663-9.663-.057 7.53a1 1 0 002 .016l.072-9.72A1.252 1.252 0 0012.48.29L2.76.363z"></path></svg>
-                                            </span>
-
-                                        </a>
-                                    </div>
+                                    <a href="<?php echo esc_url($this->btn_link); ?>" class="cta-button" role="button" aria-label="get special discount " target="_blank">
+                                        <?php
+                                            echo __('View Offer', 'getwpfunnels');
+                                        ?>
+                                        <svg width="11" height="11" fill="none" viewBox="0 0 11 11" xmlns="http://www.w3.org/2000/svg"><path fill="#3C1F7D" stroke="#3C1F7D" stroke-width=".2" d="M9.419.1a.88.88 0 01.88.881V9.42a.88.88 0 11-1.761 0V3.11l-6.934 6.933A.88.88 0 01.358 8.796l6.934-6.934H.982A.88.88 0 11.981.1h8.437z"/></svg>
+                                    </a>
                                 </div>
                             </div>
-                        </section>
-
-                        <!-- Creator lms early bird banner starts -->
-                        <section class="wpfnl-lms-earlybird-banner" style="display: none;">
-                            <div class="wpfnl-lms-earlybird-banner-container">
-                                <div class="funnel-banner__icon">
-                                    <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/creator-lms-logo.webp'); ?>" alt="creator-lms-logo.webp" class="">
-                                </div>
-
-                                <div class="funnel-banner__content">
-                                <p>📢 Introducing <strong>Creator LMS Pro</strong> — a powerful upgrade to Creator LMS with a sleek new UI, Cohorts, Communities, built-in checkout, gamification, AI Assistant, advanced analytics, and more! 🚀 <strong>Get a special discount</strong> as an Early Adopter — available for a limited time only!</p>
-
-                                <div class="funnel-banner__actions">
-                                    <div class="wpfnl-notification-counter__btn-area">
-                                    <a href="<?php echo esc_url($this->btn_link); ?>"
-                                        target="_blank"
-                                        class="wpfnl-notification-counter__btn btn btn-primary"
-                                        role="button">
-                                        <span class="wpfnl-btn-inner">
-                                        <span class="screen-reader-text">Click to upgrade to Mail Mint Pro</span>
-                                        <span aria-hidden="true" class="wpfnl-notification-counter__mint-button">
-                                            Sign Up
-                                        </span>
-                                        </span>
-                                    </a>
-                                    </div>
-
-                                    <div class="wpfnl-notification-counter__btn-area">
-                                    <a href="#"
-                                        class="wpfnl-notification-counter__btn btn btn-secondary"
-                                        role="button">
-                                        <span class="wpfnl-btn-inner">
-                                        <span class="screen-reader-text">Dismiss this offer</span>
-                                        <span aria-hidden="true" class="wpfnl-notification-counter__mint-button">
-                                            No, Thanks
-                                        </span>
-                                        </span>
-                                    </a>
-                                    </div>
-                                </div>
-                                </div>
-                            </div>
-                        </section>
-                        <!-- Creator lms early bird banner ends -->
-
-                    </div>
-
-                    <button class="close-promotional-banner" type="button" aria-label="close banner">
-                        <svg width="12" height="13" fill="none" viewBox="0 0 12 13" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke="#7A8B9A" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 1.97L1 11.96m0-9.99l10 9.99" />
-                        </svg>
-                    </button>
-
-
+                        </div>
+                    </section>
                 </div>
+
+                <button class="close-promotional-banner" type="button" aria-label="close banner">
+                    <svg width="12" height="13" fill="none" viewBox="0 0 12 13" xmlns="http://www.w3.org/2000/svg"><path stroke="#7A8B9A" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 1.97L1 11.96m0-9.99l10 9.99"/></svg>
+                </button>
             </div>
         </div>
         <!-- .gwpf-tb-notification end -->
 
-
-
-
         <script>
             function updateCountdown() {
-                var endDate = new Date("2025-10-16 23:59:59").getTime();
+                var endDate = new Date("2026-01-07 23:59:59").getTime();
                 var now = new Date().getTime();
                 var timeLeft = endDate - now;
 
@@ -259,45 +176,16 @@ class SpecialOccasionBanner
     /**
      * Adds internal CSS styles for the special occasion banners.
      */
-    public function add_styles()
-    {
-    ?>
+    public function add_styles() {
+        ?>
         <style type="text/css">
-            @font-face {
-                font-family: "Circular Std Book";
-                src: url(<?php echo plugin_dir_url(__FILE__) . 'assets/fonts/CircularStd-Book.woff2'; ?>) format("woff2"),
-                    url(<?php echo plugin_dir_url(__FILE__) . 'assets/fonts/CircularStd-Book.woff'; ?>) format("woff");
-                font-weight: 400;
-                font-style: normal;
-                font-display: swap;
-            }
-
-            @font-face {
-                font-family: 'Lexend Deca';
-                src: url(<?php echo plugin_dir_url(__FILE__) . 'assets/fonts/LexendDeca-Bold.woff2'; ?>) format("woff2"),
-                    url(<?php echo plugin_dir_url(__FILE__) . 'assets/fonts/LexendDeca-Bold.woff'; ?>) format("woff");
-                font-weight: 700;
-                font-style: normal;
-                font-display: swap;
-            }
-
-            @font-face {
-                font-family: 'Lexend Deca';
-                src: url(<?php echo plugin_dir_url(__FILE__) . 'assets/fonts/LexendDeca-ExtraBold.woff.woff2'; ?>) format("woff2"),
-                    url(<?php echo plugin_dir_url(__FILE__) . 'assets/fonts/LexendDeca-ExtraBold.woff.woff'; ?>) format("woff");
-                font-weight: 800;
-                font-style: normal;
-                font-display: swap;
-            }
-
-
             .gwpf-tb__notification,
             .gwpf-tb__notification * {
                 box-sizing: border-box;
             }
 
-            .wp-anniversary-banner.notice {
-                display: block !important;
+            .gwpf-promotional-notice.notice {
+                display: block;
                 background: none;
                 border: none;
                 box-shadow: none;
@@ -316,13 +204,113 @@ class SpecialOccasionBanner
                 display: block;
                 max-height: 110px;
             }
+            .wpfunnels_page_wp_funnels .gwpf-tb__notification {
+                width: calc(100% - 40px);
+                margin: 20px 0 20px 20px;
+            }
 
             .gwpf-tb__notification .banner-overflow {
-                overflow: hidden;
                 position: relative;
                 width: 100%;
                 z-index: 1;
             }
+
+            /* ---banner style start--- */
+            .gwpf-promotional-banner {
+                position: relative;
+                background-color: #2d1568;
+                background: linear-gradient(90deg, #AC77FD -6.28%, #3C1F7D 21.34%, #3C1F7D 87.74%, #AC77FD 130.48%);
+                z-index: 1111;
+                padding: 6px 0;
+            }
+            .gwpf-promotional-banner .promotional-banner {
+                color: white;
+                padding: 3px 20px 0;
+                /* padding: 12px 20px; */
+                text-align: center;
+                font-size: 14px;
+                line-height: 1.4;
+                position: relative;
+            }
+            .gwpf-promotional-banner .banner-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 20px;
+                row-gap: 8px;
+                position: relative;
+            }
+            .gwpf-promotional-banner .banner-text {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 6px;
+                row-gap: 0;
+                justify-content: center;
+                font-size: 16px;
+                color: #fff;
+                font-weight: 400;
+                line-height: 1.4;
+                text-transform: capitalize;
+                letter-spacing: 0;
+            }
+            .gwpf-promotional-banner .banner-text svg {
+                display: block;
+            }
+            .gwpf-promotional-banner .banner-text .highlighted-text {
+                color: #ee8134;
+                font-weight: 700;
+            }
+            .gwpf-promotional-banner .halloween-bird-left {
+                position: absolute;
+                left: -47px;
+                bottom: -7px;
+            }
+            .gwpf-promotional-banner .halloween-bird-right {
+                position: absolute;
+                right: -50px;
+                top: -5px;
+            }
+            .gwpf-promotional-banner .cta-button {
+                color: #3C1F7D;
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 700;
+                line-height: normal;
+                text-decoration: none;
+                text-decoration-thickness: 2px;
+                text-underline-offset: 5px;
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                transition: all 0.2s ease;
+                background: #fff;
+                padding: 9px 14px;
+                border-radius: 50px;
+            }
+            .gwpf-promotional-banner .cta-button svg {
+                transition: transform 0.3s ease;
+            }
+
+            .gwpf-promotional-banner .cta-button:focus, 
+            .gwpf-promotional-banner .cta-button:visited {
+                color: #3C1F7D !important;
+            }
+            .gwpf-promotional-banner .cta-button:hover {
+                color: #3C1F7D !important;
+            }
+            .gwpf-promotional-banner .cta-button:hover svg path {
+                stroke: #3C1F7D;
+                fill: #3C1F7D;
+            }
+
+            .gwpf-promotional-banner .cta-button:hover svg {
+                transform: translateX(3px);
+            }
+
 
             .gwpf-tb__notification .close-promotional-banner {
                 position: absolute;
@@ -343,497 +331,22 @@ class SpecialOccasionBanner
 
             .gwpf-tb__notification .close-promotional-banner svg {
                 width: 22px;
-            }
-
-            .gwpf-tb__notification .close-promotional-banner svg {
                 display: block;
-                width: 15px;
-                height: 15px;
             }
 
-            .gwpf-anniv__container {
-                width: 100%;
-                margin: 0 auto;
-                max-width: 1640px;
-                position: relative;
-                padding-right: 15px;
-                padding-left: 15px;
-            }
-
-            .gwpf-anniv__container-area {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .gwpf-anniv__content-area {
-                width: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: space-evenly;
-                max-width: 1310px;
-                position: relative;
-                padding-right: 15px;
-                padding-left: 15px;
-                margin: 0 auto;
-                z-index: 1;
-            }
-
-            .gwpf-anniv__image--left {
-                position: absolute;
-                left: 140px;
-                top: 50%;
-                transform: translateY(-50%);
-            }
-
-            .gwpf-anniv__image--right {
-                position: absolute;
-                right: 0;
-                top: 50%;
-                transform: translateY(-50%);
-            }
-
-            .gwpf-anniv__image--group {
-                display: flex;
-                align-items: center;
-                gap: 50px;
-            }
-
-            .gwpf-anniv__image--left img {
-                width: 100%;
-                max-width: 108px;
-            }
-
-            .gwpf-anniv__image--eid-mubarak img {
-                width: 100%;
-                max-width: 165px;
-            }
-
-            .gwpf-anniv__image--wpfunnel-logo img {
-                width: 100%;
-                max-width: 140px;
-            }
-
-            .gwpf-anniv__image--four img {
-                width: 100%;
-                max-width: 254px;
-            }
-
-            .gwpf-anniv__lead-text {
-                display: flex;
-                gap: 11px;
-            }
-
-            .gwpf-anniv__lead-text h2 {
-                font-size: 42px;
-                line-height: 1;
-                margin: 0;
-                color: #EC813F;
-                font-weight: 700;
-                font-family: 'Lexend Deca';
-
-            }
-
-
-
-            .gwpf-anniv__image--right img {
-                width: 100%;
-                max-width: 152px;
-            }
-
-            .gwpf-anniv__image figure {
-                margin: 0;
-            }
-
-            .gwpf-anniv__text-container {
-                position: relative;
-                max-width: 330px;
-            }
-
-            .gwpf-anniv__campaign-text-images {
-                position: absolute;
-                top: -10px;
-                right: -15px;
-                max-width: 100%;
-                max-height: 24px;
-            }
-
-
-
-            .gwpf-anniv__btn-area {
-                display: flex;
-                align-items: flex-end;
-                justify-content: flex-end;
-                position: relative;
-            }
-
-            .gwpf-anniv__btn-area svg {
-                position: absolute;
-                width: 70px;
-                right: -20px;
-                top: -15px;
-            }
-
-            .gwpf-anniv__btn {
-                font-family: "Circular Std Book";
-                font-size: 20px;
-                font-weight: 700;
-                line-height: 1;
-                text-align: center;
-                border-radius: 13px;
-                background: linear-gradient(0deg, #FFC8A6 0%, #FFF 100%);
-                box-shadow: 0px 11px 30px 0px rgba(19, 13, 57, 0.25);
-                color: #6E42D3;
-                padding: 17px 26px;
-                display: inline-block;
-                cursor: pointer;
-                text-transform: capitalize;
-                transition: all 0.5s linear;
-                text-decoration: none;
-            }
-
-            a.gwpf-anniv__btn:hover {
-                box-shadow: none;
-            }
-
-            .gwpf-anniv__btn-area a:focus {
-                color: #fff;
-                box-shadow: none;
-                outline: 0px solid transparent;
-            }
-
-            .gwpf-anniv__btn:hover {
-                background-color: #201cfe;
-                color: #6E42D3;
-            }
-
-            .wpcartlift-banner-title p {
-                margin: 0;
-                font-weight: 700;
-                max-width: 315px;
-                font-size: 24px;
-                color: #ffffff;
-                line-height: 1.3;
-            }
-
-            @media only screen and (min-width: 1921px) {
-                .gwpf-anniv__image--left img {
-                    max-width: 108px;
-                }
-            }
-
-
-            @media only screen and (max-width: 1710px) {
-
-                .gwpf-anniv__image--left {
-                    left: 100px;
-                }
-
-                .gwpf-anniv__lead-text h2 {
-                    font-size: 36px;
-                }
-
-                .gwpf-anniv__content-area {
-                    justify-content: center;
-                }
-
-                .gwpf-anniv__image--group {
-                    gap: 30px;
-                }
-
-                .gwpf-anniv__content-area {
-                    gap: 30px;
-                }
-
-                .gwpf-anniv__btn {
-                    font-size: 18px;
-                }
-
-                .gwpf-anniv__btn-area svg {
-                    position: absolute;
-                    width: 70px;
-                    right: -20px;
-                    top: -15px;
-                }
-
-            }
-
-
-            @media only screen and (max-width: 1440px) {
-
-                .gwpf-tb__notification {
-                    max-height: 110px;
-                }
-
-                .gwpf-anniv__image--left {
-                    left: 40px;
-                }
-
-                .gwpf-anniv__image--left img {
-                    width: 90%;
-                }
-
-                .gwpf-anniv__image--eid-mubarak img {
-                    width: 90%;
-                }
-
-                .gwpf-anniv__image--wpfunnel-logo img {
-                    width: 90%;
-                }
-
-                .gwpf-anniv__image--four img {
-                    width: 90%;
-                }
-
-                .gwpf-anniv__image--right img {
-                    width: 90%;
-                }
-
-                .gwpf-anniv__lead-text h2 {
-                    font-size: 28px;
-                }
-
-                .gwpf-anniv__image--group {
-                    gap: 25px;
-                }
-
-                .gwpf-anniv__content-area {
-                    gap: 30px;
-                    justify-content: center;
-                }
-
-                .gwpf-anniv__btn {
-                    font-size: 16px;
-                    font-weight: 400;
-                    border-radius: 30px;
-                    padding: 12px 16px;
-                }
-
-                .gwpf-anniv__btn-area svg {
-                    position: absolute;
-                    width: 60px;
-                    right: -15px;
-                    top: -15px;
-                }
-
-            }
-
-
-            @media only screen and (max-width: 1399px) {
-
-                .gwpf-tb__notification {
-                    max-height: 110px;
-                }
-
-                .gwpf-anniv__image--left {
-                    left: 20px;
-                }
-
-                .gwpf-anniv__image--left img {
-                    max-width: 86.39px;
-                }
-
-                .gwpf-anniv__image--eid-mubarak img {
-                    max-width: 132px;
-                }
-
-                .gwpf-anniv__image--wpfunnel-logo img {
-                    max-width: 108px;
-                }
-
-                .gwpf-anniv__image--four img {
-                    max-width: 203px;
-                }
-
-                .gwpf-anniv__image--right img {
-                    max-width: 121.5px;
-                }
-
-                .gwpf-anniv__lead-text h2 {
-                    font-size: 24px;
-                }
-
-                .gwpf-anniv__image--group {
-                    gap: 20px;
-                }
-
-                .gwpf-anniv__content-area {
-                    gap: 35px;
-                }
-
-                .gwpf-anniv__btn {
-                    font-size: 14px;
-                    font-weight: 600;
-                    border-radius: 30px;
-                    padding: 12px 16px;
-                }
-
-                .gwpf-anniv__btn-area svg {
-                    width: 45px;
-                    right: -13px;
-                    top: -21px;
-                }
-
-            }
-
-            @media only screen and (max-width: 1024px) {
-                .gwpf-tb__notification {
-                    max-height: 115px;
-                }
-
-                .gwpf-anniv__image--left img {
-                    max-width: 76.39px;
-                }
-
-                .gwpf-anniv__image--eid-mubarak img {
-                    max-width: 122px;
-                }
-
-                .gwpf-anniv__image--wpfunnel-logo img {
-                    max-width: 100px;
-                }
-
-                .gwpf-anniv__image--four img {
-                    max-width: 193px;
-                }
-
-                .gwpf-anniv__image--right img {
-                    max-width: 111.5px;
-                }
-
-                .gwpf-anniv__lead-text h2 {
-                    font-size: 22px;
-                }
-
-                .gwpf-anniv__lead-text svg {
-                    width: 25px;
-                    margin-top: -10px;
-                }
-
-
-                .gwpf-anniv__content-area {
-                    gap: 30px;
-                }
-
-                .gwpf-anniv__image--group {
-                    gap: 15px;
-                }
-
-                .gwpf-anniv__btn {
-                    font-size: 12px;
-                    line-height: 1.2;
-                    padding: 11px 12px;
-                    font-weight: 400;
-                }
-
-                .gwpf-anniv__btn {
-                    box-shadow: none;
-                }
-
-                .gwpf-anniv__image--right,
-                .gwpf-anniv__image--left {
-                    display: none;
-                }
-
-                .gwpf-anniv__btn-area svg {
-                    width: 40px;
-                    right: -15px;
-                    top: -23px;
-                }
-
-
-            }
-
-            @media only screen and (max-width: 768px) {
-                .gwpf-tb__notification {
-                    max-height: 195px !important;
+            @media only screen and (max-width: 991px) {
+                .promotional-banner {
+                    padding: 16px 20px;
                 }
 
                 .gwpf-tb__notification {
                     margin: 60px 0 20px;
                 }
 
-                .gwpf-anniv__container-area {
-                    padding: 0 15px;
-                }
-
-                .gwpf-anniv__container-area {
-                    justify-content: center;
-                    gap: 20px;
-                }
-
-                .gwpf-tb__notification {
-                    max-height: 110px;
-                }
-
-                .gwpf-anniv__image--left img {
-                    max-width: 76.39px;
-                }
-
-                .gwpf-anniv__image--eid-mubarak img {
-                    max-width: 92px;
-                }
-
-                .gwpf-anniv__image--wpfunnel-logo img {
-                    max-width: 90px;
-                }
-
-                .gwpf-anniv__image--four img {
-                    max-width: 163px;
-                }
-
-                .gwpf-anniv__image--right img {
-                    max-width: 111.5px;
-                }
-
-                .gwpf-anniv__lead-text h2 {
-                    font-size: 22px;
-                }
-
-                .gwpf-anniv__content-area {
-                    gap: 30px;
-                }
-
-                .gwpf-anniv__image--group {
-                    gap: 15px;
-                }
-
                 .gwpf-tb__notification .close-promotional-banner {
                     width: 25px;
                     height: 25px;
                 }
-
-                .gwpf-anniv__image--group {
-                    gap: 20px;
-                }
-
-                .gwpf-anniv__image--left,
-                .gwpf-anniv__image--right {
-                    display: none;
-                }
-
-                .gwpf-anniv__btn {
-                    font-size: 12px;
-                    line-height: 1;
-                    font-weight: 400;
-                    padding: 10px 12px;
-                    margin-left: 0;
-                    box-shadow: none;
-                }
-
-                .gwpf-anniv__content-area {
-                    display: contents;
-                    gap: 25px;
-                    text-align: center;
-                    align-items: center;
-                }
-
-                .gwpf-anniv__lead-text svg {
-                    width: 22px;
-                    margin-top: -8px;
-                }
-
-
             }
 
             @media only screen and (max-width: 767px) {
@@ -846,814 +359,26 @@ class SpecialOccasionBanner
                 .wpvr-promotional-banner {
                     max-height: none;
                 }
-
-                .gwpf-anniv__image--right,
-                .gwpf-anniv__image--left {
-                    display: none;
-                }
-
-                .gwpf-anniv__stroke-font {
-                    font-size: 16px;
-                }
-
-                .gwpf-anniv__content-area {
-                    display: contents;
-                    gap: 25px;
-                    text-align: center;
-                    align-items: center;
-                }
-
-                .gwpf-anniv__btn-area {
-                    justify-content: center;
-                    padding-top: 5px;
-                }
-
-                .gwpf-anniv__btn {
-                    font-size: 12px;
-                    padding: 15px 24px;
-                }
-
-                .gwpf-anniv__image--group {
-                    gap: 10px;
-                    padding: 0;
-                }
             }
 
-            /* funnel anniversary */
-
-            .wpf-notification-counter {
-                position: relative;
-                background-image: url(<?php echo esc_url(WPFNL_URL . 'admin/assets/images/lms-banner/bg.png'); ?>);
-                background-position: center;
-                background-repeat: no-repeat;
-                background-size: cover;
-                object-fit: cover;
-                background-color: #03031E;
-                z-index: 1111;
-                padding: 0;
-                max-height: 110px;
-                padding: 6px 0;
-            }
-
-            .wpf-notification-counter__container {
-                position: relative;
-                width: 100%;
-                max-width: 1100px;
-                margin: 0 auto;
-                max-height: 100%;
-                overflow: hidden;
-                padding: 0;
-            }
-
-            .wpf-notification-counter__content {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .wpf-notification-counter__figure-logo {
-                max-width: 212px;
-                margin: 0;
-                line-height: 0;
-            }
-
-            .wpf-notification-counter__figure-occasion {
-                max-width: 110px;
-                margin: 0;
-                line-height: 0;
-            }
-
-            .wpf-notification-counter__figure-percentage {
-                max-width: 310px;
-                margin: 0;
-                line-height: 0;
-            }
-
-            .wpf-notification-counter__img {
-                width: 100%;
-                max-width: 100%;
-            }
-
-            .wpf-notification-counter__list {
-                display: flex;
-                justify-content: center;
-                gap: 10px;
-                margin: 0;
-                padding: 0;
-                list-style: none;
-            }
-
-            .wpf-notification-counter__item {
-                margin: 0;
-                display: flex;
-                flex-direction: column;
-                width: 56.14px;
-                font-family: "Inter";
-                font-size: 14px;
-                font-style: normal;
-                font-weight: 400;
-                line-height: normal;
-                letter-spacing: 0.56px;
-                text-transform: uppercase;
-                text-align: center;
-                color: #ffffff;
-            }
-
-            .wpf-notification-counter__time {
-                font-size: 32px;
-                font-family: "Inter";
-                font-style: normal;
-                font-weight: 700;
-                line-height: normal;
-                color: #fff;
-                text-align: center;
-                margin-bottom: 6px;
-                border-radius: 10px;
-                background: linear-gradient(200deg, #DF4EE0 13.28%, #6E42D1 100.5%);
-                box-shadow: 0px 3px 0px 0px #442A7E;
-            }
-
-            .wpf-notification-counter__btn-area {
-                display: flex;
-                align-items: flex-end;
-                justify-content: flex-end;
-            }
-
-            .wpf-notification-counter__btn {
-                position: relative;
-                font-family: "Inter";
-                font-weight: 600;
-                padding: 16px 30px;
-                border-radius: 16px;
-                font-size: 20px;
-                line-height: normal;
-                color: #FFF;
-                text-align: center;
-                filter: drop-shadow(0px 30px 60px rgba(21, 19, 119, 0.2));
-                display: inline-block;
-                cursor: pointer;
-                text-transform: capitalize;
-                background: linear-gradient(90deg, #BF43C0 -34.77%, #6E42D1 61.17%);
-                box-shadow: 0px 1px 1px #442A7E;
-                text-decoration: none;
-                transition: all 0.3s ease;
-            }
-
-            .wpf-notification-counter__btn:hover {
-                background-color: #5936a7;
-                color: #ffffff;
-            }
-
-            .wpf-notification-counter__stroke-font {
-                font-size: 26px;
-                font-family: "Inter";
-                font-weight: 700;
-            }
-
-            /* Media Queries */
-            @media only screen and (max-width: 1710px) {
-                .wpf-notification-counter__container {
-                    max-width: 1024px;
+            @media only screen and (max-width: 575px) {
+                .promotional-banner {
+                    padding: 16px 55px;
+                    font-size: 13px;
                 }
-
-                .wpf-notification-counter__figure-occasion {
-                    max-width: 110px;
+                .gwpf-promotional-banner .halloween-bird-left {
+                    left: -12px;
+                    bottom: inherit;
+                    top: -5px;
                 }
-
-                .wpf-notification-counter__figure-logo {
-                    max-width: 165px;
-                }
-
-                .wpf-notification-counter__figure-percentage {
-                    max-width: 310px;
-                }
-            }
-
-            @media only screen and (max-width: 1550px) {
-                .wpf-notification-counter__container {
-                    max-width: 980px;
-                }
-
-                .wpf-notification-counter__figure-logo {
-                    max-width: 165px;
-                }
-
-                .wpf-notification-counter__figure-occasion {
-                    max-width: 110px;
-                }
-
-                .wpf-notification-counter__figure-percentage {
-                    max-width: 290px;
-                }
-
-                .wpf-notification-counter__btn {
-                    padding: 12px 18px;
-                    font-size: 17px;
-                    border-radius: 12px;
-                }
-            }
-
-            @media only screen and (max-width: 1440px) {
-                .wpf-notification-counter__container {
-                    max-width: 920px;
-                }
-
-                .wpf-notification-counter__figure-logo {
-                    max-width: 145px;
-                }
-
-                .wpf-notification-counter__figure-occasion {
-                    max-width: 110px;
-                }
-
-                .wpf-notification-counter__figure-percentage {
-                    max-width: 270px;
-                }
-
-                .wpf-notification-counter__btn {
-                    font-size: 17px;
-                    padding: 12px 18px;
-                    border-radius: 12px;
-                }
-
-                .wpf-notification-counter__time {
-                    display: flex;
-                    width: 50px;
-                    height: 42px;
-                    align-items: center;
-                    justify-content: center;
-                    margin: 0 auto 7px;
-                    font-size: 24px;
-                }
-
-                .wpf-notification-counter__list {
-                    gap: 5px;
-                }
-            }
-
-            @media only screen and (max-width: 1399px) {
-                .wpf-notification-counter__container {
-                    max-width: 820px;
-                }
-
-                .wpf-notification-counter__figure-logo {
-                    max-width: 143px;
-                }
-
-                .wpf-notification-counter__figure-occasion {
-                    max-width: 95px;
-                }
-
-                .wpf-notification-counter__figure-percentage {
-                    max-width: 250px;
-                }
-
-                .wpf-notification-counter__btn {
-                    font-size: 16px !important;
-                    padding: 12px 18px !important;
-                    border-radius: 10px !important;
-                }
-
-                .wpf-notification-counter__time {
-                    display: flex;
-                    width: 40px;
-                    height: 32px;
-                    font-size: 20px;
-                    border-radius: 8px;
-                }
-
-                .wpf-notification-counter__list {
-                    gap: 5px;
-                }
-
-                .wpf-notification-counter__item {
-                    font-size: 14px;
-                    align-items: center;
-                    width: 50px;
-                }
-            }
-
-            @media only screen and (max-width: 1199px) {
-                .wpf-notification-counter {
-                    background-size: cover;
-                }
-
-                .wpf-notification-counter__container {
-                    max-width: 780px;
-                }
-
-                .wpf-notification-counter__stroke-font {
-                    font-size: 20px;
-                }
-
-                .wpf-notification-counter__figure-logo {
-                    max-width: 150px;
-                }
-
-                .wpf-notification-counter__figure-occasion {
-                    max-width: 90px;
-                }
-
-                .wpf-notification-counter__figure-percentage {
-                    max-width: 220px;
-                }
-
-                .wpf-notification-counter__btn {
-                    font-size: 16px;
-                    padding: 12px 20px;
-                }
-
-                .wpf-notification-counter__time {
-                    font-size: 18px;
-                }
-
-                .wpf-notification-counter__list {
-                    gap: 0;
-                }
-
-                .wpf-notification-counter__time {
-                    display: flex;
-                    width: 40px;
-                    height: 32px;
-                    align-items: center;
-                    justify-content: center;
-                    margin: 0 auto 6px;
-                }
-
-                .wpf-notification-counter__item {
-                    font-size: 14px;
-                }
-            }
-
-            @media only screen and (max-width: 1024px) {
-                .wpf-notification-counter__container {
-                    max-width: 680px;
-                }
-
-                .wpf-notification-counter__figure-logo {
-                    max-width: 110px;
-                    margin: 0;
-                }
-
-                .wpf-notification-counter__figure-occasion {
-                    max-width: 80px;
-                    margin: 3px 0;
-                }
-
-                .wpf-notification-counter__figure-percentage {
-                    max-width: 200px;
-                }
-
-                .wpf-notification-counter__btn {
-                    font-size: 15px;
-                    padding: 10px 16px;
-                }
-
-                .wpf-notification-counter__btn {
-                    font-size: 16px !important;
-                    padding: 10px 14px !important;
-                    border-radius: 10px !important;
-                }
-
-                .wpf-notification-counter__time {
-                    width: 38px;
-                    height: 30px;
-                }
-
-                .wpf-notification-counter__item {
-                    font-size: 12px;
-                }
-            }
-
-            @media only screen and (max-width: 991px) {
-                .wpf-notification-counter__container {
-                    max-width: 690px;
-                }
-
-                .wpf-notification-counter__stroke-font {
-                    font-size: 20px;
-                }
-
-                .wpf-notification-counter__figure-logo {
-                    max-width: 110px;
-                }
-
-                .wpf-notification-counter__figure-occasion {
-                    max-width: 75px;
-                }
-
-                .wpf-notification-counter__figure-percentage {
-                    max-width: 190px;
-                }
-
-                .wpf-notification-counter__btn {
-                    font-size: 14px !important;
-                    padding: 10px 12px !important;
-                }
-
-                .wpf-notification-counter__time {
-                    font-size: 16px;
-                }
-
-                .wpf-notification-counter__list {
-                    gap: 0;
-                }
-
-                .wpf-notification-counter__time {
-                    display: flex;
-                    width: 35px;
-                    height: 27px;
-                    align-items: center;
-                    justify-content: center;
-                    margin: 0 auto 6px;
-                }
-
-                .wpf-notification-counter__item {
-                    font-size: 12px;
-                    width: 45px;
-                }
-            }
-
-
-            /* Creator LMS early bird banner design */
-            .wpfnl-lms-earlybird-banner {
-                .wpfnl-lms-earlybird-banner-container {
-                    display: flex;
-                    align-items: center;
-                    background: #F7F7FF;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 6px;
-                    padding: 14px 18px;
-                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-                    position: relative;
-                    font-family: 'Inter', sans-serif;
-                    position: relative;
-
-                    &::before {
-                        content: "";
-                        position: absolute;
-                        left: 0px;
-                        top: 0;
-                        height: 100%;
-                        width: 6px;
-                        background: #6E42D3;
-                        border-radius: 30px;
-                    }
-
-                    .funnel-banner__icon {
-                        flex-shrink: 0;
-                        margin-right: 20px;
-
-                        img {
-                            max-width: 85px;
-                            width: 100%;
-                        }
-                    }
-
-                    .funnel-banner__content {
-                        flex: 1;
-
-                        p {
-                            margin: 0;
-                            font-size: 14px;
-                            color: #374151;
-                            font-weight: 500;
-
-                            strong {
-                                color: #6E42D3;
-                            }
-                        }
-
-                        .funnel-banner__actions {
-                            margin-top: 8px;
-                            display: flex;
-                            flex-wrap: wrap;
-
-                            .wpfnl-notification-counter__btn-area {
-                                margin-right: 8px;
-                                margin-bottom: 6px;
-                            }
-
-                            .btn {
-                                font-size: 13px;
-                                font-weight: 500;
-                                padding: 6px 14px;
-                                border-radius: 4px;
-                                cursor: pointer;
-                                border: none;
-                                text-decoration: none;
-                                display: inline-block;
-                                transition: all 0.2s ease;
-
-                                &:focus {
-                                    box-shadow: none;
-                                    outline: none;
-                                }
-
-                                &.btn-primary {
-                                    background: #6E42D3;
-                                    color: #fff;
-
-                                    &:hover {
-                                        background: darken(#ef4444, 8%);
-                                    }
-                                }
-
-                                &.btn-secondary {
-                                    background: #f0f1f3ff;
-                                    color: #374151;
-
-                                    &:hover {
-                                        background: darken(#f3f4f6, 5%);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    .funnel-banner__close {
-                        position: absolute;
-                        top: 8px;
-                        right: 10px;
-                        border: none;
-                        background: transparent;
-                        font-size: 18px;
-                        color: #9ca3af;
-                        cursor: pointer;
-
-                        &:hover {
-                            color: #4b5563;
-                        }
-                    }
-                }
-
-                /* ================== RESPONSIVENESS ================== */
-                @media (max-width: 1550px) {
-                    .wpfnl-lms-earlybird-banner-container {
-                        padding: 12px 16px;
-
-                        .funnel-banner__content p {
-                            font-size: 13.5px;
-                        }
-                    }
-                }
-
-                @media (max-width: 1399px) {
-                    .wpfnl-lms-earlybird-banner-container {
-                        .funnel-banner__content p {
-                            font-size: 13px;
-                        }
-
-                        .funnel-banner__actions .btn {
-                            font-size: 12.5px;
-                            padding: 6px 12px;
-                        }
-                    }
-                }
-
-                @media (max-width: 1199px) {
-                    .wpfnl-lms-earlybird-banner-container {
-                        .funnel-banner__content p {
-                            font-size: 12px;
-                        }
-
-                        .funnel-banner__icon {
-                            margin-right: 15px;
-                            margin-bottom: 0;
-                        }
-
-                        .funnel-banner__actions {
-                            margin-top: 6px !important;
-
-                            .btn {
-                                margin-right: 6px;
-                                font-size: 12px !important;
-                                padding: 5px 14px !important;
-                            }
-                        }
-                    }
-                }
-
-                @media (max-width: 991px) {
-                    .wpfnl-lms-earlybird-banner-container {
-                        padding: 12px 30px;
-                        flex-direction: column;
-                        text-align: center;
-
-                        .funnel-banner__content p {
-                            font-size: 12px;
-                            line-height: 1.4;
-                        }
-
-                        .funnel-banner__icon {
-                            img {
-                                max-width: 65px;
-                                width: 100%;
-                            }
-                        }
-
-                        .funnel-banner__actions {
-                            margin-top: 10px !important;
-                            align-items: center;
-                            justify-content: center;
-
-                            .btn {
-                                width: 100%;
-                                margin-right: 0;
-                            }
-                        }
-                    }
+                .gwpf-promotional-banner .halloween-bird-right {
+                    right: -12px;
+                    bottom: -7px;
+                    top: inherit;
                 }
             }
         </style>
-    <?php
+        <?php
     }
-
-
-    /**
-     * Displays the special occasion banner if the current date and time are within the specified range.
-     */
-    public function display_new_ui_notice()
-    {
-        $screen                     = get_current_screen();
-        $promotional_notice_pages   = ['dashboard', 'plugins', 'toplevel_page_wp_funnels', 'wp-funnels_page_wpfnl_settings'];
-
-        if (!in_array($screen->id, $promotional_notice_pages)) {
-            return;
-        }
-    ?>
-        <div class="wpfunnels-newui-notice notice">
-            <a href="https://youtu.be/OrDQg-XcOLY" target="_blank">
-                <div class="newui-notice-wrapper">
-                    <figure class="newui-template-img">
-                        <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/newui-template-img-2x.webp'); ?>" alt="newui-template-img" />
-                    </figure>
-
-                    <h4 class="newui-notice-title">
-                        <span class="highlighted">WPFunnels 3.0 Is Here!</span>
-
-                        <figure class="newui-version">
-                            <img src="<?php echo esc_url(WPFNL_URL . 'admin/assets/images/wpfunnel-version.svg'); ?>" alt="wpfunnel-version" />
-                        </figure>
-                    </h4>
-                    <p class="newui-notice-description">Now experience a better funnel-building experience with a better and more intuitive canvas for designing your funnel journey easily.</p>
-                </div>
-            </a>
-
-            <button class="close-newui-notice" type="button" aria-label="close banner">
-                <svg width="20" height="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="10" cy="10" r="9.5" fill="#fff" stroke="#FE9A1B" />
-                    <path stroke="#FE9A1B" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.5 7.917l-5 5m0-5l5 5" />
-                </svg>
-            </button>
-        </div>
-    <?php
-    }
-
-
-    /**
-     * Adds internal CSS styles for new ui notice.
-     */
-    public function add_new_ui_notice_styles()
-    {
-    ?>
-        <style type="text/css">
-            .wpfunnels-newui-notice * {
-                box-sizing: border-box;
-            }
-
-            .wpfunnels-newui-notice {
-                position: relative;
-                border-radius: 5px;
-                padding: 0;
-                border: none;
-                border-left: 3px solid #6E42D3;
-                background: #ffffff;
-                box-shadow: 0px 1px 2px 0px rgba(39, 25, 72, 0.10);
-                box-sizing: border-box;
-                background-image: url(<?php echo WPFNL_URL . 'admin/assets/images/new-ui-notice-bg.svg'; ?>);
-                background-repeat: no-repeat;
-                background-size: cover;
-                background-position: right center;
-            }
-
-            .wpfunnels-newui-notice.notice {
-                display: block;
-            }
-
-            .wp-funnels_page_wpfnl_settings .wpfunnels-newui-notice,
-            .toplevel_page_wp_funnels .wpfunnels-newui-notice {
-                margin: 20px 0;
-                width: calc(100% - 20px);
-            }
-
-            .wpfunnels-newui-notice a {
-                text-decoration: none;
-            }
-
-            .wpfunnels-newui-notice .newui-notice-wrapper {
-                padding: 24px 40px;
-                position: relative;
-                overflow: hidden;
-                border-radius: 5px;
-            }
-
-            .wpfunnels-newui-notice .newui-template-img {
-                position: absolute;
-                right: 0;
-                top: 0;
-                display: block;
-                margin: 0;
-            }
-
-            .wpfunnels-newui-notice figure.newui-template-img img {
-                max-width: 482px;
-                margin: 0;
-                display: block;
-            }
-
-            .wpfunnels-newui-notice .newui-notice-title {
-                margin: 0;
-                color: #363B4E;
-                font-size: 20px;
-                font-weight: 500;
-                font-family: "Roboto", sans-serif;
-                position: relative;
-                display: inline-block;
-                z-index: 1;
-            }
-
-            .wpfunnels-newui-notice .newui-version {
-                position: absolute;
-                top: -25px;
-                left: calc(100% + 30px);
-                margin: 0;
-                display: block;
-            }
-
-            .wpfunnels-newui-notice .newui-version img {
-                display: block;
-            }
-
-            .wpfunnels-newui-notice .highlighted {
-                color: #6E42D3;
-                font-weight: 600;
-            }
-
-            .wpfunnels-newui-notice .newui-notice-description {
-                color: #7A8B9A;
-                font-size: 14px;
-                font-weight: 400;
-                font-family: "Roboto", sans-serif;
-                line-height: 1.5;
-                max-width: 632px;
-                margin: 12px 0 0;
-                position: relative;
-                z-index: 1;
-                padding: 0;
-            }
-
-            .wpfunnels-newui-notice .close-newui-notice {
-                border: none;
-                padding: 0;
-                background: transparent;
-                display: block;
-                line-height: 1;
-                cursor: pointer;
-                box-shadow: none;
-                outline: none;
-                position: absolute;
-                top: -6px;
-                right: -6px;
-            }
-
-
-            @media only screen and (max-width: 1399px) {
-                .wpfunnels-newui-notice .newui-template-img {
-                    right: -100px;
-                }
-
-                .wpfunnels-newui-notice .newui-notice-description {
-                    max-width: 592px;
-                }
-
-            }
-
-            @media only screen and (max-width: 1199px) {
-                .wpfunnels-newui-notice .newui-notice-wrapper {
-                    padding: 24px 24px;
-                }
-
-                .wpfunnels-newui-notice .newui-notice-description {
-                    max-width: 532px;
-                }
-
-                .wpfunnels-newui-notice .newui-template-img {
-                    right: -226px;
-                }
-            }
-
-        </style>
-<?php
-    }
+    
 }

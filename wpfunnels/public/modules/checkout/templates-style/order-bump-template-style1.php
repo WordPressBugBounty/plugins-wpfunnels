@@ -34,6 +34,7 @@ if ($type === 'lms') {
     $funnel_id = get_post_meta($step_id, '_funnel_id');
     $type = 'wc';
     $product             = wc_get_product($settings['product']);
+
     if ($product) {
         $regular_price = $product->get_regular_price();
         if ($product->get_type() == 'variable' || $product->get_type() == 'variable-subscription') {
@@ -99,40 +100,60 @@ if ($type === 'lms') {
         }
 
         ?>
-        <div class="template-img" style="background-image: url('<?php echo $img; ?>');">
-            <img src="<?php echo $img; ?>" alt="" class="for-mobile">
+        <div class="template-img" id="wpfnl-order-bump-image-<?php echo $key; ?>" style="background-image: url('<?php echo $img; ?>');">
+            <img src="<?php echo $img; ?>" alt="<?php echo $settings['productName'] ?>" class="for-mobile">
         </div>
-
+            <?php 
+            $isVariable = !empty($settings['isVariable']) ? $settings['isVariable'] : false; 
+            ?>
             <div class="template-content">
-                <h5 class="template-title" style="color: <?php echo $ob_title_color ?>"><?php echo $settings['productName'] ?></h5>
+                <h5 class="template-title" id="wpfnl-order-bump-title-<?php echo $key; ?>" style="color: <?php echo $ob_title_color ?>"><?php echo $settings['productName'] ?></h5>
                 <h6 class="subtitle" style="color: <?php echo $ob_highlight_color ?>"><?php echo $settings['highLightText'] ?></h6>
-                <div class="description" style="color: <?php echo $ob_description_color ?>; --descColor1:<?php echo $ob_description_color ?>"" ><?php echo $settings['productDescriptionText'] ?></div>
-                <span class=" product-price" style="--priceColor1: <?php echo $orderbump_priceColor ?> ">
+                <div class="description" id="wpfnl-order-bump-description-<?php echo $key; ?>" style="color: <?php echo $ob_description_color ?>; --descColor1:<?php echo $ob_description_color ?>"" ><?php echo $settings['productDescriptionText'] ?></div>
+                <span class=" product-price" id="wpfnl-order-bump-price-<?php echo $key; ?>" style="--priceColor1: <?php echo $orderbump_priceColor ?> ">
                     <?php echo sprintf(__('<strong>%s: </strong> %s', 'wpfnl'), $price_str, $price); ?>
                 </span>
-                <div class="product-options">
-                    <div class="option-selector" style="color: <?php echo $ob_choose_variant_color; ?>"><?php echo $ob_choose_variant_name; ?></div>
-                </div>
+                <?php if ($isVariable): ?>
+                    <div class="product-options">
+                        <div id="option-selector-<?php echo $key; ?>"  
+                            class="option-selector" 
+                            style="color: <?php echo $ob_choose_variant_color; ?>;">
+                            <!-- <?php echo $ob_choose_variant_name; ?> -->
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 
+
+        <!-- Simple Product Checkbox -->
         <div class="offer-checkbox" style="background-color: <?php echo $orderbump_color; ?>">
             <span class="wpfnl-checkbox">
                 <input
-                    id="wpfnl-order-bump-cb-<?php echo $key ?>"
+                    id="wpfnl-order-bump-cb-<?php echo $key; ?>"
                     class="wpfnl-order-bump-cb"
                     type="checkbox"
-                    name="wpfnl-order-bump-cb-<?php echo $key ?>"
+                    name="wpfnl-order-bump-cb-<?php echo $key; ?>"
                     data-key="<?php echo $key; ?>"
                     data-quantity="<?php echo $settings['quantity']; ?>"
                     data-replace="<?php echo $settings['isReplace']; ?>"
                     data-step="<?php echo get_the_ID(); ?>"
+                    data-is-variable="<?php echo $isVariable ? 'true' : 'false'; ?>"
                     data-lms="<?php echo $type; ?>"
-                    value="<?php echo $settings['product'] ?>">
+                    value="<?php echo $settings['product']; ?>">
 
-                <label for="wpfnl-order-bump-cb-<?php echo $key ?>" style="color: <?php echo $ob_checkbox_title_color ?>"><?php echo $settings['checkBoxLabel'] ?></label>
+                <label for="wpfnl-order-bump-cb-<?php echo $key; ?>" 
+                    style="color: <?php echo $ob_checkbox_title_color; ?>">
+                    <?php echo $settings['checkBoxLabel']; ?>
+                </label>
             </span>
         </div>
+
+       <?php
+        if ($isVariable) {
+            include WPFNL_DIR . 'public/modules/checkout/templates/variable-product-modal.php';
+        }
+        ?>
 
         <div style="display:none">
             <?php

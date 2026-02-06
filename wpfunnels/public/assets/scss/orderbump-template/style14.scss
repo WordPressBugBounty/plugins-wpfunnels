@@ -15,6 +15,17 @@
         border-radius: 0 0 10px 10px;
         border-top: none;
 
+        .template-content{
+            .option-selector {
+                color: #F34D01;
+                cursor: pointer;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 18px;
+                margin: 5px 0;
+            }
+        }
+
         .template-img {
             width: 150px;
             height: 150px;
@@ -48,7 +59,6 @@
             font-size: 14px;
             line-height: 16px;
             color: $primary-color;
-            margin-bottom: 14px;
         }
         .description li,
         .description span,
@@ -95,6 +105,13 @@
         .wpfnl-checkbox {
             line-height: normal;
             display: block;
+
+            .option-selector{
+                color: $primary-color;
+                font-weight: 500;
+                font-size: 15px;
+                line-height: 1.2;
+            }
         }
         .wpfnl-checkbox label {
             font-weight: 500;

@@ -34,22 +34,35 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
             $discount_type			= $order_bump_settings['discountOption'];
             $discount_apply_to  	= $_product->is_on_sale() ? 'sale' :  'regular' ;
             $product_price 			= $this->get_product_price( $_product, $discount_apply_to );
+            $original_price         = $product_price; // Store original price before discount
 
             if( 'discount-percentage' === $discount_type || 'discount-price' === $discount_type ) {
                 $discount_apply_to 	= isset($order_bump_settings['discountapply']) ? $order_bump_settings['discountapply'] : 'regular';
                 $discount_value 	= isset($order_bump_settings['discountValue']) ? $order_bump_settings['discountValue'] : 0;
                 $product_price		= $this->get_product_price( $_product, $discount_apply_to );
+                $original_price     = $product_price; // Store price before applying order bump discount
 				if( 'discount-price' === $discount_type && 1 < $quantity ){
 					$discount_value = $this->get_percentage( $product_price, $discount_value, $quantity );
 					$discount_type  = 'discount-percentage';
 				}
 
                 $product_price = $this->calculate_custom_price( $discount_type, $discount_value, $product_price );
+                // Now $original_price has the price before order bump discount, and $product_price has the discounted price
             }
 
+            // Get custom product title from order bump settings
+            $custom_product_title = isset($order_bump_settings['productName']) ? $order_bump_settings['productName'] : '';
+            
+            // Clean and store prices for cart and display
+            $discounted_price = preg_replace('/[^\d.]/', '', $product_price );
+            $original_price_clean = preg_replace('/[^\d.]/', '', $original_price );
+            
             $ob_cart_item_data = [
-                'custom_price' 		=> preg_replace('/[^\d.]/', '', $product_price ),
+                'custom_price' 		=> $discounted_price,
                 'wpfnl_order_bump' 	=> true,
+                'wpfnl_ob_title' 	=> $custom_product_title,
+                'wpfnl_ob_quantity' => $quantity,
+                'wpfnl_ob_original_price' => $original_price_clean, // Store original price for display
             ];
 
 
@@ -70,7 +83,7 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 			];
             add_filter( 'woocommerce_checkout_cart_item_quantity', array($this, 'wpfnl_checkout_cart_item_quantity'), 10, 3 );
             if ($checker == "true") {
-                $data = $this->wpfnl_order_bump_accept( $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $replaceable_ob, $ob_cart_item_data, $should_replace_first_product, $replace_settings );
+                $data = $this->wpfnl_order_bump_accept( $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $replaceable_ob, $ob_cart_item_data, $should_replace_first_product, $replace_settings, $order_bump_settings );
             }else{
                 $data = $this->wpfnl_order_bump_reject( $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $replaceable_ob, $ob_cart_item_data, $should_replace_first_product, $replace_settings );
             }
@@ -107,11 +120,11 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
     /**
      * When order bump accept for woocommerce
      *
-     * @param $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $replaceable_ob, $ob_cart_item_data, $should_replace_first_product
+     * @param $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $replaceable_ob, $ob_cart_item_data, $should_replace_first_product, $replace_settings, $order_bump_settings
      *
      * @return Array
      */
-    private function wpfnl_order_bump_accept( $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $replaceable_ob, $ob_cart_item_data, $should_replace_first_product, $replace_settings ){
+    private function wpfnl_order_bump_accept( $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $replaceable_ob, $ob_cart_item_data, $should_replace_first_product, $replace_settings, $order_bump_settings = array() ){
 
         if( Wpfnl_functions::is_wc_active() ){
             $cookie_name = 'wpfnl_order_bump';
@@ -143,58 +156,115 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
                 $is_gbf = get_post_meta( $funnel_id, 'is_global_funnel', true);
 
 				if(( isset($replace_settings['isAllReplace']) && 'yes' === $replace_settings['isAllReplace'] ) || 'yes' === $is_gbf ){
-					\WC()->cart->empty_cart();
 					if( 'yes' === $is_gbf ){
 						if(isset( $_COOKIE['wpfunnels_global_funnel_specific_product'] ) ){
 							$checkout_products  = json_decode( wp_unslash( $_COOKIE['wpfunnels_global_funnel_specific_product'] ), true );
 						}
 					}
-					foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
-						$key = array_search( isset($cart_item['variation_id']) && $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'], array_column($checkout_products, 'id'));
-						if( $key !== false ){
-							\WC()->cart->remove_cart_item($cart_item_key);
-						}
-	
-						$index = array_search( $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'], array_column($replaceable_ob, 'id'));
-						if( $index !== false ){
-							\WC()->cart->remove_cart_item($cart_item_key);
-						}
-					}
 					
-					\WC()->cart->add_to_cart($product_id, $quantity, 0, [], $ob_cart_item_data);
+					// When isAllReplace is 'yes', replace ALL products (main products + other order bumps)
+					// Empty the cart completely
+					\WC()->cart->empty_cart();
+					
+					// Add only the new order bump product
+					// Check if product_id is actually a variation ID
+					$_temp_product = wc_get_product($product_id);
+					if( $_temp_product && $_temp_product->is_type('variation') ) {
+						// It's a variation - get parent ID
+						$parent_id = $_temp_product->get_parent_id();
+						$variation_id = $product_id;
+						$variation_data = $_temp_product->get_variation_attributes();
+						\WC()->cart->add_to_cart($parent_id, $quantity, $variation_id, $variation_data, $ob_cart_item_data);
+					} else {
+						// Simple product
+						\WC()->cart->add_to_cart($product_id, $quantity, 0, [], $ob_cart_item_data);
+					}
 				}else{
 					if( isset($replace_settings['selectedProducts']) ){
 						foreach ( \WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+							// Skip if this cart item is an order bump - we only want to replace main products
+							if ( isset($cart_item['wpfnl_order_bump']) && $cart_item['wpfnl_order_bump'] ) {
+								continue;
+							}
+							
 							$car_product_id =  isset($cart_item['variation_id']) && $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
 							$key = array_search( $car_product_id, array_column($replace_settings['selectedProducts'], 'id'));
 							if( $key !== false ){
 								\WC()->cart->remove_cart_item($cart_item_key);
-								\WC()->cart->add_to_cart( $product_id, $quantity, 0, [], $ob_cart_item_data);
+								
+								// Check if product_id is actually a variation ID
+								$_temp_product = wc_get_product($product_id);
+								if( $_temp_product && $_temp_product->is_type('variation') ) {
+									// It's a variation - get parent ID
+									$parent_id = $_temp_product->get_parent_id();
+									$variation_id = $product_id;
+									$variation_data = $_temp_product->get_variation_attributes();
+									\WC()->cart->add_to_cart($parent_id, $quantity, $variation_id, $variation_data, $ob_cart_item_data);
+								} else {
+									// Simple product
+									\WC()->cart->add_to_cart( $product_id, $quantity, 0, [], $ob_cart_item_data);
+								}
 								break;
 							}
 						}
 					}
 				}
             } else {
-				$product = wc_get_product($product_id);
-				if ('variable' === $product->get_type()) {
-					$variations = $product->get_available_variations();
-					$quantity = $main_product['quantity'];
-					$this->add_default_variation($funnel_id, $step_id, $product_id, $product, $variations, $quantity);
+                // Check if product_id is actually a variation ID
+				$_temp_product = wc_get_product($product_id);
+				if( $_temp_product && $_temp_product->is_type('variation') ) {
+					// It's a variation - get parent ID
+					$parent_id = $_temp_product->get_parent_id();
+					$variation_id = $product_id;
+					$variation_data = $_temp_product->get_variation_attributes();
+					\WC()->cart->add_to_cart($parent_id, $quantity, $variation_id, $variation_data, $ob_cart_item_data);
 				} else {
-					if ('variation' === $product->get_type()) {
-						WC()->cart->add_to_cart($main_product['id'], $main_product['quantity'], isset($main_product['variation_id']) ? $main_product['variation_id'] : '', isset($main_product['variations']) ? $main_product['variations'] : [], $custom_price);
-					} else {
-						WC()->cart->add_to_cart($main_product['id'], $main_product['quantity'], 0, [], $custom_price);
-					}
+					// Simple product
+					\WC()->cart->add_to_cart( $product_id, $quantity, 0, [], $ob_cart_item_data);
 				}
-                \WC()->cart->add_to_cart( $product_id, $quantity, 0, [], $ob_cart_item_data);
+            }
+
+			// Generate Product Object and Name.
+			$product      = wc_get_product( $product_id );
+			// Use custom title if available, otherwise use product name
+			$product_name = !empty($ob_cart_item_data['wpfnl_ob_title']) ? $ob_cart_item_data['wpfnl_ob_title'] : ($product ? $product->get_name() : '');
+
+			// Calculate display price considering quantity and discount
+			$unit_price = floatval($ob_cart_item_data['custom_price']);
+			$original_unit_price = floatval($ob_cart_item_data['wpfnl_ob_original_price']);
+			$quantity_int = intval($quantity);
+			
+			$total_price = $unit_price * $quantity_int;
+			$original_total_price = $original_unit_price * $quantity_int;
+			
+			// Format price display (show as sale price if there's a discount)
+			// Round to 2 decimal places for accurate comparison
+			$total_price = round($total_price, 2);
+			$original_total_price = round($original_total_price, 2);
+			
+			if ($original_total_price > $total_price) {
+				$formatted_price = wc_format_sale_price($original_total_price, $total_price);
+			} else {
+				$formatted_price = wc_price($total_price);
+			}
+
+            // Get custom description from order bump settings, fallback to WooCommerce product description
+            $product_description = '';
+            if ( !empty($order_bump_settings['productDescriptionText']) ) {
+                $product_description = $order_bump_settings['productDescriptionText'];
+            } elseif ( $product ) {
+                $product_description = $product->get_short_description() ?: $product->get_description();
             }
 
             $data = [
-                'status' 		=> 'success',
-                'message' 		=> __('Successfully added', 'wpfnl'),
-                'order_bump'	=> true
+                'status' 		      => 'success',
+                'message' 		      => __('Successfully added', 'wpfnl'),
+                'order_bump'	      => true,
+				'product_name'	      => $product_name,
+				'product_description' => $product_description,
+				'product_price'       => $formatted_price,
+				'product_image'       => $product ? wp_get_attachment_url( $product->get_image_id() ) : '',
+				'isAllReplace'        => ($should_replace_first_product == 'yes' && isset($replace_settings['isAllReplace']) && 'yes' === $replace_settings['isAllReplace']) ? true : false,
             ];
             do_action( 'wpfunnels/order_bump_accepted', $step_id, $product_id );
 
@@ -261,6 +331,19 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
                 }
             }
             if ( $should_replace_first_product == 'yes' ) {
+                // Store existing order bumps before clearing (except the one being removed)
+                $existing_order_bumps = array();
+                foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+                    if ( isset($cart_item['wpfnl_order_bump']) && $cart_item['wpfnl_order_bump'] ) {
+                        // Check if this is the order bump being removed
+                        $cart_product_id = isset($cart_item['variation_id']) && $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
+                        if( $cart_product_id != $product_id ) {
+                            // This is a different order bump - keep it
+                            $existing_order_bumps[$cart_item_key] = $cart_item;
+                        }
+                    }
+                }
+                
                 \WC()->cart->empty_cart();
                 $is_gbf = get_post_meta( $funnel_id, 'is_global_funnel', true);
                 if( 'yes' === $is_gbf ){
@@ -305,6 +388,13 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 							WC()->cart->add_to_cart( $main_product['id'], $main_product['quantity'],0, [], $custom_price);
 						}
                     }
+                }
+                
+                // Re-add existing order bumps that were preserved
+                foreach ( $existing_order_bumps as $cart_item ) {
+                    $variation_id = isset($cart_item['variation_id']) ? $cart_item['variation_id'] : 0;
+                    $variation = isset($cart_item['variation']) ? $cart_item['variation'] : array();
+                    \WC()->cart->add_to_cart( $cart_item['product_id'], $cart_item['quantity'], $variation_id, $variation, $cart_item );
                 }
             }
             $data = [
@@ -390,7 +480,6 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 						new \WC_Product($product_id),
 						$formatted_variation
 					);
-
 					if( !$variation_id ){
 						$_product = wc_get_product($product_id);
 						if( $_product ){
@@ -412,8 +501,9 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 							'custom_price' 	=> get_post_meta($variation_id, '_regular_price', true) ? get_post_meta($variation_id, '_regular_price', true) : get_post_meta($variation_id, '_price', true)
 						];
 					}
-
-					WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $formatted_variation, $cart_item_data);
+					
+					$added = WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $formatted_variation, $cart_item_data);
+					
 					break; // Stop the main loop
 				}
 				$i++;
@@ -538,33 +628,39 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 			$step_id = get_the_ID();
 		}
 
+		// Check if this is an order bump product - if so, don't modify the quantity display
+		if( isset($cart_item['wpfnl_order_bump']) && $cart_item['wpfnl_order_bump'] ){
+			return $quantity;
+		}
 
 		$isQuantity = get_post_meta($step_id, '_wpfnl_quantity_support',true);
 		$order_bump_product = get_post_meta($step_id,'order-bump-settings',true);
 		$quantityLimit 	=  get_post_meta($step_id, '_wpfnl_quantity_limit', true);
 		if($isQuantity === 'yes'){
+			// Check if this is a legacy single order bump structure
 			if(isset($order_bump_product['product']) && isset($order_bump_product['isEnabled'])){
 
 				if( ($order_bump_product['product'] == $cart_item["product_id"]) && $order_bump_product['isEnabled'] == 'yes' ){
 					return $quantity;
 				}
-				$variations = json_encode($cart_item['variation']);
-				$product_id = $cart_item["product_id"];
-				$quantity = $cart_item["quantity"];
-				$variation_id = $cart_item["variation_id"];
-				$isQuantityLimit = false;
-				$set_quantity = 0;
+			}
+			
+			$variations = json_encode($cart_item['variation']);
+			$product_id = $cart_item["product_id"];
+			$quantity = $cart_item["quantity"];
+			$variation_id = $cart_item["variation_id"];
+			$isQuantityLimit = false;
+			$set_quantity = 0;
 
-				if( isset($quantityLimit['isEnabled']) && $quantityLimit['isEnabled'] === 'yes' ){
-					$set_quantity = $quantityLimit['quantity'];
-					$isQuantityLimit = true;
-				}
+			if( isset($quantityLimit['isEnabled']) && $quantityLimit['isEnabled'] === 'yes' ){
+				$set_quantity = $quantityLimit['quantity'];
+				$isQuantityLimit = true;
+			}
 
-				if( $isQuantityLimit ){
-					$quantity = "× <input type='number' min='1' max='".$set_quantity."'  value='".$quantity."' class='wpfnl-quantity-setect' data-product-id='".$product_id."' data-variation='".$variations."' data-variation-id='".$variation_id."' data-quantity-limit='".$set_quantity."' data-set-quantity='yes'/>";
-				}else{
-					$quantity = "× <input type='number' min='1' value='".$quantity."' class='wpfnl-quantity-setect' data-product-id='".$product_id."' data-variation='".$variations."' data-variation-id='".$variation_id."' data-set-quantity='no' />";
-				}
+			if( $isQuantityLimit ){
+				$quantity = "× <input type='number' min='1' step='1' max='".$set_quantity."'  value='".$quantity."' class='wpfnl-quantity-setect' data-product-id='".$product_id."' data-variation='".$variations."' data-variation-id='".$variation_id."' data-quantity-limit='".$set_quantity."' data-set-quantity='yes'/>";
+			}else{
+				$quantity = "× <input type='number' min='1' step='1' value='".$quantity."' class='wpfnl-quantity-setect' data-product-id='".$product_id."' data-variation='".$variations."' data-variation-id='".$variation_id."' data-set-quantity='no' />";
 			}
 		}
 		return $quantity;

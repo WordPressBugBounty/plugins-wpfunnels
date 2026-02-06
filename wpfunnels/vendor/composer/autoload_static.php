@@ -9,6 +9,7 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
+        'ff3063ba1525be89739a1851bfba6fcb' => __DIR__ . '/..' . '/coderexltd/telemetry/src/helpers.php',
         'db1766888a4f96ab813d6f6a38125eb9' => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/functions.php',
         '42ecdafac508117107920039c80ecc5f' => __DIR__ . '/../..' . '/includes/wpf-formatting-functions.php',
         '7cd7c1cdfee0818e6494720c7224cf83' => __DIR__ . '/../..' . '/includes/wpf-update-functions.php',
@@ -43,6 +44,10 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'G' => 
         array (
             'GuzzleHttp\\Psr7\\' => 16,
+        ),
+        'C' => 
+        array (
+            'CodeRex\\Telemetry\\' => 18,
         ),
         'A' => 
         array (
@@ -108,6 +113,10 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
+        'CodeRex\\Telemetry\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/coderexltd/telemetry/src',
+        ),
         'Appsero\\' => 
         array (
             0 => __DIR__ . '/..' . '/appsero/client/src',
@@ -119,6 +128,11 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'Appsero\\Insights' => __DIR__ . '/..' . '/appsero/client/src/Insights.php',
         'Appsero\\License' => __DIR__ . '/..' . '/appsero/client/src/License.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
+        'CodeRex\\Telemetry\\Client' => __DIR__ . '/..' . '/coderexltd/telemetry/src/Client.php',
+        'CodeRex\\Telemetry\\Drivers\\DriverInterface' => __DIR__ . '/..' . '/coderexltd/telemetry/src/Drivers/DriverInterface.php',
+        'CodeRex\\Telemetry\\Drivers\\OpenPanelDriver' => __DIR__ . '/..' . '/coderexltd/telemetry/src/Drivers/OpenPanelDriver.php',
+        'CodeRex\\Telemetry\\EventDispatcher' => __DIR__ . '/..' . '/coderexltd/telemetry/src/EventDispatcher.php',
+        'CodeRex\\Telemetry\\Helpers\\Utils' => __DIR__ . '/..' . '/coderexltd/telemetry/src/Helpers/Utils.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'GuzzleHttp\\Psr7\\AppendStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/AppendStream.php',
         'GuzzleHttp\\Psr7\\BufferStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/BufferStream.php',
@@ -531,6 +545,8 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'WPFunnels\\Modules\\Admin\\Settings\\Module' => __DIR__ . '/../..' . '/admin/modules/settings/class-wpfnl-settings.php',
         'WPFunnels\\Modules\\Frontend\\CheckoutHelper\\CheckoutHelper' => __DIR__ . '/../..' . '/public/modules/checkout/class-wpfnl-checkout-helper.php',
         'WPFunnels\\Modules\\Frontend\\Checkout\\Module' => __DIR__ . '/../..' . '/public/modules/checkout/class-wpfnl-checkout.php',
+        'WPFunnels\\Modules\\Frontend\\Checkout\\Product_Selection' => __DIR__ . '/../..' . '/public/modules/checkout/class-wpfnl-product-selection.php',
+        'WPFunnels\\Modules\\Frontend\\Checkout\\Wpfnl_Order_Bump_Rules' => __DIR__ . '/../..' . '/public/modules/checkout/class-wpfnl-order-bump-rules.php',
         'WPFunnels\\Modules\\Frontend\\Thankyou\\Module' => __DIR__ . '/../..' . '/public/modules/thankyou/class-wpfnl-thankyou.php',
         'WPFunnels\\Modules\\Wpfnl_Modules_Manager' => __DIR__ . '/../..' . '/includes/core/classes/class-wpfnl-module-manager.php',
         'WPFunnels\\Optin\\Optin_Record' => __DIR__ . '/../..' . '/includes/core/classes/class-wpfnl-optin-record.php',
@@ -560,6 +576,7 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'WPFunnels\\TemplateLibrary\\Manager' => __DIR__ . '/../..' . '/admin/modules/template-library/class-manager.php',
         'WPFunnels\\TemplateLibrary\\Wpfnl_Source_Base' => __DIR__ . '/../..' . '/admin/modules/template-library/sources/base.php',
         'WPFunnels\\TemplateLibrary\\Wpfnl_Source_Remote' => __DIR__ . '/../..' . '/admin/modules/template-library/sources/remote.php',
+        'WPFunnels\\Tracking\\EventTracker' => __DIR__ . '/../..' . '/includes/core/Tracking/EventTracker.php',
         'WPFunnels\\Traits\\SingletonTrait' => __DIR__ . '/../..' . '/includes/core/traits/singleton-trait.php',
         'WPFunnels\\Widgets\\Bricks\\Checkout' => __DIR__ . '/../..' . '/includes/core/widgets/bricks/Checkout.php',
         'WPFunnels\\Widgets\\Bricks\\Manager' => __DIR__ . '/../..' . '/includes/core/widgets/bricks/class-manager.php',

@@ -164,6 +164,7 @@ class Wpfnl_Controller_Wc extends Wpfnl_Controller_Type
                     $quantity = $settings['quantity'];
                     $_product = wc_get_product($settings['product']);
                     if( $_product ){
+                        // Calculate Regular Price, Sale Price and Calculable Price.
                         $regular_price = $_product->get_regular_price();
                         if ($_product->get_type() == 'variable' || $_product->get_type() == 'variable-subscription') {
                             $regular_price = $_product->get_variation_regular_price('min') ? $_product->get_variation_regular_price('min') : $_product->get_price();
@@ -172,9 +173,16 @@ class Wpfnl_Controller_Wc extends Wpfnl_Controller_Type
                         }
                         $regular_price = floatval($regular_price);
 		                $regular_price = $regular_price * $quantity;
+
                         $sale_price = $_product->get_sale_price();
+                        if ($_product->get_type() == 'variable' || $_product->get_type() == 'variable-subscription') {
+                            $sale_price = $_product->get_variation_sale_price('min') ? $_product->get_variation_sale_price('min') : $_product->get_variation_price('min');
+                        } else {
+                            $sale_price = $_product->get_sale_price() ? $_product->get_sale_price() : $_product->get_price();
+                        }
                         $sale_price = floatval($sale_price);
-		                $sale_price = $sale_price * $quantity;
+                        $sale_price = $sale_price * $quantity;
+
                         if ( $all_settings[$key]['discountapply'] == 'sale' ) {
                             if ($sale_price != "") {
                                 $calculable_price = $sale_price;
@@ -189,6 +197,7 @@ class Wpfnl_Controller_Wc extends Wpfnl_Controller_Type
 
                             $calculable_price = $regular_price;
                         }
+                        
                         if ($all_settings[$key]['discountOption'] == 'discount-percentage' || $all_settings[$key]['discountOption'] == 'discount-price') {
                             $discountPrice = $this->calculate_custom_price($all_settings[$key]['discountOption'], $all_settings[$key]['discountValue'], $calculable_price);
                             $all_settings[$key]['discountPrice'] = $discountPrice;

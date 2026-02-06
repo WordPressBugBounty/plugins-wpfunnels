@@ -136,7 +136,7 @@ export const featuresSection = `
         <div class="setup-wizard__pro-features-price">
             <p>
                 Starting at
-                <span class="setup-wizard__pro-features-price-amount">$97.00</span>/year
+                <span class="setup-wizard__pro-features-price-amount">$129.99</span>/year
 
                 <span style="display: none" class="setup-wizard_pro-features-price-savings">Normally $77.60/year </span>
             </p>

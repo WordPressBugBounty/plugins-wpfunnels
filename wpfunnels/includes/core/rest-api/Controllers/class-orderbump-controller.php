@@ -403,9 +403,7 @@ class OrderBumpController extends Wpfnl_REST_Controller
 	 * @return mixed
 	 * @throws \Exception
 	 */
-    public function get_setting(WP_REST_Request $request)
-    {
-        
+    public function get_setting(WP_REST_Request $request){
         $step_id 	= $request['step_id'];
         $all_settings = get_post_meta($step_id, 'order-bump-settings', true) ? get_post_meta($step_id, 'order-bump-settings', true) : array();
         $is_multiple = Wpfnl_functions::check_array_is_multidimentional( $all_settings );
@@ -458,9 +456,21 @@ class OrderBumpController extends Wpfnl_REST_Controller
 
             if( !empty($settings['product']) ){
                 $product = wc_get_product($settings['product']);
-                if( $product ){
-                    $all_settings[$key]['numericSalePrice'] = wc_price(floatval($product->get_sale_price()) * intval($settings['quantity']));
-                    $all_settings[$key]['numericRegularPrice'] = wc_price(floatval($product->get_regular_price()) * intval($settings['quantity']));
+                if( $product ){                    
+                    $sale_price    = 0;
+                    $regular_price = 0;
+                    
+                    // For variable products, get prices from variation range
+                    if( $product->is_type('variable') ){
+                        $sale_price = $product->get_variation_sale_price('min');
+                        $regular_price = $product->get_variation_regular_price('min');
+                    } else {
+                        $sale_price = $product->get_sale_price();
+                        $regular_price = $product->get_regular_price();
+                    }
+                    
+                    $all_settings[$key]['numericSalePrice'] = wc_price(floatval($sale_price) * intval($settings['quantity']));
+                    $all_settings[$key]['numericRegularPrice'] = wc_price(floatval($regular_price) * intval($settings['quantity']));
                 }
             }
         }
@@ -498,6 +508,20 @@ class OrderBumpController extends Wpfnl_REST_Controller
             if( $class_object ){
                 $all_settings = $class_object->update_ob_settings( $all_settings );
             }
+
+            // Validate quantity in all order bump settings
+            if (is_array($all_settings)) {
+                foreach ($all_settings as $key => $settings) {
+                    if (isset($settings['quantity'])) {
+                        $quantity = absint($settings['quantity']);
+                        if ($quantity < 1) {
+                            $quantity = 1;
+                        }
+                        $all_settings[$key]['quantity'] = $quantity;
+                    }
+                }
+            }
+
             $response = array();
             $step_id = $all_settings_value['stepID'];
             update_post_meta($step_id, 'order-bump-settings', $all_settings);

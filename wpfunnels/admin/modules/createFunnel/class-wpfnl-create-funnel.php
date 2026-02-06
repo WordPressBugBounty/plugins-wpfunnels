@@ -91,6 +91,8 @@ class Module extends Wpfnl_Admin_Module
             admin_url('admin.php')
         );
 
+        do_action('wpfunnels_after_funnel_created', $funnel_id, $funnel_type);
+
         return [
             'success' => true,
             'funnelID' => $funnel_id,

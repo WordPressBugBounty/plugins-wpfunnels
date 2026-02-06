@@ -3,7 +3,7 @@
         'name' => 'wpfunnels/wpfunnels',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'f16c303bd7e6defe462e4fe211c4d6a193aa77c9',
+        'reference' => '49c807223e16ad5f3a1c87132476f6088f87553f',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -17,6 +17,17 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../appsero/client',
             'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'coderexltd/telemetry' => array(
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => '4831df7a5dcb18e92fac5415ae7443b4ad746aaa',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../coderexltd/telemetry',
+            'aliases' => array(
+                0 => '9999999-dev',
+            ),
             'dev_requirement' => false,
         ),
         'deliciousbrains/wp-background-processing' => array(
@@ -196,7 +207,7 @@
         'wpfunnels/wpfunnels' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'f16c303bd7e6defe462e4fe211c4d6a193aa77c9',
+            'reference' => '49c807223e16ad5f3a1c87132476f6088f87553f',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

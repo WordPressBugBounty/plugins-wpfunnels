@@ -2,15 +2,15 @@
     'use strict';
     
     // ---delete promotional-banner notice permanently ------
-    $(document).on("click", ".wp-anniversary-banner .close-promotional-banner", function(event) {
+    $(document).on("click", ".gwpf-promotional-notice .close-promotional-banner", function(event) {
 		event.preventDefault();
-        $('.wp-anniversary-banner').attr('style', 'display: none !important');
+        $('.gwpf-promotional-notice').attr('style', 'display: none !important');
 		wpAjaxHelperRequest("delete_promotional_banner")
 	});
 
     $(document).on('click', '.wpfnl-notification-counter__btn-area', function (event) {
         event.preventDefault()
-        $('.wp-anniversary-banner').attr('style', 'display: none !important');
+        $('.gwpf-promotional-notice').attr('style', 'display: none !important');
         wpAjaxHelperRequest('delete_promotional_banner')
     })
 

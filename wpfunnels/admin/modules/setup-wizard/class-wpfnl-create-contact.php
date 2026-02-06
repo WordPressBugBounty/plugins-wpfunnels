@@ -152,6 +152,7 @@ class CreateContact {
         $client->insights()->send_tracking_data(true);
         update_option( $this->plugin_slug.'_allow_tracking', 'yes');
         update_option( $this->plugin_slug.'_tracking_notice', '	hide');
+        do_action('wpfunnels_after_accept_consent');
     }
 
 

@@ -6,6 +6,18 @@
         padding: 15px 15px;
         border: 2px dashed $primary-color;
 
+        .template-content{
+            .option-selector {
+                color: #F34D01;
+                cursor: pointer;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 18px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+        }
+
         .template-title {
             margin: 0 0 9px 0;
             font-weight: 500;

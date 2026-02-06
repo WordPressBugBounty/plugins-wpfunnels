@@ -12,9 +12,20 @@
     .template-preview-wrapper {
         padding: 20px 15px;
 
+        .template-content{
+            .option-selector {
+                color: #F34D01;
+                cursor: pointer;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 18px;
+                margin-bottom: 10px;
+            }
+        }
+
         .template-title-area {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: space-between;
             margin: 0 0 15px 0;
 
@@ -24,6 +35,7 @@
                 margin-left: auto;
                 width: 120px;
                 text-align: right;
+                font-size: 15px;;
     
                 span {
                     color: #EE8134;
@@ -57,6 +69,13 @@
         .wpfnl-checkbox {
             display: block;
             line-height: 1;
+
+            .option-selector{
+                color: $primary-color;
+                font-weight: 500;
+                font-size: 15px;
+                line-height: 1.2;
+            }
         }
 
         .wpfnl-checkbox label {

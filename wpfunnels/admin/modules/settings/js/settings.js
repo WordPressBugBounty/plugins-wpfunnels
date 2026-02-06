@@ -40,6 +40,20 @@ jQuery(function ($) {
             }
         }
 
+        // Toggle revenue report settings
+        function toggleRevenueReportSettings() {
+            if ($("#wpfnl-enable-revenue-report").is(':checked')) {
+                $("#wpfnl-revenue-report-settings").show();
+            } else {
+                $("#wpfnl-revenue-report-settings").hide();
+            }
+        }
+        toggleRevenueReportSettings();
+        
+        $("#wpfnl-enable-revenue-report").on('change', function() {
+            toggleRevenueReportSettings();
+        });
+
         $('#wpfunnels-page-builder').on('click', '.wpfnl-single-item', function() {
             $('#wpfunnels-page-builder .wpfnl-single-item').removeClass('checked');
             $(this).addClass('checked');
@@ -266,6 +280,7 @@ jQuery(function ($) {
                 var role                    = $(this).attr('data-role');
                 userRoleManagement[role]    = $(this).is(":checked") ? 'yes' : 'no';
             });
+
             var payload = {
                 'funnel_type': $('#wpfunnels-funnel-type .wpfnl-single-item.checked').attr('data-value'),
                 'builder': $('#wpfunnels-page-builder .wpfnl-single-item.checked').attr('data-value'),
@@ -308,6 +323,12 @@ jQuery(function ($) {
                 'recaptcha_site_secret': $('#wpfnl-recapcha-site-secret').val(),
                 'user_role_management': { roles: userRoleManagement },
                 'google_map_api_key'        : $('#wpfnl-google-map-api-key').val(),
+                'enable_global_thankyou'    : $('#wpfnl-enable-global-thankyou').is(':checked') ? 'on' : 'off',
+                'enable_revenue_report'     : $('#wpfnl-enable-revenue-report').is(':checked') ? 'yes' : 'no',
+                'revenue_report_frequency'  : $('input[name="wpfnl-revenue-report-frequency"]:checked').val(),
+                'revenue_report_recipient'  : $('#wpfnl-revenue-report-recipient').val(),
+                'revenue_report_subject'    : $('#wpfnl-revenue-report-subject').val(),
+                'send_time'                 : $('#wpfnl-send-time').val(),
             };
 
             var thisLoader  = $(this).find('.wpfnl-loader');
@@ -484,6 +505,67 @@ jQuery(function ($) {
             var tabId = $(this).data('tab');
             $('#' + tabId).addClass('active');
         });
+
+        // Send test notification
+        $('#wpfnl-send-test-notification').on('click', function(e) {
+            e.preventDefault();
+            
+            var $button = $(this);
+            var $loader = $button.find('.wpfnl-loader');
+            var email = $('#wpfnl-test-notification-email').val();
+            
+            if (!email || !isValidEmail(email)) {
+                showToaster('error', 'Please enter a valid email address');
+                return;
+            }
+            
+            $button.prop('disabled', true);
+            $loader.fadeIn();
+            
+            var payload = {
+                'email': email
+            };
+            
+            wpAjaxHelperRequest('wpfnl-send-test-notification', payload)
+                .success(function(response) {
+                    $loader.fadeOut();
+                    $button.prop('disabled', false);
+                    
+                    if (response.success) {
+                        showToaster('success', response.message);
+                    } else {
+                        showToaster('error', response.message);
+                    }
+                })
+                .error(function(response) {
+                    $loader.fadeOut();
+                    $button.prop('disabled', false);
+                    showToaster('error', 'Error occurred while sending test email');
+                });
+        });
+        
+        function isValidEmail(email) {
+            var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }
+        
+        function showToaster(type, message) {
+            var iconHtml = type === 'success' 
+                ? '<svg width="26" height="26" fill="none" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg"><path fill="#4BAE4F" fill-rule="evenodd" d="M13 0C5.83 0 0 5.83 0 13s5.83 13 13 13 13-5.83 13-13S20.17 0 13 0z" clip-rule="evenodd"/><path fill="#fff" fill-rule="evenodd" d="M19.287 8.618a.815.815 0 010 1.148l-7.617 7.617a.812.812 0 01-1.148 0l-3.808-3.809a.815.815 0 010-1.147.815.815 0 011.147 0l3.235 3.234 7.044-7.043a.806.806 0 011.147 0z" clip-rule="evenodd"/></svg>'
+                : '<svg width="26" height="26" fill="none" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg"><path fill="#EC5956" fill-rule="evenodd" d="M26 13c0 7.18-5.82 13-13 13S0 20.18 0 13 5.82 0 13 0s13 5.82 13 13zm-11.375 6.5a1.625 1.625 0 11-3.25 0 1.625 1.625 0 013.25 0zM13 4.875c-.898 0-1.625.728-1.625 1.625V13a1.625 1.625 0 103.25 0V6.5c0-.897-.727-1.625-1.625-1.625z" clip-rule="evenodd"/></svg>';
+            
+            var notificationClass = type === 'success' ? 'quick-toastify-successful-notification' : 'quick-toastify-warn-notification';
+            
+            $('#wpfnl-toaster-wrapper').addClass(notificationClass);
+            $('#wpfnl-toaster-icon').html(iconHtml);
+            $('#wpfnl-toaster-message').html(message);
+            $('#wpfnl-toaster-wrapper').show();
+            
+            setTimeout(function() {
+                $('#wpfnl-toaster-wrapper').removeClass(notificationClass);
+                $('#wpfnl-toaster-wrapper').hide();
+            }, 3000);
+        }
 
     });
 

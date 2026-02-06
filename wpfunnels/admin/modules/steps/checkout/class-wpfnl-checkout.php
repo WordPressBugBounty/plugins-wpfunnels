@@ -29,6 +29,11 @@ class Module extends Steps
 		add_action('wp_ajax_order_bump_search_products', [$this, 'fetch_products']);
 		add_action('wp_ajax_wpfnl_replace_product_search', [$this, 'fetch_replace_products']);
 		add_action('wp_ajax_order_bump_search_coupons', [$this, 'fetch_coupons']);
+		add_action('wp_ajax_order_bump_search_categories', [$this, 'fetch_categories']);
+		add_action('wp_ajax_order_bump_search_tags', [$this, 'fetch_tags']);
+		add_action('wp_ajax_order_bump_search_shipping_methods', [$this, 'fetch_shipping_methods']);
+		add_action('wp_ajax_order_bump_search_countries', [$this, 'fetch_countries']);
+		add_action('wp_ajax_order_bump_search_checkout_pages', [$this, 'fetch_checkout_pages']);
 		add_action('wpfunnels/after_save_order_bump_data', [$this, 'update_elementor_data'], 10, 2);
 	}
 
@@ -231,6 +236,11 @@ class Module extends Steps
 			update_post_meta($step_id, '_wpfnl_disabled_payemnts', [] );
 		}
 
+		// Save Product Options settings
+		if( isset( $payload['productOptions'] ) ){
+			update_post_meta($step_id, '_wpfnl_checkout_product_options', $payload['productOptions']);
+		}
+
 		return [
 			'success' => true,
 			'message' => 'Saved Successfully',
@@ -295,9 +305,7 @@ class Module extends Steps
 	 * @throws \Exception
 	 * @since  1.0.0
 	 */
-	public function fetch_products()
-	{
-
+	public function fetch_products(){
 		check_ajax_referer('wpfnl-admin', 'security');
 		if (isset($_GET['term'])) {
 			$term = (string)esc_attr(wp_unslash($_GET['term']));
@@ -316,6 +324,200 @@ class Module extends Steps
             $products = $class_object->retrieve_ob_item( $term );
         }
 		wp_send_json($products);
+	}
+
+
+	/**
+	 * Fetch product categories from WC
+	 *
+	 * @since  1.0.0
+	 */
+	public function fetch_categories(){
+		check_ajax_referer('wpfnl-admin', 'security');
+		
+		$term = isset($_GET['term']) ? (string)esc_attr(wp_unslash($_GET['term'])) : '';
+		
+		if (empty($term)) {
+			wp_die();
+		}
+
+		$categories = [];
+		
+		$args = [
+			'taxonomy'   => 'product_cat',
+			'hide_empty' => false,
+			'search'     => $term,
+			'number'     => 50,
+		];
+		
+		$product_categories = get_terms($args);
+		
+		if (!is_wp_error($product_categories) && !empty($product_categories)) {
+			foreach ($product_categories as $category) {
+				$categories[$category->term_id] = [
+					'id'   => $category->term_id,
+					'name' => $category->name,
+					'slug' => $category->slug,
+				];
+			}
+		}
+		
+		wp_send_json($categories);
+	}
+
+
+	/**
+	 * Fetch product tags from WC
+	 *
+	 * @since  1.0.0
+	 */
+	public function fetch_tags(){
+		check_ajax_referer('wpfnl-admin', 'security');
+		
+		$term = isset($_GET['term']) ? (string)esc_attr(wp_unslash($_GET['term'])) : '';
+		
+		if (empty($term)) {
+			wp_die();
+		}
+
+		$tags = [];
+		
+		$args = [
+			'taxonomy'   => 'product_tag',
+			'hide_empty' => false,
+			'search'     => $term,
+			'number'     => 50,
+		];
+		
+		$product_tags = get_terms($args);
+		
+		if (!is_wp_error($product_tags) && !empty($product_tags)) {
+			foreach ($product_tags as $tag) {
+				$tags[$tag->term_id] = [
+					'id'   => $tag->term_id,
+					'name' => $tag->name,
+					'slug' => $tag->slug,
+				];
+			}
+		}
+		
+		wp_send_json($tags);
+	}
+
+
+	/**
+	 * Fetch WooCommerce shipping methods
+	 *
+	 * @since  1.0.0
+	 */
+	public function fetch_shipping_methods(){
+		check_ajax_referer('wpfnl-admin', 'security');
+		
+		$term = isset($_GET['term']) ? (string)esc_attr(wp_unslash($_GET['term'])) : '';
+		
+		if (empty($term)) {
+			wp_die();
+		}
+
+		$shipping_methods = [];
+		
+		// Get all registered shipping methods
+		$wc_shipping = \WC_Shipping::instance();
+		$all_methods = $wc_shipping->get_shipping_methods();
+		
+		foreach ($all_methods as $method_id => $method) {
+			$method_title = $method->get_method_title();
+			
+			// Filter by search term
+			if (stripos($method_title, $term) !== false) {
+				$shipping_methods[] = [
+					'id'   => $method_id,
+					'name' => $method_title,
+				];
+			}
+		}
+		
+		wp_send_json($shipping_methods);
+	}
+
+
+	/**
+	 * Fetch countries from WooCommerce
+	 *
+	 * @since  1.0.0
+	 */
+	public function fetch_countries(){
+		check_ajax_referer('wpfnl-admin', 'security');
+		
+		$term = isset($_GET['term']) ? (string)esc_attr(wp_unslash($_GET['term'])) : '';
+		
+		if (empty($term)) {
+			wp_die();
+		}
+
+		$countries = [];
+		
+		// Get all WooCommerce countries
+		$wc_countries = WC()->countries->get_countries();
+		
+		foreach ($wc_countries as $code => $name) {
+			// Filter by search term
+			if (stripos($name, $term) !== false || stripos($code, $term) !== false) {
+				$countries[] = [
+					'id'   => $code,
+					'name' => $name,
+				];
+			}
+		}
+		
+		wp_send_json($countries);
+	}
+
+
+	/**
+	 * Fetch WPFunnels checkout pages
+	 *
+	 * @since  1.0.0
+	 */
+	public function fetch_checkout_pages(){
+		check_ajax_referer('wpfnl-admin', 'security');
+		
+		$term = isset($_GET['term']) ? (string)esc_attr(wp_unslash($_GET['term'])) : '';
+		
+		if (empty($term)) {
+			wp_die();
+		}
+
+		$checkout_pages = [];
+		
+		// Query WPFunnels checkout steps
+		$args = [
+			'post_type'      => 'wpfunnel_steps',
+			'post_status'    => 'publish',
+			'posts_per_page' => 50,
+			's'              => $term,
+			'meta_query'     => [
+				[
+					'key'     => '_step_type',
+					'value'   => 'checkout',
+					'compare' => '='
+				]
+			]
+		];
+		
+		$query = new \WP_Query($args);
+		if ($query->have_posts()) {
+			while ($query->have_posts()) {
+				$query->the_post();
+				$checkout_pages[] = [
+					'id'   => get_the_ID(),
+					'name' => get_the_title(),
+				];
+			}
+			wp_reset_postdata();
+		}
+		
+		wp_send_json($checkout_pages);
 	}
 
 

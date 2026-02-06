@@ -68,6 +68,11 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
                                 <span><?php esc_html_e('Events & Other Integrations', 'wpfnl'); ?></span>
                             </li>
 
+                            <li class="nav-li" data-id="notifications-settings">
+                                <?php require WPFNL_DIR . '/admin/partials/icons/notification-icon.php'; ?>
+                                <span><?php esc_html_e('Notifications', 'wpfnl'); ?></span>
+                            </li>
+
                             <li class="nav-li" data-id="advance-settings">
                                 <?php require WPFNL_DIR . '/admin/partials/icons/advanced-settings.php'; ?>
                                 <span><?php esc_html_e('Advanced Settings', 'wpfnl'); ?></span>
@@ -165,6 +170,12 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
                         <!--							</div>-->
                         <!--						</div>-->
                         <!--					</div>-->
+                    </div>
+
+                    <!-- Notifications Settings -->
+                    <div class="wpfnl-funnel__single-settings notifications" id="notifications-settings">
+                        <h4 class="settings-title"><?php esc_html_e('Notifications', 'wpfnl'); ?></h4>
+                        <?php require WPFNL_DIR . '/admin/modules/settings/views/notifications-settings.php'; ?>
                     </div>
 
                     <!-- Advanced setting -->
@@ -276,10 +287,10 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
                         <div class="wpfnl-pro-modal-footer_container">
                         <div  class="wpfnl-pro-modal-footer_packages">
                             <div class="wpfnl-pro-modal-footer_packages-type" id="pro-modal-package-type">
-                                <strong>Small</strong> <span>License for 1 site</span>
+                                <strong>Starter</strong> <span>License for 1 site</span>
                             </div>
                             <div class="wpfnl-pro-modal-footer_packages-price" id="pro-modal-package-price">
-                                <strong>$97</strong> <span>/year</span>
+                                <strong>$129.99</strong> <span>/year</span>
                             </div>
 
                             <button type="button" class="wpfnl-pro-modal-footer_packages-btn " id="pro-modal-dropdown-btn">
@@ -288,20 +299,20 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
 
                             <div class="wpfnl-pro-modal-select-container" id="pro-modal-dropdown-body">
                                 <ul class="wpfnl-pro-modal-dropdown wpfnl-pro-modal-select-dropdown">
-                                <li value="97" data-url="https://useraccount.getwpfunnels.com/wpfunnels-annual/steps/annual-small-checkout/"><strong>Small</strong> <span>License for 1 site</span></li>
-                                <li value="147" data-url="https://useraccount.getwpfunnels.com/wpfunnels-annual-5-sites/steps/5-sites-annual-checkout/"><strong>Medium</strong> <span>License for 5 sites</span></li>
-                                <li value="237" data-url="https://useraccount.getwpfunnels.com/wpfunnels-annual-unlimited/steps/annual-unlimited-checkout/"><strong>Large</strong> <span>License for 50 sites</span></li>
+                                    <li value="129.99" data-url="https://useraccount.getwpfunnels.com/wpf-small-annual-brand-new/steps/wpf-sa-checkout/"><strong>Starter</strong> <span>License for 1 site</span></li>
+                                    <li value="199.99" data-url="https://useraccount.getwpfunnels.com/bundle-small-annual/steps/bsa-checkout/"><strong>Pro</strong> <span>License for 1 site with Automation</span></li>
+                                    <li value="399.99" data-url="https://useraccount.getwpfunnels.com/bundle-medium-annual/steps/bma-checkout/"><strong>Business</strong> <span>License for 5 sites with Automation</span></li>
+                                    <li value="599.99" data-url="https://useraccount.getwpfunnels.com/bundle-large-annual/steps/bla-checkout/"><strong>Agency</strong> <span>License for 50 sites with Automation</span></li>
                                 </ul>
-
                             </div>
                         </div>
                         <div class="wpfnl-footer-btn-wrapper">
-                            <a class="btn-default confirmed" target="_blank" href="https://useraccount.getwpfunnels.com/wpfunnels-annual/steps/annual-small-checkout/">
+                            <a class="btn-default confirmed" target="_blank" href="https://useraccount.getwpfunnels.com/wpf-small-annual-brand-new/steps/wpf-sa-checkout/">
                                 <span>Buy Now</span>
                             </a>
                         </div>
                         </div> <p class="wpfnl-pro-modal-footer-text">
-                            <span>Easiest Funnel Builder : <strong>7000+</strong> Users, <strong>85+</strong> Five-Star Reviews</span>
+                            <span>Easiest Funnel Builder : <strong>7000+</strong> Users, <strong>160+</strong> Five-Star Reviews</span>
                         </p>
                     </div>
                 </div>

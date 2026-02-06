@@ -34,4 +34,22 @@ class Wpfnl_Divi_Batch extends Wpfnl_Background_Task {
 		$elementor_source->import_single_template( $item );
 		return false;
 	}
+
+	/**
+	 * Complete
+	 *
+	 * Override if applicable, but ensure that the below actions are
+	 * performed, or, call parent::complete().
+	 *
+	 * @since 1.0.0
+	 */
+	protected function complete() {
+		parent::complete();
+		/***
+		 * Fires when import is completed
+		 *
+		 * @since 1.0.0
+		 */
+		do_action( 'wpfunnels/wpfnl_import_complete' );
+	}
 }

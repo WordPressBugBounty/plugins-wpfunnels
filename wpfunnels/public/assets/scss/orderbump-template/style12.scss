@@ -9,6 +9,17 @@
 
     .template-preview-wrapper {
 
+        .template-content{
+            .option-selector {
+                color: #F34D01;
+                cursor: pointer;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 18px;
+                margin-bottom: 10px;
+            }
+        }
+
         .template-img {
             width: 150px;
             height: 150px;
@@ -54,7 +65,17 @@
             line-height: 20px;
             color: #7A8B9A;
             width: 100%;
-            margin-top: 8px;
+            margin: 8px 0;
+        }
+
+        .product-options{
+            margin: 10px 0 0 0;
+
+            .option-selector {
+                color: #F34D01;
+                cursor: pointer;
+                font-size: 14px;
+            }
         }
 
         .product-price {
@@ -63,7 +84,6 @@
             font-size: 13px;
             line-height: 15px;
             color: #EE8134;
-            margin-top: 5px;
 
             span {
                 font-size: 13px;
@@ -83,6 +103,15 @@
         padding: 11px 20px;
         margin-top: 10px;
         border-radius: 5px;
+
+        .wpfnl-checkbox{
+            .option-selector{
+                color: $primary-color;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 18px;
+            }
+        }
 
         .wpfnl-checkbox label {
             font-weight: 500;

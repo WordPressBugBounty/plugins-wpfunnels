@@ -79,6 +79,16 @@
 
     }
 
+    .product-options {
+        .option-selector {
+            color: #F34D01;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 18px;
+            margin-top: 10px;
+        }
+    }
     .offer-checkbox {
         background-color: $primary-color;
         padding: 12px 20px 12px;

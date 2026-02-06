@@ -1028,6 +1028,12 @@
             let checker = false,
                 main_products = $(this).attr('data-main-products')
 
+            // Validate quantity - ensure it's a positive integer
+            quantity = parseInt(quantity, 10);
+            if (isNaN(quantity) || quantity < 1) {
+                quantity = 1;
+            }
+
             var specificLabel = $('#wpfnl-order-bump-add-btn-' + key);
             if ($(this).prop('checked') == true) {
                 checker = true
@@ -1048,13 +1054,28 @@
                 $(this).prop('disabled', true);
             });
 
-            if (replace === 'yes' && checker) {
-                $('.wpfnl-order-bump-cb').each(function (index, checkbox) {
-                    if ($(checkbox).attr('data-key') !== key) {
-                        $(checkbox).prop('checked', false);
+            // Note: We don't uncheck other order bumps when replace is enabled
+            // because the replace logic only replaces main products, not other order bumps
+
+            // --- Capture variation data if exists ---
+            let variation_id = '';
+            let variation_data = {};
+
+            // Find variation form within the modal for this product
+            var $variationForm = $('.variations_form[data-product_id="' + product + '"]');
+            if ($variationForm.length) {
+                variation_id = $variationForm.find('input[name="variation_id"]').val();
+
+                // Loop through all attribute selects and store their values
+                $variationForm.find('select[name^="attribute_"]').each(function () {
+                    var name = $(this).attr('name');
+                    var value = $(this).val();
+                    if (value) {
+                        variation_data[name] = value;
                     }
                 });
             }
+
             jQuery.ajax({
                 type: 'POST',
                 url: ajaxurl,
@@ -1068,6 +1089,8 @@
                     user_id: user_id,
                     key: key,
                     main_products: main_products,
+                    variation_id: variation_id,
+                    variation_data: variation_data,
                 },
                 success: function (response) {
                     $('.wpfnl-lms-access-course-message').text('')
@@ -1087,6 +1110,29 @@
                         $('.wpfnl-lms-checkout').empty().append(response.html)
                     }
 
+                    // Only update if the data exists in response
+                    if (response.wpfunnels_data && response.wpfunnels_data.product_name) {
+                        var titleLabel = $('#wpfnl-order-bump-title-' + key);
+                        titleLabel.text(response.wpfunnels_data.product_name);
+                    }
+                    
+                    if (response.wpfunnels_data && response.wpfunnels_data.product_description) {
+                        var descriptionLabel = $('#wpfnl-order-bump-description-' + key);
+                        descriptionLabel.html(response.wpfunnels_data.product_description);
+                    }
+
+                    if (response.wpfunnels_data && response.wpfunnels_data.product_price) {
+                        var priceLabel = $('#wpfnl-order-bump-price-' + key);
+                        var labelText = priceLabel.find('strong').text();
+                        priceLabel.html('<strong>' + labelText + '</strong> ' + response.wpfunnels_data.product_price);
+                    }
+
+                    if (response.wpfunnels_data && response.wpfunnels_data.product_image) {
+                        var imageWrapper = $('#wpfnl-order-bump-image-' + key);
+                        imageWrapper.css('background-image', 'url(' + response.wpfunnels_data.product_image + ')');
+                        imageWrapper.find('img.for-mobile').attr('src', response.wpfunnels_data.product_image);
+                    }
+
                     $('.wpfnl-order-bump-cb').each(function (index) {
                         if ( 'yes' === isLms ) {
                             if ($(this).val() != product) {
@@ -1095,11 +1141,23 @@
                         }
                     })
 
+                    // If isAllReplace is true, uncheck all other order bumps
+                    if (response.wpfunnels_data && response.wpfunnels_data.isAllReplace === true && checker) {
+                        $('.wpfnl-order-bump-cb').each(function (index, checkbox) {
+                            if ($(checkbox).attr('data-key') !== key) {
+                                $(checkbox).prop('checked', false);
+                            }
+                        });
+                    }
+
                     $('.wpfnl-order-bump-cb').each(function() {
                         $(this).prop('disabled', false);
                     });
 
-                    $('.wpfnl-order-bump__popup-wrapper')
+                    var $popupWrapper = $('.wpfnl-order-bump__popup-wrapper');
+                    var inner_height = $popupWrapper.innerHeight() + 30;
+                    
+                    $popupWrapper
                     .removeClass('show')
                     .css('top', '-' + inner_height + 'px')
 
@@ -1109,19 +1167,26 @@
         })
 
         //----show order bump modal-----
-        var inner_height = $('.wpfnl-order-bump__popup-wrapper').innerHeight() + 30
-        $('.wpfnl-order-bump__popup-wrapper').css('top', '-' + inner_height + 'px')
-
         $(window).on('load', function () {
-            if (!$('.wpfnl-pre-purchase').length ) { // check if 'wpfnl-pre-purchase' class exists
-                setTimeout(function () {
-                    $('.wpfnl-order-bump__popup-wrapper').addClass('show').css('top', '30px')
-                }, 2000)
-            }
+            setTimeout(function () {
+                var $popupWrapper = $('.wpfnl-order-bump__popup-wrapper');
+                if ($popupWrapper.length) {
+                    var inner_height = $popupWrapper.innerHeight() + 30;
+                    $popupWrapper.css('top', '-' + inner_height + 'px');
+                    
+                    // Show popup automatically for position='popup' order bumps (not for pre-purchase)
+                    if (!$popupWrapper.hasClass('wpfnl-pre-purchase')) {
+                        $popupWrapper.addClass('show').css('top', '30px');
+                    }
+                }
+            }, 500);
         })
 
         $('.close-order-bump').on('click', function () {
-            $('.wpfnl-order-bump__popup-wrapper')
+            var $popupWrapper = $('.wpfnl-order-bump__popup-wrapper');
+            var inner_height = $popupWrapper.innerHeight() + 30;
+            
+            $popupWrapper
                 .removeClass('show')
                 .css('top', '-' + inner_height + 'px')
 
@@ -1441,6 +1506,31 @@
         $(document).ready(function () {
             // window.onbeforeunload = doAjaxBeforeUnload;
             // $(window).unload(doAjaxBeforeUnload);
+
+            // Add validation for product quantity inputs on checkout page
+            $(document).on('keypress', '.wpfnl-quantity-setect', function(e) {
+                // Prevent typing minus sign, plus sign, 'e', and decimal point
+                if (['-', '+', 'e', 'E', '.'].includes(e.key)) {
+                    e.preventDefault();
+                }
+            });
+
+            $(document).on('input', '.wpfnl-quantity-setect', function(e) {
+                // Validate and sanitize quantity value
+                let quantity = parseInt($(this).val(), 10);
+                if (isNaN(quantity) || quantity < 1) {
+                    $(this).val(1);
+                    quantity = 1;
+                }
+            });
+
+            $(document).on('blur', '.wpfnl-quantity-setect', function(e) {
+                // On blur, ensure the value is valid
+                let quantity = parseInt($(this).val(), 10);
+                if (isNaN(quantity) || quantity < 1) {
+                    $(this).val(1);
+                }
+            });
         })
 
         //----------optin form click to expand btn option-----------
