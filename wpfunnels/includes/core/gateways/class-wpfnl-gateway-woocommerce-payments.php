@@ -92,20 +92,24 @@ class Wpfnl_Woocommerce_Payments {
       $api_account_service = \WC_Payments::get_account_service();
       $database_cache      = class_exists( 'WCPay\Database_Cache' ) ? \WC_Payments::get_database_cache() : null;
      
-      /**
-       * @modified_date 07-11-2023
-       */
-      if ( version_compare( '6.7.0', WCPAY_VERSION_NUMBER, '<=' ) && version_compare( '7.6.0', WCPAY_VERSION_NUMBER, '>=' ) ) {
-        $order_service = new \WC_Payments_Order_Service( $api_client );
-        $session_service = new \WC_Payments_Session_Service( $api_client );
-        $customer_services = new \WC_Payments_Customer_Service( $api_client, $api_account_service, $database_cache, $session_service );
-      } elseif ( version_compare( '7.7.0', WCPAY_VERSION_NUMBER, '<=' ) ) {
-          $order_service = new \WC_Payments_Order_Service( $api_client );
-          $session_service = new \WC_Payments_Session_Service( $api_client );
-          $customer_services = new \WC_Payments_Customer_Service( $api_client, $api_account_service, $database_cache, $session_service, $order_service );
-      } else {
-          $customer_services = new \WC_Payments_Customer_Service( $api_client, $api_account_service, $database_cache );
-      }
+		/**
+		 * @modified_date 07-11-2023
+		 */
+		if ( version_compare( '6.7.0', WCPAY_VERSION_NUMBER, '<=' ) && version_compare( '7.6.0', WCPAY_VERSION_NUMBER, '>=' ) ) {
+			$order_service = new \WC_Payments_Order_Service( $api_client );
+			$session_service = new \WC_Payments_Session_Service( $api_client );
+			$customer_services = new \WC_Payments_Customer_Service( $api_client, $api_account_service, $database_cache, $session_service );
+		} elseif ( version_compare( '7.7.0', WCPAY_VERSION_NUMBER, '<=' ) && version_compare( '9.9.0', WCPAY_VERSION_NUMBER, '>=' ) ) {
+			$order_service = new \WC_Payments_Order_Service( $api_client );
+			$session_service = new \WC_Payments_Session_Service( $api_client );
+			$customer_services = new \WC_Payments_Customer_Service( $api_client, $api_account_service, $database_cache, $session_service, $order_service );
+		} elseif ( version_compare( '10.0.0', WCPAY_VERSION_NUMBER, '<=' ) ) {
+			$order_service = new \WC_Payments_Order_Service( $api_client );
+			$session_service = new \WC_Payments_Session_Service( $api_client );
+			$customer_services = new \WC_Payments_Customer_Service( $api_client, $api_account_service, $session_service, $order_service );
+		} else {
+			$customer_services = new \WC_Payments_Customer_Service( $api_client, $api_account_service, $database_cache );
+		}
       
       $token_service       = new \WC_Payments_Token_Service( $api_client, $customer_services );
     }

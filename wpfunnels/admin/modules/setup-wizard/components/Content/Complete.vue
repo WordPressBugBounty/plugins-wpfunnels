@@ -184,7 +184,6 @@ export default {
 .wpfnl-mm-complete-title {
 	font-size: 24px;
 	font-weight: 700;
-	font-family: 'DM Sans', sans-serif;
 	color: #363B4E;
 	line-height: 35px;
 	letter-spacing: -1px;
@@ -194,7 +193,6 @@ export default {
 .wpfnl-mm-complete-subtitle {
 	font-size: 15px;
 	font-weight: 400;
-	font-family: 'DM Sans', sans-serif;
 	color: #6E7A85;
 	line-height: 22px;
 	margin: 0;
@@ -319,59 +317,6 @@ export default {
 	width: 100%;
 }
 
-.wpfnl-mm-complete-buttons {
-	display: flex;
-	gap: 12px;
-	align-items: center;
-	justify-content: center;
-}
-
-.wpfnl-mm-complete .wpfnl-mm-btn {
-	padding: 10px 20px;
-	border-radius: 10px;
-	font-size: 16px;
-	font-family: 'DM Sans', sans-serif;
-	line-height: 24px;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	border: none;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	height: 44px;
-}
-
-.wpfnl-mm-complete .wpfnl-mm-btn-secondary {
-	background: #FFF;
-	color: #363B4E;
-	border: 1px solid #ECEBF0;
-	font-weight: 700;
-	min-width: 163px;
-}
-
-.wpfnl-mm-complete .wpfnl-mm-btn-secondary:hover {
-	border-color: #6E42D3;
-	color: #6E42D3;
-}
-
-.wpfnl-mm-complete .wpfnl-mm-btn-primary {
-	background: #6E42D3;
-	color: #FFF;
-	font-weight: 600;
-	letter-spacing: 0.2px;
-	min-width: 262px;
-}
-
-.wpfnl-mm-complete .wpfnl-mm-btn-primary svg {
-	width: 17px;
-	height: 12px;
-}
-
-.wpfnl-mm-complete .wpfnl-mm-btn-primary:hover {
-	background: #5c36b3;
-}
-
 .wpfnl-mm-complete-info {
 	padding: 10px;
 	text-align: center;
@@ -380,7 +325,6 @@ export default {
 .wpfnl-mm-complete-info p {
 	font-size: 14px;
 	font-weight: 400;
-	font-family: 'DM Sans', sans-serif;
 	color: #7A8C9A;
 	line-height: 22px;
 	margin: 0;

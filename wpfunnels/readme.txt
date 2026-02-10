@@ -3,9 +3,9 @@ Contributors: coderexltd, getwpfunnels, coderexco
 Donate link: https://getwpfunnels.com/
 Tags: funnel builder, order bump, sales funnels, lead generation, custom checkout, sales funnel builder, one click offer
 Requires at least: 6.1
-Tested up to:  6.9.0
+Tested up to:  6.9.1
 Requires PHP: 7.4
-Stable tag:  3.9.1
+Stable tag:  3.9.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -579,6 +579,10 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.9.2 (2026-02-10) =
+* Compatibility: Compatible with the Latest WordPress
+* Compatibility: Compatible with the Latest WooPayments
 
 = 3.9.1 (2026-02-06) =
 * Bugfix: Compatibility Issue with WooPayments

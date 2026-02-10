@@ -434,6 +434,7 @@ abstract class WP_Background_Process extends WP_Async_Request {
 	 * @return bool
 	 */
 	public function is_processing() {
+		error_log(print_r($this->identifier . '_process_lock', true));
 		if ( get_site_transient( $this->identifier . '_process_lock' ) ) {
 			// Process already running.
 			return true;

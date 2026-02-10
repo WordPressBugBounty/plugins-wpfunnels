@@ -53,6 +53,11 @@ class Server
         foreach ($this->get_rest_namespaces() as $namespace => $controllers) {
             foreach ($controllers as $controller_name => $controller_class) {
                 $controller_class_name = "WPFunnels\\Rest\\Controllers\\".$controller_class;
+
+                if ( ! class_exists( $controller_class_name ) ) {
+                    continue;
+                }
+
                 $this->controllers[ $namespace ][ $controller_name ] = new $controller_class_name();
                 $this->controllers[ $namespace ][ $controller_name ]->register_routes();
             }

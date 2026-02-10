@@ -103,8 +103,7 @@ export default {
 	padding: 12px 24px;
 	border-radius: 8px;
 	font-size: 14px;
-	font-weight: 600;
-	font-family: 'DM Sans', sans-serif;
+	font-weight: 500;
 	cursor: pointer;
 	transition: all 0.3s ease;
 	border: none;

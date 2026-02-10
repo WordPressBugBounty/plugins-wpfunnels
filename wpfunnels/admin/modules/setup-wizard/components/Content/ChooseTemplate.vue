@@ -23,10 +23,7 @@
 						<button class="wpfnl-mm-btn-preview" @click.stop="showPreview(template)">Preview</button>
 					</div>
 					<div class="wpfnl-mm-template-card-checkmark" v-if="selectedTemplateId === template.ID">
-						<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<circle cx="8" cy="8" r="8" fill="#6E42D3"/>
-							<path d="M11.3333 5.33334L6.66667 10L4.66667 8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-						</svg>
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z" fill="#fff"/><path d="M17.3327 8L9.99935 15.3333L6.66602 12" stroke="#6e42d3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
 					</div>
 				</div>
 				<div class="wpfnl-mm-template-card-divider"></div>

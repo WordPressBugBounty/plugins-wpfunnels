@@ -15,6 +15,7 @@
 		/>
 		<PageBuilders 
 			:selectedBuilder="selectedBuilder"
+			:builderStatuses="builderStatuses"
 			@update:selectedBuilder="updateSelectedBuilder"
 		/>
 		<EssentialPlugins 
@@ -27,9 +28,6 @@
 		<!-- Buttons -->
 		<div class="wpfnl-mm-choose-goal-buttons wpfnl-mm-buttons-container">
 			<button class="wpfnl-mm-btn wpfnl-mm-btn-secondary" @click="goBack" :disabled="isProcessing">
-				<svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path d="M16 6H1M1 6L6 1M1 6L6 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-				</svg>
 				Back
 			</button>
 			<div class="wpfnl-mm-btn-group">
@@ -81,6 +79,7 @@ export default {
 
 			// Builder states
 			selectedBuilder: 'gutenberg',
+			builderStatuses: {},
 			
 			// Plugin states
 			pluginStatuses: {},
@@ -117,12 +116,26 @@ export default {
 		},
 
 		detectAndSelectBuilder() {
+			// Get plugin/theme statuses from server-provided getPlugins data
+			const getPlugins = window?.setup_wizard_obj?.getPlugins || [];
+			const oxygenData = getPlugins.find(p => p.name === 'oxygen');
+			const bricksData = getPlugins.find(p => p.name === 'bricks');
+
 			const builderChecks = [
 				{ id: 'elementor', installed: window?.setup_wizard_obj?.is_elementor_installed === 'yes', active: window?.setup_wizard_obj?.is_elementor_active === 'yes' },
-				{ id: 'divi', installed: false, active: false }, // Add checks if available
-				{ id: 'bricks', installed: false, active: false }, // Add checks if available
-				{ id: 'oxygen', installed: false, active: false } // Add checks if available
+				{ id: 'bricks', installed: bricksData?.status === 'activated' || bricksData?.status === 'installed', active: bricksData?.status === 'activated' },
+				{ id: 'oxygen', installed: oxygenData?.status === 'activated' || oxygenData?.status === 'installed', active: oxygenData?.status === 'activated' }
 			];
+
+			// Build builder statuses map for the PageBuilders component
+			const statuses = {};
+			builderChecks.forEach(b => {
+				statuses[b.id] = { installed: b.installed, active: b.active };
+			});
+			// Gutenberg and Others are always available
+			statuses['gutenberg'] = { installed: true, active: true };
+			statuses['others'] = { installed: true, active: true };
+			this.builderStatuses = statuses;
 
 			// Find first installed and active builder
 			const activeBuilder = builderChecks.find(b => b.installed && b.active);

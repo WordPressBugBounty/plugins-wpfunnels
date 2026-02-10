@@ -34,22 +34,13 @@ class EventTracker{
     private static $instance;
 
     /**
-     * Flag to indicate if tracking is enabled.
-     *
-     * @var bool $enabled Flag to indicate if tracking is enabled.
-     * @since 1.17.10
-     */
-    private $enabled;
-
-    /**
      * Private constructor to prevent instantiation from outside the class.
      *
      * @since 1.17.10
      */
     private function __construct(){
-        $this->enabled = get_option('wpfunnels_allow_tracking') === 'yes';
 
-        add_action( 'wpfunnels_after_accept_consent', array( $this, 'on_plugin_activated' ) );
+        add_action( 'admin_init', array( $this, 'maybe_track_activation' ) );
         add_action( 'wpfunnels_after_funnel_created', array( $this, 'on_after_funnel_created' ), 10, 2 );
         add_action( 'wpfunnels_after_funnel_imported', array( $this, 'on_after_funnel_imported' ), 10, 3 );
         add_action( 'wpfunnels_plugin_deactivated', array( $this, 'on_plugin_deactivated' ) );
@@ -77,22 +68,27 @@ class EventTracker{
     }
 
     /**
-     * Sends a plugin activation event to OpenPanel.
-     *
-     * This method sends a plugin activation event to OpenPanel, including
-     * the site URL, plugin slug, and plugin version.
+     * Checks if the plugin was just activated and sends the tracking event.
+     * This runs on admin_init to ensure the full environment is available.
+     * Fires regardless of the consent checkbox value.
      *
      * @access public
-     *
      * @return void
-     *
      * @since 1.17.10
      */
+    public function maybe_track_activation(): void
+    {
+        if ( get_transient( 'wpfunnels_just_activated' ) ) {
+            delete_transient( 'wpfunnels_just_activated' );
+            $this->on_plugin_activated();
+        }
+    }
+
     public function on_plugin_activated(): void
     {
         coderex_telemetry_track(
             WPFNL_FILE,
-            'plugin_activation',
+            'signup',
             array(
                 'site_url'        => get_site_url(),
                 'plugin_version'  => WPFNL_VERSION,
@@ -145,10 +141,11 @@ class EventTracker{
         if (!$has_funnel_created) {
             coderex_telemetry_track(
                 WPFNL_FILE,
-                $funnel_type . '_funnel_created',
+                'first_strike',
                 array(
-                    'funnel_id' => $funnel_id,
-                    'time'      => current_time('mysql'),
+                    'funnel_id'   => $funnel_id,
+                    'funnel_type' => $funnel_type,
+                    'time'        => current_time('mysql'),
                 )
             );
             update_option('wpfunnels_funnel_created', true);
@@ -174,15 +171,16 @@ class EventTracker{
     {
         $has_funnel_imported = get_option('wpfunnels_funnel_imported', false);
         if (!$has_funnel_imported) {
-            // coderex_telemetry_track(
-            //     WPFNL_FILE,
-            //     $funnel_type . '_funnel_imported',
-            //     array(
-            //         'funnel_id' => $funnel_id,
-            //         'builder'   => $builder,
-            //         'time'      => current_time('mysql'),
-            //     )
-            // );
+            coderex_telemetry_track(
+                WPFNL_FILE,
+                'first_strike',
+                array(
+                    'funnel_id'   => $funnel_id,
+                    'builder'     => $builder,
+                    'funnel_type' => $funnel_type,
+                    'time'        => current_time('mysql'),
+                )
+            );
             update_option('wpfunnels_funnel_imported', true);
         }
     }
@@ -308,7 +306,7 @@ class EventTracker{
     {
         coderex_telemetry_track(
             WPFNL_FILE,
-            'wpfunnels_setup_complete',
+            'setup',
             array(
                 'funnel_id' => $funnel_id,
                 'action'    => $action,

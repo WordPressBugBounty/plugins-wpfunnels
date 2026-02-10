@@ -706,8 +706,8 @@ export default {
 					return
 				}
 				this.loadingMainProducts = true
-				// Use a single space or wildcard to get products
-				const products = await this.searchProducts(' ', 10)
+				// Fetch recent products (empty term + limit returns latest products)
+				const products = await this.searchProducts('', 10)
 				this.mainProducts = products
 				this.loadingMainProducts = false
 			} else if (type === 'orderbump') {
@@ -715,7 +715,7 @@ export default {
 					return
 				}
 				this.loadingOrderBumpProducts = true
-				const products = await this.searchProducts(' ', 10)
+				const products = await this.searchProducts('', 10)
 				this.orderBumpProducts = products
 				this.loadingOrderBumpProducts = false
 			} else if (type === 'upsell') {
@@ -723,7 +723,7 @@ export default {
 					return
 				}
 				this.loadingUpsellProducts = true
-				const products = await this.searchProducts(' ', 10)
+				const products = await this.searchProducts('', 10)
 				this.upsellProducts = products
 				this.loadingUpsellProducts = false
 			}
@@ -898,6 +898,23 @@ export default {
 			const container = document.getElementById('wpfnl-create-product')
 			if (container) {
 				container.innerHTML = ''
+			}
+
+			// Clear cached product lists so dropdowns reload with fresh data
+			// (including any product just created via iframe)
+			this.mainProducts = []
+			this.orderBumpProducts = []
+			this.upsellProducts = []
+
+			// Reload products for any currently open dropdown
+			if (this.showMainProductDropdown) {
+				this.loadInitialProducts('main')
+			}
+			if (this.showOrderBumpDropdown) {
+				this.loadInitialProducts('orderbump')
+			}
+			if (this.showUpsellDropdown) {
+				this.loadInitialProducts('upsell')
 			}
 		},
 
@@ -1601,16 +1618,6 @@ export default {
     letter-spacing: 0.4px;
 }
 
-/* Right Panel - Preview */
-.wpfnl-mm-build-funnel-preview {
-	flex: 1;
-	background: #FFF;
-	border-radius: 16px;
-	min-height: 556px;
-	display: flex;
-	flex-direction: column;
-}
-
 /* Tabs */
 .wpfnl-mm-build-funnel-tabs {
 	display: flex;
@@ -1676,26 +1683,6 @@ export default {
 	padding: 20px;
 }
 
-.wpfnl-mm-build-funnel-preview-image {
-	width: 100%;
-	height: 100%;
-	min-height: 400px;
-	background: #F6F5FA;
-	border-radius: 16px;
-	overflow: hidden;
-	display: flex;
-	align-items: flex-start;
-	justify-content: center;
-}
-
-.wpfnl-mm-build-funnel-preview-image img {
-	width: 100%;
-	height: auto;
-	object-fit: cover;
-	object-position: top center;
-	border-radius: 8px;
-	box-shadow: 0px 14px 20px #DFDCE8;
-}
 
 .wpfnl-mm-build-funnel-preview-placeholder,
 .wpfnl-mm-build-funnel-preview-empty {
@@ -1719,13 +1706,11 @@ export default {
 .wpfnl-mm-build-funnel-preview-placeholder p,
 .wpfnl-mm-build-funnel-preview-empty p {
 	font-size: 14px;
-	font-family: 'DM Sans', sans-serif;
 	margin: 0;
 }
 
 .wpfnl-mm-build-funnel-preview-empty h4 {
 	font-size: 18px;
-	font-family: 'DM Sans', sans-serif;
 	font-weight: 600;
 	color: #363B4E;
 	margin: 0 0 8px 0;

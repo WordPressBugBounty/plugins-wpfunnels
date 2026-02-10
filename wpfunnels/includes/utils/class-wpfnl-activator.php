@@ -145,7 +145,8 @@ class Wpfnl_Activator
 	 */
 	public static function activate()
 	{
-
+		update_option( 'wpfunnels_allow_tracking', 'yes' );
+		set_transient( 'wpfunnels_just_activated', true, 60 );
 		self::set_wpfunnels_activation_transients();
 
 		// added from version 3.1.7

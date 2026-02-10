@@ -72,6 +72,54 @@ class Module extends Wpfnl_Admin_Module
         if (isset($_GET['term'])) {
             $term = (string) esc_attr( wp_unslash($_GET['term']) );
         }
+
+        $term = isset($term) ? trim($term) : '';
+        $limit = isset($_GET['limit']) ? absint($_GET['limit']) : 0;
+
+        // If no search term but a limit is set, return recent products
+        if (empty($term) && $limit > 0) {
+            $products = [];
+            if ($_GET['isLms'] == 'true') {
+                $_class = 'lms';
+            } else {
+                $_class = 'wc';
+            }
+
+            if ($_class === 'wc' && Wpfnl_functions::is_wc_active()) {
+                $args = [
+                    'status'  => 'publish',
+                    'limit'   => $limit,
+                    'orderby' => 'date',
+                    'order'   => 'DESC',
+                    'stock_status' => 'instock',
+                ];
+                $wc_products = wc_get_products($args);
+
+                foreach ($wc_products as $product_object) {
+                    if ($product_object && (($product_object->managing_stock() && $product_object->get_stock_quantity() > 0) || (!$product_object->managing_stock() && $product_object->get_stock_status() !== 'outofstock'))) {
+                        $formatted_name = $product_object->get_name();
+
+                        if ($product_object->get_type() == 'variable' || $product_object->get_type() == 'variable-subscription') {
+                            $parent_id = $product_object->get_id();
+                            $products[$parent_id] = [
+                                'name'       => $formatted_name,
+                                'price'      => $product_object->get_variation_regular_price('min') ? $product_object->get_variation_regular_price('min') : $product_object->get_regular_price(),
+                                'sale_price' => $product_object->get_variation_sale_price('min') ? $product_object->get_variation_sale_price('min') : $product_object->get_price(),
+                            ];
+                        } else {
+                            $products[$product_object->get_id()] = [
+                                'name'       => rawurldecode($formatted_name),
+                                'price'      => $product_object->get_regular_price(),
+                                'sale_price' => $product_object->get_sale_price(),
+                            ];
+                        }
+                    }
+                }
+            }
+
+            wp_send_json($products);
+        }
+
         if (empty($term)) {
             wp_die();
         }
