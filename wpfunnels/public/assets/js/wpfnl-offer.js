@@ -247,7 +247,7 @@
         return response;
     }
 
-    $(".wpfnl-variable-attribute-offer").change(function () {
+    $(document).on("change", ".wpfnl-variable-attribute-offer", function () {
         let response = getSelectedVariationID();
         if (!response.is_empty) {
             let payload = {
