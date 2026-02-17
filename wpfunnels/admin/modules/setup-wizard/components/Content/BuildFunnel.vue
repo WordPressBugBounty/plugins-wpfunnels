@@ -1075,7 +1075,7 @@ export default {
 				let templateType = 'lead'
 				if (funnelType === 'sales') {
 					// Check if WooCommerce is active for wc type
-					templateType = window.setup_wizard_obj?.is_woo_active === 'yes' ? 'wc' : 'lead'
+					templateType = funnelType === 'sales' ? 'wc' : 'lead'
 				}
 
 				// Step 3: Update general settings (funnel type and builder)

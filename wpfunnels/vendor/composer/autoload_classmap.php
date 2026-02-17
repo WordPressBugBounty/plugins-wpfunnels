@@ -338,6 +338,7 @@ return array(
     'UnhandledMatchError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
     'UninstallCleanup' => $baseDir . '/includes/utils/class-wpfnl-uninstall-cleanup.php',
     'ValueError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
+    'WPFunnels\\Admin\\Banner\\SetupReminderBanner' => $baseDir . '/admin/class-wpfnl-setup-banner.php',
     'WPFunnels\\Admin\\Banner\\SpecialOccasionBanner' => $baseDir . '/admin/class-wpfnl-banner.php',
     'WPFunnels\\Admin\\BatchProcessing\\BatchProcessingController' => $baseDir . '/admin/BatchProcessing/BatchProcessingController.php',
     'WPFunnels\\Admin\\FunnelType\\Wpfnl_Funnel_Type' => $baseDir . '/admin/modules/type/abstruct-wpfnl-type.php',

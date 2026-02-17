@@ -262,12 +262,9 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
             if( $is_auto_match && $product ) {
                 // For auto-match, use actual product description
                 $product_description = $product->get_description() ?: $product->get_short_description();
-            } elseif ( !empty($order_bump_settings['productDescriptionText']) ) {
-                // For manual mode, use custom description from settings
-                $product_description = $order_bump_settings['productDescriptionText'];
-            } elseif ( $product ) {
-                // Fallback to product description
-                $product_description = $product->get_short_description() ?: $product->get_description();
+            } else {
+                // For manual mode, use custom description from settings (keep empty if not set)
+                $product_description = isset($order_bump_settings['productDescriptionText']) ? $order_bump_settings['productDescriptionText'] : '';
             }
 
             $data = [

@@ -387,7 +387,9 @@ $live_redirect_link = add_query_arg(
                                     <span class="steps">
                                         <?php echo $funnel->get_total_steps(). ' '. Wpfnl_functions::get_formatted_data_with_phrase($funnel->get_total_steps(), 'step', 'steps'); ?> <?php echo ' - '.$funnel_type ?>
                                     </span>
+
                                 </div>
+
                                 <?php if($is_pro_active){ ?>
                                     <div class="list-cell wpfnl-intigrations">
                                         <?php if ( $is_pro_active && $is_mint_pro_active ) { ?>
@@ -599,6 +601,55 @@ $live_redirect_link = add_query_arg(
                                 </div>
                                 <!-- /list-action -->
 
+
+                                <?php
+                                // Show activation hint only if:
+                                // 1. There's exactly one funnel
+                                // 2. The funnel status is Draft
+                                // 3. More than 24 hours have passed since creation
+                                $should_show_hint = false;
+                                if ( count($this->funnels) === 1 && 'draft' === get_post_status( $funnel_id ) ) {
+                                    // Get the funnel creation time
+                                    $funnel_post = get_post( $funnel_id );
+                                    $funnel_creation_time = strtotime( $funnel_post->post_date );
+                                    $current_time = current_time( 'timestamp' );
+                                    $time_difference = $current_time - $funnel_creation_time;
+                                    $hours_passed = $time_difference / 3600;
+                                    
+                                    if ( $hours_passed >= 24 ) {
+                                        $should_show_hint = true;
+                                    }
+                                }
+                                
+                                if ( $should_show_hint ) {
+                                ?>
+                                <div class="funnel-alert">
+                                    <div class="funnel-alert-inner">
+
+                                        <div class="funnel-alert-left">
+                                            <div class="funnel-icon">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="#6E42D3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>
+                                            </div>
+
+                                            <div class="funnel-alert-content">
+                                                <p class="funnel-alert-title">
+                                                    <?php echo __('This funnel is not published yet.', 'wpfnl'); ?>
+                                                </p>
+                                                <p class="funnel-alert-description">
+                                                    <?php echo __('Publish to go live — start boosting revenue with upsells, bumps & higher AOV today.', 'wpfnl'); ?>
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <button type="button" class="funnel-activate-btn wpfnl-update-funnel-status" data-id="<?php echo $funnel_id; ?>" data-status="<?php echo strtolower($funnel_status); ?>" title="<?php echo __('Click to Publish', 'wpfnl'); ?>">
+                                            <?php echo __('Click to Publish', 'wpfnl'); ?>
+                                        </button>
+
+                                    </div>
+                                </div>
+
+                                <?php } ?>
+
                             </div>
                             <?php
                         } //--end foreach--
@@ -625,24 +676,13 @@ $live_redirect_link = add_query_arg(
 
                                             <?php echo __('Create Your First Funnel', 'wpfnl'); ?>
                                         </a>
-                                        <?php if( !$is_pro_active ) { ?>
-                                            <a href="#" class="btn-default pro-import-button">
-                                                <?php
-                                                    require WPFNL_DIR . '/admin/partials/icons/import-icon.php';
-                                                    echo __('Import Funnels', 'wpfnl');
+                                        <a href="#" class="btn-default import-export wpfnl-import-funnels">
+                                            <?php
+                                                require WPFNL_DIR . '/admin/partials/icons/import-icon.php';
+                                                echo __('Import Funnels', 'wpfnl');
 
-                                                ?>
-                                                <span class="pro-tag-icon"><?php require WPFNL_DIR . '/admin/partials/icons/pro-icon.php'; ?></span>
-                                            </a>
-                                        <?php }else{ ?>
-                                            <a href="#" class="btn-default import-export wpfnl-import-funnels">
-                                                <?php
-                                                    require WPFNL_DIR . '/admin/partials/icons/import-icon.php';
-                                                    echo __('Import Funnels', 'wpfnl');
-
-                                                ?>
-                                            </a>
-                                        <?php } ?>
+                                            ?>
+                                        </a>
                                     </div>
                                 </div>
                             <?php }else{

@@ -456,6 +456,7 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
         'UninstallCleanup' => __DIR__ . '/../..' . '/includes/utils/class-wpfnl-uninstall-cleanup.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
+        'WPFunnels\\Admin\\Banner\\SetupReminderBanner' => __DIR__ . '/../..' . '/admin/class-wpfnl-setup-banner.php',
         'WPFunnels\\Admin\\Banner\\SpecialOccasionBanner' => __DIR__ . '/../..' . '/admin/class-wpfnl-banner.php',
         'WPFunnels\\Admin\\BatchProcessing\\BatchProcessingController' => __DIR__ . '/../..' . '/admin/BatchProcessing/BatchProcessingController.php',
         'WPFunnels\\Admin\\FunnelType\\Wpfnl_Funnel_Type' => __DIR__ . '/../..' . '/admin/modules/type/abstruct-wpfnl-type.php',

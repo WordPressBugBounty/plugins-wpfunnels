@@ -86,8 +86,13 @@ $offer_settings = \WPFunnels\Wpfnl_functions::get_offer_settings();
 			</label>
 			<div class="wpfnl-fields">
 				<div class="wpfnl-radiobtn no-title">
-					<input type="radio" name="offer-orders" id="wpfunnels-offer-child-order"
-						value="child-order" <?php checked($offer_settings['offer_orders'], 'child-order') ?>/>
+					<?php if($is_pro_activated){ ?>
+						<input type="radio" name="offer-orders" id="wpfunnels-offer-child-order" value="child-order" <?php checked($offer_settings['offer_orders'], 'child-order') ?>/>
+
+					<?php }else{ ?>
+						<input type="radio" name="offer-orders" id="wpfunnels-offer-child-order" value="" disabled />
+					<?php } ?>
+
 					<label for="wpfunnels-offer-child-order"></label>
 				</div>
 			</div>
@@ -104,8 +109,13 @@ $offer_settings = \WPFunnels\Wpfnl_functions::get_offer_settings();
 			</label>
 			<div class="wpfnl-fields">
 				<div class="wpfnl-radiobtn no-title">
-					<input type="radio" name="offer-orders" id="wpfunnels-offer-main-order"
-						value="main-order" <?php checked($offer_settings['offer_orders'], 'main-order') ?>/>
+					<?php if($is_pro_activated){ ?>
+						<input type="radio" name="offer-orders" id="wpfunnels-offer-main-order" value="main-order" <?php checked($offer_settings['offer_orders'], 'main-order') ?>/>
+
+					<?php }else{ ?>
+						<input type="radio" name="" id="wpfunnels-offer-main-order" value="" disabled />
+					<?php } ?>
+					
 					<label for="wpfunnels-offer-main-order"></label>
 				</div>
 			</div>
@@ -126,13 +136,18 @@ $offer_settings = \WPFunnels\Wpfnl_functions::get_offer_settings();
 				</span>
 			</label>
 			<div class="wpfnl-fields">
-					<span class="wpfnl-switcher extra-sm no-title">
+				<span class="wpfnl-switcher extra-sm no-title">
+					<?php if($is_pro_activated){ ?>
 						<input type="checkbox" name="wpfnl-show-supported-payment-gateway"
-							id="wpfnl-show-supported-payment-gateway" <?php if ($this->offer_settings['show_supported_payment_gateway'] == 'on') {
-							echo 'checked';
-						} ?>/>
-						<label for="wpfnl-show-supported-payment-gateway"></label>
-					</span>
+						id="wpfnl-show-supported-payment-gateway" <?php if ($this->offer_settings['show_supported_payment_gateway'] == 'on') { echo 'checked'; } ?>/>
+
+					<?php }else{ ?>
+						<input type="checkbox" name=""
+						id="wpfnl-show-supported-payment-gateway" disabled />
+					<?php } ?>
+
+					<label for="wpfnl-show-supported-payment-gateway"></label>
+				</span>
 			</div>
 		</div>
 		<!-- /field-wrapper -->
@@ -147,10 +162,13 @@ $offer_settings = \WPFunnels\Wpfnl_functions::get_offer_settings();
 			</label>
 			<div class="wpfnl-fields">
 					<span class="wpfnl-switcher extra-sm no-title">
-						<input type="checkbox" name="wpfnl-skip-offer-step"
-							id="wpfnl-skip-offer-step" <?php if ($this->offer_settings['skip_offer_step'] == 'on') {
-							echo 'checked';
-						} ?>/>
+						<?php if($is_pro_activated){ ?>
+							<input type="checkbox" name="wpfnl-skip-offer-step" id="wpfnl-skip-offer-step" <?php if ($this->offer_settings['skip_offer_step'] == 'on') { echo 'checked'; } ?>/>
+
+						<?php }else{ ?>
+							<input type="checkbox" name="" id="wpfnl-skip-offer-step" disabled />
+						<?php } ?>
+
 						<label for="wpfnl-skip-offer-step"></label>
 					</span>
 			</div>
@@ -167,10 +185,13 @@ $offer_settings = \WPFunnels\Wpfnl_functions::get_offer_settings();
 			</label>
 			<div class="wpfnl-fields">
 					<span class="wpfnl-switcher extra-sm no-title">
-						<input type="checkbox" name="wpfnl-skip-offer-step-for-free"
-							id="wpfnl-skip-offer-step-for-free" <?php if ($this->offer_settings['skip_offer_step_for_free'] == 'on') {
-							echo 'checked';
-						} ?>/>
+						<?php if($is_pro_activated){ ?>
+							<input type="checkbox" name="wpfnl-skip-offer-step-for-free" id="wpfnl-skip-offer-step-for-free" <?php if ($this->offer_settings['skip_offer_step_for_free'] == 'on') { echo 'checked'; } ?>/>
+
+						<?php }else{ ?>
+							<input type="checkbox" name="" id="wpfnl-skip-offer-step-for-free" disabled />
+
+						<?php } ?>
 						<label for="wpfnl-skip-offer-step-for-free"></label>
 					</span>
 			</div>
@@ -193,13 +214,16 @@ $offer_settings = \WPFunnels\Wpfnl_functions::get_offer_settings();
 				</span>
 			</label>
 			<div class="wpfnl-fields">
-					<span class="wpfnl-switcher extra-sm no-title">
-						<input type="checkbox" name="wpfnl-enable-global-thankyou"
-							id="wpfnl-enable-global-thankyou" <?php if ($this->offer_settings['enable_global_thankyou'] == 'on') {
-							echo 'checked';
-						} ?>/>
-						<label for="wpfnl-enable-global-thankyou"></label>
-					</span>
+				<span class="wpfnl-switcher extra-sm no-title">
+					
+					<?php if($is_pro_activated){ ?>
+						<input type="checkbox" name="wpfnl-enable-global-thankyou" id="wpfnl-enable-global-thankyou" <?php if ($this->offer_settings['enable_global_thankyou'] == 'on') { echo 'checked'; } ?>/>
+
+					<?php }else{ ?>
+						<input type="checkbox" name="" id="wpfnl-enable-global-thankyou" disabled />
+					<?php } ?>
+					<label for="wpfnl-enable-global-thankyou"></label>
+				</span>
 			</div>
 		</div>
 		<!-- /field-wrapper -->

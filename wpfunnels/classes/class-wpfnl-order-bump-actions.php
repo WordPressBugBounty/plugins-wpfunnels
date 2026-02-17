@@ -275,16 +275,21 @@ class Wpfnl_Order_Bump_Action {
 
 							ob_start();
 							if ( $settings['position'] == 'popup' ) {
+								$is_editor = false;
 
-								if(Wpfnl_functions::is_elementor_active()) {
-									if (\Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin()) {
-										echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
-									} else {
-										$order_bump_settings = $settings;
-										require_once WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
+								if ( Wpfnl_functions::is_elementor_active() ) {
+									if ( \Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin() ) {
+										$is_editor = true;
 									}
-								} else {
+								} elseif ( is_admin() && ! wp_doing_ajax() ) {
+									$is_editor = true;
+								}
+
+								if ( $is_editor ) {
 									echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
+								} else {
+									$order_bump_settings = $settings;
+									require WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
 								}
 							} else {
 								$order_bump_settings = $settings;
@@ -350,15 +355,21 @@ class Wpfnl_Order_Bump_Action {
 						if ( !empty($settings['selectedStyle']) ) {
 							ob_start();
 							if ( $settings['position'] == 'popup' ) {
-								if(Wpfnl_functions::is_elementor_active()) {
-									if (\Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin()) {
-										echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
-									} else {
-										$order_bump_settings = $settings;
-										require_once WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
+								$is_editor = false;
+
+								if ( Wpfnl_functions::is_elementor_active() ) {
+									if ( \Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin() ) {
+										$is_editor = true;
 									}
-								} else {
+								} elseif ( is_admin() && ! wp_doing_ajax() ) {
+									$is_editor = true;
+								}
+
+								if ( $is_editor ) {
 									echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
+								} else {
+									$order_bump_settings = $settings;
+									require WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
 								}
 							} else {
 								$order_bump_settings = $settings;
@@ -424,15 +435,21 @@ class Wpfnl_Order_Bump_Action {
 						if ( !empty($settings['selectedStyle']) ) {
 							ob_start();
 							if ( $settings['position'] == 'popup' ) {
-								if(Wpfnl_functions::is_elementor_active()) {
-									if (\Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin()) {
-										echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
-									}else {
-										$order_bump_settings = $settings;
-										require_once WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
+								$is_editor = false;
+
+								if ( Wpfnl_functions::is_elementor_active() ) {
+									if ( \Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin() ) {
+										$is_editor = true;
 									}
-								} else {
+								} elseif ( is_admin() && ! wp_doing_ajax() ) {
+									$is_editor = true;
+								}
+
+								if ( $is_editor ) {
 									echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
+								} else {
+									$order_bump_settings = $settings;
+									require WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
 								}
 							} else {
 								$order_bump_settings = $settings;
@@ -498,15 +515,21 @@ class Wpfnl_Order_Bump_Action {
 						if ( !empty($settings['selectedStyle']) ) {
 							ob_start();
 							if ( $settings['position'] == 'popup' ) {
-								if(Wpfnl_functions::is_elementor_active()) {
-									if (\Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin()) {
-										echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
-									} else {
-										$order_bump_settings = $settings;
-										require_once WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
+								$is_editor = false;
+
+								if ( Wpfnl_functions::is_elementor_active() ) {
+									if ( \Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin() ) {
+										$is_editor = true;
 									}
-								} else {
+								} elseif ( is_admin() && ! wp_doing_ajax() ) {
+									$is_editor = true;
+								}
+
+								if ( $is_editor ) {
 									echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
+								} else {
+									$order_bump_settings = $settings;
+									require WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
 								}
 							} else {
 								$order_bump_settings = $settings;
@@ -572,15 +595,21 @@ class Wpfnl_Order_Bump_Action {
 						if ( !empty($settings['selectedStyle']) ) {
 							ob_start();
 							if ( $settings['position'] == 'popup' ) {
-								if(Wpfnl_functions::is_elementor_active()) {
-									if (\Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin()) {
-										echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
-									} else {
-										$order_bump_settings = $settings;
-										require_once WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
+								$is_editor = false;
+
+								if ( Wpfnl_functions::is_elementor_active() ) {
+									if ( \Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin() ) {
+										$is_editor = true;
 									}
-								} else {
+								} elseif ( is_admin() && ! wp_doing_ajax() ) {
+									$is_editor = true;
+								}
+
+								if ( $is_editor ) {
 									echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
+								} else {
+									$order_bump_settings = $settings;
+									require WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
 								}
 							} else {
 								$order_bump_settings = $settings;
@@ -647,15 +676,21 @@ class Wpfnl_Order_Bump_Action {
 						if ( !empty($settings['selectedStyle']) ) {
 							ob_start();
 							if ( $settings['position'] == 'popup' ) {
-								if(Wpfnl_functions::is_elementor_active()) {
-									if (\Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin()) {
-										echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
-									} else {
-										$order_bump_settings = $settings;
-										require_once WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
+								$is_editor = false;
+
+								if ( Wpfnl_functions::is_elementor_active() ) {
+									if ( \Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin() ) {
+										$is_editor = true;
 									}
-								} else {
+								} elseif ( is_admin() && ! wp_doing_ajax() ) {
+									$is_editor = true;
+								}
+
+								if ( $is_editor ) {
 									echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
+								} else {
+									$order_bump_settings = $settings;
+									require WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
 								}
 							} else {
 								$order_bump_settings = $settings;
@@ -720,15 +755,21 @@ class Wpfnl_Order_Bump_Action {
 						if ( !empty($settings['selectedStyle']) ) {
 							ob_start();
 							if ( $settings['position'] == 'popup' ) {
-								if(Wpfnl_functions::is_elementor_active()) {
-									if (\Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin()) {
-										echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
-									} else {
-										$order_bump_settings = $settings;
-										require_once WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
+								$is_editor = false;
+
+								if ( Wpfnl_functions::is_elementor_active() ) {
+									if ( \Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin() ) {
+										$is_editor = true;
 									}
-								} else {
+								} elseif ( is_admin() && ! wp_doing_ajax() ) {
+									$is_editor = true;
+								}
+
+								if ( $is_editor ) {
 									echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
+								} else {
+									$order_bump_settings = $settings;
+									require WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
 								}
 							} else {
 								$order_bump_settings = $settings;
@@ -798,15 +839,21 @@ class Wpfnl_Order_Bump_Action {
 						if ( !empty($settings['selectedStyle']) ) {
 							ob_start();
 							if ( $settings['position'] == 'popup' ) {
-								if(Wpfnl_functions::is_elementor_active()) {
-									if (\Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin()) {
-										echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
-									} else {
-										$order_bump_settings = $settings;
-										require_once WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
+								$is_editor = false;
+
+								if ( Wpfnl_functions::is_elementor_active() ) {
+									if ( \Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin() ) {
+										$is_editor = true;
 									}
-								} else {
+								} elseif ( is_admin() && ! wp_doing_ajax() ) {
+									$is_editor = true;
+								}
+
+								if ( $is_editor ) {
 									echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
+								} else {
+									$order_bump_settings = $settings;
+									require WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
 								}
 							} else {
 								$order_bump_settings = $settings;
@@ -876,15 +923,21 @@ class Wpfnl_Order_Bump_Action {
 						if ( !empty($settings['selectedStyle']) ) {
 							ob_start();
 							if ( $settings['position'] == 'popup' ) {
-								if(Wpfnl_functions::is_elementor_active()) {
-									if (\Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin()) {
-										echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
-									} else {
-										$order_bump_settings = $settings;
-										require_once WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
+								$is_editor = false;
+
+								if ( Wpfnl_functions::is_elementor_active() ) {
+									if ( \Elementor\Plugin::$instance->editor->is_edit_mode() || is_admin() ) {
+										$is_editor = true;
 									}
-								} else {
+								} elseif ( is_admin() && ! wp_doing_ajax() ) {
+									$is_editor = true;
+								}
+
+								if ( $is_editor ) {
 									echo '<h5 style="margin-bottom: 15px;"><strong>' . __('To see the pop-up offer in action, please preview or view the page.', 'wpfnl') . '</strong></h5>';
+								} else {
+									$order_bump_settings = $settings;
+									require WPFNL_DIR . 'public/modules/checkout/templates-style/order-bump-template-' . $settings['selectedStyle'] . '.php';
 								}
 							} else {
 								$order_bump_settings = $settings;

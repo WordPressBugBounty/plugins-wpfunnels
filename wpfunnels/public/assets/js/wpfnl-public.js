@@ -1167,25 +1167,33 @@
         })
 
         //----show order bump modal-----
-        $(window).on('load', function () {
+        function wpfnlInitOrderBumpPopup() {
             setTimeout(function () {
                 var $popupWrapper = $('.wpfnl-order-bump__popup-wrapper');
                 if ($popupWrapper.length) {
                     var inner_height = $popupWrapper.innerHeight() + 30;
                     $popupWrapper.css('top', '-' + inner_height + 'px');
-                    
+
                     // Show popup automatically for position='popup' order bumps (not for pre-purchase)
                     if (!$popupWrapper.hasClass('wpfnl-pre-purchase')) {
                         $popupWrapper.addClass('show').css('top', '30px');
                     }
                 }
             }, 500);
-        })
+        }
 
-        $('.close-order-bump').on('click', function () {
+        // Use robust load detection that works in Firefox even if
+        // window.load has already fired before this script runs.
+        if (document.readyState === 'complete') {
+            wpfnlInitOrderBumpPopup();
+        } else {
+            $(window).on('load', wpfnlInitOrderBumpPopup);
+        }
+
+        $(document).on('click', '.close-order-bump', function () {
             var $popupWrapper = $('.wpfnl-order-bump__popup-wrapper');
             var inner_height = $popupWrapper.innerHeight() + 30;
-            
+
             $popupWrapper
                 .removeClass('show')
                 .css('top', '-' + inner_height + 'px')

@@ -130,7 +130,6 @@ export default {
               path: window.CheckoutStep.rest_api_url + 'wpfunnels/v1/updateSelectedProduct?product=' + this.product,
               method: 'GET'
           }).then(response => {
-              console.log(response);
               this.$emit('changeData', 'productName', response.title)
               this.$emit('changeData', 'price', response.price)
               this.$emit('changeData', 'salePrice', response.sale_price)

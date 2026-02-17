@@ -5,7 +5,7 @@ Tags: funnel builder, order bump, sales funnels, lead generation, custom checkou
 Requires at least: 6.1
 Tested up to:  6.9.1
 Requires PHP: 7.4
-Stable tag:  3.9.3
+Stable tag:  3.9.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -579,6 +579,17 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.9.4 (2026-02-17) =
+* Enhancement: Variable Product Selection on the Checkout
+* Enhancement: In-app Message for Funnel Creation and Activation
+* Enhancement: Placeholder Image for Product Image Upload
+* Enhancement: UI on the A/B Testing
+* Enhancement: Browser Compatibility for the Order Bump
+* Bugfix: Misaligned Metric Labels in Growth Comparison Dashboard
+* Bugfix: Conditional Funnel Steps Redirect to Backend Post Listing Instead of Frontend Editor
+* Bugfix: Default Product Description Showing for Order Bump When Description is Blank
+* Bugfix: Lead Funnel Editor Fails to Load After Import for Free Version
 
 = 3.9.3 (2026-02-16) =
 * Vulnerability: Cross Site Scripting (XSS) Vulnerability Issues

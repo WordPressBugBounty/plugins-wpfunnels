@@ -156,76 +156,82 @@ abstract class Wpfnl_Source_Base
 			}
 		}
 
-		if( $upsell_id === null  ) {
-			// Update inputs of thankyou and outputs of checkout
-			$filtered_array[$thank_you_id]['inputs'] = [
-				'input_1' => [
-					'connections' => [
-						[
-							'node' => $checkout_id,
-							'input' => 'output_1'
+		// Only rebuild connections if a checkout step exists.
+		// For lead funnels (landing → thankyou), there is no checkout step,
+		// so $checkout_id would be null. In that case, original connections
+		// are already correct since no downsell nodes were removed.
+		if ( $checkout_id !== null ) {
+			if( $upsell_id === null  ) {
+				// Update inputs of thankyou and outputs of checkout
+				$filtered_array[$thank_you_id]['inputs'] = [
+					'input_1' => [
+						'connections' => [
+							[
+								'node' => $checkout_id,
+								'input' => 'output_1'
+							]
 						]
 					]
-				]
-			];
+				];
 
-			$filtered_array[$checkout_id]['outputs'] = [
-				'output_1' => [
-					'connections' => [
-						[
-							'node' => $thank_you_id,
-							'output' => 'input_1'
+				$filtered_array[$checkout_id]['outputs'] = [
+					'output_1' => [
+						'connections' => [
+							[
+								'node' => $thank_you_id,
+								'output' => 'input_1'
+							]
 						]
 					]
-				]
-			];
-		}else{
-			$filtered_array[$upsell_id]['inputs'] = [
-				'input_1' => [
-					'connections' => [
-						[
-							'node' => $checkout_id,
-							'input' => 'output_1'
+				];
+			}else{
+				$filtered_array[$upsell_id]['inputs'] = [
+					'input_1' => [
+						'connections' => [
+							[
+								'node' => $checkout_id,
+								'input' => 'output_1'
+							]
 						]
 					]
-				]
-			];
+				];
 
-			$filtered_array[$upsell_id]['outputs'] = [
-				'output_1' => [
-					'connections' => [
-						[
-							'node' => $thank_you_id,
-							'output' => 'input_1'
+				$filtered_array[$upsell_id]['outputs'] = [
+					'output_1' => [
+						'connections' => [
+							[
+								'node' => $thank_you_id,
+								'output' => 'input_1'
+							]
 						]
 					]
-				]
-			];
-			
-			$filtered_array[$checkout_id]['outputs'] = [
-				'output_1' => [
-					'connections' => [
-						[
-							'node' => $upsell_id,
-							'output' => 'input_1'
+				];
+				
+				$filtered_array[$checkout_id]['outputs'] = [
+					'output_1' => [
+						'connections' => [
+							[
+								'node' => $upsell_id,
+								'output' => 'input_1'
+							]
 						]
 					]
-				]
-			];
+				];
 
-			// Update inputs of thankyou and outputs of checkout
-			$filtered_array[$thank_you_id]['inputs'] = [
-				'input_1' => [
-					'connections' => [
-						[
-							'node' => $upsell_id,
-							'input' => 'output_1'
+				// Update inputs of thankyou and outputs of checkout
+				$filtered_array[$thank_you_id]['inputs'] = [
+					'input_1' => [
+						'connections' => [
+							[
+								'node' => $upsell_id,
+								'input' => 'output_1'
+							]
 						]
 					]
-				]
-			];
+				];
 
-			delete_post_meta( $upsell_step_id, '_wpfnl_maybe_enable_condition' );
+				delete_post_meta( $upsell_step_id, '_wpfnl_maybe_enable_condition' );
+			}
 		}
 		
 

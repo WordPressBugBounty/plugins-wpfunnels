@@ -87,6 +87,10 @@
     transition: all 0.9s cubic-bezier(0.77, 0.2, 0.28, 0.88);
     transform: translateX(50%);
 
+    &.show {
+        top: 30px;
+    }
+
     .close-order-bump {
         height: 28px;
         width: 28px;

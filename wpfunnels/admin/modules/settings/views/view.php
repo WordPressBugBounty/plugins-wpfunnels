@@ -49,7 +49,7 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
                             <?php } ?>
 
                             <?php if (\WPFunnels\Wpfnl_functions::is_wc_active() && 'lead' !== $global_funnel_type) { ?>
-                                <li class="nav-li <?php echo !$is_pro_active ? ' disabled' : '' ?>" <?php echo $is_pro_active ? ' data-id="offer-settings" ' : '' ?> <?php echo !$is_pro_active ? ' id="wpfnl-offer-settings" ' : '' ?>>
+                                <li class="nav-li" data-id="offer-settings" >
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <rect x="3" y="8" width="18" height="4" rx="1" stroke="#7A8B9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                         <path d="M12 8V21" stroke="#7A8B9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -58,15 +58,6 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
                                     </svg>
 
                                     <span><?php esc_html_e('Offer Settings', 'wpfnl'); ?></span>
-
-                                    <?php
-                                    if (!$is_pro_active) {
-                                        echo '<span class="pro-tag-icon">';
-                                        require WPFNL_DIR . '/admin/partials/icons/pro-icon.php';
-                                        echo '</span>';
-                                    }
-                                    ?>
-
                                 </li>
                             <?php } ?>
 
@@ -84,7 +75,7 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
                                 <?php require WPFNL_DIR . '/admin/partials/icons/advanced-settings.php'; ?>
                                 <span><?php esc_html_e('Advanced Settings', 'wpfnl'); ?></span>
                             </li>
-                            <?php if (current_user_can('manage_options') && $is_pro_activated ) { ?>
+                            <?php if (current_user_can('manage_options') ) { ?>
                                 <li class="nav-li" data-id="user-role-manager">
                                     <?php require WPFNL_DIR . '/admin/partials/icons/role-management-menu-icon.php'; ?>
                                     <span><?php esc_html_e('Role Management', 'wpfnl'); ?></span>
@@ -109,17 +100,25 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
                     <!-- /General Settings -->
 
                     <div class="wpfnl-funnel__single-settings offer" id="offer-settings">
-                        
-                        <?php if ($is_pro_activated) { ?>
-                            <?php do_action('wpfunnels_before_offer_settings'); ?>
-                            <h4 class="settings-title"><?php esc_html_e('Offer Settings', 'wpfnl'); ?></h4>
-                            <?php require WPFNL_DIR . '/admin/modules/settings/views/offer-settings.php'; ?>
-                            <?php do_action('wpfunnels_after_offer_settings'); ?>
+                        <?php do_action('wpfunnels_before_offer_settings'); ?>
+                        <h4 class="settings-title"><?php esc_html_e('Offer Settings', 'wpfnl'); ?></h4>
+                        <?php require WPFNL_DIR . '/admin/modules/settings/views/offer-settings.php'; ?>
+                        <?php do_action('wpfunnels_after_offer_settings'); ?>
 
-                        <?php } else { ?>
-                            <a href="<?php echo $pro_url; ?>" target="_blank" title="<?php _e('Click to Upgrade Pro', 'wpfnl'); ?>">
-                                <span class="pro-tag"><?php esc_html_e('Get Pro', 'wpfnl'); ?></span>
-                            </a>
+                        <?php if(!$is_pro_activated){ ?>
+                            <div class="upgrade-to-pro-hoverlay">
+                                <a
+                                    class="btn-default"
+                                    target="_blank"
+                                    href="<?php echo $pro_url;?>"
+                                    title="<?php esc_html_e('Click to Upgrade Pro', 'wpfnl'); ?>"
+                                >
+                                    <?php
+                                        require WPFNL_DIR . '/admin/partials/icons/pro-icon.php';
+                                    ?>
+                                    Upgrade To Pro Now
+                                </a>
+                            </div>
                         <?php } ?>
                     </div>
                     <!-- /Offer Settings -->

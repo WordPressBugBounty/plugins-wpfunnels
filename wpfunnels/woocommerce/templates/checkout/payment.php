@@ -31,11 +31,13 @@ if( wp_doing_ajax()  ){
 $checkout_id = !$checkout_id && isset($post->ID) ? $post->ID : $checkout_id;
 $is_pre_purchase = false;
 if( $checkout_id ){
-	$order_bumps =  get_post_meta($checkout_id, 'order-bump-settings', true);
-	foreach ($order_bumps as $item) {
-		if ( $item['position'] === 'popup' && $item['prePurchaseUpsell'] === 'yes') {
-			$is_pre_purchase = true;
-			break;
+	$order_bumps = get_post_meta($checkout_id, 'order-bump-settings', true);
+	if ( is_array( $order_bumps ) ) {
+		foreach ($order_bumps as $item) {
+			if ( isset( $item['position'] ) && $item['position'] === 'popup' && ! empty( $item['prePurchaseUpsell'] ) && $item['prePurchaseUpsell'] === 'yes' ) {
+				$is_pre_purchase = true;
+				break;
+			}
 		}
 	}
 }

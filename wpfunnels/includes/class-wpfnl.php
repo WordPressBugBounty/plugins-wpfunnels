@@ -24,6 +24,7 @@ use WPFunnels\Admin\SetupWizard;
 use WPFunnels\Admin\Wpfnl_Admin as Admin;
 use WPFunnels\Admin\Notices\Notice;
 use WPFunnels\Admin\Banner\SpecialOccasionBanner;
+use WPFunnels\Admin\Banner\SetupReminderBanner;
 use WPFunnels\Ajax_Handler\Ajax_Handler;
 use WPFunnels\Classes\OrderBumpActions\Wpfnl_Order_Bump_Action;
 use WPFunnels\Compatibility\CartLift\Wpfnl_Cart_Lift_Compatibility;
@@ -132,6 +133,14 @@ class Wpfnl
      * @var string $admin_banner
      */
     protected $admin_banner;
+
+    /**
+     * Setup reminder banner object
+     *
+     * @var SetupReminderBanner $setup_reminder_banner
+     * @since 3.6.0
+     */
+    protected $setup_reminder_banner;
 
 	protected $optin_field;
 
@@ -428,6 +437,7 @@ class Wpfnl
         $this->page_templates           = new PageTemplates\Manager();
         $this->admin_notice             = new Notice();
         $this->admin_banner             = new SpecialOccasionBanner('newyear2026', '2025-01-01 00:00:00', '2025-01-07 23:59:59', 'https://getwpfunnels.com/pricing/?utm_source=plugin&utm_medium=dashboard-banner-wpf&utm_campaign=welcome2026');
+        $this->setup_reminder_banner    = new SetupReminderBanner();
         $this->order_bump_actions       = new Wpfnl_Order_Bump_Action();
         $this->meta                     = new Wpfnl_Default_Meta();
         $this->shortcodes				= Wpfnl_Shortcodes::getInstance()->init();

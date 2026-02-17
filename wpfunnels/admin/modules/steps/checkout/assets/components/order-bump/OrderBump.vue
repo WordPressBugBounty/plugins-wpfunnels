@@ -181,7 +181,7 @@ export default {
             quantity: '1',
             htmlPrice: '$23',
             discountPrice: '',
-            productImage: 'https://via.placeholder.com/150x156',
+            productImage: window.WPFunnelVars.placeholder_image_path,
             highLightText: 'Special one time offer',
             checkBoxLabel: 'Grab this offer with one click!',
             productDescriptionText: 'Get this scratch proof 6D Tempered Glass Screen Protector for your iPhone. Keep your phone safe and sound just like a new one. ',
