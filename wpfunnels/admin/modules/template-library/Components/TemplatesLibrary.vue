@@ -475,8 +475,8 @@ export default {
             pluginInstallLoader: false,
             pluginInstallationErrorMessage: '',
             funnelType: window.WPFunnelVars.global_funnel_type,
-			type: 'lead' == window.WPFunnelVars.global_funnel_type ? 'lead' : window.WPFunnelVars.is_wc_installed === 'yes' ? 'wc' : 'lms',
-			selectedType: 'lead' == window.WPFunnelVars.global_funnel_type ? 'lead' : window.WPFunnelVars.is_wc_installed === 'yes' ? 'wc' : 'lms',
+			type: 'wc',
+			selectedType: 'wc',
             tempalateTypes : [],
             template_type : window.template_library_object.template_type,
             activeTab : 'templates',
@@ -758,7 +758,6 @@ export default {
         },
 
         getTemplate: function (){
-
             if( this.selectedType ){
                 apiFetch({
                     path: addQueryArgs( `${window.template_library_object.rest_api_url}wpfunnels/v1/templates/get_templates`, {
@@ -872,7 +871,6 @@ export default {
 
             wpAjaxHelperRequest("wpfunnel-import-funnel", data)
                 .success(function (response) {
-                    console.log("Funnel Created Successfully!");
                     let looper = j.Deferred().resolve(),
                         first_step_id = 0;
                     j.when.apply(j, j.map(that.steps, function (step, index) {

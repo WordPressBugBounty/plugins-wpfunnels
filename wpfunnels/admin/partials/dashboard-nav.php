@@ -17,6 +17,16 @@ $nav_menus = apply_filters('wpfnl_dashboard_nav_lists', [
             'icon'  => 'overview-icon',
             'page'  => WPFNL_FUNNEL_PAGE_SLUG,
         ],
+        'templates' => [
+            'title' => __('Templates', 'wpfnl'),
+            'icon'  => 'templates-icon',
+            'page'  => WPFNL_TEMPLATE_PAGE_SLUG,
+        ],
+        'addons' => [
+            'title' => __('Add-ons', 'wpfnl'),
+            'icon'  => 'addons-icon',
+            'page'  => WPFNL_ADDONS_SLUG,
+        ],
         'settings' => [
             'title' => __('Settings', 'wpfnl'),
             'icon'  => 'settings-icon-2x',

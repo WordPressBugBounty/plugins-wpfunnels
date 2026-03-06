@@ -1,0 +1,222 @@
+#wpfnl-review-prompt {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 420px;
+    background: #fff;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.10), 0 8px 10px -6px rgba(0, 0, 0, 0.10);
+    border-radius: 16px;
+    z-index: 99999;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    overflow: hidden;
+    display: none;
+}
+
+.wpfnl-review-header {
+    background: #fff;
+    padding: 20px 20px 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wpfnl-review-header span {
+    color: #1D2327;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.wpfnl-review-header .close-review-prompt {
+    cursor: pointer;
+    color: #666;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.wpfnl-review-body {
+    padding: 0 20px 20px;
+}
+
+.wpfnl-review-text {
+    margin-bottom: 20px;
+    color: #707070;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.wpfnl-review-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wpfnl-review-options .wpfnl-review-btn {
+    display: flex;
+    align-items: center;
+    background: #FCFCFE;
+    border: 1px solid #EEF0F3;
+    padding: 13px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    color: #3c434a;
+    font-size: 14px;
+    outline: none;
+    box-shadow: none;
+    text-decoration: none;
+}
+
+.wpfnl-review-options #wpfnl-review-yes.selected {
+    background: #d1e7dd;
+    color: #0a3622;
+    border-color: #a3cfbb;
+}
+
+.wpfnl-review-options #wpfnl-review-yes.selected path {
+    stroke: #0a3622;
+}
+
+.wpfnl-review-options #wpfnl-review-okay.selected {
+    color: #664d03;
+    background: #fff3cd;
+    border-color: #ffe69c;
+}
+
+.wpfnl-review-options #wpfnl-review-okay.selected path {
+    stroke: #664d03;
+}
+
+.wpfnl-review-options #wpfnl-review-no.selected {
+    color: #58151c;
+    background: #f8d7da;
+    border-color: #f1aeb5;
+}
+
+.wpfnl-review-options #wpfnl-review-no.selected path {
+    stroke: #58151c;
+}
+
+.wpfnl-review-options .wpfnl-review-btn .emoji {
+    margin-right: 8px;
+    font-size: 18px;
+    display: block;
+}
+
+.wpfnl-review-options .wpfnl-review-btn .emoji svg {
+    display: block;
+}
+
+.wpfnl-feedback-section {
+    margin-bottom: 20px;
+}
+
+.wpfnl-feedback-form {
+    display: none;
+    margin-top: 20px;
+}
+
+.wpfnl-feedback-label {
+    font-size: 14px;
+    color: #1F2937;
+    margin-bottom: 8px;
+    font-weight: 500;
+    display: block;
+}
+
+.wpfnl-feedback-label span {
+    color: #7A8B9A;
+    font-weight: 400;
+}
+
+.wpfnl-feedback-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    border: 1px solid #EEF0F3;
+    border-radius: 10px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.wpfnl-feedback-textarea:focus {
+    border-color: #6E42D3;
+}
+
+.wpfnl-feedback-textarea::placeholder {
+    color: #a0a0a0;
+}
+
+.wpfnl-review-footer {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    border-top: 1px solid #EEF0F3;
+    padding-top: 24px;
+}
+
+.wpfnl-cancel-feedback,
+.wpfnl-submit-feedback {
+    padding: 10px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.wpfnl-cancel-feedback {
+    background: #f5f5f5;
+    color: #3c434a;
+}
+
+.wpfnl-cancel-feedback:hover {
+    background: #e8e8e8;
+}
+
+.wpfnl-submit-feedback {
+    background: #6E42D3;
+    color: #fff;
+}
+
+.wpfnl-submit-feedback:hover {
+    background: #5b36b3;
+}
+
+.wpfnl-submit-feedback:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.wpfnl-privacy-policy {
+    font-size: 12px;
+    color: #8c8f94;
+    margin-top: 7px;
+    display: block;
+}
+
+.wpfnl-privacy-policy a {
+    color: #6E42D3;
+}
+
+.wpfnl-privacy-policy a:hover {
+    text-decoration: none;
+}
+
+.wpfnl-char-counter {
+    font-size: 12px;
+    color: #d43849;
+    text-align: right;
+    margin-top: -5px;
+    margin-bottom: 12px;
+}

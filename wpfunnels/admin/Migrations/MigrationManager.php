@@ -12,7 +12,8 @@ use WPFunnels\Admin\BatchProcessing\BatchProcessingController;
  * @package WPFunnels\Admin\Migrations
  * @since 3.5.0
  */
-class MigrationManager {
+class MigrationManager
+{
 
 	/**
 	 * Batch processing controller instance.
@@ -28,7 +29,8 @@ class MigrationManager {
 	 * @var array
 	 */
 	public static $migration_instances = array(
-		'order_stat_migration' => 'WPFunnels\\Admin\\Migrations\\OrderToStatTableMigration'
+		'order_stat_migration' => 'WPFunnels\\Admin\\Migrations\\OrderToStatTableMigration',
+		'stat_status_sync' => 'WPFunnels\\Admin\\Migrations\\StatStatusSyncMigration',
 	);
 
 
@@ -38,7 +40,8 @@ class MigrationManager {
 	 * @param BatchProcessingController $batchProcessingController The batch processing controller instance.
 	 * @since 3.5.0
 	 */
-	public function __construct( BatchProcessingController $batchProcessingController ) {
+	public function __construct(BatchProcessingController $batchProcessingController)
+	{
 		$this->batchProcessingController = $batchProcessingController;
 		$this->schedule_action();
 	}
@@ -51,11 +54,12 @@ class MigrationManager {
 	 *
 	 * @since 3.5.0
 	 */
-	public function schedule_action () {
-		foreach ( self::$migration_instances as $key => $instance_class_name ) {
+	public function schedule_action()
+	{
+		foreach (self::$migration_instances as $key => $instance_class_name) {
 			$instance = new $instance_class_name();
-			if ( $instance->should_enqueue_migration_instance( $instance_class_name ) ) {
-				$this->batchProcessingController->enqueue_processor( $key, $instance_class_name );
+			if ($instance->should_enqueue_migration_instance($instance_class_name)) {
+				$this->batchProcessingController->enqueue_processor($key, $instance_class_name);
 			}
 		}
 	}

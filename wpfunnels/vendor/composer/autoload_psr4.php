@@ -15,11 +15,11 @@ return array(
     'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-factory/src', $vendorDir . '/psr/http-message/src'),
     'PhilipNewcomer\\WP_Ajax_Helper\\' => array($vendorDir . '/philipnewcomer/wp-ajax-helper/src/components'),
+    'Linno\\Telemetry\\' => array($vendorDir . '/linno/telemetry/src'),
     'League\\MimeTypeDetection\\' => array($vendorDir . '/league/mime-type-detection/src'),
     'League\\Glide\\' => array($vendorDir . '/league/glide/src'),
     'League\\Flysystem\\' => array($vendorDir . '/league/flysystem/src'),
     'Intervention\\Image\\' => array($vendorDir . '/intervention/image/src/Intervention/Image'),
     'GuzzleHttp\\Psr7\\' => array($vendorDir . '/guzzlehttp/psr7/src'),
-    'CodeRex\\Telemetry\\' => array($vendorDir . '/coderexltd/telemetry/src'),
     'Appsero\\' => array($vendorDir . '/appsero/client/src'),
 );

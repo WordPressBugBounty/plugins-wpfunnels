@@ -220,19 +220,9 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 	 */
 	public function get_templates( $request ) {
 		// Determine available template types based on active plugins
-		$default_type = 'lead'; // Default to lead gen which is always available
-		
-		// Check if WooCommerce is active - prioritize it
-		if ( Wpfnl_functions::is_wc_active() ) {
-			$default_type = 'wc';
-		}
-		// Check if LMS add-on and at least one LMS plugin (LearnDash or CreatorLMS) is active
-		elseif ( Wpfnl_functions::is_lms_addon_active() && Wpfnl_functions::is_any_lms_plugin_active() ) {
-			$default_type = 'lms';
-		}
+		$default_type = 'wc'; // Default to WooCommerce which is always available
 		
 		$funnel_template_type = isset( $_GET['type'] ) ? $_GET['type'] : $default_type;
-
         // Map 'sales' to 'wc' if passed, as API uses 'wc'
         if ( 'sales' === $funnel_template_type ) {
             $funnel_template_type = 'wc';
@@ -538,13 +528,23 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 			);
 		}
 
+		if ( is_wp_error( $response ) ) {
+			return array(
+				'title'     => '',
+				'post_meta' => array(),
+				'message'   => $response->get_error_message(),
+				'data'      => array(),
+				'success'   => false,
+				'content'   => '',
+			);
+		}
 
 		return array(
 			'title'     => '',
 			'post_meta' => array(),
-			'message'   => $response['message'],
-			'data'      => $response['data'],
-			'success'   => $response['success'],
+			'message'   => isset( $response['message'] ) ? $response['message'] : '',
+			'data'      => isset( $response['data'] ) ? $response['data'] : array(),
+			'success'   => isset( $response['success'] ) ? $response['success'] : false,
 			'content'   => '',
 		);
 	}
@@ -591,12 +591,23 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 			);
 		}
 
+		if ( is_wp_error( $response ) ) {
+			return array(
+				'title'     => '',
+				'post_meta' => array(),
+				'message'   => $response->get_error_message(),
+				'data'      => array(),
+				'success'   => false,
+				'content'   => '',
+			);
+		}
+
 		return array(
 			'title'     => '',
 			'post_meta' => array(),
-			'message'   => $response['message'],
-			'data'      => $response['data'],
-			'success'   => $response['success'],
+			'message'   => isset( $response['message'] ) ? $response['message'] : '',
+			'data'      => isset( $response['data'] ) ? $response['data'] : array(),
+			'success'   => isset( $response['success'] ) ? $response['success'] : false,
 			'content'   => '',
 		);
 	}

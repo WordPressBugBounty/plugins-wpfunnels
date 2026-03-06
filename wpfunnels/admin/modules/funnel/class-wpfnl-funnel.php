@@ -409,6 +409,7 @@ class Module extends Wpfnl_Admin_Module
 
 		return array(
 			'success'	=> true,
+			'status' 	=> $status,
 			'funnel_id'	=> $funnel_id,
 			'message'	=> __('Funnel status has been updated.', 'wpfnl'),
 			'redirect_url'	=> admin_url('admin.php?page=wp_funnels')

@@ -677,6 +677,7 @@ class FunnelController extends Wpfnl_REST_Controller
 
 		$response['first_node_id'] = $this->get_first_step_node($first_step_id, $response['funnel_data']);
 		$response['conditional_data'] = $this->get_conditional_step($response['funnel_data']);
+		$response['funnel_analytics'] = self::get_funnel_analytics($funnel_id);
 		return $response;
 	}
 
@@ -864,8 +865,9 @@ class FunnelController extends Wpfnl_REST_Controller
 		foreach ($steps_order as $step) {
 			$step_id = isset($step['id']) ? $step['id'] : null;
 			$_temp_step = $step;
-			$_temp_step['visit'] = 0;
-			$_temp_step['conversion'] = 0;
+			$analytics = self::get_step_analytics($step_id);
+			$_temp_step['visit'] = $analytics['visit'];
+			$_temp_step['conversion'] = $analytics['conversion'];
 			$_temp_step['name'] = get_the_title($step_id);
 			$_step_type = get_post_meta($step_id, '_step_type', true);
 			$should_assign_product = in_array($_step_type, ['checkout', 'upsell', 'downsell']) && !get_post_meta($step_id, '_wpfnl_' . $_step_type . '_products', true);
@@ -890,6 +892,145 @@ class FunnelController extends Wpfnl_REST_Controller
 			'steps_order' => $formatted_steps_order,
 			'is_ob' => $is_order_bump
 		];
+	}
+
+	/**
+	 * Get visit and conversion analytics data for a step.
+	 *
+	 * Queries the analytics tables to get total visits and conversions for a given step.
+	 *
+	 * @param int $step_id The step ID.
+	 * @return array Array with 'visit' and 'conversion' counts.
+	 *
+	 * @since 3.5.0
+	 */
+	private static function get_step_analytics($step_id)
+	{
+		$total = array(
+			'visit'      => 0,
+			'conversion' => 0,
+		);
+
+		if (!$step_id) {
+			return $total;
+		}
+
+		global $wpdb;
+		$analytics_table      = $wpdb->prefix . 'wpfnl_analytics';
+		$analytics_meta_table = $wpdb->prefix . 'wpfnl_analytics_meta';
+
+		// Check if the analytics table exists before querying.
+		$table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $analytics_table));
+		if (!$table_exists) {
+			return $total;
+		}
+
+		// Get total visits.
+		$cache_key_visits = 'wpfnl_pro_visits_' . $step_id;
+		$visits_data      = wp_cache_get($cache_key_visits, 'wpfnl_pro');
+
+		if (false === $visits_data) {
+			$query = $wpdb->prepare(
+				"SELECT wpft1.step_id, COUNT( DISTINCT( wpft1.id ) ) AS total_visits
+				FROM {$analytics_table} as wpft1
+				WHERE wpft1.step_id = %s
+				ORDER BY NULL",
+				$step_id
+			); // phpcs:ignore
+
+			$visits_data = $wpdb->get_row($query); // phpcs:ignore
+			wp_cache_set($cache_key_visits, $visits_data, 'wpfnl_pro', 3600);
+		}
+
+		// Get conversions.
+		$cache_key_conversion = 'wpfnl_pro_conversion_' . $step_id;
+		$conversion_data      = wp_cache_get($cache_key_conversion, 'wpfnl_pro');
+
+		if (false === $conversion_data) {
+			$query = $wpdb->prepare(
+				"SELECT wpft1.step_id, COUNT( CASE WHEN wpft2.meta_key = 'conversion' AND wpft2.meta_value = 'yes' THEN wpft1.step_id ELSE NULL END ) AS conversions
+				FROM {$analytics_table} as wpft1
+				INNER JOIN {$analytics_meta_table} as wpft2 ON wpft1.id = wpft2.analytics_id
+				WHERE wpft1.step_id = %s
+				ORDER BY NULL",
+				$step_id
+			); // phpcs:ignore
+
+			$conversion_data = $wpdb->get_row($query); // phpcs:ignore
+			wp_cache_set($cache_key_conversion, $conversion_data, 'wpfnl_pro', 3600);
+		}
+
+		if ($visits_data) {
+			$total['visit'] = $visits_data->total_visits;
+		}
+
+		if ($conversion_data) {
+			$total['conversion'] = $conversion_data->conversions;
+		}
+
+		return $total;
+	}
+
+	/**
+	 * Get funnel-level analytics data (total orders, revenue, AOV, orderbump revenue).
+	 *
+	 * Queries the wpfnl_stats table for completed orders belonging to a specific funnel.
+	 *
+	 * @param int $funnel_id The funnel ID.
+	 * @return array Analytics data with total_orders, total_revenue, aov, and orderbump_revenue.
+	 *
+	 * @since 3.5.0
+	 */
+	private static function get_funnel_analytics($funnel_id)
+	{
+		$analytics = array(
+			'total_orders'      => 0,
+			'total_revenue'     => 0,
+			'aov'               => 0,
+		);
+
+		if (!$funnel_id) {
+			return $analytics;
+		}
+
+		global $wpdb;
+		$stats_table = $wpdb->prefix . 'wpfnl_stats';
+
+		// Check if the stats table exists before querying.
+		$table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $stats_table));
+		if (!$table_exists) {
+			return $analytics;
+		}
+
+		$cache_key = 'wpfnl_funnel_analytics_' . $funnel_id;
+		$cached_data = wp_cache_get($cache_key, 'wpfnl_pro');
+
+		if (false !== $cached_data) {
+			return $cached_data;
+		}
+
+		$row = $wpdb->get_row($wpdb->prepare(
+			"SELECT 
+				COUNT(DISTINCT id) AS total_orders,
+				COALESCE(SUM(total_sales), 0) AS total_revenue
+			FROM {$stats_table}
+			WHERE funnel_id = %d AND status IN (%s, %s)",
+			$funnel_id,
+			'completed',
+			'processing'
+		)); // phpcs:ignore
+
+		if ($row) {
+			$analytics['total_orders']      = (int) $row->total_orders;
+			$analytics['total_revenue']     = round((float) $row->total_revenue, 2);
+			$analytics['aov']               = $analytics['total_orders'] > 0
+				? round($analytics['total_revenue'] / $analytics['total_orders'], 2)
+				: 0;
+		}
+
+		wp_cache_set($cache_key, $analytics, 'wpfnl_pro', 3600);
+
+		return $analytics;
 	}
 
 	/**

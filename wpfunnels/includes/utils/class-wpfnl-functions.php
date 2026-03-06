@@ -418,6 +418,10 @@ class Wpfnl_functions {
 			return true;
 		}
 
+		if ( $page === WPFNL_ADDONS_SLUG && $key === 'addons' ) {
+			return true;
+		}
+
 		if ( $page === 'wpfunnels_integrations' && $key === 'integrations' ) {
 			return true;
 		}
@@ -3011,12 +3015,10 @@ class Wpfnl_functions {
 		$types = array();
 		
 		// Add WooCommerce templates if WooCommerce is active
-		if ( self::is_wc_active() ) {
-			$types[] = array(
-				'slug'  => 'wc',
-				'label' => 'Woo Templates',
-			);
-		}
+		$types[] = array(
+			'slug'  => 'wc',
+			'label' => 'Sales Templates',
+		);
 		
 		// Add LMS templates if LMS add-on and at least one LMS plugin (LearnDash or CreatorLMS) is active
 		if ( self::is_lms_addon_active() && self::is_any_lms_plugin_active() ) {

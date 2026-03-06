@@ -14,15 +14,15 @@ $builders = \WPFunnels\Wpfnl_functions::get_supported_builders();
     <div class="wpfnl-field-wrapper">
         <div class="wpfnl-fields">
             <div class="wpfnl-items-wrapper" id="wpfunnels-funnel-type">
+                <div class="wpfnl-single-item <?php echo $this->general_settings['funnel_type'] == 'sales' ? 'checked' : '' ?>" data-value="sales">
+                    <!-- SVG omitted for brevity -->
+                    <?php require WPFNL_DIR . '/admin/partials/icons/complete-funnel-icon.php'; ?>
+                    <p class="wpfnl-title"><?php esc_html_e('Sales Funnel', 'wpfnl'); ?></p>
+                </div>
                 <div class="wpfnl-single-item <?php echo $this->general_settings['funnel_type'] == 'lead' ? 'checked' : '' ?>" data-value="lead">
                     <!-- SVG omitted for brevity -->
                     <?php require WPFNL_DIR . '/admin/partials/icons/lead-funnel-icon.php'; ?>
                     <p class="wpfnl-title"><?php esc_html_e('Lead Funnel', 'wpfnl'); ?></p>
-                </div>
-                <div class="wpfnl-single-item <?php echo $this->general_settings['funnel_type'] == 'sales' ? 'checked' : '' ?>" data-value="sales">
-                    <!-- SVG omitted for brevity -->
-                    <?php require WPFNL_DIR . '/admin/partials/icons/complete-funnel-icon.php'; ?>
-                    <p class="wpfnl-title"><?php esc_html_e('Complete Funnel', 'wpfnl'); ?></p>
                 </div>
             </div>
         </div>

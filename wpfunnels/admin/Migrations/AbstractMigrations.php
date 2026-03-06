@@ -10,7 +10,8 @@ namespace WPFunnels\Admin\Migrations;
  * @package WPFunnels\Admin\Migrations
  * @since 3.5.0
  */
-abstract class AbstractMigrations {
+abstract class AbstractMigrations
+{
 
 	/**
 	 * Migration key.
@@ -30,9 +31,10 @@ abstract class AbstractMigrations {
 	 *
 	 * @since 3.5.0
 	 */
-	public function should_enqueue_migration_instance() {
+	public function should_enqueue_migration_instance()
+	{
 		$is_migration_completed = $this->is_migration_completed();
-		if ( 'completed' === $is_migration_completed ) {
+		if ('completed' === $is_migration_completed) {
 			return false;
 		}
 		return true;
@@ -46,8 +48,9 @@ abstract class AbstractMigrations {
 	 *
 	 * @since 3.5.0
 	 */
-	public function is_migration_completed() {
-		return get_option( "wpfunnels_".$this->key."_status", '' );
+	public function is_migration_completed()
+	{
+		return get_option("wpfunnels_" . $this->key . "_status", '');
 	}
 
 
@@ -58,8 +61,9 @@ abstract class AbstractMigrations {
 	 *
 	 * @since 3.5.0
 	 */
-	public function set_migration_status( $status ) {
-		update_option( "wpfunnels_".$this->key."_status", $status );
+	public function set_migration_status($status)
+	{
+		update_option("wpfunnels_" . $this->key . "_status", $status);
 	}
 
 
@@ -70,8 +74,9 @@ abstract class AbstractMigrations {
 	 *
 	 * @since 3.5.0
 	 */
-	public function is_on_queue() {
-		return get_option( "wpfunnels_".$this->key."_status", '' ) === 'running';
+	public function is_on_queue()
+	{
+		return get_option("wpfunnels_" . $this->key . "_status", '') === 'running';
 	}
 
 
@@ -82,8 +87,9 @@ abstract class AbstractMigrations {
 	 *
 	 * @since 3.5.0
 	 */
-	public function set_batch( $batch ) {
-		update_option( "wpfunnels_".$this->key."_batch", $batch );
+	public function set_batch($batch)
+	{
+		update_option("wpfunnels_" . $this->key . "_batch", $batch);
 	}
 
 

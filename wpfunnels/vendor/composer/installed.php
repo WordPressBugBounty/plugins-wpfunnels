@@ -3,7 +3,7 @@
         'name' => 'wpfunnels/wpfunnels',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'ff531d56880df1053c5c8f09e570d1bae21281a3',
+        'reference' => 'e336e19e662c996edc1d55af2e8bfd866102737e',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -17,17 +17,6 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../appsero/client',
             'aliases' => array(),
-            'dev_requirement' => false,
-        ),
-        'coderexltd/telemetry' => array(
-            'pretty_version' => 'dev-master',
-            'version' => 'dev-master',
-            'reference' => '4831df7a5dcb18e92fac5415ae7443b4ad746aaa',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../coderexltd/telemetry',
-            'aliases' => array(
-                0 => '9999999-dev',
-            ),
             'dev_requirement' => false,
         ),
         'deliciousbrains/wp-background-processing' => array(
@@ -82,6 +71,17 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../league/mime-type-detection',
             'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'linno/telemetry' => array(
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => '3e5bb8833a00cf9ff2b94627aab4f3ad56560704',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../linno/telemetry',
+            'aliases' => array(
+                0 => '9999999-dev',
+            ),
             'dev_requirement' => false,
         ),
         'philipnewcomer/wp-ajax-helper' => array(
@@ -207,7 +207,7 @@
         'wpfunnels/wpfunnels' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'ff531d56880df1053c5c8f09e570d1bae21281a3',
+            'reference' => 'e336e19e662c996edc1d55af2e8bfd866102737e',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

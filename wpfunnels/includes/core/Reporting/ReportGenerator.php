@@ -8,6 +8,25 @@ class ReportGenerator {
 
 
 	/**
+	 * Format a monetary value using WooCommerce's decimal settings.
+	 *
+	 * Uses wc_format_decimal() + wc_get_price_decimals() when WooCommerce
+	 * is active, otherwise falls back to rounding to 2 decimal places.
+	 *
+	 * @param mixed $value Raw numeric value.
+	 * @return float Formatted decimal value.
+	 *
+	 * @since 3.6.0
+	 */
+	private static function format_price( $value ) {
+		if ( function_exists( 'wc_format_decimal' ) ) {
+			return (float) wc_format_decimal( $value, wc_get_price_decimals() );
+		}
+		return round( (float) $value, 2 );
+	}
+
+
+	/**
 	 * Get overview data of all funnels
 	 *
 	 * @param $start_date
@@ -25,8 +44,8 @@ class ReportGenerator {
 		$result = array(
 			'total_orders'			=> (int) $total_orders,
 			'total_customers'		=> (int) $total_customers,
-			'total_sales'			=> floatval(number_format(  floatval($total_sales) , 2, '.', '' )),
-			'total_ob_revenue'		=> floatval(number_format( floatval($total_ob_revenue), 2, '.', '' )),
+			'total_sales'			=> self::format_price( $total_sales ),
+			'total_ob_revenue'		=> self::format_price( $total_ob_revenue ),
 		);
 
 		$response['status'] = true;
@@ -50,8 +69,8 @@ class ReportGenerator {
 			$response['sales']['interval'][]	= apply_filters( 'wpfunnels/stat-interval-data',  array(
 				'total_orders'			=> (int) $total_orders,
 				'total_customers'		=> (int) $total_customers,
-				'total_sales'			=> floatval( $total_checkout_sales ),
-				'total_ob_revenue'		=> floatval($total_ob_revenue),
+				'total_sales'			=> self::format_price( $total_checkout_sales ),
+				'total_ob_revenue'		=> self::format_price( $total_ob_revenue ),
 			), $start_date, $end_date );
 
 			$response['lead']['interval'][]	= apply_filters( 'wpfunnels/stat-interval-data-leads',  array(
@@ -102,7 +121,7 @@ class ReportGenerator {
 				'title'				=> get_the_title( $funnel_id ),
 				'views'				=> 0,
 				'conversion'		=> 0,
-				'revenue' 			=> number_format(floatval($revenue), 2, '.', ''),
+				'revenue' 			=> self::format_price( $revenue ),
 				'conversion_rate'	=> 0,
 			);
 		}

@@ -45,7 +45,6 @@ use WPFunnels\Widgets\Wpfnl_Widgets_Manager as Widget_Manager;
 use WPFunnels\Batch\Elementor\Wpfnl_Batch;
 use WPFunnels\Meta\Wpfnl_Default_Meta;
 use WPFunnels\Compatibility\Wpfnl_Compatibility;
-use WPFunnels\Tracking\EventTracker;
 use WPFunnels\Export\Wpfnl_Export;
 use WPFunnels\Import\Wpfnl_Import;
 use WPFunnels\Report\Reporting;
@@ -238,14 +237,6 @@ class Wpfnl
      * @since 3.2.0
      */
     protected $optin_recorder;
-
-    /**
-	 * EventTracker object
-	 * 
-	 * @var object|EventTracker
-	 * @since 3.6.4
-	 */
-	public $event_tracker;
 
     /**
      * Instance.
@@ -448,12 +439,11 @@ class Wpfnl
 
         $this->stat_hooks_handler		= new StatHookHandler();
         $this->optin_recorder		    = new OptinRecorder();
-        $this->event_tracker            = EventTracker::init();
 
 		// Initialize Payment Gateway Factory
 		if ( Wpfnl_functions::is_wc_active() ) {
 			Gateway\Payment_Gateways_Factory::getInstance();
-			
+
 			// Initialize Offer Module (upsell/downsell) only if Pro is not active
 			// When Pro is active, it handles offer functionality
 			if ( ! Wpfnl_functions::is_wpfnl_pro_activated() ) {
@@ -708,7 +698,7 @@ class Wpfnl
     public function init_setup_wizard() {
         add_action('init', array( $this, 'register_setup_wizard_page' ));
         add_action('admin_init', array($this, 'admin_redirects'));
-        
+
         // Register AJAX handlers for setup wizard (needs to be available even when not on wizard page)
         \WPFunnels\Admin\SetupWizard::register_ajax_handlers();
     }

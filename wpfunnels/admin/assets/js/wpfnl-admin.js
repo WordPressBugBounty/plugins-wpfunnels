@@ -985,7 +985,7 @@
         var fnl_name2 = ''
         var funnelNameWidth = ''
         $('.funnel-name-edit').on('click', function (e) {
-            e.stopPropagation()
+            e.stopPropagation();
             fnl_name = $(this).parents('.steps-page__fnl-name').find('.funnel-name').text()
             $(this).hide()
             funnelNameWidth = $(this).parents('.steps-page__fnl-name').find('.funnel-name').width()
@@ -1003,17 +1003,39 @@
             $(this).parents('.steps-page__fnl-name').find('.funnel-name').hide()
         })
 
-        $('.funnel-name-input').keyup(function () {
+        $('.funnel-name-input').keyup(function (e) {
+            e.stopPropagation();
             $(this).parents('.steps-page__fnl-name').find('.funnel-name').text($(this).val())
             funnelNameWidth = $(this).parents('.steps-page__fnl-name').find('.funnel-name').width()
 
-            let input = $(this)
-            let valueLength = input.val().length
-            input.css('width', funnelNameWidth + 'px')
+            let input = $(this);
+            let valueLength = input.val().length;
+            input.css('width', funnelNameWidth + 'px');
+
+            // When Enter is pressed, save and hide input, show funnel name
+            if (e.keyCode === 13 || e.key === 'Enter') {
+                fnl_name2 = $(this).val();
+
+                if(fnl_name2.length === 0){
+                    fnl_name2 = fnl_name;
+                }
+
+                $(this).val(fnl_name2).hide();
+                $(this).parents('.steps-page__fnl-name').find('.funnel-name').text(fnl_name2).show();
+                $(this).blur(); // Remove focus from input
+            }
+        })
+
+        $('.funnel-name-input').on('click', function (e) {
+            e.stopPropagation();
         })
 
         $('body').on('click', function (e) {
             fnl_name2 = $('.steps-page__fnl-name .funnel-name-input').val()
+
+            if(fnl_name2.length === 0){
+                fnl_name2 = fnl_name;
+            }
 
             $('.steps-page__fnl-name .funnel-name-input').val(fnl_name2).hide()
             $('.steps-page__fnl-name .funnel-name').text(fnl_name2).show()
@@ -2699,7 +2721,7 @@
 
     // modal Open function
     const openModal = (config) => {
-        configureProModal(config)
+        // configureProModal(config)
         $('#wpfnl-pro-modal').css('display', 'flex')
     }
     // open modal starts

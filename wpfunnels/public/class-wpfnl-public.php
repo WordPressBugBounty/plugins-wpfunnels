@@ -385,7 +385,6 @@ class Wpfnl_Public
 			add_filter('astra_theme_woocommerce_dynamic_css', '__return_empty_string');
 
 			wp_enqueue_style('wpfnl-public', plugin_dir_url(__FILE__) . 'assets/css/wpfnl-public.css', [], WPFNL_VERSION, 'all');
-			wp_enqueue_style('wpfnl-order-bump-modal', plugin_dir_url(__FILE__) . 'assets/css/order-bump-modal.css', [], WPFNL_VERSION, 'all');
 			//$this->load_googlefonts();
 		}
 	}

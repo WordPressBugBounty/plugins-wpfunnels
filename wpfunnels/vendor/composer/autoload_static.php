@@ -9,7 +9,7 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
-        'ff3063ba1525be89739a1851bfba6fcb' => __DIR__ . '/..' . '/coderexltd/telemetry/src/helpers.php',
+        'aed659f3655c497c30e044c41fa917c6' => __DIR__ . '/..' . '/linno/telemetry/src/helpers.php',
         'db1766888a4f96ab813d6f6a38125eb9' => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/functions.php',
         '42ecdafac508117107920039c80ecc5f' => __DIR__ . '/../..' . '/includes/wpf-formatting-functions.php',
         '7cd7c1cdfee0818e6494720c7224cf83' => __DIR__ . '/../..' . '/includes/wpf-update-functions.php',
@@ -33,6 +33,7 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         ),
         'L' => 
         array (
+            'Linno\\Telemetry\\' => 16,
             'League\\MimeTypeDetection\\' => 25,
             'League\\Glide\\' => 13,
             'League\\Flysystem\\' => 17,
@@ -44,10 +45,6 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'G' => 
         array (
             'GuzzleHttp\\Psr7\\' => 16,
-        ),
-        'C' => 
-        array (
-            'CodeRex\\Telemetry\\' => 18,
         ),
         'A' => 
         array (
@@ -93,6 +90,10 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         array (
             0 => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/components',
         ),
+        'Linno\\Telemetry\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/linno/telemetry/src',
+        ),
         'League\\MimeTypeDetection\\' => 
         array (
             0 => __DIR__ . '/..' . '/league/mime-type-detection/src',
@@ -113,10 +114,6 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
-        'CodeRex\\Telemetry\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/coderexltd/telemetry/src',
-        ),
         'Appsero\\' => 
         array (
             0 => __DIR__ . '/..' . '/appsero/client/src',
@@ -128,11 +125,6 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'Appsero\\Insights' => __DIR__ . '/..' . '/appsero/client/src/Insights.php',
         'Appsero\\License' => __DIR__ . '/..' . '/appsero/client/src/License.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
-        'CodeRex\\Telemetry\\Client' => __DIR__ . '/..' . '/coderexltd/telemetry/src/Client.php',
-        'CodeRex\\Telemetry\\Drivers\\DriverInterface' => __DIR__ . '/..' . '/coderexltd/telemetry/src/Drivers/DriverInterface.php',
-        'CodeRex\\Telemetry\\Drivers\\OpenPanelDriver' => __DIR__ . '/..' . '/coderexltd/telemetry/src/Drivers/OpenPanelDriver.php',
-        'CodeRex\\Telemetry\\EventDispatcher' => __DIR__ . '/..' . '/coderexltd/telemetry/src/EventDispatcher.php',
-        'CodeRex\\Telemetry\\Helpers\\Utils' => __DIR__ . '/..' . '/coderexltd/telemetry/src/Helpers/Utils.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'GuzzleHttp\\Psr7\\AppendStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/AppendStream.php',
         'GuzzleHttp\\Psr7\\BufferStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/BufferStream.php',
@@ -372,6 +364,15 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'League\\MimeTypeDetection\\GeneratedExtensionToMimeTypeMap' => __DIR__ . '/..' . '/league/mime-type-detection/src/GeneratedExtensionToMimeTypeMap.php',
         'League\\MimeTypeDetection\\MimeTypeDetector' => __DIR__ . '/..' . '/league/mime-type-detection/src/MimeTypeDetector.php',
         'League\\MimeTypeDetection\\OverridingExtensionToMimeTypeMap' => __DIR__ . '/..' . '/league/mime-type-detection/src/OverridingExtensionToMimeTypeMap.php',
+        'Linno\\Telemetry\\Client' => __DIR__ . '/..' . '/linno/telemetry/src/Client.php',
+        'Linno\\Telemetry\\Consent' => __DIR__ . '/..' . '/linno/telemetry/src/Consent.php',
+        'Linno\\Telemetry\\Deactivation' => __DIR__ . '/..' . '/linno/telemetry/src/Deactivation.php',
+        'Linno\\Telemetry\\Drivers\\DriverInterface' => __DIR__ . '/..' . '/linno/telemetry/src/Drivers/DriverInterface.php',
+        'Linno\\Telemetry\\Drivers\\OpenPanelDriver' => __DIR__ . '/..' . '/linno/telemetry/src/Drivers/OpenPanelDriver.php',
+        'Linno\\Telemetry\\EventDispatcher' => __DIR__ . '/..' . '/linno/telemetry/src/EventDispatcher.php',
+        'Linno\\Telemetry\\Helpers\\Utils' => __DIR__ . '/..' . '/linno/telemetry/src/Helpers/Utils.php',
+        'Linno\\Telemetry\\Queue' => __DIR__ . '/..' . '/linno/telemetry/src/Queue.php',
+        'Linno\\Telemetry\\TriggerManager' => __DIR__ . '/..' . '/linno/telemetry/src/TriggerManager.php',
         'PhilipNewcomer\\WP_Ajax_Helper\\Frontend' => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/components/Frontend.php',
         'PhilipNewcomer\\WP_Ajax_Helper\\Handler' => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/components/Handler.php',
         'PhilipNewcomer\\WP_Ajax_Helper\\Responder' => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/components/Responder.php',
@@ -464,6 +465,7 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'WPFunnels\\Admin\\Migrations\\AbstractMigrations' => __DIR__ . '/../..' . '/admin/Migrations/AbstractMigrations.php',
         'WPFunnels\\Admin\\Migrations\\MigrationManager' => __DIR__ . '/../..' . '/admin/Migrations/MigrationManager.php',
         'WPFunnels\\Admin\\Migrations\\OrderToStatTableMigration' => __DIR__ . '/../..' . '/admin/Migrations/OrderToStatTableMigration.php',
+        'WPFunnels\\Admin\\Migrations\\StatStatusSyncMigration' => __DIR__ . '/../..' . '/admin/Migrations/StatStatusSyncMigration.php',
         'WPFunnels\\Admin\\Module\\Layout\\TemplateLayout' => __DIR__ . '/../..' . '/admin/modules/layout/class-wpfnl-template-layout.php',
         'WPFunnels\\Admin\\Module\\Steps\\Wpfnl_Steps_Factory' => __DIR__ . '/../..' . '/admin/modules/steps/class-wpfnl-steps-factory.php',
         'WPFunnels\\Admin\\Module\\Wpfnl_Admin_Module' => __DIR__ . '/../..' . '/admin/modules/abstract-wpfnl-admin-modules.php',
@@ -477,6 +479,7 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'WPFunnels\\Admin\\SetupWizard\\ActivatePlugin' => __DIR__ . '/../..' . '/admin/modules/setup-wizard/class-wpfnl-activate-plugin.php',
         'WPFunnels\\Admin\\SetupWizard\\CreateContact' => __DIR__ . '/../..' . '/admin/modules/setup-wizard/class-wpfnl-create-contact.php',
         'WPFunnels\\Admin\\Wpfnl_Admin' => __DIR__ . '/../..' . '/admin/class-wpfnl-admin.php',
+        'WPFunnels\\Admin\\Wpfnl_Review_Prompt' => __DIR__ . '/../..' . '/admin/class-wpfnl-review-prompt.php',
         'WPFunnels\\Ajax_Handler\\Ajax_Handler' => __DIR__ . '/../..' . '/includes/core/classes/class-wpfnl-ajax-handler.php',
         'WPFunnels\\Base_Manager' => __DIR__ . '/../..' . '/includes/core/classes/abstact-wpfnl-manager.php',
         'WPFunnels\\Batch\\Bricks\\Wpfnl_Bricks_Source' => __DIR__ . '/../..' . '/admin/import-export/batch-processing/bricks/class-wpfnl-bricks-source.php',
@@ -603,7 +606,7 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'WPFunnels\\TemplateLibrary\\Manager' => __DIR__ . '/../..' . '/admin/modules/template-library/class-manager.php',
         'WPFunnels\\TemplateLibrary\\Wpfnl_Source_Base' => __DIR__ . '/../..' . '/admin/modules/template-library/sources/base.php',
         'WPFunnels\\TemplateLibrary\\Wpfnl_Source_Remote' => __DIR__ . '/../..' . '/admin/modules/template-library/sources/remote.php',
-        'WPFunnels\\Tracking\\EventTracker' => __DIR__ . '/../..' . '/includes/core/Tracking/EventTracker.php',
+        'WPFunnels\\Tracking\\Telemetry' => __DIR__ . '/../..' . '/includes/core/Tracking/class-wpfnl-telemetry.php',
         'WPFunnels\\Traits\\SingletonTrait' => __DIR__ . '/../..' . '/includes/core/traits/singleton-trait.php',
         'WPFunnels\\Widgets\\Bricks\\Checkout' => __DIR__ . '/../..' . '/includes/core/widgets/bricks/Checkout.php',
         'WPFunnels\\Widgets\\Bricks\\Manager' => __DIR__ . '/../..' . '/includes/core/widgets/bricks/class-manager.php',

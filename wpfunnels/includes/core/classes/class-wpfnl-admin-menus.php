@@ -81,6 +81,22 @@ class Wpfnl_Menus
 
         add_submenu_page(
             WPFNL_MAIN_PAGE_SLUG,
+            __('Add-ons', 'wpfnl'),
+            __('Add-ons', 'wpfnl'),
+			Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
+            WPFNL_ADDONS_SLUG,
+            [$this, 'render_addons_page']
+        );
+
+        /**
+		 * After setup menu of WPFunnels.
+		 *
+		 * @since 1.0.0
+		 */
+		do_action( 'wpfunnels/after_setup_menu');
+
+        add_submenu_page(
+            WPFNL_MAIN_PAGE_SLUG,
             __('Settings', 'wpfnl'),
             __('Settings', 'wpfnl'),
 			Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
@@ -151,13 +167,6 @@ class Wpfnl_Menus
 		// 		'https://getwpfunnels.com/pricing/'
 		// 	);
         // }
-
-		/**
-		 * After setup menu of WPFunnels.
-		 *
-		 * @since 1.0.0
-		 */
-		do_action( 'wpfunnels/after_setup_menu');
     }
 
 
@@ -253,6 +262,17 @@ class Wpfnl_Menus
     public function render_settings_page()
     {
         Wpfnl::$instance->module_manager->get_admin_modules('settings')->get_view();
+    }
+
+
+    /**
+     * Render addons page
+     *
+     * @since 1.0.0
+     */
+    public function render_addons_page()
+    {
+        require_once WPFNL_DIR . 'admin/modules/addons/view.php';
     }
 
 

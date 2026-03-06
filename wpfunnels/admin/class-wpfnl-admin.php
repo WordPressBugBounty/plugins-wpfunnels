@@ -80,6 +80,7 @@ class Wpfnl_Admin
 		'wpfunnels_page_edit_funnel',
 		'wpfunnels_page_create_funnel',
 		'wpfunnels_page_wpfnl_settings',
+		'wpfunnels_page_wpfnl_addons',
 		'wpfunnels_page_wpf-license',
 		'wpfunnels_page_email-builder',
 		'wpfunnels_page_wp_funnels',
@@ -114,6 +115,11 @@ class Wpfnl_Admin
 			// Register Dashboard Widgets.
 			add_action('wp_dashboard_setup', [$this, 'wpfnl_register_dashboard_widgets']);
 
+			if (file_exists(WPFNL_ADMIN_DIR . 'class-wpfnl-review-prompt.php')) {
+				require_once WPFNL_ADMIN_DIR . 'class-wpfnl-review-prompt.php';
+				new \WPFunnels\Admin\Wpfnl_Review_Prompt();
+			}
+
 			if (isset($_GET['page']) && 'edit_funnel' === $_GET['page']) {
 				wp_cache_flush();
 			}
@@ -135,8 +141,8 @@ class Wpfnl_Admin
 		 *
 		 */
 		add_action('admin_init', function () {
-			$current_version 	= get_option('wpfunnels_version');
-			$is_already_synced 	= get_option('_is_wpfunnels_new_templates_synced', 'no');
+			$current_version = get_option('wpfunnels_version');
+			$is_already_synced = get_option('_is_wpfunnels_new_templates_synced', 'no');
 			if (version_compare($current_version, '3.1.2', '>') && 'yes' != $is_already_synced) {
 				delete_option(WPFNL_TEMPLATES_OPTION_KEY . '_wc');
 				delete_option(WPFNL_TEMPLATES_OPTION_KEY . '_lms');
@@ -158,6 +164,10 @@ class Wpfnl_Admin
 	{
 		$batch_processor = new BatchProcessingController();
 		new MigrationManager($batch_processor);
+
+		// Run stat status sync migration directly (independent of Action Scheduler).
+		$stat_sync = new \WPFunnels\Admin\Migrations\StatStatusSyncMigration();
+		$stat_sync->run();
 	}
 
 	/**
@@ -192,18 +202,18 @@ class Wpfnl_Admin
 	 */
 	public function wpfnl_dashboard_overview_widget()
 	{
-		$upgrade_to_pro      = __('Upgrade to Pro', 'wpfnl');
-		$install_activate    = __('Install & Activate', 'wpfnl');
+		$upgrade_to_pro = __('Upgrade to Pro', 'wpfnl');
+		$install_activate = __('Install & Activate', 'wpfnl');
 		$is_mail_mint_active = WPFnl_functions::is_mail_mint_free_active();
 
 		$response = $this->get_wpfnl_feed_data();
 
 		$icons = [
-			'Total Orders'            => '<svg width="16" height="17" fill="none" viewBox="0 0 16 17" xmlns="http://www.w3.org/2000/svg"><path fill="#B7A6E9" d="M12.061 8.04a4.015 4.015 0 01-3.478-6.03h-5.74l-.029-.236A2.01 2.01 0 00.82 0H.67a.67.67 0 000 1.34h.15a.67.67 0 01.665.592l.922 7.84a3.35 3.35 0 003.328 2.96h6.997a.67.67 0 000-1.341H5.734a2.01 2.01 0 01-1.89-1.34h7.987a3.35 3.35 0 003.298-2.756l.16-.884a4.01 4.01 0 01-3.228 1.63z"/><path fill="#B7A6E9" d="M10.542 5.994a1.254 1.254 0 00.901.402h.023a1.255 1.255 0 00.894-.37l2.863-2.863a.672.672 0 10-.95-.952l-2.806 2.81-.827-.887a.67.67 0 00-.98.915l.882.945zM4.69 16.082a1.34 1.34 0 100-2.68 1.34 1.34 0 000 2.68zm6.701 0a1.34 1.34 0 100-2.68 1.34 1.34 0 000 2.68z"/></svg>',
-			'Total Revenue'           => '<svg width="15" height="15" fill="none" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg"><path fill="#B7A6E9" d="M9.75 15h-4.5C1.5 15 0 13.5 0 9.75v-4.5C0 1.5 1.5 0 5.25 0h4.5C13.5 0 15 1.5 15 5.25v4.5C15 13.5 13.5 15 9.75 15z"/><path fill="#B7A6E9" d="M5.004 9.247c0 .968.742 1.748 1.665 1.748H8.55c.803 0 1.455-.683 1.455-1.523 0-.915-.397-1.237-.99-1.447l-3.022-1.05c-.593-.21-.99-.533-.99-1.448 0-.84.652-1.522 1.455-1.522H8.34c.923 0 1.665.78 1.665 1.747"/><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" d="M5.004 9.247c0 .968.742 1.748 1.665 1.748H8.55c.803 0 1.455-.683 1.455-1.523 0-.915-.397-1.237-.99-1.447l-3.022-1.05c-.593-.21-.99-.533-.99-1.448 0-.84.652-1.522 1.455-1.522H8.34c.923 0 1.665.78 1.665 1.747"/><path fill="#B7A6E9" d="M7.5 3v9-9z"/><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" d="M7.5 3v9"/></svg>',
-			'Order Bump Revenue'      => '<svg width="15" height="15" fill="none" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg"><path stroke="#B7A6E9" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5" d="M5.376 1L3.05 3.333M9.475 1l2.327 2.333"/><path fill="#fff" stroke="#B7A6E9" stroke-width="1.5" d="M1 4.76c0-1.19.636-1.286 1.427-1.286h10c.791 0 1.428.097 1.428 1.286 0 1.382-.637 1.285-1.427 1.285H2.427C1.637 6.045 1 6.142 1 4.76z"/><path fill="#B7A6E9" d="M3.273 13.064L1.79 5.944h10.975l-.89 6.526c0 .712-1.582 1.286-2.373 1.484H5.35c-.237.237-1.483-.495-2.076-.89z"/><path stroke="#B7A6E9" stroke-linecap="round" stroke-width="1.5" d="M1.964 6.142l.906 5.553c.206 1.247.7 2.16 2.54 2.16h3.875c1.999 0 2.294-.874 2.526-2.082l1.08-5.63"/><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" d="M8.91 9.504L7.425 8.021 5.943 9.504M7.426 8.02v3.56"/></svg>',
+			'Total Orders' => '<svg width="16" height="17" fill="none" viewBox="0 0 16 17" xmlns="http://www.w3.org/2000/svg"><path fill="#B7A6E9" d="M12.061 8.04a4.015 4.015 0 01-3.478-6.03h-5.74l-.029-.236A2.01 2.01 0 00.82 0H.67a.67.67 0 000 1.34h.15a.67.67 0 01.665.592l.922 7.84a3.35 3.35 0 003.328 2.96h6.997a.67.67 0 000-1.341H5.734a2.01 2.01 0 01-1.89-1.34h7.987a3.35 3.35 0 003.298-2.756l.16-.884a4.01 4.01 0 01-3.228 1.63z"/><path fill="#B7A6E9" d="M10.542 5.994a1.254 1.254 0 00.901.402h.023a1.255 1.255 0 00.894-.37l2.863-2.863a.672.672 0 10-.95-.952l-2.806 2.81-.827-.887a.67.67 0 00-.98.915l.882.945zM4.69 16.082a1.34 1.34 0 100-2.68 1.34 1.34 0 000 2.68zm6.701 0a1.34 1.34 0 100-2.68 1.34 1.34 0 000 2.68z"/></svg>',
+			'Total Revenue' => '<svg width="15" height="15" fill="none" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg"><path fill="#B7A6E9" d="M9.75 15h-4.5C1.5 15 0 13.5 0 9.75v-4.5C0 1.5 1.5 0 5.25 0h4.5C13.5 0 15 1.5 15 5.25v4.5C15 13.5 13.5 15 9.75 15z"/><path fill="#B7A6E9" d="M5.004 9.247c0 .968.742 1.748 1.665 1.748H8.55c.803 0 1.455-.683 1.455-1.523 0-.915-.397-1.237-.99-1.447l-3.022-1.05c-.593-.21-.99-.533-.99-1.448 0-.84.652-1.522 1.455-1.522H8.34c.923 0 1.665.78 1.665 1.747"/><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" d="M5.004 9.247c0 .968.742 1.748 1.665 1.748H8.55c.803 0 1.455-.683 1.455-1.523 0-.915-.397-1.237-.99-1.447l-3.022-1.05c-.593-.21-.99-.533-.99-1.448 0-.84.652-1.522 1.455-1.522H8.34c.923 0 1.665.78 1.665 1.747"/><path fill="#B7A6E9" d="M7.5 3v9-9z"/><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" d="M7.5 3v9"/></svg>',
+			'Order Bump Revenue' => '<svg width="15" height="15" fill="none" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg"><path stroke="#B7A6E9" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5" d="M5.376 1L3.05 3.333M9.475 1l2.327 2.333"/><path fill="#fff" stroke="#B7A6E9" stroke-width="1.5" d="M1 4.76c0-1.19.636-1.286 1.427-1.286h10c.791 0 1.428.097 1.428 1.286 0 1.382-.637 1.285-1.427 1.285H2.427C1.637 6.045 1 6.142 1 4.76z"/><path fill="#B7A6E9" d="M3.273 13.064L1.79 5.944h10.975l-.89 6.526c0 .712-1.582 1.286-2.373 1.484H5.35c-.237.237-1.483-.495-2.076-.89z"/><path stroke="#B7A6E9" stroke-linecap="round" stroke-width="1.5" d="M1.964 6.142l.906 5.553c.206 1.247.7 2.16 2.54 2.16h3.875c1.999 0 2.294-.874 2.526-2.082l1.08-5.63"/><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" d="M8.91 9.504L7.425 8.021 5.943 9.504M7.426 8.02v3.56"/></svg>',
 			'Upsell/Downsell Revenue' => '<svg width="15" height="15" fill="none" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg"><path fill="#B7A6E9" d="M5.25 15h4.5C13.5 15 15 13.5 15 9.75v-4.5C15 1.5 13.5 0 9.75 0h-4.5C1.5 0 0 1.5 0 5.25v4.5C0 13.5 1.5 15 5.25 15z"/><path fill="#B7A6E9" d="M6.379 5.25h3.37v3.371"/><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.379 5.25h3.37v3.371M9.75 5.25l-4.5 4.5"/></svg>',
-			'Total Leads'             => '<svg width="13" height="13" fill="none" viewBox="0 0 13 13" xmlns="http://www.w3.org/2000/svg"><path fill="#B7A6E9" d="M8.45 0h-3.9C1.3 0 0 1.3 0 4.55v3.9c0 2.457.741 3.803 2.509 4.303.143-1.69 1.879-3.023 3.991-3.023 2.113 0 3.848 1.333 3.991 3.023C12.259 12.253 13 10.907 13 8.45v-3.9C13 1.3 11.7 0 8.45 0zM6.5 7.91a2.33 2.33 0 010-4.66 2.33 2.33 0 010 4.66z"/></svg>',
+			'Total Leads' => '<svg width="13" height="13" fill="none" viewBox="0 0 13 13" xmlns="http://www.w3.org/2000/svg"><path fill="#B7A6E9" d="M8.45 0h-3.9C1.3 0 0 1.3 0 4.55v3.9c0 2.457.741 3.803 2.509 4.303.143-1.69 1.879-3.023 3.991-3.023 2.113 0 3.848 1.333 3.991 3.023C12.259 12.253 13 10.907 13 8.45v-3.9C13 1.3 11.7 0 8.45 0zM6.5 7.91a2.33 2.33 0 010-4.66 2.33 2.33 0 010 4.66z"/></svg>',
 		];
 
 
@@ -216,8 +226,12 @@ class Wpfnl_Admin
 					<div class="wpfnl-logo-wrapper">
 						<svg width="38" height="28" viewBox="0 0 38 28" fill="none" xmlns="http://www.w3.org/2000/svg">
 							<path d="M7.01532 18H31.9847L34 11H5L7.01532 18Z" fill="#EE8134"></path>
-							<path d="M11.9621 27.2975C12.0923 27.7154 12.4792 28 12.9169 28H26.0831C26.5208 28 26.9077 27.7154 27.0379 27.2975L29 21H10L11.9621 27.2975Z" fill="#6E42D3"></path>
-							<path d="M37.8161 0.65986C37.61 0.247888 37.2609 0 36.8867 0H1.11326C0.739128 0 0.390003 0.247888 0.183972 0.65986C-0.0220592 1.07193 -0.0573873 1.59277 0.0898627 2.04655L1.69781 7H36.3022L37.9102 2.04655C38.0574 1.59287 38.022 1.07193 37.8161 0.65986Z" fill="#6E42D3"></path>
+							<path
+								d="M11.9621 27.2975C12.0923 27.7154 12.4792 28 12.9169 28H26.0831C26.5208 28 26.9077 27.7154 27.0379 27.2975L29 21H10L11.9621 27.2975Z"
+								fill="#6E42D3"></path>
+							<path
+								d="M37.8161 0.65986C37.61 0.247888 37.2609 0 36.8867 0H1.11326C0.739128 0 0.390003 0.247888 0.183972 0.65986C-0.0220592 1.07193 -0.0573873 1.59277 0.0898627 2.04655L1.69781 7H36.3022L37.9102 2.04655C38.0574 1.59287 38.022 1.07193 37.8161 0.65986Z"
+								fill="#6E42D3"></path>
 						</svg>
 					</div>
 				</div>
@@ -226,19 +240,21 @@ class Wpfnl_Admin
 					<span><?php echo !Wpfnl_functions::is_pro_license_activated() ? __('Upgrade to Pro to get premium features such as one-click upsells, A/B testing and more!', 'wpfnl') : __('Start creating high converting landing pages, sales funnels, and checkout flows in minutes!', 'wpfnl'); ?></span>
 				</div>
 
-				<?php if (! Wpfnl_functions::is_pro_license_activated()) { ?>
+				<?php if (!Wpfnl_functions::is_pro_license_activated()) { ?>
 					<div class="wpfnl-overview__create">
-						<a href="https://getwpfunnels.com/pricing/" target="_blank" class="button"><span aria-hidden="true"></span> <?php echo esc_html($upgrade_to_pro); ?></a>
+						<a href="https://getwpfunnels.com/pricing/" target="_blank" class="button"><span aria-hidden="true"></span>
+							<?php echo esc_html($upgrade_to_pro); ?></a>
 					</div>
-				<?php } ?>
+				<?php
+		}?>
 
 			</div>
 
 			<!-- overview report -->
 			<div class="wpfnl-overview__report">
-				<?php foreach ($response as $report) :
-					$icon_html = $icons[$report['title']] ?? '';
-				?>
+				<?php foreach ($response as $report):
+			$icon_html = $icons[$report['title']] ?? '';
+?>
 					<div class="report-item">
 						<div class="icon"><?php echo $icon_html; ?></div>
 						<div class="text-wrapper">
@@ -246,28 +262,36 @@ class Wpfnl_Admin
 							<p class="amount"><?php echo $report['amount']; ?></p>
 						</div>
 
-						<?php if ($report['show_pro'] && ! Wpfnl_functions::is_pro_license_activated()) : ?>
+						<?php if ($report['show_pro'] && !Wpfnl_functions::is_pro_license_activated()): ?>
 							<?php echo $pro_icon_svg; ?>
-						<?php endif; ?>
+						<?php
+			endif; ?>
 
 					</div>
-				<?php endforeach; ?>
+				<?php
+		endforeach; ?>
 			</div>
 
-			<?php if (!Wpfnl_functions::is_mint_mrm_active()) : ?>
+			<?php if (!Wpfnl_functions::is_mint_mrm_active()): ?>
 				<!-- install mail mint -->
-				<div class="wpfnl-overview__mailmint <?php echo Wpfnl_functions::is_mint_mrm_active() ? 'is-active' : 'is-disabled'; ?>">
+				<div
+					class="wpfnl-overview__mailmint <?php echo Wpfnl_functions::is_mint_mrm_active() ? 'is-active' : 'is-disabled'; ?>">
 					<div class="icon-wrapper">
 						<div class="icon">
 							<svg width="34" height="34" fill="none" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
 								<circle cx="17" cy="17" r="16.5" fill="#fff" stroke="#573BFF" />
-								<path fill="#573BFF" d="M24.084 14.876l-.634 8.778.905-1.267.996-10.225-9.23 6.153-2.082-2.172-5.972-5.067 7.601 8.868c.272.271.634.362.996.09l7.42-5.158z" />
-								<path fill="#02C4FB" d="M21.822 11.62c-3.891.814-7.24.904-8.416.814l.995 1.086c4.525-.272 6.697-.905 7.24-1.267.362-.272.271-.543.18-.634z" />
-								<path fill="#573BFF" d="M20.374 13.61c-2.444.724-4.525.905-5.249.905l.724.633c2.805-.362 4.163-.905 4.434-1.176.272-.181.181-.362.09-.362z" />
-								<path fill="#573BFF" d="M25.947 11.345c-.212-.033-.418.064-.596.184l-9.05 6.153-4.162-4.525-.749-.793-.79-.835c1.72.18 8.778-.09 12.67-.996 1.81-.452 1.447-1.267 1.266-1.176-8.415 1.176-15.745.452-15.745.452-.403-.034-.617.066-.815.362-.18.272-.09.634.09.905l.453.453 2.082 2.08 5.158 5.43c.271.272.633.272.995.09l8.054-5.52c-.453 4.073-.996 8.145-1.267 9.14-1.81.363-12.397.453-13.845.091-.453-.724-.996-4.253-1.358-7.963-.09-.543-.633-.905-1.176-.634 0 0-.362.177-.362.724.905 8.597 1.81 9.05 2.081 9.23.543.272 4.163.453 7.873.453s7.33-.181 7.873-.634c.18-.18.814-.723 1.9-11.401v-.091c.074-.736-.152-1.113-.58-1.18z" />
+								<path fill="#573BFF"
+									d="M24.084 14.876l-.634 8.778.905-1.267.996-10.225-9.23 6.153-2.082-2.172-5.972-5.067 7.601 8.868c.272.271.634.362.996.09l7.42-5.158z" />
+								<path fill="#02C4FB"
+									d="M21.822 11.62c-3.891.814-7.24.904-8.416.814l.995 1.086c4.525-.272 6.697-.905 7.24-1.267.362-.272.271-.543.18-.634z" />
+								<path fill="#573BFF"
+									d="M20.374 13.61c-2.444.724-4.525.905-5.249.905l.724.633c2.805-.362 4.163-.905 4.434-1.176.272-.181.181-.362.09-.362z" />
+								<path fill="#573BFF"
+									d="M25.947 11.345c-.212-.033-.418.064-.596.184l-9.05 6.153-4.162-4.525-.749-.793-.79-.835c1.72.18 8.778-.09 12.67-.996 1.81-.452 1.447-1.267 1.266-1.176-8.415 1.176-15.745.452-15.745.452-.403-.034-.617.066-.815.362-.18.272-.09.634.09.905l.453.453 2.082 2.08 5.158 5.43c.271.272.633.272.995.09l8.054-5.52c-.453 4.073-.996 8.145-1.267 9.14-1.81.363-12.397.453-13.845.091-.453-.724-.996-4.253-1.358-7.963-.09-.543-.633-.905-1.176-.634 0 0-.362.177-.362.724.905 8.597 1.81 9.05 2.081 9.23.543.272 4.163.453 7.873.453s7.33-.181 7.873-.634c.18-.18.814-.723 1.9-11.401v-.091c.074-.736-.152-1.113-.58-1.18z" />
 								<path fill="url(#paint0_linear_129_34)" d="M8.474 11.538h2.135l1.687 1.79H9.984l-1.51-1.79z" />
 								<defs>
-									<linearGradient id="paint0_linear_129_34" x1="9.613" x2="10.654" y1="11.538" y2="13.37" gradientUnits="userSpaceOnUse">
+									<linearGradient id="paint0_linear_129_34" x1="9.613" x2="10.654" y1="11.538" y2="13.37"
+										gradientUnits="userSpaceOnUse">
 										<stop stop-color="#0C0632" />
 										<stop offset="1" stop-color="#573BFF" />
 									</linearGradient>
@@ -281,31 +305,39 @@ class Wpfnl_Admin
 						</div>
 					</div>
 					<div class="wpfnl-overview__install-mailmint">
-						<?php if (Wpfnl_functions::is_mail_mint_free_active()) : ?>
+						<?php if (Wpfnl_functions::is_mail_mint_free_active()): ?>
 							<a href="https://getwpfunnels.com/pricing/#mail-mint" target="_blank" class="button">
 								<?php echo $upgrade_to_pro; ?>
 							</a>
-						<?php else : ?>
+						<?php
+			else: ?>
 							<button id="pro-modal-dropdown-btn" class="button">
 								<span class="loader" style="display:none;"></span>
 								<span class="btn-text"><?php echo $install_activate; ?></span>
 							</button>
-						<?php endif; ?>
+						<?php
+			endif; ?>
 					</div>
 
 				</div>
-			<?php endif; ?>
+			<?php
+		endif; ?>
 
 			<div class="wpfnl-overview__footer wpfnl-divider_top">
 				<ul>
-					<?php foreach ($this->get_wpfunnels_dashboard_overview_widget_footer_actions() as $action_id => $action) : ?>
-						<li class="wpfnl-overview__<?php echo esc_attr($action_id); ?>"><a href="<?php echo esc_attr($action['link']); ?>" target="_blank"><?php echo esc_html($action['title']); ?> <span class="screen-reader-text"><?php echo esc_html__('(opens in a new window)', 'wpfnl'); ?></span></a></li>
-					<?php endforeach; ?>
+					<?php foreach ($this->get_wpfunnels_dashboard_overview_widget_footer_actions() as $action_id => $action): ?>
+						<li class="wpfnl-overview__<?php echo esc_attr($action_id); ?>"><a
+								href="<?php echo esc_attr($action['link']); ?>"
+								target="_blank"><?php echo esc_html($action['title']); ?> <span
+									class="screen-reader-text"><?php echo esc_html__('(opens in a new window)', 'wpfnl'); ?></span></a>
+						</li>
+					<?php
+		endforeach; ?>
 				</ul>
 			</div>
 
 			<script>
-				(function($) {
+				(function ($) {
 
 					const apiService = (path = "", method = "GET", data, content_type = "text/plain") => {
 						return new Promise((resolve, reject) => {
@@ -313,7 +345,7 @@ class Wpfnl_Admin
 								url: wpApiSettings.root + path,
 								type: method,
 								data: data,
-								beforeSend: function(xhr) {
+								beforeSend: function (xhr) {
 									xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
 								},
 								dataType: "json",
@@ -324,7 +356,7 @@ class Wpfnl_Admin
 						});
 					};
 
-					$(document).ready(function() {
+					$(document).ready(function () {
 						jQuery("#pro-modal-dropdown-btn").click((e) => {
 							e.preventDefault();
 							var btn = $('#pro-modal-dropdown-btn');
@@ -624,7 +656,7 @@ class Wpfnl_Admin
 				}
 			</style>
 		</div>
-<?php
+		<?php
 	}
 
 	/**
@@ -663,28 +695,28 @@ class Wpfnl_Admin
 		global $wpdb;
 		$response = [
 			[
-				'title'    => 'Total Orders',
-				'amount'   => $wpdb->get_var($wpdb->prepare("SELECT COUNT(id) FROM {$wpdb->prefix}wpfnl_stats WHERE status = %s", 'completed')),
+				'title' => 'Total Orders',
+				'amount' => $wpdb->get_var($wpdb->prepare("SELECT COUNT(id) FROM {$wpdb->prefix}wpfnl_stats WHERE status = %s", 'completed')),
 				'show_pro' => false
 			],
 			[
-				'title'    => 'Total Revenue',
-				'amount'   => Wpfnl_functions::is_wc_active() ? wc_price((int)$wpdb->get_var($wpdb->prepare("SELECT SUM(total_sales) FROM {$wpdb->prefix}wpfnl_stats WHERE status = %s", 'completed'))) : number_format(0, 2),
+				'title' => 'Total Revenue',
+				'amount' => Wpfnl_functions::is_wc_active() ? wc_price((int)$wpdb->get_var($wpdb->prepare("SELECT SUM(total_sales) FROM {$wpdb->prefix}wpfnl_stats WHERE status = %s", 'completed'))) : number_format(0, 2),
 				'show_pro' => false
 			],
 			[
-				'title'    => 'Order Bump Revenue',
-				'amount'   => Wpfnl_functions::is_wc_active() ? wc_price((int)$wpdb->get_var($wpdb->prepare("SELECT SUM(orderbump_sales) FROM {$wpdb->prefix}wpfnl_stats WHERE status = %s", 'completed'))) : number_format(0, 2),
+				'title' => 'Order Bump Revenue',
+				'amount' => Wpfnl_functions::is_wc_active() ? wc_price((int)$wpdb->get_var($wpdb->prepare("SELECT SUM(orderbump_sales) FROM {$wpdb->prefix}wpfnl_stats WHERE status = %s", 'completed'))) : number_format(0, 2),
 				'show_pro' => false
 			],
 			[
-				'title'    => 'Upsell/Downsell Revenue',
-				'amount'   => ( Wpfnl_functions::is_pro_license_activated() && Wpfnl_functions::is_wc_active() ) ? wc_price((int)$wpdb->get_var($wpdb->prepare("SELECT SUM(upsell_sales + downsell_sales) FROM {$wpdb->prefix}wpfnl_stats WHERE status = %s", 'completed'))) : number_format(0, 2),
+				'title' => 'Upsell/Downsell Revenue',
+				'amount' => (Wpfnl_functions::is_pro_license_activated() && Wpfnl_functions::is_wc_active()) ? wc_price((int)$wpdb->get_var($wpdb->prepare("SELECT SUM(upsell_sales + downsell_sales) FROM {$wpdb->prefix}wpfnl_stats WHERE status = %s", 'completed'))) : number_format(0, 2),
 				'show_pro' => true
 			],
 			[
-				'title'    => 'Total Leads',
-				'amount'   => $wpdb->get_var($wpdb->prepare("SELECT COUNT(id) FROM {$wpdb->prefix}wpfnl_optin_entries",)),
+				'title' => 'Total Leads',
+				'amount' => $wpdb->get_var("SELECT COUNT(id) FROM {$wpdb->prefix}wpfnl_optin_entries"),
 				'show_pro' => false
 			],
 		];
@@ -704,25 +736,25 @@ class Wpfnl_Admin
 	{
 		$response = wp_remote_get($url, $args);
 
-		if (is_wp_error($response) || ! is_array($response) || ! isset($response['body'])) {
+		if (is_wp_error($response) || !is_array($response) || !isset($response['body'])) {
 			return [
 				'success' => false,
 				'message' => $response->get_error_message(),
-				'data'    => $response,
+				'data' => $response,
 			];
 		}
 
 		// Decode the results.
 		$results = json_decode($response['body'], true);
 
-		if (! is_array($results)) {
+		if (!is_array($results)) {
 			return new \WP_Error('unexpected_data_format', 'Data was not returned in the expected format.');
 		}
 
 		return [
 			'success' => true,
 			'message' => 'Data successfully retrieved',
-			'data'    => json_decode(wp_remote_retrieve_body($response), true),
+			'data' => json_decode(wp_remote_retrieve_body($response), true),
 		];
 	}
 
@@ -815,7 +847,9 @@ class Wpfnl_Admin
 		if (in_array($hook, $this->page_hooks)) {
 			wp_enqueue_style('wp-color-picker');
 			wp_enqueue_style($this->plugin_name . '-jquery-ui', plugin_dir_url(__FILE__) . 'assets/css/jquery-ui.min.css', [], $this->version, 'all');
+
 			wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'assets/css/wpfnl-admin.css', [], $this->version, 'all');
+
 			do_action('wpfunnels_after_styles_loaded');
 		}
 	}
@@ -868,11 +902,11 @@ class Wpfnl_Admin
 				$this->plugin_name . '-email-builder',
 				'WPFEmailBuilderVars',
 				array(
-					'editor_data_source' => $this->get_editor_source(),
-					'post_types'		 => MrmCommon::get_all_post_types(),
-					'is_wc_installed'    => $is_wc_installed,
-					'is_mint_active'     => Wpfnl_functions::is_mint_mrm_active(),
-				)
+				'editor_data_source' => $this->get_editor_source(),
+				'post_types' => MrmCommon::get_all_post_types(),
+				'is_wc_installed' => $is_wc_installed,
+				'is_mint_active' => Wpfnl_functions::is_mint_mrm_active(),
+			)
 			);
 		}
 
@@ -901,12 +935,12 @@ class Wpfnl_Admin
 				}
 			}
 
-			$funnel_id 		= '';
-			$funnel_title 	= '';
-			$step_id 		= '';
+			$funnel_id = '';
+			$funnel_title = '';
+			$step_id = '';
 			if (isset($_GET['id'])) {
-				$funnel_id 		= $_GET['id'];
-				$funnel_title 	= html_entity_decode(get_the_title($funnel_id));
+				$funnel_id = $_GET['id'];
+				$funnel_title = html_entity_decode(get_the_title($funnel_id));
 				if (isset($_GET['step_id'])) {
 					$step_id = filter_input(INPUT_GET, 'step_id', FILTER_VALIDATE_INT);
 				}
@@ -915,8 +949,8 @@ class Wpfnl_Admin
 			/**
 			 * Get funnel preview link
 			 */
-			$steps 					= get_post_meta($funnel_id, '_steps_order', true);
-			$funnel_preview_link 	= '#';
+			$steps = get_post_meta($funnel_id, '_steps_order', true);
+			$funnel_preview_link = '#';
 			$response['success'] = false;
 			if ($steps) {
 				if (isset($steps[0]) && $steps[0]['id']) {
@@ -937,8 +971,8 @@ class Wpfnl_Admin
 			wp_enqueue_script($this->plugin_name . '-backbone-marionette', plugin_dir_url(__FILE__) . 'assets/lib/backbone/backbone.marionette.min.js', ['backbone'], $this->version, true);
 			wp_enqueue_script($this->plugin_name . '-backbone-radio', plugin_dir_url(__FILE__) . 'assets/lib/backbone/backbone.radio.min.js', ['backbone'], $this->version, true);
 
-			$general_settings 	= Wpfnl_functions::get_general_settings();
-			$builder 			= $general_settings['builder'];
+			$general_settings = Wpfnl_functions::get_general_settings();
+			$builder = $general_settings['builder'];
 
 			/**
 			 * This code snippet will check if pro addons is activated or not. if not activated
@@ -964,150 +998,150 @@ class Wpfnl_Admin
 
 			$product_url = esc_url_raw(
 				add_query_arg(
-					array(
-						'post_type'      => 'product',
-						'wpfunnels' => 'yes',
-					),
-					admin_url('post-new.php')
-				)
+				array(
+				'post_type' => 'product',
+				'wpfunnels' => 'yes',
+			),
+				admin_url('post-new.php')
+			)
 			);
 
 			wp_localize_script($this->plugin_name, 'WPFunnelVars', array(
-				'ajaxurl' 					=> admin_url('admin-ajax.php'),
-				'rest_api_url' 				=> get_rest_url(),
-				'security' 					=> wp_create_nonce('wpfnl-admin'),
-				'import_nonce' 				=> wp_create_nonce('wpfnl_import_funnels_nonce'),
-				'admin_url' 				=> admin_url(),
-				'edit_funnel_url' 			=> admin_url('admin.php?page=edit_funnel'),
-				'i18n'                      => array('wpfnl' => $this->get_jed_locale_data('wpfnl')),
-				'current_user_id'           => get_current_user_id(),
-				'is_wc_installed' 			=> $is_wc_installed,
-				'is_wpfunnels_installed'	=> $is_wpfunnels_installed,
-				'products' 					=> $products,
-				'funnel_id' 				=> $funnel_id,
-				'step_id' 					=> $step_id,
-				'funnel_title' 				=> $funnel_title,
-				'funnel_preview_link' 		=> $funnel_preview_link,
-				'site_url'	 				=> site_url(),
-				'image_path' 				=> WPFNL_URL . 'admin/assets/images',
-				'placeholder_image_path' 	=> WPFNL_URL . 'admin/assets/images/ob_placeholder.png',
-				'nonce' 					=> wp_create_nonce('wp_rest'),
-				'isNewFunnel' 				=> \Wpfnl_Activator::is_new_install() ? true : false,
-				'isProActivated' 			=> $is_pro_active,
-				'totalFunnels' 				=> $count_funnels,
-				'count_active_funnels' 		=> $count_active_funnels,
-				'product_url' 				=> $product_url,
-				'totalAllowedFunnels' 		=> $total_allowed_funnels,
-				'builder' 					=> $builder,
-				'dependencyPlugins' 		=> Wpfnl_functions::get_dependency_plugins_status(),
-				'isAnyPluginMissing' 		=> Wpfnl_functions::is_any_plugin_missing(),
-				'isGlobalFunnelActivated' 	=> Wpfnl_functions::is_global_funnel_activated(),
-				'isGlobalFunnel' 			=> Wpfnl_functions::is_global_funnel($funnel_id),
-				'GBFVersion' 			    => defined('WPFNL_PRO_GB_VERSION') ? WPFNL_PRO_GB_VERSION : '',
-				'isSkipOffer' 			    => $this->is_skip_offer(),
-				'paymentMethod' 			=> $this->get_payment_method(),
-				'shippingMethod' 			=> $this->get_shipping_method(),
-				'isGbf' 					=> $this->maybe_gbf($funnel_id),
-				'isLms' 					=> $this->maybe_lms($funnel_id),
-				'lmsProvider' 				=> $this->get_lms_provider(),
-				'isLmsActivated' 			=> Wpfnl_functions::is_lms_addon_active(),
-				'isAnyLmsPluginActive' 		=> Wpfnl_functions::is_any_lms_plugin_active(),
-				'isLmsSettings' 			=> Wpfnl_functions::is_enable_lms_settings(),
-				'isLmsDisbaled' 	        => $this->maybe_lms_settings_disbaled(),
-				'lmsVersion'				=>( defined('WPFNL_PRO_LMS_VERSION') || defined('WPFUNNELS_PRO_LMS_VERSION') ) && defined('LEARNDASH_VERSION') ? version_compare(LEARNDASH_VERSION, '4.2.1.1', '>=') : false,
-				'global_funnel_type' 		=> Wpfnl_functions::get_global_funnel_type(),
-				'individual_funnel_type' 	=> get_post_meta($funnel_id, '_wpfnl_funnel_type', true),
-				'gbf_set_condition_steps'	=> $this->get_gbf_steps($funnel_id),
-				'reconfigurable_condition_data'	=> $this->get_reconfigurable_condition_data($funnel_id),
-				'mint_steps'				=> $this->mint_step_settings($funnel_id),
-				'mint_tags'					=> Wpfnl_functions::get_mint_contact_groups('tags'),
-				'mint_lists'				=> Wpfnl_functions::get_mint_contact_groups('lists'),
-				'mint_sequences'			=> Wpfnl_functions::get_sequences(),
-				'obList'					=> Wpfnl_functions::get_all_ob($funnel_id),
-				'upsellSteps'				=> Wpfnl_functions::get_selected_steps('upsell', $funnel_id),
-				'downsellSteps'				=> Wpfnl_functions::get_selected_steps('downsell', $funnel_id),
-				'landingAndCustomSteps'		=> Wpfnl_functions::get_selected_steps('landing', $funnel_id),
-				'customSteps'				=> Wpfnl_functions::get_selected_steps('custom', $funnel_id),
-				'onlySettingsSteps'			=> Wpfnl_functions::get_only_settings_steps(),
-				'isWCML'					=> defined('WCML_VERSION'),
-				'cfeDefault'			    => Wpfnl_functions::get_cfe_default_fields(),
-				'adminEmail'				=> get_bloginfo('admin_email'),
-				'siteName'					=> get_option('blogname'),
-				'mailMintEmail'				=> Wpfnl_functions::get_mailmint_email(),
-				'email_settings'			=> Wpfnl_functions::get_mailmint_email_settings(),
-				'mint_twillo_settings'		=> Wpfnl_functions::get_mailmint_twillo_settings(),
-				'emailBuilderUrl'			=> admin_url() . 'admin.php?page=email-builder',
-				'currentUrl'				=> (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]",
-				'wc_currency'				=> $wc_currency_symbol,
-				'ld_currency'				=> $ld_currency_symbol,
-				'getText'					=> Wpfnl_functions::get_text(),
-				'user_role_manager_data'	=> Wpfnl_functions::get_user_role_settings(),
-				'availableGateways'			=> Wpfnl_functions::get_enabled_payment_gateways(),
-				'guidedTour'				=> Wpfnl_functions::get_guided_tour(),
-				'isWPFIntegrationActive' 	=> Wpfnl_functions::is_integrations_addon_active(),
+				'ajaxurl' => admin_url('admin-ajax.php'),
+				'rest_api_url' => get_rest_url(),
+				'security' => wp_create_nonce('wpfnl-admin'),
+				'import_nonce' => wp_create_nonce('wpfnl_import_funnels_nonce'),
+				'admin_url' => admin_url(),
+				'edit_funnel_url' => admin_url('admin.php?page=edit_funnel'),
+				'i18n' => array('wpfnl' => $this->get_jed_locale_data('wpfnl')),
+				'current_user_id' => get_current_user_id(),
+				'is_wc_installed' => $is_wc_installed,
+				'is_wpfunnels_installed' => $is_wpfunnels_installed,
+				'products' => $products,
+				'funnel_id' => $funnel_id,
+				'step_id' => $step_id,
+				'funnel_title' => $funnel_title,
+				'funnel_preview_link' => $funnel_preview_link,
+				'site_url' => site_url(),
+				'image_path' => WPFNL_URL . 'admin/assets/images',
+				'placeholder_image_path' => WPFNL_URL . 'admin/assets/images/ob_placeholder.png',
+				'nonce' => wp_create_nonce('wp_rest'),
+				'isNewFunnel' => \Wpfnl_Activator::is_new_install() ? true : false,
+				'isProActivated' => $is_pro_active,
+				'totalFunnels' => $count_funnels,
+				'count_active_funnels' => $count_active_funnels,
+				'product_url' => $product_url,
+				'totalAllowedFunnels' => $total_allowed_funnels,
+				'builder' => $builder,
+				'dependencyPlugins' => Wpfnl_functions::get_dependency_plugins_status(),
+				'isAnyPluginMissing' => Wpfnl_functions::is_any_plugin_missing(),
+				'isGlobalFunnelActivated' => Wpfnl_functions::is_global_funnel_activated(),
+				'isGlobalFunnel' => Wpfnl_functions::is_global_funnel($funnel_id),
+				'GBFVersion' => defined('WPFNL_PRO_GB_VERSION') ? WPFNL_PRO_GB_VERSION : '',
+				'isSkipOffer' => $this->is_skip_offer(),
+				'paymentMethod' => $this->get_payment_method(),
+				'shippingMethod' => $this->get_shipping_method(),
+				'isGbf' => $this->maybe_gbf($funnel_id),
+				'isLms' => $this->maybe_lms($funnel_id),
+				'lmsProvider' => $this->get_lms_provider(),
+				'isLmsActivated' => Wpfnl_functions::is_lms_addon_active(),
+				'isAnyLmsPluginActive' => Wpfnl_functions::is_any_lms_plugin_active(),
+				'isLmsSettings' => Wpfnl_functions::is_enable_lms_settings(),
+				'isLmsDisbaled' => $this->maybe_lms_settings_disbaled(),
+				'lmsVersion' => (defined('WPFNL_PRO_LMS_VERSION') || defined('WPFUNNELS_PRO_LMS_VERSION')) && defined('LEARNDASH_VERSION') ? version_compare(LEARNDASH_VERSION, '4.2.1.1', '>=') : false,
+				'global_funnel_type' => Wpfnl_functions::get_global_funnel_type(),
+				'individual_funnel_type' => get_post_meta($funnel_id, '_wpfnl_funnel_type', true),
+				'gbf_set_condition_steps' => $this->get_gbf_steps($funnel_id),
+				'reconfigurable_condition_data' => $this->get_reconfigurable_condition_data($funnel_id),
+				'mint_steps' => $this->mint_step_settings($funnel_id),
+				'mint_tags' => Wpfnl_functions::get_mint_contact_groups('tags'),
+				'mint_lists' => Wpfnl_functions::get_mint_contact_groups('lists'),
+				'mint_sequences' => Wpfnl_functions::get_sequences(),
+				'obList' => Wpfnl_functions::get_all_ob($funnel_id),
+				'upsellSteps' => Wpfnl_functions::get_selected_steps('upsell', $funnel_id),
+				'downsellSteps' => Wpfnl_functions::get_selected_steps('downsell', $funnel_id),
+				'landingAndCustomSteps' => Wpfnl_functions::get_selected_steps('landing', $funnel_id),
+				'customSteps' => Wpfnl_functions::get_selected_steps('custom', $funnel_id),
+				'onlySettingsSteps' => Wpfnl_functions::get_only_settings_steps(),
+				'isWCML' => defined('WCML_VERSION'),
+				'cfeDefault' => Wpfnl_functions::get_cfe_default_fields(),
+				'adminEmail' => get_bloginfo('admin_email'),
+				'siteName' => get_option('blogname'),
+				'mailMintEmail' => Wpfnl_functions::get_mailmint_email(),
+				'email_settings' => Wpfnl_functions::get_mailmint_email_settings(),
+				'mint_twillo_settings' => Wpfnl_functions::get_mailmint_twillo_settings(),
+				'emailBuilderUrl' => admin_url() . 'admin.php?page=email-builder',
+				'currentUrl' => (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]",
+				'wc_currency' => $wc_currency_symbol,
+				'ld_currency' => $ld_currency_symbol,
+				'getText' => Wpfnl_functions::get_text(),
+				'user_role_manager_data' => Wpfnl_functions::get_user_role_settings(),
+				'availableGateways' => Wpfnl_functions::get_enabled_payment_gateways(),
+				'guidedTour' => Wpfnl_functions::get_guided_tour(),
+				'isWPFIntegrationActive' => Wpfnl_functions::is_integrations_addon_active(),
 			));
 			wp_localize_script(
 				$this->plugin_name,
 				'template_library_object',
 				array(
-					'ajaxurl' 				=> esc_url_raw(admin_url('admin-ajax.php')),
-					'rest_api_url' 			=> esc_url_raw(get_rest_url()),
-					'dashboard_url' 		=> esc_url_raw(admin_url('admin.php?page=' . WPFNL_FUNNEL_PAGE_SLUG)),
-					'settings_url' 			=> esc_url_raw(admin_url('admin.php?page=settings')),
-					'home_url' 				=> esc_url_raw(home_url()),
-					'funnel_id' 			=> $funnel_id,
-					'isTemplatePage' 		=> 'wpfunnels_page_wpf_templates' === $hook,
-					'is_pro' 				=> Wpfnl_functions::is_pro_license_activated(),
-					'is_ab_tesing_available' => defined('WPFNL_PRO_VERSION') ? version_compare(WPFNL_PRO_VERSION, "1.7.3", ">=") : false,
-					'is_webhook_licensed'   => Wpfnl_functions::is_webhook_license_activated(),
-					'pro_url' 				=> add_query_arg('wpfnl-dashboard', '1', GETWPFUNNEL_PRICING_URL),
-					'nonce' 				=> wp_create_nonce('wp_rest'),
-					'image_path' 			=> WPFNL_URL . 'admin/assets/images',
-					'template_type' 	    => Wpfnl_functions::get_template_types(),
-					'countries' 	        => Wpfnl_functions::get_countries(),
-					'supported_steps' 		=> Wpfnl_functions::get_supported_step_type(),
-					'is_mint_active' 		=> Wpfnl_functions::is_mint_mrm_active(),
-					'settingsSteps' 		=> Wpfnl_functions::get_settings_steps(),
-					'isRemote' 				=> Wpfnl_functions::maybe_remote_funnel(),
-				)
+				'ajaxurl' => esc_url_raw(admin_url('admin-ajax.php')),
+				'rest_api_url' => esc_url_raw(get_rest_url()),
+				'dashboard_url' => esc_url_raw(admin_url('admin.php?page=' . WPFNL_FUNNEL_PAGE_SLUG)),
+				'settings_url' => esc_url_raw(admin_url('admin.php?page=settings')),
+				'home_url' => esc_url_raw(home_url()),
+				'funnel_id' => $funnel_id,
+				'isTemplatePage' => 'wpfunnels_page_wpf_templates' === $hook,
+				'is_pro' => Wpfnl_functions::is_pro_license_activated(),
+				'is_ab_tesing_available' => defined('WPFNL_PRO_VERSION') ? version_compare(WPFNL_PRO_VERSION, "1.7.3", ">=") : false,
+				'is_webhook_licensed' => Wpfnl_functions::is_webhook_license_activated(),
+				'pro_url' => add_query_arg('wpfnl-dashboard', '1', GETWPFUNNEL_PRICING_URL),
+				'nonce' => wp_create_nonce('wp_rest'),
+				'image_path' => WPFNL_URL . 'admin/assets/images',
+				'template_type' => Wpfnl_functions::get_template_types(),
+				'countries' => Wpfnl_functions::get_countries(),
+				'supported_steps' => Wpfnl_functions::get_supported_step_type(),
+				'is_mint_active' => Wpfnl_functions::is_mint_mrm_active(),
+				'settingsSteps' => Wpfnl_functions::get_settings_steps(),
+				'isRemote' => Wpfnl_functions::maybe_remote_funnel(),
+			)
 			);
 
 			wp_localize_script(
 				$this->plugin_name,
 				'CheckoutStep',
 				array(
-					'ajaxurl' 			=> esc_url_raw(admin_url('admin-ajax.php')),
-					'rest_api_url' 		=> esc_url_raw(get_rest_url()),
-					'wc_currency' 		=> $wc_currency_symbol,
-					'nonce' 			=> wp_create_nonce('wp_rest'),
-					'security' 			=> wp_create_nonce('wpfnl-admin'),
-					'image_path' 		=> WPFNL_URL . 'admin/assets/images',
-					'tooltipIcon' 		=> WPFNL_URL . 'admin/partials/icons/question-tooltip-icon.php',
-					'imageUploadIcon' 	=> WPFNL_URL . 'admin/partials/icons/image-upload-icon.php',
-					'step_id' 			=> $step_id,
-					'back' => add_query_arg(
-						array(
-							'page'      => WPFNL_EDIT_FUNNEL_SLUG,
-							'id'        => filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT),
-							'step_id'   => $step_id,
-						),
-						admin_url('admin.php')
-					),
-					'priceConfig'       => Wpfnl_functions::get_wc_price_config(),
-				)
+				'ajaxurl' => esc_url_raw(admin_url('admin-ajax.php')),
+				'rest_api_url' => esc_url_raw(get_rest_url()),
+				'wc_currency' => $wc_currency_symbol,
+				'nonce' => wp_create_nonce('wp_rest'),
+				'security' => wp_create_nonce('wpfnl-admin'),
+				'image_path' => WPFNL_URL . 'admin/assets/images',
+				'tooltipIcon' => WPFNL_URL . 'admin/partials/icons/question-tooltip-icon.php',
+				'imageUploadIcon' => WPFNL_URL . 'admin/partials/icons/image-upload-icon.php',
+				'step_id' => $step_id,
+				'back' => add_query_arg(
+					array(
+					'page' => WPFNL_EDIT_FUNNEL_SLUG,
+					'id' => filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT),
+					'step_id' => $step_id,
+				),
+				admin_url('admin.php')
+			),
+				'priceConfig' => Wpfnl_functions::get_wc_price_config(),
+			)
 			);
 
 			wp_localize_script(
 				$this->plugin_name,
 				'wpfnl_addons_vars',
 				array(
-					'addons' 		 => Wpfnl_functions::get_supported_addons(),
-					'gbf_conditions' => Wpfnl_functions::get_supported_gbf_offer_condition(),
-					'categories'	 => Wpfnl_functions::get_categories_gbf_offer_condition(),
-					'role'			 => Wpfnl_functions::get_all_user_roles(),
-					'tags'			 => Wpfnl_functions::get_all_tags(),
-					'shippingClasses' => Wpfnl_functions::get_shipping_classes(),
-				)
+				'addons' => Wpfnl_functions::get_supported_addons(),
+				'gbf_conditions' => Wpfnl_functions::get_supported_gbf_offer_condition(),
+				'categories' => Wpfnl_functions::get_categories_gbf_offer_condition(),
+				'role' => Wpfnl_functions::get_all_user_roles(),
+				'tags' => Wpfnl_functions::get_all_tags(),
+				'shippingClasses' => Wpfnl_functions::get_shipping_classes(),
+			)
 			);
 
 			// Enqueue the admin dashboard script only on WPFunnels Main Page
@@ -1115,13 +1149,14 @@ class Wpfnl_Admin
 			if ($this->is_current_page('wpfunnels')) {
 				wp_enqueue_script('wpfnl-admin-app', plugin_dir_url(__FILE__) . 'assets/dist/js/wpfnl-admin-app.min.js', array(), $this->version, true);
 				wp_localize_script('wpfnl-admin-app', 'WPFAdminObj', array(
-					'rest_api_url'		=> get_rest_url(),
-					'security'			=> wp_create_nonce('wpfnl-admin'),
-					'nonce'				=> wp_create_nonce('wp_rest'),
-					'priceConfig'   	=> Wpfnl_functions::get_wc_price_config(),
-					'isProActivated' 	=> apply_filters('wpfunnels/is_wpfnl_pro_active', false),
-					'isWPFIntegrationActive' 	=> Wpfnl_functions::is_integrations_addon_active(),
-					'getText'					=> Wpfnl_functions::get_text(),
+					'rest_api_url' => get_rest_url(),
+					'security' => wp_create_nonce('wpfnl-admin'),
+					'nonce' => wp_create_nonce('wp_rest'),
+					'priceConfig' => Wpfnl_functions::get_wc_price_config(),
+					'isProActivated' => apply_filters('wpfunnels/is_wpfnl_pro_active', false),
+					'isWPFIntegrationActive' => Wpfnl_functions::is_integrations_addon_active(),
+					'getText' => Wpfnl_functions::get_text(),
+					'admin_url' => admin_url(),
 				));
 			}
 
@@ -1144,9 +1179,9 @@ class Wpfnl_Admin
 
 
 	public function get_lms_provider()
-	{	
-		$lms_settings = get_option( '_wpfunnels_lms_settings', array() );
-		$provider_id  = isset( $lms_settings['lms_provider'] ) ? $lms_settings['lms_provider'] : 'learndash';
+	{
+		$lms_settings = get_option('_wpfunnels_lms_settings', array());
+		$provider_id = isset($lms_settings['lms_provider']) ? $lms_settings['lms_provider'] : 'learndash';
 		return $provider_id;
 	}
 
@@ -1189,7 +1224,8 @@ class Wpfnl_Admin
 								if (is_array($conditions)) {
 									array_push($gbf_steps, $step['id']);
 								}
-							} elseif ('upsell' === $step['step_type'] || 'downsell' === $step['step_type']) {
+							}
+							elseif ('upsell' === $step['step_type'] || 'downsell' === $step['step_type']) {
 
 								$conditions = get_post_meta($step['id'], 'global_funnel_' . $step['step_type'] . '_rules', true);
 								if (is_array($conditions)) {
@@ -1219,20 +1255,21 @@ class Wpfnl_Admin
 		$translations = get_translations_for_domain($domain);
 
 		$locale = array(
-			'domain'      => $domain,
+			'domain' => $domain,
 			'locale_data' => array(
 				$domain => array(
 					'' => array(
 						'domain' => $domain,
-						'lang'   => is_admin() ? get_user_locale() : get_locale(),
+						'lang' => is_admin() ? get_user_locale() : get_locale(),
 					),
 				),
 			),
 		);
 
-		if (! empty($translations->headers['Plural-Forms'])) {
+		if (!empty($translations->headers['Plural-Forms'])) {
 			$locale['locale_data'][$domain]['']['plural_forms'] = $translations->headers['Plural-Forms'];
-		} else if (! empty($plugin_translations['header'])) {
+		}
+		else if (!empty($plugin_translations['header'])) {
 			$locale['locale_data'][$domain]['']['plural_forms'] = $plugin_translations['header']['Plural-Forms'];
 		}
 
@@ -1257,12 +1294,12 @@ class Wpfnl_Admin
 	public function get_translations_for_plugin_domain($domain, $language_dir = null)
 	{
 		if ($language_dir == null) {
-			$language_dir      = WPFNL_PATH . '/languages/';
+			$language_dir = WPFNL_PATH . '/languages/';
 		}
-		$languages     = get_available_languages($language_dir);
+		$languages = get_available_languages($language_dir);
 		$get_site_lang = is_admin() ? get_user_locale() : get_locale();
-		$mo_file_name  = $domain . '-' . $get_site_lang;
-		$translations  = [];
+		$mo_file_name = $domain . '-' . $get_site_lang;
+		$translations = [];
 
 		if (in_array($mo_file_name, $languages) && file_exists($language_dir . $mo_file_name . '.mo')) {
 			$mo = new \MO();
@@ -1272,7 +1309,7 @@ class Wpfnl_Admin
 		}
 
 		return [
-			'header'       => isset($mo) ? $mo->headers : '',
+			'header' => isset($mo) ? $mo->headers : '',
 			'translations' => $translations,
 		];
 	}
@@ -1313,7 +1350,7 @@ class Wpfnl_Admin
 	public function get_wpfnl_routes()
 	{
 		$routes = array(
-			array(
+				array(
 				'path' => '/',
 				'name' => 'home',
 				'component' => 'Home'
@@ -1334,7 +1371,7 @@ class Wpfnl_Admin
 			$enabled_gateways = [];
 
 			if ($gateways) {
-				foreach ($gateways as $key =>  $gateway) {
+				foreach ($gateways as $key => $gateway) {
 					if ($gateway->enabled == 'yes') {
 						$enabled_gateways[$key] = $gateway->method_title;
 					}
@@ -1356,7 +1393,7 @@ class Wpfnl_Admin
 			$available_shipping = WC()->shipping()->get_shipping_methods();
 			$enabled_shipping = [];
 			if ($available_shipping) {
-				foreach ($available_shipping as $key =>  $shipping) {
+				foreach ($available_shipping as $key => $shipping) {
 					$enabled_shipping[$key] = $shipping->method_title;
 				}
 			}
@@ -1392,39 +1429,39 @@ class Wpfnl_Admin
 	 */
 	private function show_steps_options($output)
 	{
-		$options 	= '';
+		$options = '';
 
 		$steps = get_posts(
 			array(
-				'post_type'      => WPFNL_STEPS_POST_TYPE,
-				'posts_per_page' => -1,
-				'numberposts'    => 100,
-				'orderby'        => 'title',
-				'order'          => 'ASC',
-				'post_status'    => 'publish',
-				'meta_query'  => array(
-					'relation' => 'OR',
+			'post_type' => WPFNL_STEPS_POST_TYPE,
+			'posts_per_page' => -1,
+			'numberposts' => 100,
+			'orderby' => 'title',
+			'order' => 'ASC',
+			'post_status' => 'publish',
+			'meta_query' => array(
+				'relation' => 'OR',
 					array(
-						'key'   => '_step_type',
-						'value' => 'landing',
-					),
-					array(
-						'key'   => '_step_type',
-						'value' => 'checkout',
-					)
+					'key' => '_step_type',
+					'value' => 'landing',
 				),
-			)
+					array(
+					'key' => '_step_type',
+					'value' => 'checkout',
+				)
+			),
+		)
 		);
 
 		if ($steps && is_array($steps)) {
-			$front_page_id 	= get_option('page_on_front');
+			$front_page_id = get_option('page_on_front');
 			foreach ($steps as $step) {
-				$selected      	= selected($front_page_id, $step->ID, false);
-				$post_type_obj 	= get_post_type_object($step->post_type);
-				$options 		.= "<option value=\"{$step->ID}\"{$selected}>{$step->post_title} (WPFunnels {$post_type_obj->labels->singular_name})</option>";
+				$selected = selected($front_page_id, $step->ID, false);
+				$post_type_obj = get_post_type_object($step->post_type);
+				$options .= "<option value=\"{$step->ID}\"{$selected}>{$step->post_title} (WPFunnels {$post_type_obj->labels->singular_name})</option>";
 			}
-			$options 	.= '</select>';
-			$output 	= str_replace('</select>', $options, $output);
+			$options .= '</select>';
+			$output = str_replace('</select>', $options, $output);
 		}
 		return $output;
 	}
@@ -1552,14 +1589,17 @@ class Wpfnl_Admin
 				Wpfnl_functions::update_funnel_type_to_lead();
 			}
 			Wpfnl_functions::wpfnl_delete_transient();
-		} elseif ('sfwd-lms/sfwd_lms.php' === $filename) {
+		}
+		elseif ('sfwd-lms/sfwd_lms.php' === $filename) {
 			if (!Wpfnl_functions::is_wc_active()) {
 				Wpfnl_functions::update_funnel_type_to_lead();
 			}
 			Wpfnl_functions::wpfnl_delete_transient();
-		} elseif ('wpfunnels-pro-lms/wpfunnels-pro-lms.php' === $filename) {
+		}
+		elseif ('wpfunnels-pro-lms/wpfunnels-pro-lms.php' === $filename) {
 			Wpfnl_functions::wpfnl_delete_transient();
-		} elseif ('qubely/qubely.php' === $filename) {
+		}
+		elseif ('qubely/qubely.php' === $filename) {
 			Wpfnl_functions::wpfnl_delete_transient();
 			delete_option(WPFNL_TEMPLATES_OPTION_KEY . '_wc');
 			delete_option(WPFNL_TEMPLATES_OPTION_KEY . '_lms');
@@ -1581,13 +1621,16 @@ class Wpfnl_Admin
 	{
 		if ('woocommerce/woocommerce.php' === $filename) {
 			Wpfnl_functions::wpfnl_delete_transient();
-		} elseif ('sfwd-lms/sfwd_lms.php' === $filename) {
+		}
+		elseif ('sfwd-lms/sfwd_lms.php' === $filename) {
 			if (Wpfnl_functions::is_lms_addon_active()) {
 				Wpfnl_functions::wpfnl_delete_transient();
 			}
-		} elseif ('wpfunnels-pro-lms/wpfunnels-pro-lms.php' === $filename) {
+		}
+		elseif ('wpfunnels-pro-lms/wpfunnels-pro-lms.php' === $filename) {
 			Wpfnl_functions::wpfnl_delete_transient();
-		} elseif ('qubely/qubely.php' === $filename) {
+		}
+		elseif ('qubely/qubely.php' === $filename) {
 			Wpfnl_functions::wpfnl_delete_transient();
 			delete_option(WPFNL_TEMPLATES_OPTION_KEY . '_wc');
 			delete_option(WPFNL_TEMPLATES_OPTION_KEY . '_lms');
@@ -1614,10 +1657,10 @@ class Wpfnl_Admin
 		return apply_filters(
 			'plugin_hook_name',
 			array(
-				'product_categories' => $wc_categories,
-				'post_categories'    => $wp_categories,
-				'placeholder_image'  => ''
-			)
+			'product_categories' => $wc_categories,
+			'post_categories' => $wp_categories,
+			'placeholder_image' => ''
+		)
 		);
 	}
 
@@ -1631,25 +1674,25 @@ class Wpfnl_Admin
 	 */
 	private function get_formatted_wc_categories()
 	{
-		$taxonomy     = 'product_cat';
-		$orderby      = 'name';
-		$show_count   = 0;
-		$pad_counts   = 0;
+		$taxonomy = 'product_cat';
+		$orderby = 'name';
+		$show_count = 0;
+		$pad_counts = 0;
 		$hierarchical = 1;
-		$title        = '';
-		$empty        = 0;
+		$title = '';
+		$empty = 0;
 
-		$args               = array(
-			'taxonomy'     => $taxonomy,
-			'orderby'      => $orderby,
-			'show_count'   => $show_count,
-			'pad_counts'   => $pad_counts,
+		$args = array(
+			'taxonomy' => $taxonomy,
+			'orderby' => $orderby,
+			'show_count' => $show_count,
+			'pad_counts' => $pad_counts,
 			'hierarchical' => $hierarchical,
-			'title_li'     => $title,
-			'hide_empty'   => $empty,
+			'title_li' => $title,
+			'hide_empty' => $empty,
 		);
 		$product_categories = get_categories($args);
-		$wc_categories      = array();
+		$wc_categories = array();
 		foreach ($product_categories as $product_cat) {
 			$wc_categories[] = array(
 				'value' => $product_cat->term_id,
@@ -1669,25 +1712,25 @@ class Wpfnl_Admin
 	 */
 	private function get_formatted_wp_post_categories()
 	{
-		$taxonomy     = 'category';
-		$orderby      = 'name';
-		$show_count   = 0;
-		$pad_counts   = 0;
+		$taxonomy = 'category';
+		$orderby = 'name';
+		$show_count = 0;
+		$pad_counts = 0;
 		$hierarchical = 1;
-		$title        = '';
-		$empty        = 0;
+		$title = '';
+		$empty = 0;
 
-		$args               = array(
-			'taxonomy'     => $taxonomy,
-			'orderby'      => $orderby,
-			'show_count'   => $show_count,
-			'pad_counts'   => $pad_counts,
+		$args = array(
+			'taxonomy' => $taxonomy,
+			'orderby' => $orderby,
+			'show_count' => $show_count,
+			'pad_counts' => $pad_counts,
 			'hierarchical' => $hierarchical,
-			'title_li'     => $title,
-			'hide_empty'   => $empty,
+			'title_li' => $title,
+			'hide_empty' => $empty,
 		);
 		$post_categories = get_categories($args);
-		$categories      = array();
+		$categories = array();
 		foreach ($post_categories as $post_cat) {
 			$categories[] = array(
 				'value' => $post_cat->term_id,
@@ -1745,9 +1788,9 @@ class Wpfnl_Admin
 	{
 		if (isset($data['admin_email'], $data['first_name'], $data['last_name'])) {
 			$json_body_data = json_encode([
-				'email'         => $data['admin_email'],
-				'first_name'    => $data['first_name'],
-				'last_name'     => $data['last_name'],
+				'email' => $data['admin_email'],
+				'first_name' => $data['first_name'],
+				'last_name' => $data['last_name'],
 			]);
 
 			$webHookUrl = [
@@ -1758,7 +1801,7 @@ class Wpfnl_Admin
 				if (!empty($webHookUrl)) {
 					foreach ($webHookUrl as $url) {
 						wp_remote_request($url, [
-							'method'    => 'POST',
+							'method' => 'POST',
 							'headers' => [
 								'Content-Type' => 'application/json',
 							],
@@ -1766,7 +1809,8 @@ class Wpfnl_Admin
 						]);
 					}
 				}
-			} catch (\Exception $e) {
+			}
+			catch (\Exception $e) {
 			}
 		}
 	}
@@ -1783,19 +1827,19 @@ class Wpfnl_Admin
 			return;
 		}
 		// Get double opt-in settings.
-		$default  =  \MRM\Common\MrmCommon::double_optin_default_configuration();
+		$default = \MRM\Common\MrmCommon::double_optin_default_configuration();
 		$settings = get_option('_mrm_optin_settings', $default);
-		$enable   = isset($settings['enable']) ? $settings['enable'] : false;
+		$enable = isset($settings['enable']) ? $settings['enable'] : false;
 
-		$user_data     = array(
-			'email' 	  => $data['data']['user_email'],
-			'first_name'  => isset($data['data']['first_name']) ? $data['data']['first_name'] : '',
-			'last_name'   => isset($data['data']['last_name']) ? $data['data']['last_name'] : '',
+		$user_data = array(
+			'email' => $data['data']['user_email'],
+			'first_name' => isset($data['data']['first_name']) ? $data['data']['first_name'] : '',
+			'last_name' => isset($data['data']['last_name']) ? $data['data']['last_name'] : '',
 			'meta_fields' => array(
 				'phone_number' => isset($data['data']['phone_number']) ? $data['data']['phone_number'] : '',
 			),
-			'status'      => $enable ? 'pending' : 'subscribed',
-			'source'      => 'WPFunnels',
+			'status' => $enable ? 'pending' : 'subscribed',
+			'source' => 'WPFunnels',
 		);
 
 		$mail_mint_object = new \WPFunnels\Integrations\MailMint($user_data);

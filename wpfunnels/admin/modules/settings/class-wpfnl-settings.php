@@ -203,29 +203,29 @@ class Module extends Wpfnl_Admin_Module
         $general_settings  = [
             'funnel_type'               => sanitize_text_field($payload['funnel_type']),
             'builder'                   => sanitize_text_field($payload['builder']),
-            'uninstall_cleanup'         => sanitize_text_field($payload['uninstall_cleanup']),
+            'uninstall_cleanup'         => isset($payload['uninstall_cleanup']) ? sanitize_text_field($payload['uninstall_cleanup']) : 'off',
             'disable_analytics'         => isset($payload['analytics_roles']) ? $payload['analytics_roles'] : '',
             'allow_funnels'             => isset($payload['permission_role']) ? $payload['permission_role'] : [],
-            'paypal_reference'          => $payload['paypal_reference'],
-            'order_bump'                => $payload['order_bump'],
-            'ab_testing'                => $payload['ab_testing'],
-            'disable_theme_style'       => $payload['disable_theme_style'],
-            'enable_log_status'         => $payload['enable_log_status'],
+            'paypal_reference'          => isset($payload['paypal_reference']) ? sanitize_text_field($payload['paypal_reference']) : 'off',
+            'order_bump'                => isset($payload['order_bump']) ? sanitize_text_field($payload['order_bump']) : 'off',
+            'ab_testing'                => isset($payload['ab_testing']) ? sanitize_text_field($payload['ab_testing']) : 'off',
+            'disable_theme_style'       => isset($payload['disable_theme_style']) ? sanitize_text_field($payload['disable_theme_style']) : 'off',
+            'enable_log_status'         => isset($payload['enable_log_status']) ? sanitize_text_field($payload['enable_log_status']) : 'off',
             'enable_skip_cart'          => isset($payload['enable_skip_cart']) ? $payload['enable_skip_cart'] : 'no',
             'skip_cart_for'             => isset($payload['skip_cart_for']) ? $payload['skip_cart_for'] : 'whole',
         ];
 
         $permalink_settings = [
-            'structure'             => sanitize_text_field($payload['permalink_settings']),
-            'step_base'             => sanitize_text_field($payload['permalink_step_base']),
-            'funnel_base'           => sanitize_text_field($payload['permalink_funnel_base']),
+            'structure'   => isset($payload['permalink_settings']) ? sanitize_text_field($payload['permalink_settings']) : 'default',
+            'step_base'   => isset($payload['permalink_step_base']) ? sanitize_text_field($payload['permalink_step_base']) : WPFNL_STEPS_POST_TYPE,
+            'funnel_base' => isset($payload['permalink_funnel_base']) ? sanitize_text_field($payload['permalink_funnel_base']) : WPFNL_FUNNELS_POST_TYPE,
         ];
         
         if( isset($payload['sender_name']) && isset($payload['sender_email']) ){
             $optin_settings = [
-                'sender_name'           => sanitize_text_field($payload['sender_name']),
-                'sender_email'          => sanitize_text_field($payload['sender_email']),
-                'email_subject'         => isset($payload['email_subject']) ? sanitize_text_field($payload['email_subject']) : '',
+                'sender_name'   => sanitize_text_field($payload['sender_name']),
+                'sender_email'  => sanitize_text_field($payload['sender_email']),
+                'email_subject' => isset($payload['email_subject']) ? sanitize_text_field($payload['email_subject']) : '',
             ];
         }else{
             $optin_settings = Wpfnl_functions::get_optin_settings();

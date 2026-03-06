@@ -15,7 +15,7 @@
  * Plugin Name:       WPFunnels
  * Plugin URI:        https://getwpfunnels.com
  * Description:       Easiest 💥 Sales Funnel Builder 💥 For WordPress & WooCommerce by WPFunnels - Generate Leads & Craft A Highly-Converting Sales Journey In Minutes
- * Version:           3.9.4
+ * Version:           3.9.5
  * Author:            WPFunnels Team
  * Author URI:        https://getwpfunnels.com
  * License:           GPL-2.0+
@@ -24,7 +24,7 @@
  * Domain Path:       /languages
  */
 
-use CodeRex\Telemetry\Client;
+use WPFunnels\Tracking\Telemetry;
 use wPFunnels\Wpfnl;
 /**
  * If this file is called directly, abort.
@@ -40,7 +40,7 @@ if (!defined('WPINC')) {
  */
 
 if (!defined('WPFNL_VERSION')) {
-	define('WPFNL_VERSION', '3.9.4');
+	define('WPFNL_VERSION', '3.9.5');
 }
 
 if (!defined('WPFNL_FILE')) {
@@ -88,6 +88,7 @@ define('WPFNL_FUNNELS_POST_TYPE', 'wpfunnels');
 define('WPFNL_STEPS_POST_TYPE', 'wpfunnel_steps');
 define('WPFNL_CREATE_FUNNEL_SLUG', 'create_funnel');
 define('WPFNL_GLOBAL_SETTINGS_SLUG', 'wpfnl_settings');
+define('WPFNL_ADDONS_SLUG', 'wpfnl_addons');
 define('WPFNL_FUNNEL_PER_PAGE', 10);
 define('WPFNL_TEMPLATES_OPTION_KEY', 'wpfunnels_remote_templates');
 define('WPFNL_TESTS', false);
@@ -151,7 +152,8 @@ function deactivate_wpfnl()
 }
 
 require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
-init_wpfunnels_telemetry();
+require_once plugin_dir_path(__FILE__) . 'includes/core/Tracking/class-wpfnl-telemetry.php';
+Telemetry::init();
 
 register_activation_hook(__FILE__, 'activate_wpfnl');
 register_deactivation_hook(__FILE__, 'deactivate_wpfnl');
@@ -183,34 +185,6 @@ function run_wpfnl()
 	wpfnl()->run();
 }
 run_wpfnl();
-
-
-
-/**
- * Initialize the plugin tracker
- *
- * @return void
- */
-function appsero_init_tracker_wpfunnels()
-{
-	$client = new Appsero\Client('6fb1e340-8276-4337-bca6-28a7cd186f06', 'WPFunnels', __FILE__);
-	$client->insights()->init();
-}
-appsero_init_tracker_wpfunnels();
-
-function init_wpfunnels_telemetry()
-{
-	$api_key = 'd1bd55fc-4258-48fa-a712-ab6a0f25f313';
-	$api_secret = 'sec_294ef7dfd3bf5b3bcdcf';
-	$telemetry = new Client(
-		$api_key,
-		$api_secret,
-		'WPFunnels',
-		__FILE__
-	);
-}
-
-
 
 add_filter('et_builder_third_party_post_types', 'wpfnl_third_party_post_type', 10, 1);
 
