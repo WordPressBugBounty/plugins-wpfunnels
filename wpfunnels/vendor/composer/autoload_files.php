@@ -6,7 +6,6 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'a4a119a56e50fbb293281d9a48007e0e' => $vendorDir . '/symfony/polyfill-php80/bootstrap.php',
     '7b11c4dc42b3b3023073cb14e519683c' => $vendorDir . '/ralouphie/getallheaders/src/getallheaders.php',
     'aed659f3655c497c30e044c41fa917c6' => $vendorDir . '/linno/telemetry/src/helpers.php',
     'db1766888a4f96ab813d6f6a38125eb9' => $vendorDir . '/philipnewcomer/wp-ajax-helper/src/functions.php',

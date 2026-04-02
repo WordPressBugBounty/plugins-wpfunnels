@@ -146,6 +146,10 @@ class OfferController extends Wpfnl_REST_Controller
         $data = json_decode($request['product'], true);
         $products[] = $data;
         update_post_meta($step_id, '_wpfnl_upsell_products', $products);
+
+        $funnel_id = absint( get_post_meta( absint( $step_id ), '_funnel_id', true ) );
+        do_action( 'wpfunnels_upsell_configured', $funnel_id, absint( $step_id ), 'upsell' );
+
         return 'success';
     }
     
@@ -250,6 +254,10 @@ class OfferController extends Wpfnl_REST_Controller
         $data = json_decode($request['product'], true);
         $products[] = $data;
         update_post_meta($step_id, '_wpfnl_downsell_product', $products);
+
+        $funnel_id = absint( get_post_meta( absint( $step_id ), '_funnel_id', true ) );
+        do_action( 'wpfunnels_upsell_configured', $funnel_id, absint( $step_id ), 'downsell' );
+
         return 'success';
     }
 

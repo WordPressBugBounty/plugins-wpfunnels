@@ -320,17 +320,41 @@
 
 		.product-name {
 
+			.quantity-selct-wrapper {
+				border-radius: 6px;
+				border: 1px solid #D1D5DC;
+				display: inline-flex;
+				margin-top: 6px;
+
+				& > button {
+					border: none;
+					background: none;
+					padding: 5px 8px;
+					cursor: pointer;
+				}
+			}
+
 			input {
-				height: 40px;
-				width: 60px;
+				height: 28px;
+				width: 32px;
 				padding: 7px;
 				line-height: 1;
 				margin: 0;
-			}
+				border-top: none;
+				border-bottom: none;
+				border-color: #D1D5DC;
+				border-radius: 0;
+				color: #1A241A;
+				font-size: 14px;
+				text-align: center;
 
-			input[type=number]::-webkit-inner-spin-button,
-			input[type=number]::-webkit-outer-spin-button {
-				opacity: 1;
+				&:focus {
+					border-color: #D1D5DC;
+				}
+
+				&::-webkit-inner-spin-button {
+					display: none;
+				}
 			}
 		}
 
@@ -370,6 +394,7 @@
 					border: 2px solid #72737e;
 					border-radius: 50px;
 					transition: all 0.3s ease;
+					box-sizing: border-box;
 				}
 				&:after {
 					content: "";
@@ -732,7 +757,7 @@
             padding-left: 30px;
             min-height: 14px;
         }
-        
+
         #mailpoet_woocommerce_checkout_optin {
 			display: inline-block;
             margin: initial;
@@ -760,7 +785,7 @@
                 border-color: #fff;
                 border-radius: 2px;
             }
-            
+
         }
 
     }
@@ -776,7 +801,7 @@
 	.creator-lms-order-review-table-wrapper table .creator-lms-course-info-wrapper .creator-lms-course-title {
 		width: calc(100% - 72px);
 	}
-	.creator-lms-order-review-table-wrapper table th:first-child, 
+	.creator-lms-order-review-table-wrapper table th:first-child,
 	.creator-lms-order-review-table-wrapper table td:first-child {
 		width: 160px;
 	}
@@ -790,7 +815,7 @@
 	.creator-lms-checkout-coupon .apply-coupon-btn {
 		text-align: center;
 	}
-	
+
 }
 
 
@@ -829,7 +854,7 @@
 			}
 		}
 	}
-	
+
 	//-----floating label style for login field-----
 	form.woocommerce-form-login {
 		.form-row-last,
@@ -865,7 +890,7 @@
 			bottom: -23px;
 		}
 	}
-	
+
 }
 
 .et-db #et-boc .et-l .et_pb_module {
@@ -1099,9 +1124,9 @@
 			display: inline-block;
 			margin-bottom: 10px;
 		}
-		
+
 		table {
-			
+
 
 			th,
 			td {
@@ -1133,8 +1158,6 @@
 				text-transform: capitalize;
 			}
 
-			
-
 			td .wpfnl-cart-update {
 				background: $primary-color;
 				color: #fff;
@@ -1152,8 +1175,6 @@
 					margin-left: 0;
 				}
 			}
-
-			
 
 			.product-quantity {
 				width: 90px;
@@ -1454,6 +1475,11 @@
 .et_divi_builder #et_builder_outer_content .wpfnl-checkout .woocommerce form .place-order {
     padding: 1em!important;
 }
+
+.et_divi_builder #et_builder_outer_content .wpfnl-checkout.wpfnl-modern-checkout .woocommerce form .place-order {
+    padding: 0!important;
+	margin: 0!important;
+}
 .et_divi_builder #et_builder_outer_content .wpfnl_next_step_button {
     display: inline-block;
 }
@@ -1544,7 +1570,7 @@ body.rtl {
 	.wpfnl-checkout #ship-to-different-address label span {
 		text-align: right;
 	}
-	.wpfnl-checkout table.woocommerce-checkout-review-order-table th, 
+	.wpfnl-checkout table.woocommerce-checkout-review-order-table th,
     .wpfnl-checkout table.woocommerce-checkout-review-order-table td {
         text-align: right;
     }
@@ -1560,22 +1586,22 @@ body.rtl {
         left: inherit;
         right: 5px;
     }
-    .wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > label, 
+    .wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > label,
     .wpfnl-checkout .woocommerce-checkout #payment ul.payment_methods > li > label {
         padding: 0 30px 0 0;
 		text-align: right;
     }
-    .wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > label:before, 
+    .wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > label:before,
     .wpfnl-checkout .woocommerce-checkout #payment ul.payment_methods > li > label:before {
         left: inherit;
         right: 0;
     }
-    .wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > label:after, 
+    .wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > label:after,
     .wpfnl-checkout .woocommerce-checkout #payment ul.payment_methods > li > label:after {
         right: 5px;
         left: inherit;
     }
-    .wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > label img, 
+    .wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > label img,
     .wpfnl-checkout .woocommerce-checkout #payment ul.payment_methods > li > label img {
         float: left;
     }
@@ -1588,7 +1614,7 @@ body.rtl {
         padding-right: 10px;
     }
 
-    #add_payment_method #payment ul.payment_methods li .stripe-credit-card-brand, 
+    #add_payment_method #payment ul.payment_methods li .stripe-credit-card-brand,
     .woocommerce-checkout #payment ul.payment_methods li .stripe-credit-card-brand {
         right: inherit;
         left: 10px;
@@ -1615,14 +1641,14 @@ body.rtl {
 	}
 
 	//------1 column style-----
-	.wpfnl-checkout .wpfnl-checkout-form-one-column .woocommerce .col2-set, 
-	.wpfnl-checkout.wpfnl-col-1 .woocommerce .col2-set, 
+	.wpfnl-checkout .wpfnl-checkout-form-one-column .woocommerce .col2-set,
+	.wpfnl-checkout.wpfnl-col-1 .woocommerce .col2-set,
 	.woocommerce-page .wpfnl-checkout.wpfnl-col-1 .col2-set {
 		padding: 0;
 	}
 
 	//---------multistep style---------
-	.wpfnl-checkout-form-wpfnl-multistep .wpfnl-multistep-navigation, 
+	.wpfnl-checkout-form-wpfnl-multistep .wpfnl-multistep-navigation,
 	.wpfnl-multistep .wpfnl-multistep-navigation {
 		justify-content: flex-start;
 	}
@@ -1632,7 +1658,7 @@ body.rtl {
 		margin-left: 0;
 		margin-right: 30px;
 	}
-	.wpfnl-express-checkout .wpfnl-express-checkout-wrapper .wpfnl-express-checkout-left .express-shipping-table table td, 
+	.wpfnl-express-checkout .wpfnl-express-checkout-wrapper .wpfnl-express-checkout-left .express-shipping-table table td,
 	.wpfnl-express-checkout .wpfnl-express-checkout-wrapper .wpfnl-express-checkout-left .express-shipping-table table th {
 		text-align: right;
 	}

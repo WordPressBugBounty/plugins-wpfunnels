@@ -115,6 +115,13 @@ class CheckoutForm extends AbstractDynamicBlock {
         'stepNavigationBtnPaddingLeft'   => '25',
         'stepNavigationBtnHvrColor'   => '',
         'stepNavigationBtnHvrBgColor'   => '',
+
+        'placeOrderBtnText'    => 'Place Order',
+        'placeOrderSubText'    => '',
+        'placeOrderEnableIcon' => false,
+        'placeOrderIconStyle'  => 'lock1',
+        'placeOrderEnablePrice'=> false,
+        'placeOrderBelowText'  => '',
     );
 
 
@@ -131,8 +138,96 @@ class CheckoutForm extends AbstractDynamicBlock {
 		parent::__construct($block_name);
 		add_action('wp_ajax_show_checkout_markup', [$this, 'show_checkout_markup']);
 		add_action( 'wpfunnels/gutenberg_checkout_dynamic_filters', array($this, 'dynamic_filters') );
+		add_action( 'woocommerce_checkout_update_order_review', array( $this, 'apply_place_order_filter_on_ajax_update' ) );
 	}
 
+
+
+	/**
+     * Fired during WooCommerce AJAX checkout update (update_order_review).
+     * Reads Place Order settings from post_meta and applies the button filter
+     * so the button is customized even during payment section re-renders.
+     *
+     * @param string $post_data URL-encoded post data string from the AJAX request.
+     */
+    public function apply_place_order_filter_on_ajax_update( $post_data ) {
+        $parsed = array();
+        wp_parse_str( $post_data, $parsed );
+        $checkout_id = isset( $parsed['_wpfunnels_checkout_id'] ) ? intval( $parsed['_wpfunnels_checkout_id'] ) : 0;
+        if ( ! $checkout_id ) {
+            $checkout_id = intval( \WPFunnels\Wpfnl_functions::get_checkout_id_from_post_data() );
+        }
+        if ( ! $checkout_id ) {
+            $checkout_id = intval( \WPFunnels\Wpfnl_functions::get_checkout_id_from_post( $_POST ) );
+        }
+        if ( ! $checkout_id ) {
+            return;
+        }
+        $settings = get_post_meta( $checkout_id, '_wpfnl_place_order_settings', true );
+        if ( empty( $settings ) || ! is_array( $settings ) ) {
+            return;
+        }
+        $place_order_filter = $this->get_place_order_button_filter( $settings );
+        add_filter( 'woocommerce_order_button_html', $place_order_filter );
+
+        $below_text = isset( $settings['placeOrderBelowText'] ) ? $settings['placeOrderBelowText'] : '';
+        if ( ! empty( $below_text ) ) {
+            add_action( 'woocommerce_review_order_after_submit', function() use ( $below_text ) {
+                echo '<div class="wpfnl-below-place-order-btn">' . wp_kses_post( $below_text ) . '</div>';
+            } );
+        }
+    }
+
+
+	/**
+     * Build and return the woocommerce_order_button_html filter closure.
+     *
+     * @param array $attributes Block attributes.
+     * @return \Closure
+     */
+    protected function get_place_order_button_filter( $attributes ) {
+        $btn_text     = isset( $attributes['placeOrderBtnText'] ) && '' !== $attributes['placeOrderBtnText'] ? $attributes['placeOrderBtnText'] : 'Place Order';
+        $sub_text     = isset( $attributes['placeOrderSubText'] ) ? $attributes['placeOrderSubText'] : '';
+        $enable_icon  = isset( $attributes['placeOrderEnableIcon'] ) ? (bool) $attributes['placeOrderEnableIcon'] : false;
+        $icon_style   = isset( $attributes['placeOrderIconStyle'] ) ? $attributes['placeOrderIconStyle'] : 'lock1';
+        $enable_price = isset( $attributes['placeOrderEnablePrice'] ) ? (bool) $attributes['placeOrderEnablePrice'] : false;
+
+        $icon_svgs = array(
+            'lock1'    => '<svg width="24" height="24" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V7a4 4 0 118 0v4" stroke="white" stroke-width="2"/></svg>',
+            'lock2'    => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V7a4 4 0 118 0v4" stroke="currentColor" stroke-width="2"/></svg>',
+            'cart1'    => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 6h15l-2 9H8L6 6z" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="20" r="1.5" fill="currentColor"/><circle cx="18" cy="20" r="1.5" fill="currentColor"/></svg>',
+            'checkout' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            'arrow1'   => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            'arrow2'   => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            'arrow3'   => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M6 13l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        );
+
+        return function( $button_html ) use ( $btn_text, $sub_text, $enable_icon, $icon_style, $enable_price, $icon_svgs ) {
+            $icon_html = '';
+            if ( $enable_icon ) {
+                $icon_svg  = isset( $icon_svgs[ $icon_style ] ) ? $icon_svgs[ $icon_style ] : $icon_svgs['lock1'];
+                $icon_html = '<span class="wpfnl-place-order-icon">' . $icon_svg . '</span>';
+            }
+
+            $price_html = '';
+            if ( $enable_price && function_exists( 'WC' ) && is_object( WC()->cart ) ) {
+                $price_html = ' <span class="wpfnl-place-order-price">' . WC()->cart->get_total() . '</span>';
+            }
+
+            $sub_text_html = '';
+            if ( ! empty( $sub_text ) ) {
+                $sub_text_html = '<span class="wpfnl-place-order-sub-text">' . esc_html( $sub_text ) . '</span>';
+            }
+
+            $label = esc_html( $btn_text );
+            return '<button type="submit" class="button alt" name="woocommerce_checkout_place_order" id="place_order" value="' . $label . '" data-value="' . $label . '">'
+                . $icon_html
+                . '<span class="wpfnl-place-order-text">' . $label . '</span>'
+                . $price_html
+                . $sub_text_html
+                . '</button>';
+        };
+    }
 
 
 	/**
@@ -140,7 +235,7 @@ class CheckoutForm extends AbstractDynamicBlock {
      *
      * @param array  $attributes Block attributes.
      * @param string $content    Block content.
-     * 
+     *
      * @return string Rendered block type output.
      */
     protected function render( $attributes, $content ) {
@@ -151,15 +246,43 @@ class CheckoutForm extends AbstractDynamicBlock {
 		update_post_meta( $checkout_id, '_wpfnl_checkout_layout', $checkout_layout );
         update_post_meta( $checkout_id, '_wpfnl_floating_label', $floating_label );
         $attributes = wp_parse_args( $attributes, $this->defaults );
-        
+
         $dynamic_css = $this->generate_assets( $attributes );
         do_action( 'wpfunnels/gutenberg_checkout_dynamic_filters', $attributes );
         do_action( 'wpfunnels/before_checkout_form', $checkout_id );
+
+        // Persist Place Order settings so WooCommerce AJAX checkout updates can apply them.
+        update_post_meta( $checkout_id, '_wpfnl_place_order_settings', array(
+            'placeOrderBtnText'    => isset( $attributes['placeOrderBtnText'] ) ? $attributes['placeOrderBtnText'] : 'Place Order',
+            'placeOrderSubText'    => isset( $attributes['placeOrderSubText'] ) ? $attributes['placeOrderSubText'] : '',
+            'placeOrderEnableIcon' => isset( $attributes['placeOrderEnableIcon'] ) ? (bool) $attributes['placeOrderEnableIcon'] : false,
+            'placeOrderIconStyle'  => isset( $attributes['placeOrderIconStyle'] ) ? $attributes['placeOrderIconStyle'] : 'lock1',
+            'placeOrderEnablePrice'=> isset( $attributes['placeOrderEnablePrice'] ) ? (bool) $attributes['placeOrderEnablePrice'] : false,
+            'placeOrderBelowText'  => isset( $attributes['placeOrderBelowText'] ) ? $attributes['placeOrderBelowText'] : '',
+        ) );
+
+        $place_order_filter = $this->get_place_order_button_filter( $attributes );
+        add_filter( 'woocommerce_order_button_html', $place_order_filter );
+
+        $below_text = isset( $attributes['placeOrderBelowText'] ) ? $attributes['placeOrderBelowText'] : '';
+        $below_btn_filter = null;
+        if ( ! empty( $below_text ) ) {
+            $below_btn_filter = function() use ( $below_text ) {
+                echo '<div class="wpfnl-below-place-order-btn">' . wp_kses_post( $below_text ) . '</div>';
+            };
+            add_action( 'woocommerce_review_order_after_submit', $below_btn_filter );
+        }
+
         $output  = sprintf( '<div class="%1s" style="%2s">', esc_attr( $this->get_classes( $attributes ) ), esc_attr( $this->get_styles( $attributes ) ) );
         $output .= '<div class="wpfnl-block-checkout-form__wrapper wp-block-wpfunnels-checkout">';
         $output .= do_shortcode('[wpfunnels_checkout]');
         $output .= '</div>';
         $output .= '</div>';
+
+        remove_filter( 'woocommerce_order_button_html', $place_order_filter );
+        if ( null !== $below_btn_filter ) {
+            remove_action( 'woocommerce_review_order_after_submit', $below_btn_filter );
+        }
 
         return "<style>$dynamic_css</style>".$output;
     }
@@ -544,8 +667,14 @@ class CheckoutForm extends AbstractDynamicBlock {
     public function show_checkout_markup() {
 
 		$get_attributes = array(
-			'billingHeaderColor'   	=> isset( $_POST['billingHeaderColor'] ) ? $_POST['billingHeaderColor'] : 'red',
-			'layout' 				=> isset( $_POST['layout'] ) ? $_POST['layout'] : 'wpfnl-col-2',
+			'billingHeaderColor'    => isset( $_POST['billingHeaderColor'] ) ? $_POST['billingHeaderColor'] : 'red',
+			'layout'                => isset( $_POST['layout'] ) ? $_POST['layout'] : 'wpfnl-col-2',
+			'placeOrderBtnText'     => isset( $_POST['placeOrderBtnText'] ) ? sanitize_text_field( $_POST['placeOrderBtnText'] ) : 'Place Order',
+			'placeOrderSubText'     => isset( $_POST['placeOrderSubText'] ) ? sanitize_text_field( $_POST['placeOrderSubText'] ) : '',
+			'placeOrderEnableIcon'  => isset( $_POST['placeOrderEnableIcon'] ) ? filter_var( $_POST['placeOrderEnableIcon'], FILTER_VALIDATE_BOOLEAN ) : false,
+			'placeOrderIconStyle'   => isset( $_POST['placeOrderIconStyle'] ) ? sanitize_text_field( $_POST['placeOrderIconStyle'] ) : 'lock1',
+			'placeOrderEnablePrice' => isset( $_POST['placeOrderEnablePrice'] ) ? filter_var( $_POST['placeOrderEnablePrice'], FILTER_VALIDATE_BOOLEAN ) : false,
+			'placeOrderBelowText'   => isset( $_POST['placeOrderBelowText'] ) ? sanitize_text_field( $_POST['placeOrderBelowText'] ) : '',
 		);
 		$checkout_id				= isset($_POST['post_id']) ? $_POST['post_id'] : 0;
 
@@ -577,6 +706,18 @@ class CheckoutForm extends AbstractDynamicBlock {
 		do_action( 'wpfunnels/gutenberg_checkout_dynamic_filters', $attributes );
 		do_action( 'wpfunnels/before_gb_checkout_form_ajax', $checkout_id, $_POST );
 
+		$place_order_filter = $this->get_place_order_button_filter( $attributes );
+		add_filter( 'woocommerce_order_button_html', $place_order_filter );
+
+		$below_text = isset( $attributes['placeOrderBelowText'] ) ? $attributes['placeOrderBelowText'] : '';
+		$below_btn_filter = null;
+		if ( ! empty( $below_text ) ) {
+			$below_btn_filter = function() use ( $below_text ) {
+				echo '<div class="wpfnl-below-place-order-btn">' . wp_kses_post( $below_text ) . '</div>';
+			};
+			add_action( 'woocommerce_review_order_after_submit', $below_btn_filter );
+		}
+
 		$output  		= sprintf( '<div class="%1$s" style="%2$s">', esc_attr( $this->get_classes( $attributes ) ), esc_attr( $this->get_styles( $attributes ) ) );
 
 		$output 		.= '<div class="wpfnl-block-checkout-form__wrapper wpfnl-checkout '.$checkout_layout.' '.$floating_label.'">';
@@ -584,6 +725,12 @@ class CheckoutForm extends AbstractDynamicBlock {
 		$output 		.= '</div>';
 		$output 		.= '</div>';
 		$output 		.= "<style>$dynamic_css</style>";
+
+		remove_filter( 'woocommerce_order_button_html', $place_order_filter );
+		if ( null !== $below_btn_filter ) {
+			remove_action( 'woocommerce_review_order_after_submit', $below_btn_filter );
+		}
+
 		wp_send_json_success($output);
     }
 }

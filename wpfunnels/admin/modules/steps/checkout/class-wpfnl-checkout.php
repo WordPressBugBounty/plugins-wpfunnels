@@ -219,6 +219,14 @@ class Module extends Steps
 
 		update_post_meta($step_id, '_wpfnl_checkout_products', $products);
 		update_post_meta($step_id, '_wpfnl_checkout_coupon', $coupon);
+
+		$collapsible_coupon = isset($payload['collapsibleCoupon']) ? $payload['collapsibleCoupon'] : 'no';
+		if ($collapsible_coupon === 'true') {
+			$collapsible_coupon = 'yes';
+		} elseif ($collapsible_coupon != 'yes') {
+			$collapsible_coupon = 'no';
+		}
+		update_post_meta($step_id, '_wpfnl_checkout_collapsible_coupon', $collapsible_coupon);
 		update_post_meta($step_id, '_wpfnl_multiple_product', $isMultipleProduct);
 		update_post_meta($step_id, '_wpfnl_quantity_support', $isQuantity);
 

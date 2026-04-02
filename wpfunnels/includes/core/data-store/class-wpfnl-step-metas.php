@@ -25,6 +25,8 @@ class Wpfnl_Step_Meta_keys
                 '_wpfnl_checkout_products' => [],
                 '_wpfnl_checkout_discount' => [],
                 '_wpfnl_checkout_coupon' => '',
+                '_wpfnl_checkout_collapsible_coupon' => '',
+                '_wpfnl_express_checkout_enabled' => 'no',
             ],
             'thankyou' => [
                 '_wpfnl_thankyou_text' => '',
@@ -77,6 +79,10 @@ class Wpfnl_Step_Meta_keys
                 'default'  => '',
                 'sanitize_func' => 'FILTER_SCRIPT',
             ),
+            '_wpfnl_custom_css'   => array(
+                'default'  => '',
+                'sanitize_func' => 'FILTER_SCRIPT',
+            ),
         );
     }
 
@@ -94,6 +100,18 @@ class Wpfnl_Step_Meta_keys
                 'default'  => '',
                 'sanitize_func' => 'FILTER_SCRIPT',
             ),
+            '_wpfnl_custom_css'   => array(
+                'default'  => '',
+                'sanitize_func' => 'FILTER_SCRIPT',
+            ),
+            '_wpfnl_express_checkout_enabled'   => array(
+                'default'  => 'yes',
+                'sanitize_func' => 'FILTER_DEFAULT',
+            ),
+            '_wpfnl_express_checkout_position'  => array(
+                'default'  => 'top',
+                'sanitize_func' => 'FILTER_DEFAULT',
+            ),
         );
     }
 
@@ -108,6 +126,10 @@ class Wpfnl_Step_Meta_keys
     public static function get_thankyou_meta() {
         return array(
             '_wpfnl_custom_script'   => array(
+                'default'  => '',
+                'sanitize_func' => 'FILTER_SCRIPT',
+            ),
+            '_wpfnl_custom_css'   => array(
                 'default'  => '',
                 'sanitize_func' => 'FILTER_SCRIPT',
             ),
@@ -128,6 +150,10 @@ class Wpfnl_Step_Meta_keys
                 'default'  => '',
                 'sanitize_func' => 'FILTER_SCRIPT',
             ),
+            '_wpfnl_custom_css'   => array(
+                'default'  => '',
+                'sanitize_func' => 'FILTER_SCRIPT',
+            ),
         );
     }
 
@@ -142,6 +168,10 @@ class Wpfnl_Step_Meta_keys
     public static function get_custom_meta() {
         return array(
             '_wpfnl_custom_script'   => array(
+                'default'  => '',
+                'sanitize_func' => 'FILTER_SCRIPT',
+            ),
+            '_wpfnl_custom_css'   => array(
                 'default'  => '',
                 'sanitize_func' => 'FILTER_SCRIPT',
             ),
@@ -167,6 +197,9 @@ class Wpfnl_Step_Meta_keys
             switch ( $sanitize_filter ) {
                 case 'FILTER_SCRIPT':
                     $meta_value = htmlentities( wp_unslash( $settings[ $key ] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+                    break;
+                case 'FILTER_DEFAULT':
+                    $meta_value = sanitize_text_field( $settings[ $key ] );
                     break;
                 default:
                     break;

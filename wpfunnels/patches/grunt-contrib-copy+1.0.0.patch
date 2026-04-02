@@ -1,0 +1,13 @@
+diff --git a/node_modules/grunt-contrib-copy/tasks/copy.js b/node_modules/grunt-contrib-copy/tasks/copy.js
+index bdb476c..c9c3c65 100644
+--- a/node_modules/grunt-contrib-copy/tasks/copy.js
++++ b/node_modules/grunt-contrib-copy/tasks/copy.js
+@@ -34,7 +34,7 @@ module.exports = function(grunt) {
+     };
+ 
+     var detectDestType = function(dest) {
+-      if (grunt.util._.endsWith(dest, '/')) {
++      if (dest.endsWith('/')) {
+         return 'directory';
+       } else {
+         return 'file';

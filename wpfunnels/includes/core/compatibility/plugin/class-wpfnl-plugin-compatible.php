@@ -82,6 +82,10 @@ class Wpfnl_Plugin_Compatibility {
             [
                 'name'          => 'Fox Currency Switcher',
                 'class_name'    => 'FoxCurrencySwitcher'
+            ],
+            [
+                'name'          => 'WooCommerce Germanized',
+                'class_name'    => 'WooCommerceGermanized'
             ]
         ];
         return $plugins;

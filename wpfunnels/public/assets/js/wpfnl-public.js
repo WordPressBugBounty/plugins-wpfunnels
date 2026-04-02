@@ -243,7 +243,7 @@
         //     $('#billing_country').length
         // ) {
         //     if ('undefined' !== typeof $.fn.select2) {
-                
+
         //         $('#billing_country, #billing_state, #shipping_country, #shipping_state')
         //             .select2()
         //             .on('select2:open', (elm) => {
@@ -434,7 +434,7 @@
                 checkoutFieldValidation('#wpfnl_checkout_billing')
 
                 $('#wpfnl_checkout_billing .validate-required').each(function () {
-                    if ($(this).find('.field-required').length) {
+                    if ($(this).hasClass('woocommerce-invalid-required-field')) {
                         isValidate = false
                     }
                 })
@@ -467,7 +467,7 @@
                     checkoutFieldValidation('#wpfnl_checkout_billing')
 
                     $('#wpfnl_checkout_billing .validate-required').each(function () {
-                        if ($(this).find('.field-required').length) {
+                        if ($(this).hasClass('woocommerce-invalid-required-field')) {
                             isValidate = false
                         }
                     })
@@ -479,7 +479,7 @@
                     checkoutFieldValidation('#wpfnl_checkout_shipping')
 
                     $('#wpfnl_checkout_shipping .validate-required').each(function () {
-                        if ($(this).find('.field-required').length) {
+                        if ($(this).hasClass('woocommerce-invalid-required-field')) {
                             isValidate = false
                         }
                     })
@@ -491,7 +491,7 @@
                     checkoutFieldValidation('.woocommerce-additional-fields')
 
                     $('.woocommerce-additional-fields .validate-required').each(function () {
-                        if ($(this).find('.field-required').length) {
+                        if ($(this).hasClass('woocommerce-invalid-required-field')) {
                             isValidate = false
                         }
                     })
@@ -659,7 +659,7 @@
                 checkoutFieldValidation('#wpfnl_checkout_billing')
 
                 $('#wpfnl_checkout_billing .validate-required').each(function () {
-                    if ($(this).find('.field-required').length) {
+                    if ($(this).hasClass('woocommerce-invalid-required-field')) {
                         isValidate = false
                     }
                 })
@@ -692,7 +692,7 @@
                     checkoutFieldValidation('#wpfnl_checkout_billing')
 
                     $('#wpfnl_checkout_billing .validate-required').each(function () {
-                        if ($(this).find('.field-required').length) {
+                        if ($(this).hasClass('woocommerce-invalid-required-field')) {
                             isValidate = false
                         }
                     })
@@ -703,7 +703,7 @@
                     checkoutFieldValidation('#wpfnl_checkout_shipping')
 
                     $('#wpfnl_checkout_shipping .validate-required').each(function () {
-                        if ($(this).find('.field-required').length) {
+                        if ($(this).hasClass('woocommerce-invalid-required-field')) {
                             isValidate = false
                         }
                     })
@@ -715,7 +715,7 @@
                     checkoutFieldValidation('.woocommerce-additional-fields')
 
                     $('.woocommerce-additional-fields .validate-required').each(function () {
-                        if ($(this).find('.field-required').length) {
+                        if ($(this).hasClass('woocommerce-invalid-required-field')) {
                             isValidate = false
                         }
                     })
@@ -770,60 +770,176 @@
             }
         })
 
+        function ensureCheckoutValidationStyles() {
+            if ($('#wpfnl-checkout-validation-style').length) {
+                return
+            }
+
+            $('<style id="wpfnl-checkout-validation-style">' +
+                '.wpfnl-checkout .form-row.wpfnl-js-invalid > label{color:#a00 !important;}' +
+                '.wpfnl-checkout .form-row.wpfnl-js-invalid input.input-text,' +
+                '.wpfnl-checkout .form-row.wpfnl-js-invalid input[type="email"],' +
+                '.wpfnl-checkout .form-row.wpfnl-js-invalid input[type="tel"],' +
+                '.wpfnl-checkout .form-row.wpfnl-js-invalid input[type="password"],' +
+                '.wpfnl-checkout .form-row.wpfnl-js-invalid input[type="number"],' +
+                '.wpfnl-checkout .form-row.wpfnl-js-invalid input[type="text"],' +
+                '.wpfnl-checkout .form-row.wpfnl-js-invalid select,' +
+                '.wpfnl-checkout .form-row.wpfnl-js-invalid textarea{border-color:#a00 !important;}' +
+                '.wpfnl-checkout .form-row.wpfnl-js-invalid .select2-container--default .select2-selection--single,' +
+                '.wpfnl-checkout .form-row.wpfnl-js-invalid .select2-container--default .select2-selection--multiple{border-color:#a00 !important;}' +
+                '</style>').appendTo('head')
+        }
+
+        function updateCheckoutFieldState($field, isInvalid) {
+            var $row = $field.closest('.form-row')
+
+            if (!$row.length) {
+                return
+            }
+
+            if (isInvalid) {
+                $row
+                    .removeClass('woocommerce-validated')
+                    .addClass(
+                        'required-field-appended woocommerce-invalid woocommerce-invalid-required-field wpfnl-js-invalid',
+                    )
+            } else {
+                $row.removeClass(
+                    'required-field-appended woocommerce-invalid woocommerce-invalid-required-field wpfnl-js-invalid',
+                )
+            }
+        }
+
         function checkoutFieldValidation(step) {
+            ensureCheckoutValidationStyles()
+
+            let msgEnabled = window.wpfnl_obj && window.wpfnl_obj.field_validation_enabled === 'yes';
+            let msgTemplate = (window.wpfnl_obj && window.wpfnl_obj.field_validation_message) ? window.wpfnl_obj.field_validation_message : '{field} is required';
+
+            function appendFieldMessage($element, message) {
+                $element.parent().find('.field-required').remove()
+                if (msgEnabled) {
+                    $element.parent().append('<span class="field-required">' + message + '</span>')
+                }
+            }
+
+            function getErrorMessage($element) {
+                if (!msgEnabled) return 'Field required';
+                let $label = $element.closest('.form-row').find('label').clone();
+                $label.find('*').remove();
+                let fieldName = $.trim($label.text()).replace(/\*+$/, '').trim();
+                return msgTemplate.replace('{field}', fieldName);
+            }
+
             $(step + ' .validate-required input').each(function () {
                 var fieldValue = $(this).val()
                 if (!fieldValue) {
+                    var errorMsg = getErrorMessage($(this));
                     if (!maybeNeedAccount) {
                         if (
                             'account_username' === $(this).attr('name') ||
                             'account_password' === $(this).attr('name')
                         ) {
-                            $(this).parent().find('.field-required').remove()
-                            $(this).parents('.form-row').removeClass('required-field-appended')
+                            appendFieldMessage($(this), '')
+                            updateCheckoutFieldState($(this), false)
                             return true
                         } else {
-                            $(this).parent().find('.field-required').remove()
-                            $(this)
-                                .parent()
-                                .append('<span class="field-required">Field required</span>')
-                            $(this).parents('.form-row').addClass('required-field-appended')
+                            appendFieldMessage($(this), errorMsg)
+                            updateCheckoutFieldState($(this), true)
                         }
                     } else {
-                        $(this).parent().find('.field-required').remove()
-                        $(this)
-                            .parent()
-                            .append('<span class="field-required">Field required</span>')
-                        $(this).parents('.form-row').addClass('required-field-appended')
+                        appendFieldMessage($(this), errorMsg)
+                        updateCheckoutFieldState($(this), true)
                     }
                 } else if (fieldValue) {
-                    $(this).parent().find('.field-required').remove()
-                    $(this).parents('.form-row').removeClass('required-field-appended')
+                    appendFieldMessage($(this), '')
+                    updateCheckoutFieldState($(this), false)
                 }
             })
 
             $(step + ' .validate-required select').each(function () {
                 var fieldValue = $(this).children('option:selected').val()
                 if (!fieldValue) {
-                    $(this).parent().find('.field-required').remove()
-                    $(this).parent().append('<span class="field-required">Field required</span>')
-                    $(this).parents('.form-row').addClass('required-field-appended')
+                    var errorMsg = getErrorMessage($(this));
+                    appendFieldMessage($(this), errorMsg)
+                    updateCheckoutFieldState($(this), true)
                 } else if (fieldValue) {
-                    $(this).parent().find('.field-required').remove()
-                    $(this).parents('.form-row').removeClass('required-field-appended')
+                    appendFieldMessage($(this), '')
+                    updateCheckoutFieldState($(this), false)
                 }
             })
 
             $(step + ' .validate-required input[type="checkbox"]').each(function () {
                 var fieldValue = $(this).is(':checked')
                 if (!fieldValue) {
-                    $(this).parent().find('.field-required').remove()
-                    $(this).parent().append('<span class="field-required">Field required</span>')
+                    var errorMsg = getErrorMessage($(this));
+                    appendFieldMessage($(this), errorMsg)
+                    updateCheckoutFieldState($(this), true)
                 } else if (fieldValue) {
-                    $(this).parent().find('.field-required').remove()
+                    appendFieldMessage($(this), '')
+                    updateCheckoutFieldState($(this), false)
                 }
             })
         }
+
+        $('form.checkout').on('checkout_place_order', function () {
+            var isValidate = true;
+            checkoutFieldValidation('form.checkout');
+
+            $('form.checkout .validate-required').each(function () {
+                if ($(this).hasClass('woocommerce-invalid-required-field') && $(this).is(':visible')) {
+                    isValidate = false;
+                    $(this).removeClass('woocommerce-validated').addClass('woocommerce-invalid woocommerce-invalid-required-field');
+                }
+            });
+
+            if (!isValidate) {
+                var $firstErrorField = $('.field-required:visible').first();
+                var $firstInvalidRow = $('form.checkout .validate-required.woocommerce-invalid-required-field:visible').first();
+                var scrollTarget = $firstErrorField.length ? $firstErrorField.offset().top : $firstInvalidRow.offset().top;
+
+                if (scrollTarget) {
+                    $('html, body').animate({
+                        scrollTop: scrollTarget - 100
+                    }, 800);
+                }
+
+                return false;
+            }
+        });
+
+        $(document).on('input change focusout', 'form.checkout .validate-required input, form.checkout .validate-required select, form.checkout .validate-required textarea', function(e) {
+            ensureCheckoutValidationStyles();
+            var msgEnabled = window.wpfnl_obj && window.wpfnl_obj.field_validation_enabled === 'yes';
+            var isCheckable = $(this).is('[type="checkbox"], [type="radio"]');
+            var val = isCheckable ? $(this).is(':checked') : $.trim($(this).val());
+
+            if(val) {
+                $(this).parent().find('.field-required').remove();
+                updateCheckoutFieldState($(this), false);
+            } else if (e.type === 'focusout' || (isCheckable && e.type === 'change')) {
+                // Ignore account_password and account_username if maybeNeedAccount is false
+                if (!maybeNeedAccount && ('account_username' === $(this).attr('name') || 'account_password' === $(this).attr('name'))) {
+                    return;
+                }
+
+                let msgTemplate = (window.wpfnl_obj && window.wpfnl_obj.field_validation_message) || '{field} is required';
+                let $label = $(this).parents('.form-row').find('label').clone();
+                $label.find('*').remove();
+                let fieldName = $.trim($label.text()).replace(/\*+$/, '').trim();
+                let errorMsg = msgTemplate.replace('{field}', fieldName);
+
+                $(this).parent().find('.field-required').remove();
+                if (msgEnabled) {
+                    $(this).parent().append('<span class="field-required">' + errorMsg + '</span>');
+                }
+
+                var $row = $(this).parents('.form-row');
+                setTimeout(function() {
+                    updateCheckoutFieldState($row.find('input, select, textarea').first(), true);
+                }, 10);
+            }
+        });
 
         //-------when previous button click------
         $('.wpfnl-multistep-navigation button.previous').on('click', function () {
@@ -1115,7 +1231,7 @@
                         var titleLabel = $('#wpfnl-order-bump-title-' + key);
                         titleLabel.text(response.wpfunnels_data.product_name);
                     }
-                    
+
                     if (response.wpfunnels_data && response.wpfunnels_data.product_description) {
                         var descriptionLabel = $('#wpfnl-order-bump-description-' + key);
                         descriptionLabel.html(response.wpfunnels_data.product_description);
@@ -1156,7 +1272,7 @@
 
                     var $popupWrapper = $('.wpfnl-order-bump__popup-wrapper');
                     var inner_height = $popupWrapper.innerHeight() + 30;
-                    
+
                     $popupWrapper
                     .removeClass('show')
                     .css('top', '-' + inner_height + 'px')
@@ -1208,6 +1324,220 @@
         //--------woocommerce checkout page coupon toggle add class-----------
         $('.wpfnl-checkout .woocommerce-form-coupon-toggle .showcoupon').on('click', function () {
             $(this).parents('.woocommerce-form-coupon-toggle').toggleClass('show-form')
+        })
+
+        // Collapsible coupon field toggle
+        $(document).on('click', '.wpfnl-coupon-toggle-link', function (e) {
+            e.preventDefault()
+            var $wrapper = $(this).closest('.wpfnl-coupon-toggle-wrapper')
+            $wrapper.find('.wpfnl-coupon-collapsible').slideToggle(300)
+            $(this).closest('.wpfnl-coupon-toggle-notice').toggleClass('wpfnl-coupon-expanded')
+        })
+
+        function initCollapsibleCheckoutFields() {
+            var $rows = $('.wpfnl-checkout .form-row.wpfnl-field-collapsible')
+            if (!$rows.length) {
+                return
+            }
+
+            $rows.each(function () {
+                var $row = $(this)
+                if ($row.data('wpfnlCollapsibleReady')) {
+                    return
+                }
+
+                var $inputWrapper = $row.children('.woocommerce-input-wrapper').first()
+                if (!$inputWrapper.length) {
+                    $inputWrapper = $row.find('.woocommerce-input-wrapper').first()
+                }
+                if (!$inputWrapper.length) {
+                    return
+                }
+
+                var $label = $row.children('label').first()
+                var labelText = ''
+                if ($label.length) {
+                    var $labelClone = $label.clone()
+                    $labelClone.find('*').remove()
+                    labelText = $.trim($labelClone.text()).replace(/\*/g, '')
+                    $label.addClass('wpfnl-field-original-label')
+                }
+
+                if (!labelText) {
+                    labelText = 'Field'
+                }
+
+                $row.attr('data-collapse-label', labelText)
+
+                var $toggle = $(
+                    '<button type="button" class="wpfnl-field-collapse-toggle" aria-expanded="false">' +
+                        '<span class="wpfnl-field-collapse-icon" aria-hidden="true"></span>' +
+                        '<span class="wpfnl-field-collapse-text"></span>' +
+                    '</button>'
+                )
+
+                $toggle.find('.wpfnl-field-collapse-text').text('Add ' + labelText)
+                $row.prepend($toggle)
+
+                $row.addClass('wpfnl-field-collapsible-ready wpfnl-field-collapsed')
+                $row.data('wpfnlCollapsibleReady', true)
+                $inputWrapper.hide()
+            })
+        }
+
+        $(document).on('click', '.wpfnl-checkout .wpfnl-field-collapse-toggle', function (e) {
+            e.preventDefault()
+            var $button = $(this)
+            var $row = $button.closest('.form-row.wpfnl-field-collapsible')
+            var $inputWrapper = $row.children('.woocommerce-input-wrapper').first()
+            if (!$inputWrapper.length) {
+                $inputWrapper = $row.find('.woocommerce-input-wrapper').first()
+            }
+            if (!$inputWrapper.length) {
+                return
+            }
+
+            if (!$row.hasClass('wpfnl-field-collapsed')) {
+                return
+            }
+
+            $row.removeClass('wpfnl-field-collapsed').addClass('wpfnl-field-expanded')
+            $button.attr('aria-expanded', 'true').hide()
+            $inputWrapper.stop(true, true).slideDown(200)
+        })
+
+        $(document.body).on('checkout_error', function () {
+
+            $('.wpfnl-checkout .form-row.wpfnl-field-collapsible.woocommerce-invalid').each(function () {
+                var $row = $(this)
+                if ($row.hasClass('wpfnl-field-expanded')) {
+                    return
+                }
+
+                var $inputWrapper = $row.children('.woocommerce-input-wrapper').first()
+                if (!$inputWrapper.length) {
+                    $inputWrapper = $row.find('.woocommerce-input-wrapper').first()
+                }
+                if (!$inputWrapper.length) {
+                    return
+                }
+
+                $row.removeClass('wpfnl-field-collapsed').addClass('wpfnl-field-expanded')
+                $row.find('.wpfnl-field-collapse-toggle').attr('aria-expanded', 'true').hide()
+                $inputWrapper.stop(true, true).slideDown(200)
+            })
+        })
+
+        /**
+         * Modern checkout custom coupon flow.
+         */
+        function initModernCheckoutCouponFlow() {
+            var $checkoutWrapper = $('.wpfnl-checkout.wpfnl-modern-checkout, .wpfnl-checkout.wpfnl-modern-one-column')
+            if (!$checkoutWrapper.length) {
+                return
+            }
+
+            function renderCouponMessages(messages) {
+                $checkoutWrapper.find('.wpfnl-custom-coupon-messages').remove()
+                if (!messages) {
+                    return
+                }
+
+                var $container = $('<div class="wpfnl-custom-coupon-messages"></div>').html(messages)
+                var $target = $checkoutWrapper.find('.wpfnl-modern-checkout-right .wpfnl-modern-order-summary').first()
+                if (!$target.length) {
+                    $target = $checkoutWrapper.find('.wpfnl-modern-section--order-summary .wpfnl-modern-section__content').first()
+                }
+                if ($target.length) {
+                    $target.prepend($container)
+                }
+            }
+
+            function applyCoupon(couponCode, $button) {
+                if (!couponCode) {
+                    renderCouponMessages('<ul class="woocommerce-error" role="alert"><li>Please enter a coupon code.</li></ul>')
+                    return
+                }
+
+                $button.prop('disabled', true).addClass('wpfnl-loading')
+
+                $.ajax({
+                    type: 'POST',
+                    url: window.wpfnl_obj.ajaxurl,
+                    dataType: 'json',
+                    data: {
+                        action: 'wpfnl_apply_checkout_coupon',
+                        coupon_code: couponCode,
+                        security: window.wpfnl_obj.ajax_nonce,
+                    },
+                    success: function (response) {
+                        renderCouponMessages(response && response.data ? response.data.messages : '')
+                        $('body').trigger('update_checkout')
+                    },
+                    error: function () {
+                        renderCouponMessages('<ul class="woocommerce-error" role="alert"><li>Unable to apply coupon right now.</li></ul>')
+                    },
+                    complete: function () {
+                        $button.prop('disabled', false).removeClass('wpfnl-loading')
+                    },
+                })
+            }
+
+            $(document)
+                .off('click.wpfnlCouponFlow', '.wpfnl-submit-coupon')
+                .on('click.wpfnlCouponFlow', '.wpfnl-submit-coupon', function (e) {
+                    e.preventDefault()
+                    var $button = $(this)
+                    var couponCode = $button
+                        .closest('.wpfnl-custom-coupon-field')
+                        .find('.wpfnl-coupon-code-input')
+                        .val()
+
+                    applyCoupon($.trim(couponCode), $button)
+                })
+
+            $(document)
+                .off('keypress.wpfnlCouponFlow', '.wpfnl-coupon-code-input')
+                .on('keypress.wpfnlCouponFlow', '.wpfnl-coupon-code-input', function (e) {
+                    if (13 !== e.which) {
+                        return
+                    }
+
+                    e.preventDefault()
+                    var $input = $(this)
+                    var $button = $input.closest('.wpfnl-custom-coupon-field').find('.wpfnl-submit-coupon')
+                    applyCoupon($.trim($input.val()), $button)
+                })
+
+            $(document)
+                .off('click.wpfnlCouponRemove', '.wpfnl-modern-checkout-right .woocommerce-remove-coupon, .wpfnl-modern-one-column-wrapper .woocommerce-remove-coupon')
+                .on('click.wpfnlCouponRemove', '.wpfnl-modern-checkout-right .woocommerce-remove-coupon, .wpfnl-modern-one-column-wrapper .woocommerce-remove-coupon', function (e) {
+                    e.preventDefault()
+                    var couponCode = $(this).attr('data-coupon')
+
+                    $.ajax({
+                        type: 'POST',
+                        url: window.wpfnl_obj.ajaxurl,
+                        dataType: 'json',
+                        data: {
+                            action: 'wpfnl_remove_checkout_coupon',
+                            coupon_code: couponCode,
+                            security: window.wpfnl_obj.ajax_nonce,
+                        },
+                        success: function (response) {
+                            renderCouponMessages(response && response.data ? response.data.messages : '')
+                            $('body').trigger('update_checkout')
+                        },
+                    })
+                })
+        }
+
+        initModernCheckoutCouponFlow()
+        initCollapsibleCheckoutFields()
+
+        $(document.body).on('updated_checkout', function () {
+            initModernCheckoutCouponFlow()
+            initCollapsibleCheckoutFields()
         })
 
         /**
@@ -1541,10 +1871,321 @@
             });
         })
 
+        /**
+         * Modern checkout customer login/account toggle flow.
+         * - Initially shows only email for logged-out users.
+         * - Click "Log in" => reveal password section with slide animation.
+         * - If user does not click login, check email existence via AJAX and toggle sections.
+         */
+        function initModernCheckoutCustomerFlow() {
+            var $wrapper = $('.wpfnl-modern-checkout-wrapper .wpfnl-customer-info, .wpfnl-modern-one-column-wrapper .wpfnl-customer-info')
+            if (!$wrapper.length) {
+                return
+            }
+
+            var $email = $wrapper.find('input[name="billing_email"]')
+            var $passwordSection = $wrapper.find('.wpfnl-customer-login-section')
+            var $createAccountSection = $wrapper.find('.wpfnl-create-account-section')
+            var $inlineError = $wrapper.find('.wpfnl-email-inline-error')
+            var hasClickedLogin = false
+            var lastCheckedEmail = ''
+            var checkTimer = null
+
+            if (!$inlineError.length && $email.length) {
+                $inlineError = $('<p class="wpfnl-email-inline-error" style="display:none;color:#c62828;font-size:12px;margin-top:6px;"></p>')
+                $email.first().closest('.form-row').append($inlineError)
+            }
+
+            if ($passwordSection.length) {
+                $passwordSection.stop(true, true).hide()
+            }
+
+            if ($createAccountSection.length) {
+                $createAccountSection.attr('hidden', true).stop(true, true).hide()
+            }
+
+            $(document)
+                .off('click.wpfnlModernCustomerFlow', '.wpfnl-customer-login-url')
+                .on('click.wpfnlModernCustomerFlow', '.wpfnl-customer-login-url', function (e) {
+                    e.preventDefault()
+                    hasClickedLogin = true
+                    if ($createAccountSection.length) {
+                        $createAccountSection.stop(true, true).slideUp(180).attr('hidden', true)
+                    }
+                    if ($passwordSection.length) {
+                        $passwordSection.stop(true, true).slideDown(220)
+                    }
+                })
+
+            function isValidEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+            }
+
+            function showInlineEmailError(message) {
+                if (!$inlineError.length) {
+                    return
+                }
+                $inlineError.text(message).stop(true, true).slideDown(140)
+            }
+
+            function hideInlineEmailError() {
+                if (!$inlineError.length) {
+                    return
+                }
+                $inlineError.stop(true, true).slideUp(120)
+            }
+
+            function updateSectionsForEmailCheck(result) {
+                if (hasClickedLogin) {
+                    return
+                }
+
+                if (!result || !result.data) {
+                    return
+                }
+
+                var payload = result.data
+                var emailExists = !!payload.success
+                var loginAllowed = !!payload.is_login_allowed
+
+                if (emailExists && loginAllowed) {
+                    if ($createAccountSection.length) {
+                        $createAccountSection.stop(true, true).slideUp(180).attr('hidden', true)
+                    }
+                    if ($passwordSection.length) {
+                        $passwordSection.stop(true, true).slideDown(220)
+                    }
+                    return
+                }
+
+                if ($passwordSection.length) {
+                    $passwordSection.stop(true, true).slideUp(180)
+                }
+
+                if ($createAccountSection.length) {
+                    $createAccountSection.removeAttr('hidden').stop(true, true).slideDown(220)
+                }
+            }
+
+            function checkEmailExistence() {
+                if (!$email.length || hasClickedLogin) {
+                    return
+                }
+
+                var email = ($email.val() || '').trim()
+                if (!email.length) {
+                    hideInlineEmailError()
+                    return
+                }
+
+                if (!isValidEmail(email)) {
+                    showInlineEmailError('Entered email address is not a valid email.')
+                    return
+                }
+
+                hideInlineEmailError()
+
+                if (email === lastCheckedEmail) {
+                    return
+                }
+
+                lastCheckedEmail = email
+
+                $.ajax({
+                    type: 'POST',
+                    url: window.wpfnl_obj.ajaxurl,
+                    dataType: 'json',
+                    data: {
+                        action: 'wpf_check_email_exists',
+                        email: email,
+                        security: window.wpfnl_obj.ajax_nonce,
+                    },
+                    success: function (response) {
+                        updateSectionsForEmailCheck(response)
+                    },
+                    error: function () {
+                        // Keep UI quiet on network/server error to avoid noisy checkout UX.
+                    },
+                })
+            }
+
+            $(document)
+                .off('input.wpfnlModernCustomerFlow keyup.wpfnlModernCustomerFlow paste.wpfnlModernCustomerFlow blur.wpfnlModernCustomerFlow change.wpfnlModernCustomerFlow', '.wpfnl-modern-checkout-wrapper input[name="billing_email"], .wpfnl-modern-one-column-wrapper input[name="billing_email"]')
+                .on('input.wpfnlModernCustomerFlow keyup.wpfnlModernCustomerFlow paste.wpfnlModernCustomerFlow blur.wpfnlModernCustomerFlow change.wpfnlModernCustomerFlow', '.wpfnl-modern-checkout-wrapper input[name="billing_email"], .wpfnl-modern-one-column-wrapper input[name="billing_email"]', function () {
+                    clearTimeout(checkTimer)
+                    checkTimer = setTimeout(checkEmailExistence, 250)
+                })
+        }
+
+        initModernCheckoutCustomerFlow()
+
+        $(document.body).on('updated_checkout', function () {
+            initModernCheckoutCustomerFlow()
+        })
+
         //----------optin form click to expand btn option-----------
         $('.clickto-expand-btn').on('click', function (e) {
             $(this).parents('.wpfnl-optin-clickto-expand').hide()
             $('.wpfnl-optin-form.clickto-expand-optin').show()
         })
+
+        // Preserve custom Place Order button HTML after WooCommerce's payment_method_selected
+        // handler calls .text() which strips all child elements (icon, price, sub-text spans).
+        var wpfnlPlaceOrderHTML = null
+
+        function wpfnlCachePlaceOrderBtn() {
+            var $btn = $('#place_order')
+            if ($btn.find('.wpfnl-place-order-icon, .wpfnl-place-order-price, .wpfnl-place-order-sub-text').length) {
+                wpfnlPlaceOrderHTML = $btn.html()
+            }
+        }
+
+        function wpfnlRestorePlaceOrderBtn() {
+            if (wpfnlPlaceOrderHTML) {
+                $('#place_order').html(wpfnlPlaceOrderHTML)
+            }
+        }
+
+        $(document.body).on('updated_checkout', function () {
+            wpfnlCachePlaceOrderBtn()
+        })
+
+        $(document.body).on('payment_method_selected', function () {
+            wpfnlRestorePlaceOrderBtn()
+        })
+
+        // Also restore on initial load after a short delay to catch early WC init
+        $(document.body).on('init_checkout', function () {
+            wpfnlCachePlaceOrderBtn()
+        })
+
+        // Enhanced Phone Field Implementation
+        function initEnhancedPhoneField() {
+            if (window.wpfnl_obj && window.wpfnl_obj.enhanced_phone_field_enabled === 'yes') {
+                if ($('#wpfnl-iti-styles').length === 0) {
+                    $('<style id="wpfnl-iti-styles">.iti { width: 100%; } .wpfnl-invalid-phone { border-color: #a00 !important; }</style>').appendTo('head');
+                }
+
+                var phoneInputs = document.querySelectorAll('#billing_phone, .wpfnl-phone, input[type="tel"]');
+
+                phoneInputs.forEach(function(input) {
+                    if (!input.classList.contains('iti__tel-input') && window.intlTelInput) {
+                        input.classList.add('iti__tel-input');
+
+                        var iti = window.intlTelInput(input, {
+                            initialCountry: "auto",
+                            separateDialCode: true,
+                            geoIpLookup: function(success, failure) {
+                                $.get('https://ipinfo.io', function() {}, "jsonp").always(function(resp) {
+                                    var countryCode = (resp && resp.country) ? resp.country : "us";
+                                    success(countryCode);
+                                });
+                            },
+                            utilsScript: window.wpfnl_obj.phone_utils_url,
+                        });
+
+                        if (window.wpfnl_obj.phone_help_text) {
+                            var helpText = document.createElement('small');
+                            helpText.className = 'wpfnl-phone-help-text';
+                            helpText.style.display = 'block';
+                            helpText.style.color = '#686F7F';
+                            helpText.style.marginTop = '4px';
+                            helpText.style.fontSize = '12px';
+                            helpText.innerText = window.wpfnl_obj.phone_help_text;
+                            input.parentNode.parentNode.appendChild(helpText);
+                        }
+
+                        if (window.wpfnl_obj.validate_phone_number === 'yes') {
+                            input.addEventListener('blur', function() {
+                                if (input.value.trim()) {
+                                    if (iti.isValidNumber()) {
+                                        input.classList.remove('wpfnl-invalid-phone');
+                                        $(input).parents('.form-row').removeClass('woocommerce-invalid');
+                                    } else {
+                                        input.classList.add('wpfnl-invalid-phone');
+                                        $(input).parents('.form-row').addClass('woocommerce-invalid');
+                                    }
+                                }
+                            });
+                        }
+
+                        if (window.wpfnl_obj.save_phone_number_format === 'with_country_code') {
+                            var $form = $(input).closest('form.checkout');
+                            if ($form.length) {
+                                $form.on('checkout_place_order', function() {
+                                    if (iti.isValidNumber()) {
+                                        input.value = iti.getNumber();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        initEnhancedPhoneField();
+
+        function initCollapsibleOrderSummary() {
+            if (window.wpfnl_obj && window.wpfnl_obj.collapsible_order_summary_enabled !== 'no') {
+                var $table = $('.woocommerce-checkout-review-order-table');
+                if ($table.length > 0 && $('.wpfnl-mobile-order-summary-toggle').length === 0) {
+                    var toggleHtml = '<div class="wpfnl-mobile-order-summary-toggle" style="display:none; padding: 10px 14px; background: #f8f8f8; cursor: pointer; border: 1px solid #e2e8f0; border-bottom: none; border-radius: 10px; font-weight: 600; color: #1e293b; align-items: center; justify-content: space-between; margin-bottom: 0;">' +
+                                     '<span class="wpfnl-mos-text" style="color: #1A241A; font-size: 16px;">Show order summary</span>' +
+                                     '<span class="wpfnl-mos-icon" style="transition: transform 0.3s ease; font-size: 12px;">▼</span>' +
+                                     '</div>';
+                    $(toggleHtml).insertBefore($table);
+
+                    $('.wpfnl-mobile-order-summary-toggle').on('click', function() {
+                        var $content = $(this).next('.woocommerce-checkout-review-order-table');
+                        var $icon = $(this).find('.wpfnl-mos-icon');
+                        var $text = $(this).find('.wpfnl-mos-text');
+
+                        $content.slideToggle(300, function() {
+                            var isVisible = $content.is(':visible');
+                            $text.text(isVisible ? 'Hide order summary' : 'Show order summary');
+                            $icon.css('transform', isVisible ? 'rotate(180deg)' : 'rotate(0deg)');
+                        });
+                    });
+                }
+
+                var handleResize = function() {
+                    if ($(window).width() <= 768) {
+                        $('.wpfnl-mobile-order-summary-toggle').css('display', 'flex');
+                        if (!$('.woocommerce-checkout-review-order-table').hasClass('wpfnl-mos-collapsed') && !$('.woocommerce-checkout-review-order-table').is(':visible')) {
+                            // Already handled
+                        } else if (!$('.woocommerce-checkout-review-order-table').hasClass('wpfnl-mos-collapsed')) {
+                            $('.woocommerce-checkout-review-order-table').hide().addClass('wpfnl-mos-collapsed');
+                            $('.wpfnl-mobile-order-summary-toggle').css('border-bottom', '1px solid #e2e8f0').css('border-radius', '4px');
+                            $('.wpfnl-mobile-order-summary-toggle .wpfnl-mos-text').text('Show order summary');
+                            $('.wpfnl-mobile-order-summary-toggle .wpfnl-mos-icon').css('transform', 'rotate(0deg)');
+                        }
+                    } else {
+                        $('.wpfnl-mobile-order-summary-toggle').hide();
+                        $('.woocommerce-checkout-review-order-table').show().removeClass('wpfnl-mos-collapsed');
+                    }
+                };
+
+                $(window).on('resize', handleResize);
+                handleResize();
+            }
+        }
+
+        initCollapsibleOrderSummary();
+
+        $(document.body).on('updated_checkout', function () {
+            initEnhancedPhoneField();
+            if ($('.wpfnl-mobile-order-summary-toggle').length === 0) {
+                initCollapsibleOrderSummary();
+            } else {
+                if ($(window).width() <= 768 && $('.woocommerce-checkout-review-order-table').hasClass('wpfnl-mos-collapsed')) {
+                    $('.woocommerce-checkout-review-order-table').hide();
+                } else if ($(window).width() > 768) {
+                    $('.woocommerce-checkout-review-order-table').show();
+                }
+            }
+        });
+
+
     })
 })(jQuery)

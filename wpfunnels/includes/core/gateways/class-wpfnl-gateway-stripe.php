@@ -16,6 +16,7 @@ class Wpfnl_Stripe_payment_process {
         $this->refund_support = true;
 
         add_filter( 'wc_stripe_force_save_source', array( $this, 'should_tokenize_stripe' ), 9999);
+        add_filter( 'wc_stripe_force_save_payment_method', array( $this, 'should_save_payment_method_for_offer' ), 9999, 2 );
         add_filter( 'wc_stripe_3ds_source', array( $this, 'may_be_modify_3ds_param' ), 9999, 2);
         add_action( 'wc_gateway_stripe_process_response', array( $this, 'handle_redirection' ), 9999, 2 );
 
@@ -27,6 +28,16 @@ class Wpfnl_Stripe_payment_process {
         add_action( 'wpfunnels/subscription_created', array( $this, 'add_offer_subscription_meta' ), 9999, 3 );
 
         add_action( 'woocommerce_checkout_after_order_review', array( $this, 'add_stripe_hidden_field' ), 99 );
+
+        // Support for Stripe Express Checkout Element (Apple Pay / Google Pay) which uses the WC Store API.
+        add_action( 'woocommerce_store_api_checkout_update_order_from_request', array( $this, 'save_funnel_meta_for_express_checkout' ), 10, 2 );
+
+        // Force setup_future_usage on checkout PaymentIntents for funnel orders so the Express Checkout
+        // PaymentMethod (pm_xxx) gets attached to the Stripe customer. Without this, guests using
+        // Google Pay / Apple Pay produce a single-use pm_ that cannot be reused for offer charges.
+        // wc_stripe_force_save_payment_method is ignored for guests (is_user_logged_in guard in WC Stripe),
+        // so we must inject directly into the PI request instead.
+        add_filter( 'wc_stripe_generate_create_intent_request', array( $this, 'force_save_pm_for_funnel_order' ), 10, 2 );
 
     }
 
@@ -44,15 +55,223 @@ class Wpfnl_Stripe_payment_process {
         // Get checkout id if not found in post data.
         $checkout_id = !$checkout_id ? get_the_ID() : $checkout_id;
         $funnel_id   = Wpfnl_functions::get_funnel_id_from_step( $checkout_id );
-        
+
         if ( $checkout_id && $funnel_id ) {
 
             if ( Wpfnl_functions::is_offer_exists_in_funnel($funnel_id) ) {
                 $save_source = true;
             }
         }
-       
+
         return $save_source;
+    }
+
+
+    /**
+     * Force save payment method for funnel orders with offers.
+     * Handles the newer wc_stripe_force_save_payment_method filter used by the UPE gateway.
+     * This is needed for Stripe Express Checkout (Apple Pay/Google Pay) which uses the Store API
+     * and doesn't go through the classic $_POST checkout flow.
+     *
+     * @param bool       $force_save Whether to force save the payment method.
+     * @param string|int $order_id   The WooCommerce order ID (may be empty during intent creation).
+     * @return bool
+     */
+    public function should_save_payment_method_for_offer( $force_save, $order_id ) {
+        if ( $force_save ) {
+            return $force_save;
+        }
+
+        // For Store API / ECE: funnel meta is already saved on the order by
+        // save_funnel_meta_for_express_checkout before payment processing runs.
+        if ( $order_id ) {
+            $order = wc_get_order( $order_id );
+            if ( $order ) {
+                $funnel_id = Wpfnl_functions::get_funnel_id_from_order( $order );
+                if ( $funnel_id && Wpfnl_functions::is_offer_exists_in_funnel( $funnel_id ) ) {
+                    return true;
+                }
+            }
+        }
+
+        return $force_save;
+    }
+
+
+    /**
+     * Save WPFunnels funnel metadata to the order when Stripe Express Checkout
+     * (Apple Pay / Google Pay) processes via the WooCommerce Store API.
+     *
+     * Classic checkout sends _wpfunnels_checkout_id via $_POST, but the Stripe
+     * Express Checkout Element submits to /wp-json/wc/store/v1/checkout (Blocks
+     * Store API) where $_POST is not populated. We recover the checkout step ID
+     * from the HTTP Referer header instead.
+     *
+     * @param \WC_Order        $order   The WooCommerce order being processed.
+     * @param \WP_REST_Request $request The REST API request.
+     * @return void
+     */
+    public function save_funnel_meta_for_express_checkout( $order, $request ) {
+        // Only handle Stripe payments (including express methods like Apple Pay and Google Pay).
+        $payment_method = $request->get_param( 'payment_method' );
+        
+        // Check if this is a Stripe payment method:
+        // - 'stripe' (main gateway)
+        // - 'stripe_*' (split UPE gateways)
+        // - 'google_pay', 'apple_pay', 'link' (express checkout methods)
+        $is_stripe_payment = ( 
+            'stripe' === $payment_method || 
+            0 === strpos( $payment_method, 'stripe_' ) ||
+            in_array( $payment_method, [ 'google_pay', 'apple_pay', 'link' ], true )
+        );
+        
+        if ( ! $is_stripe_payment ) {
+            return;
+        }
+        
+        // Skip if funnel metadata was already saved (classic checkout path).
+        if ( $order->get_meta( '_wpfunnels_funnel_id' ) ) {
+            return;
+        }
+
+        // Determine the checkout page from the HTTP Referer.
+        $referer = $request->get_header( 'referer' );
+        if ( ! $referer ) {
+            $referer = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
+        }
+
+        if ( ! $referer ) {
+            return;
+        }
+
+        // Strip query string and get the slug from the URL.
+        $referer_path = strtok( $referer, '?' );
+        $page_id      = url_to_postid( $referer_path );
+
+        // If url_to_postid fails (returns 0), try to find the page by slug.
+        // This is needed for custom post types with custom rewrite rules.
+        if ( ! $page_id ) {
+            
+            // Extract the slug from the URL (last segment of the path).
+            $parsed_url = wp_parse_url( $referer_path );
+            $path       = isset( $parsed_url['path'] ) ? trim( $parsed_url['path'], '/' ) : '';
+            
+            if ( $path ) {
+                $path_parts = explode( '/', $path );
+                $slug       = end( $path_parts );
+                
+                
+                // Try to find a wpfunnel_steps post with this slug.
+                $args = array(
+                    'name'           => $slug,
+                    'post_type'      => 'wpfunnel_steps',
+                    'post_status'    => 'publish',
+                    'posts_per_page' => 1,
+                );
+                
+                $posts = get_posts( $args );
+                
+                if ( ! empty( $posts ) ) {
+                    $page_id = $posts[0]->ID;
+                }
+            }
+        }
+
+        if ( ! $page_id ) {
+            return;
+        }
+
+        // Confirm this is a WPFunnels checkout step.
+        $is_checkout_step = Wpfnl_functions::check_if_this_is_step_type_by_id( $page_id, 'checkout' );
+        if ( ! $is_checkout_step ) {
+            return;
+        }
+
+        $funnel_id = Wpfnl_functions::get_funnel_id_from_step( $page_id );
+        if ( ! $funnel_id ) {
+            return;
+        }
+
+        $order->update_meta_data( '_wpfunnels_checkout_id', $page_id );
+        $order->update_meta_data( '_wpfunnels_funnel_id', $funnel_id );
+        $order->update_meta_data( '_wpfunnels_order', 'yes' );
+        $order->save();
+
+        // Mark this session as the order owner so is_valid_order_owner() passes
+        // for subsequent upsell/downsell AJAX calls in the same browser session.
+        if ( WC()->session ) {
+            $session_handler = new \WC_Session_Handler();
+            WC()->session->set( 'wpfnl_order_owner', $session_handler->generate_customer_id() );
+        }
+    }
+
+    /**
+     * Force setup_future_usage = 'off_session' on the checkout PaymentIntent for
+     * WPFunnels funnel orders that use Stripe Express Checkout (Google Pay / Apple Pay).
+     *
+     * WC Stripe 10.x uses "confirmation tokens" for Express Checkout. In that flow
+     * setup_future_usage is only added when has_subscription = true. For regular
+     * funnel checkouts (guest or logged-in) the PM would otherwise be single-use
+     * and cannot be reused for the subsequent offer/upsell charge.
+     *
+     * WC_Stripe_Helper::should_force_save_payment_method() has an is_user_logged_in()
+     * hard-guard meaning the wc_stripe_force_save_payment_method filter never fires
+     * for guests. Injecting directly into the PI request via this filter is the only
+     * reliable approach.
+     *
+     * @param array    $request The Stripe PaymentIntent request parameters.
+     * @param WC_Order $order   The WooCommerce order.
+     * @return array
+     */
+    public function force_save_pm_for_funnel_order( $request, $order ) {
+        // Only apply when there is a Stripe customer to attach the PM to.
+        if ( empty( $request['customer'] ) ) {
+            return $request;
+        }
+
+        // Only apply to payment creation requests (must have either a payment_method or confirmation_token).
+        $has_pm    = ! empty( $request['payment_method'] );
+        $has_ct    = ! empty( $request['confirmation_token'] );
+        if ( ! $has_pm && ! $has_ct ) {
+            return $request;
+        }
+
+        // Identify the order object — $order may be null in some call paths.
+        if ( ! $order instanceof \WC_Order ) {
+            return $request;
+        }
+
+        $funnel_id = Wpfnl_functions::get_funnel_id_from_order( $order );
+        if ( ! $funnel_id ) {
+            return $request;
+        }
+
+        if ( ! Wpfnl_functions::is_offer_exists_in_funnel( $funnel_id ) ) {
+            return $request;
+        }
+
+        if ( $has_ct ) {
+            // Confirmation token flow (ECE with Optimised Checkout Element):
+            // setup_future_usage must be set inside payment_method_options.
+            $pm_type = 'card';
+            if ( ! empty( $request['payment_method_types'] ) && is_array( $request['payment_method_types'] ) ) {
+                $pm_type = reset( $request['payment_method_types'] );
+            }
+            if ( ! isset( $request['payment_method_options'] ) ) {
+                $request['payment_method_options'] = [];
+            }
+            if ( empty( $request['payment_method_options'][ $pm_type ]['setup_future_usage'] ) ) {
+                $request['payment_method_options'][ $pm_type ]['setup_future_usage'] = 'off_session';
+            }
+        } else {
+            // Payment method flow (ECE with classic pm_ or saved token):
+            // setup_future_usage is set at the top level of the PI request.
+            if ( empty( $request['setup_future_usage'] ) ) {
+                $request['setup_future_usage'] = 'off_session';
+            }
+        }
+
+        return $request;
     }
 
 
@@ -188,57 +407,60 @@ class Wpfnl_Stripe_payment_process {
             $gateways   = $woocommerce->payment_gateways->payment_gateways();
             $gateway    = $gateways['stripe'];
             if ( $gateway ) {
-                $order_source   = $gateway->prepare_order_source($order);
+                $order_source = $gateway->prepare_order_source( $order );
 
-                $is_3ds         = isset($order_source->source_object->card->three_d_secure) ? $order_source->source_object->card->three_d_secure : false;
+                $main_settings   = get_option( 'woocommerce_stripe_settings' );
+                $testmode        = ( ! empty( $main_settings['testmode'] ) && 'yes' === $main_settings['testmode'] );
+                $publishable_key = $testmode
+                    ? ( ! empty( $main_settings['test_publishable_key'] ) ? $main_settings['test_publishable_key'] : '' )
+                    : ( ! empty( $main_settings['publishable_key'] ) ? $main_settings['publishable_key'] : '' );
 
-                $_3ds_array = [
-                    'optional',
-                    'not_supported',
-                ];
+                $offer_settings = Wpfnl_functions::get_offer_settings();
+
+                // Express Checkout (pm_xxx PaymentMethod): no client-side 3DS step needed.
+                // Return without intent_secret so JS routes to wpfunnels_process_offer directly,
+                // where process_payment() handles the full charge server-side.
+                if ( ! empty( $order_source->source ) && 0 === strpos( $order_source->source, 'pm_' ) ) {
+                    wp_send_json( array( 'result' => 'success' ) );
+                    return;
+                }
+
+                $is_3ds     = isset( $order_source->source_object->card->three_d_secure ) ? $order_source->source_object->card->three_d_secure : false;
+                $_3ds_array = [ 'optional', 'not_supported' ];
 
                 // check if 3ds is active or not
                 if ( isset($is_3ds) && !in_array( $is_3ds,$_3ds_array ) ) {
-                    
-                    $intent         = $this->create_intent($order, $order_source, $offer_product);
-                   
-                    $main_settings  = get_option('woocommerce_stripe_settings');
-                    $testmode       = (!empty($main_settings['testmode']) && 'yes' === $main_settings['testmode']) ? true : false;
-                    if ($testmode) {
-                        $publishable_key = !empty($main_settings['test_publishable_key']) ? $main_settings['test_publishable_key'] : '';
-                    } else {
-                        $publishable_key = !empty($main_settings['publishable_key']) ? $main_settings['publishable_key'] : '';
-                    }
 
-                    $offer_settings = Wpfnl_functions::get_offer_settings();
+                    $intent = $this->create_intent( $order, $order_source, $offer_product );
+
                     // Confirm the intent after locking the order to make sure webhooks will not interfere.
                     if ( empty( $intent->error ) ) {
                         $intent = $this->confirm_stripe_intent( $intent, $order, $order_source );
                     }
 
-                    $response = isset($intent->charges->data) ? end( $intent->charges->data ) : false;
+                    // Use get_latest_charge_from_intent() to support both old charges->data
+                    // and new latest_charge (required since Stripe API 2022-11-15).
+                    $response = $gateway->get_latest_charge_from_intent( $intent );
 
-                    if( !empty( $response->balance_transaction ) ){
+                    if ( ! empty( $response->balance_transaction ) ) {
                         $order->update_meta_data( '_stripe_balance_transaction_' . $step_id, $response->balance_transaction );
-                        if ( isset($offer_settings['offer_orders']) && 'main-order' === $offer_settings['offer_orders'] ) {
+                        if ( isset( $offer_settings['offer_orders'] ) && 'main-order' === $offer_settings['offer_orders'] ) {
                             self::update_stripe_fees( $order, $response->balance_transaction );
                             $this->store_offer_transaction( $order, $response, $offer_product );
                         }
                     }
-                    
 
                     if ( $order ) {
                         $order->update_meta_data( '_stripe_intent_id_' . $step_id, $intent->id );
                         $order->save();
                     }
 
-                    wp_send_json(array(
+                    wp_send_json( array(
                         'result'        => 'success',
                         'redirect'      => $gateway->get_return_url( $order ),
                         'intent_secret' => $intent->client_secret,
                         'stripe_pk'     => $publishable_key,
-                    ));
-                    
+                    ) );
                 }
             }
 
@@ -393,28 +615,63 @@ class Wpfnl_Stripe_payment_process {
         if ($order_source->customer) {
             $request['customer'] = $order_source->customer;
         }
-        
+
         if (!empty($full_request['statement_descriptor_suffix'])) {
             $request['statement_descriptor_suffix'] = $full_request['statement_descriptor_suffix'];
         }
+
+        // Express Checkout Element (Apple Pay / Google Pay) stores a PaymentMethod (pm_xxx).
+        // Confirm immediately (on-session: the customer is present on the offer page).
+        // Force capture_method=automatic so the confirmed intent settles immediately.
+        if ( 0 === strpos( $order_source->source, 'pm_' ) ) {
+            // Use string 'true' not PHP bool: wp_safe_remote_post encodes via http_build_query
+            // which converts PHP true -> '1', but Stripe expects the string 'true'.
+            $request['confirm']        = 'true';
+            $request['capture_method'] = 'automatic';
+
+            if ( ! empty( $order_source->customer ) && ! empty( $order_source->source ) ) {
+                $pm_object = \WC_Stripe_API::get_payment_method( $order_source->source );
+                if ( ! empty( $pm_object->error ) ) {
+                    return $pm_object;
+                }
+
+                if ( empty( $pm_object->customer ) ) {
+                    // PM is not yet attached — attach it now before creating the offer intent.
+                    $attach_result = \WC_Stripe_API::attach_payment_method_to_customer( $order_source->customer, $order_source->source );
+                    if ( ! empty( $attach_result->error ) ) {
+                        return $attach_result;
+                    }
+                }
+
+                // Use the actual PM type so Stripe doesn't reject for type mismatch (e.g. 'link' vs 'card').
+                if ( ! empty( $pm_object->type ) ) {
+                    $request['payment_method_types'] = [ $pm_object->type ];
+                }
+
+                // PM is attached (either already was or we just attached it): charge off-session.
+                $request['off_session'] = 'true';
+            }
+        }
+
         // Create an intent that awaits an action.
         $intent = \WC_Stripe_API::request( $request, 'payment_intents' );
 
-        if (!empty($intent->error)) {
-            $intent_id = $order->get_meta('_stripe_intent_id');
-            if ( $intent_id ) {
-                $intent =  $this->get_intent( 'payment_intents', $intent_id );
-                if( !empty($intent->error) ){
-                    return $intent;
-                }
-            }
+        if ( ! empty( $intent->error ) ) {
+            return $intent;
         }
 
         $order_id = $order->get_id();
 
+        // Get step_id from POST data (for AJAX calls) or from product data (for direct calls).
         $step_id = filter_input(INPUT_POST, 'step_id', FILTER_VALIDATE_INT);
+        if ( ! $step_id && isset( $product['step_id'] ) ) {
+            $step_id = intval( $product['step_id'] );
+        }
+        
         // Save the intent ID to the order.
-        update_post_meta($order_id, '_stripe_intent_id_' . $step_id, $intent->id);
+        if ( $step_id ) {
+            update_post_meta($order_id, '_stripe_intent_id_' . $step_id, $intent->id);
+        }
         
         return $intent;
     }
@@ -482,6 +739,39 @@ class Wpfnl_Stripe_payment_process {
         }
         $gateway = $this->get_wc_gateway();
         $order_source = $gateway->prepare_order_source( $order );
+        
+        // Express Checkout Element (Apple Pay / Google Pay) stores a PaymentMethod (pm_xxx).
+        // These must be charged using Payment Intents, not the legacy Charges API.
+        if ( 0 === strpos( $order_source->source, 'pm_' ) ) {
+            $intent = $this->create_intent( $order, $order_source, $offer_product );
+            
+            if ( ! empty( $intent->error ) ) {
+                $result['message'] = $intent->error->message;
+                return $result;
+            }
+            
+            // Payment Intents are confirmed immediately when created with confirm=true.
+            // Check if the charge was successful.
+            // Use get_latest_charge_from_intent() to support both old charges->data
+            // and new latest_charge (required since Stripe API 2022-11-15).
+            $response = $gateway->get_latest_charge_from_intent( $intent );
+            
+            if ( ! $response || empty( $response->id ) ) {
+                $result['message'] = __( 'Payment intent created but no charge found', 'wpfnl' );
+                return $result;
+            }
+            
+            if ( ! empty( $response->balance_transaction ) ) {
+                $this->update_stripe_payout_details( $order, $response );
+            }
+            
+            $result['is_success'] = true;
+            $this->store_offer_transaction( $order, $response, $offer_product );
+            
+            return $result;
+        }
+        
+        // Legacy flow: Use Charges API for Sources (src_xxx) and cards (card_xxx).
         $response = \WC_Stripe_API::request( $this->generate_payment_request( $order, $order_source, $offer_product ) );
         
         if ( ! is_wp_error( $response ) ) {

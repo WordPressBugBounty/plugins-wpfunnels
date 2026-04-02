@@ -5,11 +5,11 @@
  * Provides utility functions for gathering system information,
  * sanitizing data, and other helper operations.
  *
- * @package Linno\Telemetry
+ * @package LinnoSDK\Telemetry
  * @since 1.0.0
  */
 
-namespace Linno\Telemetry\Helpers;
+namespace LinnoSDK\Telemetry\Helpers;
 
 /**
  * Utils class
@@ -93,7 +93,7 @@ class Utils {
      * @since 1.0.0
      */
     public static function sanitizeEventName( string $event ): string {
-        return preg_replace( '/[^a-zA-Z0-9_]/', '', $event );
+        return preg_replace( '/[^a-zA-Z0-9_\/]/', '', $event );
     }
 
     /**
@@ -242,5 +242,16 @@ class Utils {
         }
 
         return $identify;
+    }
+
+    /**
+     * Get unique site ID
+     *
+     * @return string Unique site ID
+     * @since 1.0.0
+     */
+    public static function getUniqueSiteId(): string
+    {
+        return md5( home_url() );
     }
 }

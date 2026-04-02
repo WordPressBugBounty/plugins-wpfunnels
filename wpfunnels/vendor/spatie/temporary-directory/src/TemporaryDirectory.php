@@ -2,24 +2,31 @@
 
 namespace Spatie\TemporaryDirectory;
 
-use Exception;
 use FilesystemIterator;
-use InvalidArgumentException;
+use Spatie\TemporaryDirectory\Exceptions\InvalidDirectoryName;
+use Spatie\TemporaryDirectory\Exceptions\PathAlreadyExists;
+use Throwable;
 
 class TemporaryDirectory
 {
-    /** @var string */
-    protected $location;
+    protected string $location;
 
-    /** @var string */
-    protected $name;
+    protected string $name = '';
 
-    /** @var bool */
-    protected $forceCreate = false;
+    protected bool $forceCreate = false;
+
+    protected bool $deleteWhenDestroyed = false;
+
+    protected int $permission = 0777;
 
     public function __construct(string $location = '')
     {
         $this->location = $this->sanitizePath($location);
+    }
+
+    public static function make(string $location = ''): self
+    {
+        return (new self($location))->create();
     }
 
     public function create(): self
@@ -36,11 +43,11 @@ class TemporaryDirectory
             $this->deleteDirectory($this->getFullPath());
         }
 
-        if (file_exists($this->getFullPath())) {
-            throw new InvalidArgumentException("Path `{$this->getFullPath()}` already exists.");
+        if ($this->exists()) {
+            throw PathAlreadyExists::create($this->getFullPath());
         }
 
-        mkdir($this->getFullPath(), 0777, true);
+        mkdir($this->getFullPath(), $this->permission, true);
 
         return $this;
     }
@@ -48,6 +55,13 @@ class TemporaryDirectory
     public function force(): self
     {
         $this->forceCreate = true;
+
+        return $this;
+    }
+
+    public function permission(int $permission): self
+    {
+        $this->permission = $permission;
 
         return $this;
     }
@@ -77,7 +91,7 @@ class TemporaryDirectory
         $directoryPath = $this->removeFilenameFromPath($path);
 
         if (! file_exists($directoryPath)) {
-            mkdir($directoryPath, 0777, true);
+            mkdir($directoryPath, $this->permission, true);
         }
 
         return $path;
@@ -86,7 +100,8 @@ class TemporaryDirectory
     public function empty(): self
     {
         $this->deleteDirectory($this->getFullPath());
-        mkdir($this->getFullPath(), 0777, true);
+
+        mkdir($this->getFullPath(), $this->permission, true);
 
         return $this;
     }
@@ -96,9 +111,19 @@ class TemporaryDirectory
         return $this->deleteDirectory($this->getFullPath());
     }
 
+    public function exists(): bool
+    {
+        return file_exists($this->getFullPath());
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
     protected function getFullPath(): string
     {
-        return $this->location.($this->name ? DIRECTORY_SEPARATOR.$this->name : '');
+        return $this->location.(! empty($this->name) ? DIRECTORY_SEPARATOR.$this->name : '');
     }
 
     protected function isValidDirectoryName(string $directoryName): bool
@@ -121,7 +146,7 @@ class TemporaryDirectory
     protected function sanitizeName(string $name): string
     {
         if (! $this->isValidDirectoryName($name)) {
-            throw new Exception("The directory name `$name` contains invalid characters.");
+            throw InvalidDirectoryName::create($name);
         }
 
         return trim($name);
@@ -138,35 +163,53 @@ class TemporaryDirectory
 
     protected function isFilePath(string $path): bool
     {
-        return strpos($path, '.') !== false;
+        return str_contains($path, '.');
     }
 
     protected function deleteDirectory(string $path): bool
     {
-        if (is_link($path)) {
-            return unlink($path);
-        }
-
-        if (! file_exists($path)) {
-            return true;
-        }
-
-        if (! is_dir($path)) {
-            return unlink($path);
-        }
-
-        foreach (new FilesystemIterator($path) as $item) {
-            if (! $this->deleteDirectory($item)) {
-                return false;
+        try {
+            if (is_link($path)) {
+                return unlink($path);
             }
+
+            if (! file_exists($path)) {
+                return true;
+            }
+
+            if (! is_dir($path)) {
+                return unlink($path);
+            }
+
+            foreach (new FilesystemIterator($path) as $item) {
+                if (! $this->deleteDirectory((string) $item)) {
+                    return false;
+                }
+            }
+
+            /*
+             * By forcing a php garbage collection cycle using gc_collect_cycles() we can ensure
+             * that the rmdir does not fail due to files still being reserved in memory.
+             */
+            gc_collect_cycles();
+
+            return rmdir($path);
+        } catch (Throwable) {
+            return false;
         }
+    }
 
-        /*
-         * By forcing a php garbage collection cycle using gc_collect_cycles() we can ensure
-         * that the rmdir does not fail due to files still being reserved in memory.
-         */
-        gc_collect_cycles();
+    public function deleteWhenDestroyed(bool $deleteWhenDestroyed = true): self
+    {
+        $this->deleteWhenDestroyed = $deleteWhenDestroyed;
 
-        return rmdir($path);
+        return $this;
+    }
+
+    public function __destruct()
+    {
+        if ($this->deleteWhenDestroyed) {
+            $this->delete();
+        }
     }
 }

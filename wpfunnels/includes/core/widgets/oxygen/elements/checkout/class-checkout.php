@@ -72,6 +72,13 @@ class Checkout extends Elements {
                 $checkout_layout .= ' wpfnl-multistep';
             }
 
+            // Add shared modern checkout class for both modern layouts
+            if( 'wpfnl-modern-one-column' === $checkout_layout || 'wpfnl-modern-checkout' === $checkout_layout ) {
+                if( false === strpos( $checkout_layout, 'wpfnl-modern-checkout' ) ) {
+                    $checkout_layout .= ' wpfnl-modern-checkout';
+                }
+            }
+
             //-----floating label class-----
             $floating_label = isset($options['checkout_floating_label']) ? $options['checkout_floating_label'] : '';
 
@@ -151,6 +158,8 @@ class Checkout extends Elements {
                 'wpfnl-2-step' => __('2 Step Checkout', 'wpfnl'),
                 'wpfnl-multistep' => __('Multistep Checkout', 'wpfnl'),
                 'wpfnl-express-checkout' => __('Express Checkout', 'wpfnl'),
+                'wpfnl-modern-checkout' => __('Modern Checkout', 'wpfnl'),
+                'wpfnl-modern-one-column' => __('Modern One Column Checkout', 'wpfnl'),
             )
         )->rebuildElementOnChange();
 

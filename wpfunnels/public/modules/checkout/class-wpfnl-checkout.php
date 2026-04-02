@@ -64,6 +64,16 @@ class Module extends Wpfnl_Frontend_Module
 
 		add_action( 'wp_ajax_wpfnl_update_variation', [$this, 'wpfnl_update_variation']);
 		add_action( 'wp_ajax_nopriv_wpfnl_update_variation', [$this, 'wpfnl_update_variation']);
+		add_action( 'wp_ajax_wpfnl_apply_checkout_coupon', [$this, 'wpfnl_apply_checkout_coupon'] );
+		add_action( 'wp_ajax_nopriv_wpfnl_apply_checkout_coupon', [$this, 'wpfnl_apply_checkout_coupon'] );
+		add_action( 'wp_ajax_wpfnl_remove_checkout_coupon', [$this, 'wpfnl_remove_checkout_coupon'] );
+		add_action( 'wp_ajax_nopriv_wpfnl_remove_checkout_coupon', [$this, 'wpfnl_remove_checkout_coupon'] );
+
+		// Email existence checker for modern checkout customer-info flow.
+		add_action( 'wp_ajax_wpf_check_email_exists', [$this, 'wpfnl_check_email_exists'] );
+		add_action( 'wp_ajax_nopriv_wpf_check_email_exists', [$this, 'wpfnl_check_email_exists'] );
+		add_action( 'wp_ajax_wpfnl_check_email_exists', [$this, 'wpfnl_check_email_exists'] );
+		add_action( 'wp_ajax_nopriv_wpfnl_check_email_exists', [$this, 'wpfnl_check_email_exists'] );
 
 		add_action( 'woocommerce_before_calculate_totals', [$this, 'custom_price_to_cart_item'], 9999);
 		add_action( 'woocommerce_before_checkout_form', [$this, 'apply_auto_coupon'], 9999);
@@ -82,9 +92,118 @@ class Module extends Wpfnl_Frontend_Module
 		add_action( 'wpfunnels/after_optin_submit', array( $this, 'get_optin_data_checkout' ), 10, 4 );
 		add_filter( 'woocommerce_checkout_fields', array($this, 'set_option_data_in_checkout_filed'),10 );
 		add_filter( 'woocommerce_available_payment_gateways', array($this, 'conditional_payment_gateways'),10 );
+		add_action( 'woocommerce_checkout_after_customer_details', array( $this, 'add_custom_shipping_section' ), 10 );
+		add_action( 'woocommerce_checkout_order_review', array( $this, 'display_custom_coupon_field' ) );
 
+		/* Manage Express Checkout buttons visibility dynamically */
+		add_filter( 'wc_stripe_show_payment_request_on_checkout', [$this, 'wpfnl_manage_stripe_express_checkout'], 9999, 2 );
+
+		/* Position Express Checkout buttons based on step setting */
+		add_action( 'wp', [$this, 'wpfnl_position_stripe_express_checkout'], 5 );
 
 	}
+
+	/**
+	 * Manage Stripe Express Checkout buttons visibility based on WPFunnels step settings.
+	 *
+	 * @param bool $show If it should show
+	 * @param \WP_Post $post Current post
+	 * @return bool
+	 */
+	public function wpfnl_manage_stripe_express_checkout( $show, $post = null ) {
+		if ( ! Wpfnl_functions::check_if_this_is_step_type('checkout') ) {
+			return $show;
+		}
+
+		$checkout_id = '';
+		if( wp_doing_ajax() ){
+			$checkout_id = Wpfnl_functions::get_checkout_id_from_post($_POST);
+		} else {
+			global $post;
+			if ( $post && isset( $post->ID ) ) {
+				$checkout_id = $post->ID;
+			}
+		}
+
+		if ( $checkout_id ) {
+			$express_checkout_enabled = get_post_meta( $checkout_id, '_wpfnl_express_checkout_enabled', true );
+			if ( 'yes' !== $express_checkout_enabled ) {
+				return false; // Hide Stripe Payment Request (Apple Pay / Google Pay) 
+			}
+		}
+
+		return $show;
+	}
+
+	/**
+	 * Reposition Stripe Express Checkout buttons based on the `_wpfnl_express_checkout_position`
+	 * step meta. Detaches Stripe's default hook and re-attaches it to the user-selected position.
+	 *
+	 * Supported positions:
+	 *  - top                    -> woocommerce_checkout_before_customer_details (default Stripe pos)
+	 *  - before_product_switcher -> woocommerce_before_order_notes, priority 4
+	 *  - after_product_switcher  -> woocommerce_before_order_notes, priority 6
+	 *  - before_order_summary   -> woocommerce_checkout_before_order_review
+	 *  - after_order_summary    -> woocommerce_checkout_after_order_review
+	 *  - above_payment_gateways -> woocommerce_review_order_before_payment
+	 *
+	 * @return void
+	 */
+	public function wpfnl_position_stripe_express_checkout() {
+		if ( ! Wpfnl_functions::check_if_this_is_step_type('checkout') ) {
+			return;
+		}
+
+		global $post;
+		$checkout_id = $post && isset( $post->ID ) ? $post->ID : 0;
+		if ( ! $checkout_id ) {
+			return;
+		}
+
+		$express_checkout_enabled = get_post_meta( $checkout_id, '_wpfnl_express_checkout_enabled', true );
+		// Only reposition when the feature is enabled. 'yes' is the default.
+		if ( 'yes' !== $express_checkout_enabled ) {
+			return;
+		}
+
+		$position = get_post_meta( $checkout_id, '_wpfnl_express_checkout_position', true );
+		if ( ! $position ) {
+			$position = 'top'; // default
+		}
+
+		// No repositioning needed for the default 'top' position — Stripe already hooks there.
+		if ( 'top' === $position ) {
+			return;
+		}
+
+		// Retrieve the Stripe ECE singleton (hooks are already registered since we are on 'wp' action).
+		if ( ! class_exists( '\WC_Stripe_Express_Checkout_Element' ) ) {
+			return;
+		}
+
+		$ece = \WC_Stripe_Express_Checkout_Element::instance();
+		if ( ! $ece ) {
+			return;
+		}
+
+		// Detach from Stripe's default checkout position.
+		remove_action( 'woocommerce_checkout_before_customer_details', [ $ece, 'display_express_checkout_button_html' ], 1 );
+
+		// Map setting → hook name + priority.
+		$hook_map = array(
+			'before_product_switcher' => array( 'woocommerce_before_order_notes',           4  ),
+			'after_product_switcher'  => array( 'woocommerce_before_order_notes',           6  ),
+			'before_order_summary'    => array( 'woocommerce_checkout_before_order_review', 10 ),
+			'after_order_summary'     => array( 'woocommerce_checkout_after_order_review',  10 ),
+			'above_payment_gateways'  => array( 'woocommerce_review_order_before_payment',  10 ),
+		);
+
+		if ( isset( $hook_map[ $position ] ) ) {
+			list( $hook, $priority ) = $hook_map[ $position ];
+			add_action( $hook, [ $ece, 'display_express_checkout_button_html' ], $priority );
+		}
+	}
+
 
 
 
@@ -892,6 +1011,48 @@ class Module extends Wpfnl_Frontend_Module
 
 
 	/**
+	 * Check if an email exists and return CartFlows-compatible response shape.
+	 *
+	 * @return void
+	 */
+	public function wpfnl_check_email_exists() {
+
+		if ( isset( $_POST['security'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['security'] ) ), 'wpfnl' ) ) {
+			wp_send_json_error(
+				array(
+					'success'          => false,
+					'is_login_allowed' => false,
+					'msg'              => __( 'Invalid request.', 'wpfnl' ),
+				)
+			);
+		}
+
+		$email = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+
+		if ( empty( $email ) || ! is_email( $email ) ) {
+			wp_send_json_success(
+				array(
+					'success'          => false,
+					'is_login_allowed' => 'yes' === get_option( 'woocommerce_enable_checkout_login_reminder' ),
+					'msg'              => __( 'Invalid email address.', 'wpfnl' ),
+				)
+			);
+		}
+
+		$email_exists     = (bool) email_exists( $email );
+		$is_login_allowed = 'yes' === get_option( 'woocommerce_enable_checkout_login_reminder' );
+
+		wp_send_json_success(
+			array(
+				'success'          => $email_exists,
+				'is_login_allowed' => $is_login_allowed,
+				'msg'              => $email_exists ? __( 'Email exists', 'wpfnl' ) : __( 'Email not exist', 'wpfnl' ),
+			)
+		);
+	}
+
+
+	/**
 	 * Prepare query param for redirect url
 	 *
 	 * @param String $name
@@ -1268,6 +1429,296 @@ class Module extends Wpfnl_Frontend_Module
 
 
 	/**
+	 * Render custom shipping section for modern checkout only.
+	 *
+	 * @return void
+	 */
+	public function add_custom_shipping_section() {
+		if ( ! $this->is_modern_checkout_layout() || ! apply_filters( 'wpfunnels_should_render_custom_shipping', true ) ) {
+			return;
+		}
+		ob_start();
+		echo '<div class="wpfnl-customer-shipping">';
+		$this->wpfnl_cart_totals_shipping_html();
+		echo '</div>';
+		ob_end_flush();
+	}
+
+
+	/**
+	 * Display custom coupon field in modern checkout order review section.
+	 *
+	 * @return void
+	 */
+	public function display_custom_coupon_field() {
+		if ( ! $this->is_modern_checkout_layout() || ! $this->is_custom_coupon_field_enabled() ) {
+			return;
+		}
+
+		$is_collapsible = $this->is_collapsible_coupon_enabled();
+
+		$coupon_field = apply_filters(
+			'wpfunnels_coupon_field_options',
+			array(
+				'field_text'  => __( 'Coupon Code', 'wpfnl' ),
+				'button_text' => __( 'Apply', 'wpfnl' ),
+				'class'       => '',
+			)
+		);
+
+		do_action( 'wpfunnels_before_custom_coupon_field_html', $coupon_field );
+
+		if ( $is_collapsible ) {
+		?>
+		<div class="wpfnl-coupon-toggle-wrapper">
+			<div class="wpfnl-coupon-toggle-notice">
+				<?php echo wp_kses_post( apply_filters( 'wpfunnels_coupon_toggle_text', __( 'Have a coupon?', 'wpfnl' ) ) ); ?>
+				<a href="#!" class="wpfnl-coupon-toggle-link"><?php echo esc_html( apply_filters( 'wpfunnels_coupon_toggle_link_text', __( 'Click here to enter your code', 'wpfnl' ) ) ); ?></a>
+			</div>
+			<div class="wpfnl-custom-coupon-field wpfnl-coupon-collapsible <?php echo esc_attr( $coupon_field['class'] ); ?>" id="wpfnl_custom_coupon_field" style="display: none;">
+				<div class="wpfnl-coupon-col-1">
+					<span>
+						<input type="text" name="coupon_code" class="input-text wpfnl-coupon-code-input" placeholder="<?php echo esc_attr( $coupon_field['field_text'] ); ?>" id="wpfnl_coupon_code" value="">
+					</span>
+				</div>
+				<div class="wpfnl-coupon-col-2">
+					<span>
+						<button type="button" class="button wpfnl-submit-coupon wpfnl-btn-small" name="apply_coupon" value="Apply"><?php echo esc_html( $coupon_field['button_text'] ); ?></button>
+					</span>
+				</div>
+			</div>
+		</div>
+		<?php
+		} else {
+		?>
+		<div class="wpfnl-custom-coupon-field <?php echo esc_attr( $coupon_field['class'] ); ?>" id="wpfnl_custom_coupon_field">
+			<div class="wpfnl-coupon-col-1">
+				<span>
+					<input type="text" name="coupon_code" class="input-text wpfnl-coupon-code-input" placeholder="<?php echo esc_attr( $coupon_field['field_text'] ); ?>" id="wpfnl_coupon_code" value="">
+				</span>
+			</div>
+			<div class="wpfnl-coupon-col-2">
+				<span>
+					<button type="button" class="button wpfnl-submit-coupon wpfnl-btn-small" name="apply_coupon" value="Apply"><?php echo esc_html( $coupon_field['button_text'] ); ?></button>
+				</span>
+			</div>
+		</div>
+		<?php
+		}
+		do_action( 'wpfunnels_after_custom_coupon_field_html', $coupon_field );
+	}
+
+
+	/**
+	 * Check if custom coupon field is enabled for this checkout.
+	 *
+	 * @return bool
+	 */
+	private function is_custom_coupon_field_enabled() {
+		if ( ! apply_filters( 'woocommerce_coupons_enabled', true ) ) {
+			return false;
+		}
+
+		$checkout_id = 0;
+		if ( wp_doing_ajax() ) {
+			if ( isset( $_POST['step_id'] ) ) {
+				$checkout_id = intval( wp_unslash( $_POST['step_id'] ) );
+			} elseif ( isset( $_POST['_wpfunnels_checkout_id'] ) ) {
+				$checkout_id = intval( wp_unslash( $_POST['_wpfunnels_checkout_id'] ) );
+			} elseif ( isset( $_POST['post_data'] ) ) {
+				$post_data = array();
+				parse_str( wp_unslash( $_POST['post_data'] ), $post_data );
+				if ( isset( $post_data['_wpfunnels_checkout_id'] ) ) {
+					$checkout_id = intval( $post_data['_wpfunnels_checkout_id'] );
+				}
+			}
+		}
+
+		if ( ! $checkout_id ) {
+			$checkout_id = get_the_ID();
+		}
+
+		if ( ! $checkout_id ) {
+			return false;
+		}
+
+		$show_coupon = Wpfnl::get_instance()->meta->get_checkout_meta_value( $checkout_id, '_wpfnl_checkout_coupon' );
+
+		return 'yes' === $show_coupon;
+	}
+
+
+	/**
+	 * Check if collapsible coupon field is enabled for this checkout.
+	 *
+	 * @return bool
+	 */
+	private function is_collapsible_coupon_enabled() {
+		$checkout_id = 0;
+		if ( wp_doing_ajax() ) {
+			if ( isset( $_POST['step_id'] ) ) {
+				$checkout_id = intval( wp_unslash( $_POST['step_id'] ) );
+			} elseif ( isset( $_POST['_wpfunnels_checkout_id'] ) ) {
+				$checkout_id = intval( wp_unslash( $_POST['_wpfunnels_checkout_id'] ) );
+			} elseif ( isset( $_POST['post_data'] ) ) {
+				$post_data = array();
+				parse_str( wp_unslash( $_POST['post_data'] ), $post_data );
+				if ( isset( $post_data['_wpfunnels_checkout_id'] ) ) {
+					$checkout_id = intval( $post_data['_wpfunnels_checkout_id'] );
+				}
+			}
+		}
+
+		if ( ! $checkout_id ) {
+			$checkout_id = get_the_ID();
+		}
+
+		if ( ! $checkout_id ) {
+			return false;
+		}
+
+		$collapsible = get_post_meta( $checkout_id, '_wpfnl_checkout_collapsible_coupon', true );
+
+		return 'yes' === $collapsible;
+	}
+
+
+	/**
+	 * Apply checkout coupon via AJAX.
+	 *
+	 * @return void
+	 */
+	public function wpfnl_apply_checkout_coupon() {
+		if ( isset( $_POST['security'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['security'] ) ), 'wpfnl' ) ) {
+			wp_send_json_error( array( 'messages' => '<ul class="woocommerce-error" role="alert"><li>' . esc_html__( 'Invalid request.', 'wpfnl' ) . '</li></ul>' ) );
+		}
+
+		$coupon_code = isset( $_POST['coupon_code'] ) ? wc_format_coupon_code( sanitize_text_field( wp_unslash( $_POST['coupon_code'] ) ) ) : '';
+		if ( empty( $coupon_code ) ) {
+			wp_send_json_error( array( 'messages' => '<ul class="woocommerce-error" role="alert"><li>' . esc_html__( 'Please enter a coupon code.', 'wpfnl' ) . '</li></ul>' ) );
+		}
+
+		if ( ! WC()->cart ) {
+			wp_send_json_error( array( 'messages' => '<ul class="woocommerce-error" role="alert"><li>' . esc_html__( 'Cart is not available.', 'wpfnl' ) . '</li></ul>' ) );
+		}
+
+		$applied = WC()->cart->apply_coupon( $coupon_code );
+		WC()->cart->calculate_totals();
+
+		ob_start();
+		wc_print_notices();
+		$messages = ob_get_clean();
+
+		if ( $applied ) {
+			wp_send_json_success( array( 'messages' => $messages ) );
+		}
+
+		wp_send_json_error( array( 'messages' => $messages ) );
+	}
+
+
+	/**
+	 * Remove checkout coupon via AJAX.
+	 *
+	 * @return void
+	 */
+	public function wpfnl_remove_checkout_coupon() {
+		if ( isset( $_POST['security'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['security'] ) ), 'wpfnl' ) ) {
+			wp_send_json_error( array( 'messages' => '<ul class="woocommerce-error" role="alert"><li>' . esc_html__( 'Invalid request.', 'wpfnl' ) . '</li></ul>' ) );
+		}
+
+		$coupon_code = isset( $_POST['coupon_code'] ) ? wc_format_coupon_code( sanitize_text_field( wp_unslash( $_POST['coupon_code'] ) ) ) : '';
+		if ( empty( $coupon_code ) ) {
+			wp_send_json_error( array( 'messages' => '<ul class="woocommerce-error" role="alert"><li>' . esc_html__( 'Invalid coupon code.', 'wpfnl' ) . '</li></ul>' ) );
+		}
+
+		if ( ! WC()->cart ) {
+			wp_send_json_error( array( 'messages' => '<ul class="woocommerce-error" role="alert"><li>' . esc_html__( 'Cart is not available.', 'wpfnl' ) . '</li></ul>' ) );
+		}
+
+		WC()->cart->remove_coupon( $coupon_code );
+		WC()->cart->calculate_totals();
+
+		ob_start();
+		wc_print_notices();
+		$messages = ob_get_clean();
+
+		wp_send_json_success( array( 'messages' => $messages ) );
+	}
+
+
+	/**
+	 * Render shipping methods HTML for modern checkout custom section.
+	 *
+	 * @return void
+	 */
+	public function wpfnl_cart_totals_shipping_html() {
+		if ( ! Wpfnl_functions::is_wc_active() || ! function_exists( 'WC' ) ) {
+			return;
+		}
+
+		$packages = WC()->shipping()->get_packages();
+		if ( empty( $packages ) ) {
+			WC()->cart->calculate_totals();
+			$packages = WC()->shipping()->get_packages();
+		}
+
+		$first = true;
+		foreach ( $packages as $i => $package ) {
+			$chosen_method = isset( WC()->session->chosen_shipping_methods[ $i ] ) ? WC()->session->chosen_shipping_methods[ $i ] : '';
+			$product_names = array();
+
+			if ( count( $packages ) > 1 ) {
+				foreach ( $package['contents'] as $item_id => $values ) {
+					$product_names[ $item_id ] = $values['data']->get_name() . ' &times;' . $values['quantity'];
+				}
+				$product_names = apply_filters( 'woocommerce_shipping_package_details_array', $product_names, $package );
+			}
+
+			include WPFNL_DIR . 'public/modules/checkout/templates/checkout/shipping-methods.php';
+			do_action( 'woocommerce_review_order_after_shipping' );
+			$first = false;
+		}
+	}
+
+
+	/**
+	 * Check if current checkout uses modern templates.
+	 *
+	 * @return bool
+	 */
+	private function is_modern_checkout_layout() {
+		$checkout_id = 0;
+
+		if ( wp_doing_ajax() ) {
+			if ( isset( $_POST['step_id'] ) ) {
+				$checkout_id = intval( wp_unslash( $_POST['step_id'] ) );
+			} elseif ( isset( $_POST['_wpfunnels_checkout_id'] ) ) {
+				$checkout_id = intval( wp_unslash( $_POST['_wpfunnels_checkout_id'] ) );
+			} elseif ( isset( $_POST['post_data'] ) ) {
+				$post_data = array();
+				parse_str( wp_unslash( $_POST['post_data'] ), $post_data );
+				if ( isset( $post_data['_wpfunnels_checkout_id'] ) ) {
+					$checkout_id = intval( $post_data['_wpfunnels_checkout_id'] );
+				}
+			}
+		}
+
+		if ( ! $checkout_id ) {
+			$checkout_id = get_the_ID();
+		}
+
+		if ( ! $checkout_id ) {
+			return false;
+		}
+
+		$checkout_layout = Wpfnl::get_instance()->meta->get_checkout_meta_value( $checkout_id, 'wpfnl_checkout_layout', 'wpfnl-col-2' );
+
+		return in_array( $checkout_layout, array( 'wpfnl-modern-checkout', 'wpfnl-modern-one-column' ), true );
+	}
+
+
+	/**
 	 * Set checkout ID hidden field in checkout page.
 	 *
 	 * @param array $checkout
@@ -1513,6 +1964,40 @@ class Module extends Wpfnl_Frontend_Module
 				$fields['billing']['billing_email']['default'] 		= $email;
 			}
 		}
+
+		$checkout_id = 0;
+
+		if ( wp_doing_ajax() ) {
+			if ( isset( $_POST['step_id'] ) ) {
+				$checkout_id = intval( wp_unslash( $_POST['step_id'] ) );
+			} elseif ( isset( $_POST['_wpfunnels_checkout_id'] ) ) {
+				$checkout_id = intval( wp_unslash( $_POST['_wpfunnels_checkout_id'] ) );
+			} elseif ( isset( $_POST['post_data'] ) ) {
+				$post_data = array();
+				parse_str( wp_unslash( $_POST['post_data'] ), $post_data );
+				if ( isset( $post_data['_wpfunnels_checkout_id'] ) ) {
+					$checkout_id = intval( $post_data['_wpfunnels_checkout_id'] );
+				}
+			}
+		}
+
+		if ( ! $checkout_id ) {
+			$checkout_id = get_the_ID();
+		}
+
+		if ( $checkout_id ) {
+			$checkout_layout = Wpfnl::get_instance()->meta->get_checkout_meta_value( $checkout_id, 'wpfnl_checkout_layout', 'wpfnl-col-2' );
+
+			if ( 'wpfnl-modern-checkout' === $checkout_layout ) {
+				if ( isset( $fields['account']['account_username'] ) ) {
+					unset( $fields['account']['account_username'] );
+				}
+				if ( isset( $fields['account']['account_password'] ) ) {
+					unset( $fields['account']['account_password'] );
+				}
+			}
+		}
+
 		return $fields;
 	}
 

@@ -42,6 +42,97 @@ class Checkout_Form extends Widget_Base
      */
     // public $hide_section_settings;
     // $hide_section_settings = \WPFunnels\Wpfnl_functions::get_checkout_section_heading_settings( 'order' , get_the_ID() );
+
+    public function __construct( $data = [], $args = null ) {
+        parent::__construct( $data, $args );
+        add_action( 'woocommerce_checkout_update_order_review', array( $this, 'apply_place_order_filter_on_ajax_update' ) );
+    }
+
+    /**
+     * Fired during WooCommerce AJAX checkout update (update_order_review).
+     * Reads Place Order settings from post_meta and applies the button filter
+     * so the button is customized even during payment section re-renders.
+     *
+     * @param string $post_data URL-encoded post data string from the AJAX request.
+     */
+    public function apply_place_order_filter_on_ajax_update( $post_data ) {
+        $parsed = array();
+        wp_parse_str( $post_data, $parsed );
+        $checkout_id = isset( $parsed['_wpfunnels_checkout_id'] ) ? intval( $parsed['_wpfunnels_checkout_id'] ) : 0;
+        if ( ! $checkout_id ) {
+            $checkout_id = intval( \WPFunnels\Wpfnl_functions::get_checkout_id_from_post_data() );
+        }
+        if ( ! $checkout_id ) {
+            $checkout_id = intval( \WPFunnels\Wpfnl_functions::get_checkout_id_from_post( $_POST ) );
+        }
+        if ( ! $checkout_id ) {
+            return;
+        }
+        $settings = get_post_meta( $checkout_id, '_wpfnl_place_order_settings', true );
+        if ( empty( $settings ) || ! is_array( $settings ) ) {
+            return;
+        }
+        $place_order_filter = $this->get_place_order_button_filter( $settings );
+        add_filter( 'woocommerce_order_button_html', $place_order_filter );
+
+        $below_text = isset( $settings['placeOrderBelowText'] ) ? $settings['placeOrderBelowText'] : '';
+        if ( ! empty( $below_text ) ) {
+            add_action( 'woocommerce_review_order_after_submit', function() use ( $below_text ) {
+                echo '<div class="wpfnl-below-place-order-btn">' . wp_kses_post( $below_text ) . '</div>';
+            } );
+        }
+    }
+
+    /**
+     * Build and return the woocommerce_order_button_html filter closure.
+     *
+     * @param array $settings Widget settings / post meta array.
+     * @return \Closure
+     */
+    protected function get_place_order_button_filter( $settings ) {
+        $btn_text     = isset( $settings['place_order_btn_text'] ) && '' !== $settings['place_order_btn_text'] ? $settings['place_order_btn_text'] : ( isset( $settings['placeOrderBtnText'] ) && '' !== $settings['placeOrderBtnText'] ? $settings['placeOrderBtnText'] : 'Place Order' );
+        $sub_text     = isset( $settings['place_order_sub_text'] ) ? $settings['place_order_sub_text'] : ( isset( $settings['placeOrderSubText'] ) ? $settings['placeOrderSubText'] : '' );
+        $enable_icon  = isset( $settings['place_order_enable_icon'] ) ? ( 'yes' === $settings['place_order_enable_icon'] ) : ( isset( $settings['placeOrderEnableIcon'] ) ? (bool) $settings['placeOrderEnableIcon'] : false );
+        $icon_style   = isset( $settings['place_order_icon_style'] ) ? $settings['place_order_icon_style'] : ( isset( $settings['placeOrderIconStyle'] ) ? $settings['placeOrderIconStyle'] : 'lock1' );
+        $enable_price = isset( $settings['place_order_enable_price'] ) ? ( 'yes' === $settings['place_order_enable_price'] ) : ( isset( $settings['placeOrderEnablePrice'] ) ? (bool) $settings['placeOrderEnablePrice'] : false );
+
+        $icon_svgs = array(
+            'lock1'    => '<svg width="24" height="24" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V7a4 4 0 118 0v4" stroke="white" stroke-width="2"/></svg>',
+            'lock2'    => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V7a4 4 0 118 0v4" stroke="currentColor" stroke-width="2"/></svg>',
+            'cart1'    => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 6h15l-2 9H8L6 6z" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="20" r="1.5" fill="currentColor"/><circle cx="18" cy="20" r="1.5" fill="currentColor"/></svg>',
+            'checkout' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            'arrow1'   => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            'arrow2'   => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            'arrow3'   => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M6 13l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        );
+
+        return function( $button_html ) use ( $btn_text, $sub_text, $enable_icon, $icon_style, $enable_price, $icon_svgs ) {
+            $icon_html = '';
+            if ( $enable_icon ) {
+                $icon_svg  = isset( $icon_svgs[ $icon_style ] ) ? $icon_svgs[ $icon_style ] : $icon_svgs['lock1'];
+                $icon_html = '<span class="wpfnl-place-order-icon">' . $icon_svg . '</span>';
+            }
+
+            $price_html = '';
+            if ( $enable_price && function_exists( 'WC' ) && is_object( WC()->cart ) ) {
+                $price_html = ' <span class="wpfnl-place-order-price">' . WC()->cart->get_total() . '</span>';
+            }
+
+            $sub_text_html = '';
+            if ( ! empty( $sub_text ) ) {
+                $sub_text_html = '<span class="wpfnl-place-order-sub-text">' . esc_html( $sub_text ) . '</span>';
+            }
+
+            $label = esc_html( $btn_text );
+            return '<button type="submit" class="button alt" name="woocommerce_checkout_place_order" id="place_order" value="' . $label . '" data-value="' . $label . '">'
+                . $icon_html
+                . '<span class="wpfnl-place-order-text">' . $label . '</span>'
+                . $price_html
+                . $sub_text_html
+                . '</button>';
+        };
+    }
+
     protected function init_controls() {
         if ( version_compare(ELEMENTOR_VERSION, '3.1.0', '>=') ) {
             $this->register_controls();
@@ -244,6 +335,8 @@ class Checkout_Form extends Widget_Base
 			'wpfnl-2-step' 	            => __('2 Step Checkout', 'wpfnl'),
 			'wpfnl-multistep' 	        => __('Multistep Checkout', 'wpfnl'),
 			'wpfnl-express-checkout' 	=> __('Express Checkout', 'wpfnl'),
+            'wpfnl-modern-checkout' 	=> __('Modern Checkout', 'wpfnl'),
+            'wpfnl-modern-one-column' => __('Modern One Column Checkout', 'wpfnl'),
 		);
     	return $layouts;
 	}
@@ -260,7 +353,7 @@ class Checkout_Form extends Widget_Base
         $this->start_controls_section(
             'section_content',
             [
-                'label' => __('Funnel Checkout', 'wpfnl'),
+                'label' => __('Layout Selection', 'wpfnl'),
             ]
         );
 
@@ -305,12 +398,10 @@ class Checkout_Form extends Widget_Base
 			);
 		}
 
-        //=== Order Bump Start ===//
-        $order_bump_enabler = '';
-        $this->ob_register_control();
-        //=== Order Bump End ===//
-
         $this->end_controls_section();
+
+        $this->register_order_bump_controls();
+        $this->register_place_order_controls();
 
         $this->register_billing_style_controls();
         $this->register_shipping_style_controls();
@@ -333,7 +424,7 @@ class Checkout_Form extends Widget_Base
         $this->start_controls_section(
             'section_content',
             [
-                'label' => __('Funnel Checkout', 'wpfnl'),
+                'label' => __('Layout Selection', 'wpfnl'),
             ]
         );
 
@@ -378,14 +469,10 @@ class Checkout_Form extends Widget_Base
 			);
 		}
 
-        //=== Order Bump Start ===//
-        $order_bump_enabler = '';
-        $this->ob_register_control();
-
-        $ob_settings = $this->order_bump_primary_settings();
-        //=== Order Bump End ===//
-
         $this->end_controls_section();
+
+        $this->register_order_bump_controls();
+        $this->register_place_order_controls();
 
         $this->register_billing_style_controls();
         $this->register_shipping_style_controls();
@@ -396,6 +483,119 @@ class Checkout_Form extends Widget_Base
         $this->register_multistep_style_controls();
     }
 
+
+    /**
+     * Register Place Order Button Controls.
+     *
+     * @since  x.x.x
+     * @access protected
+     */
+    protected function register_place_order_controls()
+    {
+        $this->start_controls_section(
+            'section_place_order',
+            [
+                'label' => __( 'Checkout Button', 'wpfnl' ),
+            ]
+        );
+
+        $this->add_control(
+            'place_order_btn_text',
+            [
+                'label'       => __( 'Button Text', 'wpfnl' ),
+                'type'        => Controls_Manager::TEXT,
+                'default'     => __( 'Place Order', 'wpfnl' ),
+                'label_block' => true,
+            ]
+        );
+
+        $this->add_control(
+            'place_order_sub_text',
+            [
+                'label'       => __( 'Button Sub Text', 'wpfnl' ),
+                'type'        => Controls_Manager::TEXT,
+                'default'     => '',
+                'label_block' => true,
+            ]
+        );
+
+        $this->add_control(
+            'place_order_enable_icon',
+            [
+                'label'   => __( 'Enable Icon', 'wpfnl' ),
+                'type'    => Controls_Manager::SWITCHER,
+                'default' => '',
+            ]
+        );
+
+        $this->add_control(
+            'place_order_icon_style',
+            [
+                'label'       => __( 'Icon Style', 'wpfnl' ),
+                'type'        => Controls_Manager::SELECT,
+                'default'     => 'lock1',
+                'label_block' => true,
+                'options'     => [
+                    'lock1'    => __( 'Lock (Filled)', 'wpfnl' ),
+                    'lock2'    => __( 'Lock (Outlined)', 'wpfnl' ),
+                    'cart1'    => __( 'Shopping Cart', 'wpfnl' ),
+                    'checkout' => __( 'Checkmark', 'wpfnl' ),
+                    'arrow1'   => __( 'Arrow Right', 'wpfnl' ),
+                    'arrow2'   => __( 'Arrow Chevron', 'wpfnl' ),
+                    'arrow3'   => __( 'Arrow Down', 'wpfnl' ),
+                ],
+                'condition' => [
+                    'place_order_enable_icon' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'place_order_enable_price',
+            [
+                'label'   => __( 'Show Cart Total on Button', 'wpfnl' ),
+                'type'    => Controls_Manager::SWITCHER,
+                'default' => '',
+            ]
+        );
+
+        $this->add_control(
+            'place_order_below_text',
+            [
+                'label'       => __( 'Text Below Button', 'wpfnl' ),
+                'type'        => Controls_Manager::WYSIWYG,
+                'default'     => '',
+                'label_block' => true,
+            ]
+        );
+
+        $this->end_controls_section();
+    }
+
+    /**
+     * Register Order Bump Controls as a dedicated section.
+     *
+     * @since  x.x.x
+     * @access protected
+     */
+    protected function register_order_bump_controls()
+    {
+        $ob_settings = $this->order_bump_primary_settings();
+        if ( empty( $ob_settings ) ) {
+            return;
+        }
+
+        $this->start_controls_section(
+            'section_order_bump',
+            [
+                'label' => __( 'Order Bump', 'wpfnl' ),
+            ]
+        );
+
+        $this->ob_register_control();
+
+        $this->end_controls_section();
+    }
 
     private function ob_register_control(){
         $ob_settings = $this->order_bump_primary_settings();
@@ -3188,12 +3388,46 @@ class Checkout_Form extends Widget_Base
         if( Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-2-step' === $checkout_layout ) {
 			$checkout_layout .= ' wpfnl-multistep';
 		}
+
+        // Add shared modern checkout class for both modern layouts
+        if( 'wpfnl-modern-one-column' === $checkout_layout || 'wpfnl-modern-checkout' === $checkout_layout ) {
+            if( false === strpos( $checkout_layout, 'wpfnl-modern-checkout' ) ) {
+                $checkout_layout .= ' wpfnl-modern-checkout';
+            }
+        }
         query_posts('post_type="checkout"');
-        
+
+        // Persist layout and floating label so the shortcode / template picks them up.
+        update_post_meta( $checkout_id, '_wpfnl_checkout_layout', isset( $settings['checkout_layout'] ) ? $settings['checkout_layout'] : 'wpfnl-col-2' );
+        update_post_meta( $checkout_id, '_wpfnl_floating_label', $floating_label );
+
+        // Persist Place Order settings for WooCommerce AJAX checkout updates.
+        $place_order_meta = array(
+            'placeOrderBtnText'    => isset( $settings['place_order_btn_text'] ) ? $settings['place_order_btn_text'] : 'Place Order',
+            'placeOrderSubText'    => isset( $settings['place_order_sub_text'] ) ? $settings['place_order_sub_text'] : '',
+            'placeOrderEnableIcon' => isset( $settings['place_order_enable_icon'] ) ? ( 'yes' === $settings['place_order_enable_icon'] ) : false,
+            'placeOrderIconStyle'  => isset( $settings['place_order_icon_style'] ) ? $settings['place_order_icon_style'] : 'lock1',
+            'placeOrderEnablePrice'=> isset( $settings['place_order_enable_price'] ) ? ( 'yes' === $settings['place_order_enable_price'] ) : false,
+            'placeOrderBelowText'  => isset( $settings['place_order_below_text'] ) ? $settings['place_order_below_text'] : '',
+        );
+        update_post_meta( $checkout_id, '_wpfnl_place_order_settings', $place_order_meta );
+
+        $place_order_filter = $this->get_place_order_button_filter( $settings );
+        add_filter( 'woocommerce_order_button_html', $place_order_filter );
+
+        $below_text       = isset( $settings['place_order_below_text'] ) ? $settings['place_order_below_text'] : '';
+        $below_btn_filter = null;
+        if ( ! empty( $below_text ) ) {
+            $below_btn_filter = function() use ( $below_text ) {
+                echo '<div class="wpfnl-below-place-order-btn">' . wp_kses_post( $below_text ) . '</div>';
+            };
+            add_action( 'woocommerce_review_order_after_submit', $below_btn_filter );
+        }
+
 		do_action( 'wpfunnels/before_elementor_checkout_form', $settings );
 		do_action( 'wpfunnels/before_checkout_form', $checkout_id );
 		?>
-		<div class="wpfnl-checkout <?php echo $checkout_layout .' '. $floating_label ?>">
+		<div class="wpfnl-checkout <?php echo esc_attr( $checkout_layout . ' ' . $floating_label ); ?>">
 
 			<?php echo do_shortcode('[woocommerce_checkout]'); ?>
 
@@ -3202,7 +3436,12 @@ class Checkout_Form extends Widget_Base
                 ?>
             <?php } ?>
 		</div>
-	<?php
+		<?php
+
+        remove_filter( 'woocommerce_order_button_html', $place_order_filter );
+        if ( null !== $below_btn_filter ) {
+            remove_action( 'woocommerce_review_order_after_submit', $below_btn_filter );
+        }
     }
 
     public function render_popup_in_editor()

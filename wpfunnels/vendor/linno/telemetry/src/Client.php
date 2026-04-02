@@ -5,14 +5,17 @@
  * Main entry point for plugin developers to integrate telemetry tracking.
  * Handles initialization, configuration, and provides the public API for tracking events.
  *
- * @package Linno\Telemetry
+ * @package LinnoSDK\Telemetry
  * @since 1.0.0
  */
 
-namespace Linno\Telemetry;
+namespace LinnoSDK\Telemetry;
 
-use Linno\Telemetry\Drivers\OpenPanelDriver;
-use Linno\Telemetry\Helpers\Utils;
+use LinnoSDK\Telemetry\Drivers\DriverInterface;
+use LinnoSDK\Telemetry\Drivers\NullDriver;
+use LinnoSDK\Telemetry\Drivers\OpenPanelDriver;
+use LinnoSDK\Telemetry\Drivers\PostHogDriver;
+use LinnoSDK\Telemetry\Helpers\Utils;
 use InvalidArgumentException;
 
 /**
@@ -95,6 +98,15 @@ class Client {
     private static string $consentServiceName = 'our analytics service';
 
     /**
+     * Registry of all active Client instances.
+     *
+     * Used by add_feature_used_event to dispatch events across all initialized clients.
+     *
+     * @var Client[]
+     */
+    private static array $instances = [];
+
+    /**
      * Handlers (dispatcher, consent, deactivation, queue)
      *
      * @var array
@@ -111,51 +123,191 @@ class Client {
     /**
      * Constructor
      *
-     * Initializes the telemetry client with API key, plugin name, and plugin file path.
+     * Accepts either an array configuration or the legacy 4-positional-parameter signature.
      *
-     * @param string $apiKey API key for OpenPanel authentication.
-     * @param string $apiSecret API secret for OpenPanel authentication.
-     * @param string $pluginName Human-readable plugin name.
-     * @param string $pluginFile Path to the main plugin file.
+     * Array form (current):
+     *   new Client(['pluginFile' => ..., 'slug' => ..., ...])
      *
-     * @throws InvalidArgumentException If API key is empty.
+     * Legacy positional form (deprecated):
+     *   new Client($apiKey, $apiSecret, $pluginName, $pluginFile)
+     *
+     * @param array|string $configOrApiKey Configuration array, or API key string for legacy form.
+     * @param string       $apiSecret      (Legacy) API secret.
+     * @param string       $pluginName     (Legacy) Human-readable plugin name.
+     * @param string       $pluginFile     (Legacy) Path to the main plugin file.
+     *
+     * @throws InvalidArgumentException If the first argument is not an array or string, or if
+     *                                  required fields are missing.
      * @since 1.0.0
      */
-    public function __construct( string $apiKey, string $apiSecret, string $pluginName, string $pluginFile ) {
-        // Validate API key
-        if ( empty( $apiKey ) ) {
-            throw new InvalidArgumentException( 'API key cannot be empty' );
+    public function __construct($configOrApiKey, string $apiSecret = '', string $pluginName = '', string $pluginFile = '')
+    {
+        if ( is_array( $configOrApiKey ) ) {
+            $config = $configOrApiKey;
+
+            if (empty($config['pluginFile']) || empty($config['slug'])) {
+                throw new InvalidArgumentException('The "pluginFile" and "slug" parameters are required.');
+            }
+        } elseif ( is_string( $configOrApiKey ) ) {
+            $config = $this->buildLegacyConfig( $configOrApiKey, $apiSecret, $pluginName, $pluginFile );
+        } else {
+            throw new InvalidArgumentException( 'First argument must be a configuration array or a string API key' );
         }
 
-        $this->config['apiKey']        = $apiKey;
-        $this->config['apiSecret']     = $apiSecret;
-        $this->config['pluginName']    = $pluginName;
-        $this->config['pluginFile']    = $pluginFile;
-        $this->config['pluginVersion'] = Utils::getPluginVersion( $pluginFile );
-        
-        $this->set_slug();
-        $this->config['unique_id']     = $this->get_or_create_unique_id();
+        $this->config = array_merge([
+            'apiKey'      => '',
+            'apiSecret'   => '',
+            'pluginName'  => '',
+            'version'     => '',
+            'unique_id'   => '',
+            'driver'      => '',
+            'driver_config' => [],
+        ], $config);
 
-        // Default text domain if not already set
-        if ( empty( self::$textDomain ) ) {
-            self::$textDomain = $this->config['slug'];
+        // Normalize version key: accept both 'version' and 'pluginVersion'
+        if ( empty( $this->config['version'] ) && ! empty( $this->config['pluginVersion'] ) ) {
+            $this->config['version'] = $this->config['pluginVersion'];
         }
 
-        // Initialize OpenPanelDriver
-        $driver = new OpenPanelDriver();
-        $driver->setApiKey( $apiKey );
-        $driver->setApiSecret( $apiSecret );
+        // Ensure unique_id is populated
+        if ( empty( $this->config['unique_id'] ) ) {
+            $this->config['unique_id'] = $this->get_or_create_unique_id();
+        }
 
-        // Initialize EventDispatcher
-        $this->handlers['dispatcher'] = new EventDispatcher( $driver, $pluginName, $this->config['pluginVersion'], $this->config['unique_id'] );
+        self::$textDomain = $this->config['slug'];
 
-        // Initialize other handlers
-        $this->handlers['consent'] = new Consent( $this );
-        $this->handlers['deactivation'] = new Deactivation( $this );
-        $this->handlers['queue'] = new Queue();
+        $driver = $this->resolve_driver();
 
-        // Schedule background reporting
-        $this->scheduleBackgroundReporting();
+        $this->handlers = [
+            'dispatcher'  => new EventDispatcher( $driver, $this->config ),
+            'consent'     => new Consent( $this ),
+            'deactivation' => new Deactivation( $this ),
+            'queue'       => new Queue(),
+        ];
+
+        self::$instances[] = $this;
+
+        $this->init();
+    }
+
+    public function getDispatcher(): EventDispatcher
+    {
+        return $this->handlers['dispatcher'];
+    }
+
+    /**
+     * Build a config array from legacy 4-positional-parameter constructor arguments.
+     *
+     * @param string $apiKey      API key.
+     * @param string $apiSecret   API secret.
+     * @param string $pluginName  Human-readable plugin name.
+     * @param string $pluginFile  Path to the main plugin file.
+     * @return array
+     * @throws InvalidArgumentException If any required parameter is missing or empty.
+     */
+    private function buildLegacyConfig( string $apiKey, string $apiSecret, string $pluginName, string $pluginFile ): array
+    {
+        if ( '' === $apiSecret && '' === $pluginName && '' === $pluginFile ) {
+            throw new InvalidArgumentException( 'Legacy constructor requires exactly 4 string parameters' );
+        }
+
+        if ( '' === $apiKey ) {
+            throw new InvalidArgumentException( 'API key must not be empty' );
+        }
+
+        if ( '' === $pluginFile ) {
+            throw new InvalidArgumentException( 'Plugin file path must not be empty' );
+        }
+
+        if ( '' === $pluginName ) {
+            throw new InvalidArgumentException( 'Plugin name must not be empty' );
+        }
+
+        trigger_error(
+            'Passing positional parameters to LinnoSDK\Telemetry\Client::__construct() is deprecated. Use an array configuration instead. See https://github.com/user/coderex-telemetry#migration for details. This will be removed in the next major version.',
+            E_USER_DEPRECATED
+        );
+
+        return [
+            'apiKey'     => $apiKey,
+            'apiSecret'  => $apiSecret,
+            'pluginName' => $pluginName,
+            'pluginFile' => $pluginFile,
+            'slug'       => sanitize_title( $pluginName ),
+            'driver'     => 'open_panel',
+        ];
+    }
+
+    /**
+     * Get a copy of the current configuration array.
+     *
+     * @return array
+     */
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
+
+    /**
+     * Resolve the configured telemetry driver.
+     *
+     * Supports an injected test driver via config key '_test_driver' for unit tests.
+     * Falls back to NullDriver with a warning when the driver is missing or unrecognized.
+     *
+     * @return DriverInterface
+     */
+    private function resolve_driver(): DriverInterface
+    {
+        // Allow test injection without touching the real driver factories.
+        if ( ! empty( $this->config['_test_driver'] ) && $this->config['_test_driver'] instanceof DriverInterface ) {
+            return $this->config['_test_driver'];
+        }
+
+        $driver_type = strtolower( trim( $this->config['driver'] ?? '' ) );
+
+        if ( 'posthog' === $driver_type ) {
+            if ( ! class_exists( \PostHog\PostHog::class ) ) {
+                error_log( '[Linno Telemetry] Warning: PostHog SDK not found. Install posthog/posthog-php or switch to a supported driver. Falling back to NullDriver.' );
+                return new NullDriver();
+            }
+            $host   = $this->config['driver_config']['host'] ?? '';
+            $driver = new PostHogDriver( $host );
+            $driver->setApiKey( $this->config['driver_config']['api_key'] ?? $this->config['apiKey'] ?? '' );
+            return $driver;
+        }
+
+        if ( 'open_panel' === $driver_type ) {
+            $driver = new OpenPanelDriver();
+            $driver->setApiKey( $this->config['apiKey'] ?? '' );
+            if ( method_exists( $driver, 'setApiSecret' ) ) {
+                $driver->setApiSecret( $this->config['apiSecret'] ?? '' );
+            }
+            return $driver;
+        }
+
+        if ( '' !== $driver_type ) {
+            error_log( sprintf(
+                '[Linno Telemetry] Warning: Unrecognized driver "%s". Supported drivers: open_panel, posthog. Falling back to NullDriver.',
+                $driver_type
+            ) );
+        } else {
+            error_log( '[Linno Telemetry] Warning: No telemetry driver configured. Events will be silently dropped. Set the "driver" key to "open_panel" or "posthog" to enable tracking.' );
+        }
+
+        return new NullDriver();
+    }
+
+    /**
+     * WordPress action handler for the generic custom-event hook.
+     *
+     * Registered as: add_action( '<slug>_telemetry_track', ... )
+     *
+     * @param string $event_name  The event name.
+     * @param array  $properties  Optional associative properties array.
+     * @return void
+     */
+    public function handle_telemetry_action( string $event_name, array $properties = [] ): void {
+        $this->track( $event_name, $properties );
     }
 
     /**
@@ -231,7 +383,7 @@ class Client {
         if ( ! empty( self::$textDomain ) ) {
             load_plugin_textdomain( self::$textDomain, false, dirname( plugin_basename( $this->config['pluginFile'] ) ) . '/languages' );
         }
-        
+
         $this->handlers['consent']->init();
         $this->handlers['deactivation']->init();
         $this->init_triggers();
@@ -239,6 +391,14 @@ class Client {
         // Internally register activation and deactivation hooks
         register_activation_hook( $this->config['pluginFile'], [ $this, 'activate' ] );
         register_deactivation_hook( $this->config['pluginFile'], [ $this, 'deactivate' ] );
+
+        // Register the generic custom-event action hook: <slug>_telemetry_track
+        add_action(
+            $this->config['slug'] . '_telemetry_track',
+            [ $this, 'handle_telemetry_action' ],
+            10,
+            2
+        );
 
         // Ensure post-consent setup is completed for already-consented sites.
         if ( $this->isOptInEnabled() ) {
@@ -255,7 +415,7 @@ class Client {
         // Track activation without consent using minimal non-personal payload.
         if ( ! get_option( $this->config['slug'] . '_telemetry_activated_tracked' ) ) {
             $this->track_lifecycle_event(
-                'plugin_activated',
+                'activation/plugin_activated',
                 [
                     'site_url' => get_site_url(),
                 ]
@@ -290,7 +450,7 @@ class Client {
         if ( 'yes' !== get_transient( $transient_key ) ) {
             // Send a generic deactivation event if the feedback form didn't send one
             $this->track_lifecycle_event(
-                'plugin_deactivated',
+                'activation/plugin_deactivated',
                 [
                     'site_url' => get_site_url(),
                     'reason'   => 'none',
@@ -301,6 +461,8 @@ class Client {
         delete_transient( $transient_key );
 
         $this->handlers['queue']->clear_for_plugin( $this->config['slug'] );
+
+        $this->unscheduleBackgroundReporting();
     }
 
 
@@ -371,7 +533,7 @@ class Client {
         $properties['site_url']       = $properties['site_url'] ?? get_site_url();
         $properties['unique_id']      = $properties['unique_id'] ?? $this->config['unique_id'];
         $properties['plugin_name']    = $properties['plugin_name'] ?? $this->config['pluginName'];
-        $properties['plugin_version'] = $properties['plugin_version'] ?? $this->config['pluginVersion'];
+        $properties['plugin_version'] = $properties['plugin_version'] ?? $this->config['version'] ?? '';
         $properties['timestamp']      = $properties['timestamp'] ?? Utils::getCurrentTimestamp();
 
         // Add user identification context if not already present
@@ -403,7 +565,7 @@ class Client {
             ),
         );
 
-        if ( 'plugin_deactivated' === $event ) {
+        if ( 'activation/plugin_deactivated' === $event ) {
             $minimal_properties['reason'] = sanitize_text_field( (string) ( $properties['reason'] ?? 'none' ) );
         }
 
@@ -608,7 +770,7 @@ class Client {
      * @return void
      */
     public function track_setup( array $properties = [] ): void {
-        if ( $this->has_sent_event( 'setup' ) ) {
+        if ( $this->has_sent_event( 'onboarding_completed' ) ) {
             return;
         }
 
@@ -616,34 +778,11 @@ class Client {
             return;
         }
 
-        $this->track( 'setup', $properties );
-        $this->mark_event_sent( 'setup' );
+        $this->track( 'activation/onboarding_completed', $properties );
+        $this->mark_event_sent( 'onboarding_completed' );
     }
 
-    /**
-     * Track a 'first_strike' event.
-     *
-     * This event is sent only once when the user experiences the core value of the product.
-     * Requires user consent.
-     *
-     * @param array $properties Additional properties for the event.
-     * @return void
-     */
-    public function track_first_strike( array $properties = [] ): void {
-        if ( $this->has_sent_event( 'first_strike' ) ) {
-            return;
-        }
 
-        if ( ! $this->isOptInEnabled() ) {
-            return;
-        }
-
-        // Ensure first_strike appears at least 1 second after setup in telemetry timelines.
-        $properties['__timestamp'] = gmdate( 'c', time() + 1 );
-
-        $this->track( 'first_strike', $properties );
-        $this->mark_event_sent( 'first_strike' );
-    }
 
     /**
      * Track a 'kui' (Key Usage Indicator) event.
@@ -656,7 +795,42 @@ class Client {
      * @return void
      */
     public function track_kui( string $kui_name, array $properties = [] ): void {
-        $this->track( 'kui_' . $kui_name, $properties );
+        $this->track( 'activation/aha_reached', array_merge( [ 'indicator' => $kui_name ], $properties ) );
+    }
+
+    /**
+     * Track a 'feature_used' event.
+     *
+     * This event is sent when the user uses a core feature of the product.
+     * Requires user consent.
+     *
+     * @param string $feature_name The name of the feature.
+     * @param array $properties Additional properties for the event.
+     * @return void
+     */
+    public function track_feature_used( string $feature_name, array $properties = [] ): void {
+        $this->track( 'retention/feature_used', array_merge( [ 'feature' => $feature_name ], $properties ) );
+    }
+
+    /**
+     * Register a WordPress action hook that sends a retention/feature_used event when triggered.
+     *
+     * This static convenience method attaches a callback to the given WordPress
+     * action hook. When that hook fires, a `retention/feature_used` event is
+     * dispatched through every active Client instance initialized on the current
+     * request.
+     *
+     * @param string $hook_name    WordPress action hook to listen for.
+     * @param string $feature_name Name of the feature being tracked.
+     * @param array  $params       Optional key-value pairs sent with the event.
+     * @return void
+     */
+    public static function add_feature_used_event( string $hook_name, string $feature_name, array $params = [] ): void {
+        add_action( $hook_name, function() use ( $feature_name, $params ) {
+            foreach ( self::$instances as $instance ) {
+                $instance->track_feature_used( $feature_name, $params );
+            }
+        } );
     }
 
     /**
@@ -681,26 +855,31 @@ class Client {
      *
      * @param array $config Configuration array with:
      *                       - setup: hook name or ['hook' => hook_name, 'callback' => callable]
-     *                       - first_strike: hook name or ['hook' => hook_name, 'callback' => callable]
      *                       - kui: array of KUI configurations
+     *                       - feature_used: array of feature used configurations
      * @return self
      * @since 1.0.0
      */
     public function define_triggers( array $config ): self {
         $triggers = $this->triggers();
 
+        // setup → fires activation/onboarding_completed (once)
         if ( isset( $config['setup'] ) ) {
             $hook = is_array( $config['setup'] ) ? $config['setup']['hook'] : $config['setup'];
             $callback = is_array( $config['setup'] ) ? ( $config['setup']['callback'] ?? null ) : null;
             $triggers->on_setup( $hook, $callback );
         }
 
-        if ( isset( $config['first_strike'] ) ) {
-            $hook = is_array( $config['first_strike'] ) ? $config['first_strike']['hook'] : $config['first_strike'];
-            $callback = is_array( $config['first_strike'] ) ? ( $config['first_strike']['callback'] ?? null ) : null;
-            $triggers->on_first_strike( $hook, $callback );
+        // onboarding → canonical alias for setup
+        if ( isset( $config['onboarding'] ) ) {
+            $hook = is_array( $config['onboarding'] ) ? $config['onboarding']['hook'] : $config['onboarding'];
+            $callback = is_array( $config['onboarding'] ) ? ( $config['onboarding']['callback'] ?? null ) : null;
+            $triggers->on_setup( $hook, $callback );
         }
 
+
+
+        // kui → fires activation/aha_reached for each defined indicator
         if ( isset( $config['kui'] ) && is_array( $config['kui'] ) ) {
             foreach ( $config['kui'] as $name => $kui_config ) {
                 if ( is_array( $kui_config ) ) {
@@ -708,6 +887,27 @@ class Client {
                 }
             }
         }
+
+        // aha → canonical alias for kui
+        if ( isset( $config['aha'] ) && is_array( $config['aha'] ) ) {
+            foreach ( $config['aha'] as $name => $aha_config ) {
+                if ( is_array( $aha_config ) ) {
+                    $triggers->on_kui( $name, $aha_config );
+                }
+            }
+        }
+
+        // feature_used → fires retention/feature_used for each defined feature
+        if ( isset( $config['feature_used'] ) && is_array( $config['feature_used'] ) ) {
+            foreach ( $config['feature_used'] as $name => $feature_config ) {
+                if ( is_array( $feature_config ) && isset($feature_config['hook'])) {
+                    $triggers->on_feature_used( $name, $feature_config['hook'], $feature_config['callback'] ?? null );
+                }
+            }
+        }
+
+        // Register all newly-defined triggers so their WordPress hooks fire.
+        $triggers->init();
 
         return $this;
     }
@@ -833,6 +1033,8 @@ class Client {
             $this->create_queue_table();
             update_option( self::GLOBAL_TABLE_CREATED_KEY, 'yes' );
         }
+
+        $this->scheduleBackgroundReporting();
     }
 
     /**

@@ -161,11 +161,17 @@ class Wpfnl_functions {
 	 * @return bool|int
 	 */
 	public static function get_checkout_id_from_post( $post = null ) {
-		if ( isset( $post['post_data'] ) ) {
+		if ( is_array( $post ) && ! empty( $post['_wpfunnels_checkout_id'] ) ) {
+			$checkout_id = filter_var( wp_unslash( $post['_wpfunnels_checkout_id'] ), FILTER_SANITIZE_NUMBER_INT );
+			return $checkout_id ? intval( $checkout_id ) : false;
+		}
+
+		if ( is_array( $post ) && isset( $post['post_data'] ) ) {
 			$post_data = array();
-			parse_str( $post['post_data'], $post_data );
-			if ( isset( $post_data['_wpfunnels_checkout_id'] ) ) {
-				return $post_data['_wpfunnels_checkout_id'];
+			wp_parse_str( wp_unslash( $post['post_data'] ), $post_data );
+			if ( ! empty( $post_data['_wpfunnels_checkout_id'] ) ) {
+				$checkout_id = filter_var( $post_data['_wpfunnels_checkout_id'], FILTER_SANITIZE_NUMBER_INT );
+				return $checkout_id ? intval( $checkout_id ) : false;
 			}
 		}
 		return false;
@@ -3947,10 +3953,18 @@ class Wpfnl_functions {
 	 * @return bool
 	 * @since 2.7.13
 	 */
-	public static function is_valid_order_owner( $order ) {
+	public static function is_valid_order_owner( $order, $order_key = '' ) {
 
 		if ( ! self::is_wc_active() || false === is_a( $order, 'WC_Order' ) ) {
 			return false;
+		}
+
+		// Validate via order_key when provided. The key is cryptographically random
+		// and unpredictable, so possession of it proves the requester is the legitimate
+		// order owner. This covers guest checkout and Express Checkout (Google Pay /
+		// Apple Pay) in incognito mode where no WP user session or WC session exists.
+		if ( ! empty( $order_key ) && $order->key_is_valid( $order_key ) ) {
+			return true;
 		}
 
 		// If it's not a guest order, current user can pay but only if it's their own order,
@@ -4688,6 +4702,11 @@ class Wpfnl_functions {
 			'use_this_funnel_for_lms_only'                => __( 'Use this funnel for LMS only', 'wpfnl' ),
 			'use_this_funnel_for_lms_only_tooltip'        => __( 'Enable this option to turn this funnel into a sales funnel for LMS. You can use it when you have a supported LMS activated such as LearnDash.', 'wpfnl' ),
 			'save_changes'                                => __( 'Save Changes', 'wpfnl' ),
+			'custom_css_desc'                             => __( 'Add custom CSS code here and it will be automatically added to the head section of this page. Do not include &lt;style&gt; tags.', 'wpfnl' ),
+			'field_validation'                            => __( 'Field Validation', 'wpfnl' ),
+			'enable_field_validation'                     => __( 'Enable Field validation error message', 'wpfnl' ),
+			'enable_field_validation_desc'                => __( 'Show custom validation error messages for required checkout fields.', 'wpfnl' ),
+			'validation_message_label'                    => __( 'Validation error message', 'wpfnl' ),
 
 			// ----Global Funnel Offer Mode------
 			'offer_selection_mode'                        => __( 'Offer Selection Mode:', 'wpfnl' ),
@@ -5137,6 +5156,9 @@ class Wpfnl_functions {
 			'total'                                       => __( 'Total', 'wpfnl' ),
 			'allow_use_of_coupon'                         => __( 'Allow Use Of Coupon', 'wpfnl' ),
 			'allow_use_of_coupon_tooltip'                 => __( 'Enable this if you want to allow buyers to use coupons during checkout in the funnel.', 'wpfnl' ),
+			'collapsible_coupon_field'                    => __( 'Collapsible Coupon Field', 'wpfnl' ),
+			'collapsible_coupon_field_tooltip'            => __( 'Enable this to show the coupon field in a collapsible section on the checkout page.', 'wpfnl' ),
+			'collapsible'                                => __( 'Collapsible', 'wpfnl' ),
 			'coupon_auto_applied'                         => __( 'Coupon (auto-applied)', 'wpfnl' ),
 			'coupon_auto_applied_tooltip'                 => __( 'Enable this to allow Auto-apply Coupon during the checkout on this funnel.', 'wpfnl' ),
 			'quantity_limit'                              => __( 'Enable Quantity Limit', 'wpfnl' ),

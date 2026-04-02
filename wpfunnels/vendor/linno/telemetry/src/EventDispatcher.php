@@ -5,14 +5,14 @@
  * Orchestrates event sending by normalizing payloads, adding system information,
  * validating data, and delegating transmission to the appropriate driver.
  *
- * @package Linno\Telemetry
+ * @package LinnoSDK\Telemetry
  * @since 1.0.0
  */
 
-namespace Linno\Telemetry;
+namespace LinnoSDK\Telemetry;
 
-use Linno\Telemetry\Drivers\DriverInterface;
-use Linno\Telemetry\Helpers\Utils;
+use LinnoSDK\Telemetry\Drivers\DriverInterface;
+use LinnoSDK\Telemetry\Helpers\Utils;
 
 /**
  * EventDispatcher class
@@ -51,20 +51,32 @@ class EventDispatcher {
 	private $unique_id;
 
 	/**
+	 * Configuration data
+	 *
+	 * @var array
+	 */
+	private $config;
+
+	/**
 	 * Constructor
 	 *
 	 * @param DriverInterface $driver Driver instance for sending events.
-	 * @param string          $plugin_name Plugin name.
-	 * @param string          $plugin_version Plugin version.
-	 * @param string          $unique_id Unique identifier for the site.
+	 * @param array           $config Configuration data.
 	 *
 	 * @since 1.0.0
 	 */
-	public function __construct( DriverInterface $driver, string $plugin_name, string $plugin_version, string $unique_id ) {
+	public function __construct(DriverInterface $driver, array $config)
+	{
 		$this->driver         = $driver;
-		$this->plugin_name    = $plugin_name;
-		$this->plugin_version = $plugin_version;
-		$this->unique_id      = $unique_id;
+		$this->config         = $config;
+		$this->plugin_name    = $config['pluginName'] ?? '';
+		$this->plugin_version = $config['version'] ?? $config['pluginVersion'] ?? '';
+		$this->unique_id      = $config['unique_id'] ?? '';
+	}
+
+	public function getDriver(): DriverInterface
+	{
+		return $this->driver;
 	}
 
 	/**
@@ -95,6 +107,11 @@ class EventDispatcher {
 
 		if ( ! $result ) {
 			$error = $this->driver->getLastError();
+			error_log( sprintf(
+				'[Linno Telemetry] Failed to send event "%s": %s',
+				$payload['event'],
+				$error ?? 'unknown error'
+			) );
 			return false;
 		}
 
@@ -125,6 +142,11 @@ class EventDispatcher {
 
 		if ( ! $result ) {
 			$error = $this->driver->getLastError();
+			error_log( sprintf(
+				'[Linno Telemetry] Failed to send event "%s": %s',
+				$sanitized_event,
+				$error ?? 'unknown error'
+			) );
 			return false;
 		}
 

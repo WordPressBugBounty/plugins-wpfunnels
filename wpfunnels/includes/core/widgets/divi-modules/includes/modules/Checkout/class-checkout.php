@@ -1033,6 +1033,8 @@ class WPFNL_Checkout extends ET_Builder_Module {
 					'wpfnl-2-step'       	  => __( '2 Step Checkout' ,'wpfnl'),
 					'wpfnl-multistep'   	  => __( 'Multistep Checkout','wpfnl' ),
 					'wpfnl-express-checkout'  => __( 'Express Checkout','wpfnl' ),
+                    'wpfnl-modern-checkout'   => __( 'Modern Checkout','wpfnl' ),
+                    'wpfnl-modern-one-column' => __( 'Modern One Column Checkout','wpfnl' ),
 				),
 				'priority'         => 80,
 				'default'          => 'wpfnl-col-2',
@@ -1109,6 +1111,13 @@ class WPFNL_Checkout extends ET_Builder_Module {
 
 		if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-2-step' === $checkout_layout ){
 			$checkout_layout .= ' wpfnl-multistep';
+		}
+
+		// Add shared modern checkout class for both modern layouts
+		if( 'wpfnl-modern-one-column' === $checkout_layout || 'wpfnl-modern-checkout' === $checkout_layout ) {
+			if( false === strpos( $checkout_layout, 'wpfnl-modern-checkout' ) ) {
+				$checkout_layout .= ' wpfnl-modern-checkout';
+			}
 		}
 
 		//-----floating label class-----

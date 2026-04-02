@@ -92,7 +92,9 @@ class Wpfnl_Controller_Wc extends Wpfnl_Controller_Type
                 }
             }
 
+            $collapsible_coupon = get_post_meta($step_id, '_wpfnl_checkout_collapsible_coupon', true);
             $response[ 'coupon' ]            = $use_of_coupon;
+            $response[ 'collapsibleCoupon' ] = 'yes' === $collapsible_coupon;
             $response[ 'autoCoupon' ]        = $auto_coupon;
             $response[ 'isMultipleProduct' ] = $isMultipleProduct;
             $response[ 'isQuantity' ]        = $isQuantity;

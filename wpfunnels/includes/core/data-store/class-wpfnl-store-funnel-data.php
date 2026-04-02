@@ -361,6 +361,7 @@ class Wpfnl_Funnel_Store_Data extends Wpfnl_Abstract_Store_data implements Wpfnl
 				'_wpfnl_checkout_discount_main_product',
 				'order-bump-settings',
 				'_wpfnl_checkout_coupon',
+				'_wpfnl_checkout_collapsible_coupon',
 				'_wpfnl_multiple_product',
 				'_wpfnl_quantity_support',
 				'wpfnl_checkout_billing_fields',

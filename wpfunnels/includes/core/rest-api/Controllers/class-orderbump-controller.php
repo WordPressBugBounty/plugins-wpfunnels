@@ -533,6 +533,8 @@ class OrderBumpController extends Wpfnl_REST_Controller
             do_action( 'wpfunnels/after_save_order_bump_data', $step_id, $all_settings );
             $response['success'] = true;
 
+            do_action( 'wpfunnels_order_bump_added', absint( $funnel_id ), absint( $step_id ) );
+
         }
 
 

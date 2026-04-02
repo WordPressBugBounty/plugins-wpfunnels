@@ -63,10 +63,11 @@ class Wpfnl_Import {
             global $current_screen;
             $disabled_notice_page = [ 'wp_funnels' ];
             if( 'plugins' === $current_screen->parent_base || !isset( $_GET[ 'page' ] ) || ( isset( $_GET[ 'page' ] ) && in_array( $_GET[ 'page' ], $disabled_notice_page ) ) ) {
+                $nonce_field = "<input type='hidden' id='wpfnl-import-nonce' value='" . esc_attr( wp_create_nonce('wpfnl-admin') ) . "'>";
                 $options = array(
                     'id'          => 'wpfnl-import-notice',
                     'title'       => 'wpfunnels-basic',
-                    'description' => "<span>{$import_status}</span>",
+                    'description' => "<span>{$import_status}</span>{$nonce_field}",
                     'classes'     => [ 'notice', 'notice-info', 'wpfnl-import-notice' ],
                     'type'        => 'update-plugin',
                     'dismissible' => true,

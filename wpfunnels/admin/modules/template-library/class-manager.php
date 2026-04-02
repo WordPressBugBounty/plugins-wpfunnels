@@ -281,7 +281,18 @@ class Manager
     public function import_funnel($payload)
     {
         $source = $this->get_source($payload['source']);
-        return $source->import_funnel($payload);
+        $result = $source->import_funnel($payload);
+
+        if ( ! empty( $result['success'] ) && ! empty( $result['funnelID'] ) ) {
+            do_action(
+                'wpfunnels_template_imported',
+                absint( $result['funnelID'] ),
+                0,
+                sanitize_text_field( $payload['source'] ?? '' )
+            );
+        }
+
+        return $result;
     }
 
     /**

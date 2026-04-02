@@ -22,6 +22,13 @@ if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-express-check
 if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-2-step' === $checkout_layout ) {
 	$checkout_layout .= ' wpfnl-multistep';
 }
+
+// Add shared modern checkout class for both modern layouts
+if( 'wpfnl-modern-one-column' === $checkout_layout || 'wpfnl-modern-checkout' === $checkout_layout ) {
+	if( false === strpos( $checkout_layout, 'wpfnl-modern-checkout' ) ) {
+		$checkout_layout .= ' wpfnl-modern-checkout';
+	}
+}
 ?>
 <div id="wpfnl-checkout-form" class="wpfnl-checkout  <?php echo esc_attr( $checkout_layout ); ?>  <?php echo esc_attr( $floating_label ); ?> ">
 	<?php

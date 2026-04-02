@@ -7,6 +7,7 @@
 @import 'next-step-block';
 @import 'multistep-checkout';
 @import 'express-checkout';
+@import 'modern-checkout';
 @import 'optin-form';
 @import 'lms-checkout';
 @import 'lms-thankyou';
@@ -42,3 +43,8 @@
 @import 'dynamic-offer-templates/style1';
 @import 'dynamic-offer-templates/style2';
 @import 'dynamic-offer-templates/style3';
+
+
+//----checkout testimonial styles----
+@import 'checkout-testimonials/style1';
+@import 'checkout-testimonials/trust-badge';

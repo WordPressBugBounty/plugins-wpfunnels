@@ -810,7 +810,7 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
 
         $wpfnl_functions_instance = new Wpfnl_functions();
         if( method_exists($wpfnl_functions_instance,'is_valid_order_owner')){
-            if (!Wpfnl_functions::is_valid_order_owner($order)) {
+            if (!Wpfnl_functions::is_valid_order_owner($order, $order_key)) {
                 wp_send_json([
                     'status'  => 'error',
                     'message' => __( 'Unauthorized request', 'wpfnl-pro' ),
@@ -885,7 +885,7 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
 
         $wpfnl_functions_instance = new Wpfnl_functions();
         if( method_exists($wpfnl_functions_instance,'is_valid_order_owner')){
-            if (!Wpfnl_functions::is_valid_order_owner($order)) {
+            if (!Wpfnl_functions::is_valid_order_owner($order, $order_key)) {
                 wp_send_json([
                     'status'  => 'error',
                     'message' => __( 'Unauthorized request', 'wpfnl-pro' ),

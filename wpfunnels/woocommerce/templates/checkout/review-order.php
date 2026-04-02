@@ -15,12 +15,22 @@
  * @version 5.2.0
  */
 
+use WPFunnels\Wpfnl_functions;
+
 $is_express_checkout = true;
 
 defined( 'ABSPATH' ) || exit;
+
+$checkout_id = get_the_ID();
+if ( ! $checkout_id || 'wpfunnel_steps' !== get_post_type( $checkout_id ) ) {
+	$data        = \WPFunnels\Wpfnl_functions::get_sanitized_get_post();
+	$checkout_id = isset( $data['post']['step_id'] ) ? $data['post']['step_id'] : 0;
+}
+$show_product_images = 'yes' === get_post_meta( $checkout_id, '_wpfnl_display_product_images', true );
+
 do_action( 'wpfunnel_review_order_before_cart_contents' );
 ?>
-<table class="shop_table woocommerce-checkout-review-order-table">
+<table class="shop_table woocommerce-checkout-review-order-table<?php echo $show_product_images ? ' has-product-images' : ''; ?>">
 	<thead>
 		<tr>
 			<th class="product-name">
@@ -36,15 +46,58 @@ do_action( 'wpfunnel_review_order_before_cart_contents' );
 
 		foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
 			$_product = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
-			
+
 			if ( $_product && $_product->exists() && $cart_item['quantity'] > 0 && apply_filters( 'woocommerce_checkout_cart_item_visible', true, $cart_item, $cart_item_key ) ) {
+
+				$step_id = 0;
+				$isQuantity = 'no';
+				if( wp_doing_ajax() ) {
+					if ( isset( $_POST['post_data'] ) ) {
+						parse_str( $_POST['post_data'], $post_data );
+						if ( isset( $post_data['_wpfunnels_checkout_id'] ) ) {
+							$step_id = $post_data['_wpfunnels_checkout_id'];	
+						}
+					}
+				} else {
+					$step_id = get_the_ID();
+				}
+				
+				$isQuantity = get_post_meta($step_id, '_wpfnl_quantity_support',true);
 				?>
+
 				<tr class="<?php echo esc_attr( apply_filters( 'woocommerce_cart_item_class', 'cart_item', $cart_item, $cart_item_key ) ); ?>">
+
 					<td class="product-name">
-						<?php echo apply_filters( 'woocommerce_cart_item_name',$_product->get_type() == 'variation' ? \WPFunnels\Wpfnl_functions::get_formated_product_name($_product) : $_product->get_name(), $cart_item, $cart_item_key ). '&nbsp;'; ?>
-						<?php echo apply_filters( 'woocommerce_checkout_cart_item_quantity', ' <strong class="product-quantity">' . sprintf( '&times;&nbsp;%s', $cart_item['quantity'] ) . '</strong>', $cart_item, $cart_item_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-						<?php echo wc_get_formatted_cart_item_data( $cart_item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<div class="product-name-wrapper">
+							<?php if ( $show_product_images ) : ?>
+								<div class="product-thumbnail">
+									<?php
+										$thumbnail = apply_filters( 'woocommerce_cart_item_thumbnail', $_product->get_image( 'thumbnail' ), $cart_item, $cart_item_key );
+										echo $thumbnail; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+									
+										if($isQuantity === 'no'){
+											echo apply_filters( 'woocommerce_checkout_cart_item_quantity', ' <strong class="product-quantity">' . sprintf( '%s', $cart_item['quantity'] ) . '</strong>', $cart_item, $cart_item_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+										}
+									?>
+								</div>
+							<?php endif; ?>
+
+							<div class="product-name-text-wrapper">
+								<span class="product-name-text">
+									<?php echo apply_filters( 'woocommerce_cart_item_name',$_product->get_type() == 'variation' ? \WPFunnels\Wpfnl_functions::get_formated_product_name($_product) : $_product->get_name(), $cart_item, $cart_item_key ). '&nbsp;'; ?>
+
+									<?php echo wc_get_formatted_cart_item_data( $cart_item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+								</span>
+
+								<?php
+									if($isQuantity === 'yes'){
+										echo apply_filters( 'woocommerce_checkout_cart_item_quantity', ' <strong class="product-quantity">' . sprintf( '%s', $cart_item['quantity'] ) . '</strong>', $cart_item, $cart_item_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+									}
+								?>
+							</div>
+						</div>
 					</td>
+
 					<td class="product-total">
 						<?php echo apply_filters( 'woocommerce_cart_item_subtotal', WC()->cart->get_product_subtotal( $_product, $cart_item['quantity'] ), $cart_item, $cart_item_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</td>
@@ -81,23 +134,21 @@ do_action( 'wpfunnel_review_order_before_cart_contents' );
 			if( isset( $_SESSION[ 'checkout_layout' ] ) ) {
 				$checkout_layout = $_SESSION[ 'checkout_layout' ];
 				unset( $_SESSION[ 'checkout_layout' ] );
-				if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-express-checkout' === $checkout_layout ) {
+				if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && ('wpfnl-express-checkout' === $checkout_layout || 'wpfnl-modern-checkout' === $checkout_layout || 'wpfnl-modern-one-column' === $checkout_layout) ) {
 					$shipping_method = WC()->session->get( 'chosen_shipping_methods' );
 					$shipping_method = isset( $shipping_method[0] ) ? $shipping_method[0] : '';
-					$shipping_label = $shipping_method && isset( $package[ 'rates' ][ $shipping_method ] ) ? $package[ 'rates' ][ $shipping_method ] : '';
-					$shipping_label = $shipping_label ? $shipping_label->get_label() : '';
-					$currency   = get_woocommerce_currency_symbol();
 					$shipping_cost = '';
 
 					foreach ( WC()->shipping->get_packages() as $key => $package ) {
-						$cost = $shipping_method && $package[ 'rates' ][ $shipping_method ] ? $package[ 'rates' ][ $shipping_method ]->get_cost() : '';
-						$cost = $cost ? $currency . $cost : '';
-						$shipping_cost = $shipping_label . $cost;
+						if ( $shipping_method && isset( $package['rates'][ $shipping_method ] ) ) {
+							$shipping_cost = wc_price( (float) $package['rates'][ $shipping_method ]->get_cost() );
+							break;
+						}
 					}
 					?>
 					<tr>
 						<th><?php esc_html_e( 'Shipping', 'wpfnl' ); ?></th>
-						<td class="wpfnl-express-shipping-method"><?php echo $shipping_cost ?></td>
+						<td class="wpfnl-express-shipping-method"><?php echo wp_kses_post( $shipping_cost ); ?></td>
 					</tr>
 					<?php
 				}
@@ -111,23 +162,21 @@ do_action( 'wpfunnel_review_order_before_cart_contents' );
 					$data        = \WPFunnels\Wpfnl_functions::get_sanitized_get_post();
 					$checkout_id = isset( $data[ 'post' ][ 'step_id' ] ) ? $data[ 'post' ][ 'step_id' ] : 0;
 				}
-				if( \WPFunnels\Wpfnl_functions::maybe_express_checkout( $checkout_id ) && \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() ) {
+				if( (\WPFunnels\Wpfnl_functions::maybe_express_checkout( $checkout_id ) || in_array( get_post_meta( $checkout_id, '_wpfnl_checkout_layout', true ), array( 'wpfnl-modern-checkout', 'wpfnl-modern-one-column' ), true )) && \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() ) {
 					$shipping_method = WC()->session->get( 'chosen_shipping_methods' );
 					$shipping_method = isset( $shipping_method[0] ) ? $shipping_method[0] : '';
-					$shipping_label = $shipping_method && isset( $package[ 'rates' ][ $shipping_method ] ) ? $package[ 'rates' ][ $shipping_method ] : '';
-					$shipping_label = $shipping_label ? $shipping_label->get_label() : '';
-					$currency   = get_woocommerce_currency_symbol();
 					$shipping_cost = '';
 
 					foreach ( WC()->shipping->get_packages() as $key => $package ) {
-						$cost = $shipping_method && $package[ 'rates' ][ $shipping_method ] ? $package[ 'rates' ][ $shipping_method ]->get_cost() : '';
-						$cost = $cost ? $currency . $cost : '';
-						$shipping_cost = $shipping_label . $cost;
+						if ( $shipping_method && isset( $package['rates'][ $shipping_method ] ) ) {
+							$shipping_cost = wc_price( (float) $package['rates'][ $shipping_method ]->get_cost() );
+							break;
+						}
 					}
 					?>
 					<tr>
 						<th><?php esc_html_e( 'Shipping', 'wpfnl' ); ?></th>
-						<td class="wpfnl-express-shipping-method"><?php echo $shipping_cost ?></td>
+						<td class="wpfnl-express-shipping-method"><?php echo wp_kses_post( $shipping_cost ); ?></td>
 					</tr>
 					<?php
 				}
@@ -179,10 +228,10 @@ do_action( 'wpfunnel_review_order_before_cart_contents' );
 
 	</tfoot>
 </table>
-<?php 
+<?php
 	/**
 	 * Fires after order total in checkout page
 	 * @since 2.8.21
 	 */
-	do_action( 'wpfunnels/after_order_total' ); 
+	do_action( 'wpfunnels/after_order_total' );
 ?>

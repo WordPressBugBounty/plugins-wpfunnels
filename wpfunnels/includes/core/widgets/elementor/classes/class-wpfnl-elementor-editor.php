@@ -62,6 +62,7 @@ class Elemenetor_Editror_Compatibility {
 						if ('wpfnl-checkout' === $widget_type || 'wpfnl-lms-checkout' === $widget_type) {
 							$ob_settings = $this->get_order_bump_settings_for_preview($current_post_id, $widget_settings);
 							do_action('wpfunnels/elementor_render_order_bump', $current_post_id, $ob_settings);
+							do_action('wpfunnels/elementor_render_testimonial', $current_post_id);
 						}
 					});
 

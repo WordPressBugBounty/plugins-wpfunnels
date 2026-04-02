@@ -116,13 +116,14 @@ class Wpfnl_Public
 		 * Add custom script
 		 */
 		add_action('wp_head', array($this, 'add_custom_script'));
+		add_action('wp_head', array($this, 'add_custom_css'));
 
 		// remove woodmart hook for funnel checkout
 		add_action('wp', [$this, 'remove_woodmart_hook'], 150);
 
 		add_action( 'wp_footer', array( $this, 'load_variable_product_modal' ) );
-		
-		
+
+
 	}
 
 	/**
@@ -444,8 +445,24 @@ class Wpfnl_Public
 					'is_user_logged_in' 	=> is_user_logged_in(),
 					'user_id' 				=> get_current_user_id(),
 					'is_login_reminder' 	=> get_option('woocommerce_enable_checkout_login_reminder'),
+					'express_checkout_enabled' => get_post_meta(get_the_ID(), '_wpfnl_express_checkout_enabled', true) ? get_post_meta(get_the_ID(), '_wpfnl_express_checkout_enabled', true) : 'no',
+					'field_validation_enabled' => get_post_meta(get_the_ID(), '_wpfnl_field_validation_enabled', true) ? get_post_meta(get_the_ID(), '_wpfnl_field_validation_enabled', true) : 'no',
+					'field_validation_message' => get_post_meta(get_the_ID(), '_wpfnl_field_validation_message', true) ? get_post_meta(get_the_ID(), '_wpfnl_field_validation_message', true) : '{field} is required',
+					'display_product_images'   => get_post_meta(get_the_ID(), '_wpfnl_display_product_images', true) ? get_post_meta(get_the_ID(), '_wpfnl_display_product_images', true) : 'no',
+					'collapsible_order_summary_enabled' => get_post_meta(get_the_ID(), '_wpfnl_collapsible_order_summary_enabled', true) !== '' ? get_post_meta(get_the_ID(), '_wpfnl_collapsible_order_summary_enabled', true) : 'yes',
+					'enhanced_phone_field_enabled' => get_post_meta(get_the_ID(), '_wpfnl_enhanced_phone_field_enabled', true) ? get_post_meta(get_the_ID(), '_wpfnl_enhanced_phone_field_enabled', true) : 'no',
+					'validate_phone_number' => get_post_meta(get_the_ID(), '_wpfnl_validate_phone_number', true) ? get_post_meta(get_the_ID(), '_wpfnl_validate_phone_number', true) : 'no',
+					'save_phone_number_format' => get_post_meta(get_the_ID(), '_wpfnl_save_phone_number_format', true) ? get_post_meta(get_the_ID(), '_wpfnl_save_phone_number_format', true) : 'without_country_code',
+					'phone_help_text' => get_post_meta(get_the_ID(), '_wpfnl_phone_help_text', true) ? get_post_meta(get_the_ID(), '_wpfnl_phone_help_text', true) : '',
+					'phone_utils_url' => plugin_dir_url(__FILE__) . 'assets/phone/js/utils.js',
 				]
 			);
+
+			if ('yes' === (get_post_meta(get_the_ID(), '_wpfnl_enhanced_phone_field_enabled', true) ? get_post_meta(get_the_ID(), '_wpfnl_enhanced_phone_field_enabled', true) : 'no')) {
+				wp_enqueue_style('intl-tel-input-style', plugin_dir_url(__FILE__) . 'assets/phone/css/intlTelInput.css', array(), WPFNL_VERSION);
+				wp_enqueue_script('intl-tel-input-script', plugin_dir_url(__FILE__) . 'assets/phone/js/intlTelInput.min.js', array('jquery'), WPFNL_VERSION, true);
+				wp_enqueue_script('intl-tel-input-utils', plugin_dir_url(__FILE__) . 'assets/phone/js/utils.js', array('intl-tel-input-script'), WPFNL_VERSION, true);
+			}
 
 			$post_id = get_the_ID();
 			$custom_css = get_post_meta($post_id, 'rex_gutenberg_css', true);
@@ -778,7 +795,6 @@ class Wpfnl_Public
 	 */
 	public function redirect_to_funnel_thankyou_page($order_received_url, $order)
 	{
-
 		if ($order && Wpfnl_functions::check_if_funnel_order($order)) {
 			$order_key       = $order->get_order_key();
 			$order_id        = $order->get_id();
@@ -795,7 +811,7 @@ class Wpfnl_Public
 			$next_node 				= Wpfnl_functions::get_next_conditional_step($funnel_id, $current_page_id, $order);
 			$next_node       		= apply_filters('wpfunnels/next_step_data', $next_node);
 			$next_node       		= apply_filters('wpfunnels/modify_next_step_based_on_order', $next_node, $order);
-			
+
 			if (isset($next_node['step_type']) && 'thankyou' === $next_node['step_type']) {
 				if( Wpfnl_functions::is_global_thank_you_page_enabled() ){
 					return home_url() . '/checkout/order-received/' . $order_id . '/?key=' . $order_key;
@@ -812,7 +828,6 @@ class Wpfnl_Public
 			);
 			$query_args = apply_filters('wpfunnels/order_meta', $query_args, $order);
 			$next_step_url = $this->get_thankyou_step_url($funnel_id, $next_node['step_id'], $order);
-			error_log( 'Next Step URL after Thankyou check: ' . $next_step_url );
 			if ($next_step_url) {
 				return add_query_arg($query_args, $next_step_url);
 			}
@@ -841,8 +856,8 @@ class Wpfnl_Public
 
 		$next_step_url 		= get_permalink($step_id);
 		$step_type 		= get_post_meta($step_id, '_step_type', true);
-		
-		
+
+
 
 		$thankyou_step_url  = '';
 		if (Wpfnl_functions::check_if_this_is_step_type_by_id($step_id, 'thankyou')) {
@@ -856,7 +871,7 @@ class Wpfnl_Public
 		if( ! defined( 'WPFNL_PRO_DIR' ) ){
 			$thankyou_step_url = $next_step_url;
 		}
-		
+
 		return apply_filters('wpfunnels/next_step_url', $thankyou_step_url, $next_step_url, $order);
 	}
 
@@ -1300,6 +1315,31 @@ class Wpfnl_Public
 			echo '<!-- Custom WPFunnels Script -->';
 			echo html_entity_decode($script); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo '<!-- End Custom WPFunnels Script -->';
+		}
+	}
+
+	/**
+	 * Add custom css to header of funnel step
+	 *
+	 * @return void
+	 * @since 3.1.0
+	 */
+	public function add_custom_css()
+	{
+		global $post;
+
+		if (!is_object($post) && !isset($post->ID)) {
+			return;
+		}
+
+		$css = get_post_meta($post->ID, '_wpfnl_custom_css', true);
+		if ('' !== $css) {
+			if (false === strpos($css, htmlentities('<style'))) {
+				$css = '<style>' . $css . '</style>';
+			}
+			echo "\n<!-- Custom WPFunnels CSS -->\n";
+			echo html_entity_decode($css); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo "\n<!-- End Custom WPFunnels CSS -->\n";
 		}
 	}
 

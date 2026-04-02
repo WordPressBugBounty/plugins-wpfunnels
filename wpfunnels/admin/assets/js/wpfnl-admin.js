@@ -32,6 +32,26 @@
      */
 
     jQuery(document).ready(function ($) {
+        
+        // ---delete import funnel notice permanently ------
+        $(document).on("click", ".wpfnl-import-notice .notice-dismiss", function(event) {
+            event.preventDefault();
+            var nonce = $('#wpfnl-import-nonce').val();
+            
+            // Use standard WP ajaxurl if available or WPFunnelVars
+            var reqUrl = (typeof ajaxurl !== 'undefined') ? ajaxurl : (window.WPFunnelVars && window.WPFunnelVars.ajaxurl ? window.WPFunnelVars.ajaxurl : '');
+            if (reqUrl) {
+                $.ajax({
+                    url: reqUrl,
+                    type: 'POST',
+                    data: {
+                        action: 'wpfnl_hide_import_funnel_notice',
+                        security: nonce
+                    }
+                });
+            }
+        });
+
         //date format
         function PresentDateForm(date) {
             var date = new Date(date),

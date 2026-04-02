@@ -23,6 +23,10 @@ if ( ! wp_doing_ajax() ) {
 
 global $post;
 
+if ( ! isset( $order_button_text ) || '' === $order_button_text ) {
+	$order_button_text = apply_filters( 'woocommerce_order_button_text', __( 'Place order', 'woocommerce' ) );
+}
+
 $checkout_id = '';
 if( wp_doing_ajax()  ){
 	$checkout_id = \WPFunnels\Wpfnl_functions::get_checkout_id_from_post($_POST);

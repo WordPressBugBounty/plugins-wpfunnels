@@ -1,0 +1,67 @@
+.wpfnl-testimonial-trust-badge {
+	margin-top: 40px;
+
+    .wpfnl-testimonial-trust-card {
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        border: 1px solid #E5E7EB;
+        border-radius: 12px;
+        padding: 20px;
+        background: #ffffff;
+
+        .wpfnl-testimonial-badge {
+            flex-shrink: 0;
+            width: 130px;
+            height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wpfnl-testimonial-headline {
+            color: #111827;
+            font-size: 20px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .wpfnl-testimonial-text {
+            color: #3F4654;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-top: 10px;
+        }
+    }
+
+}
+
+
+@media only screen and (max-width: 767px) {
+	.wpfnl-testimonial-trust-badge .wpfnl-testimonial-trust-card .wpfnl-testimonial-badge {
+		width: 100px;
+		height: auto;
+		display: block;
+	}
+	.wpfnl-testimonial-trust-badge .wpfnl-testimonial-trust-card .wpfnl-testimonial-headline {
+		font-size: 18px;
+	}
+	.wpfnl-testimonial-trust-badge .wpfnl-testimonial-trust-card .wpfnl-testimonial-text {
+		font-size: 15px;
+	}
+
+}
+
+@media only screen and (max-width: 525px) {
+	.wpfnl-testimonial-trust-badge .wpfnl-testimonial-trust-card {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 17px;
+		padding: 16px;
+	}
+	.wpfnl-testimonial-trust-badge .wpfnl-testimonial-trust-card .wpfnl-testimonial-headline {
+		font-size: 17px;
+	}
+
+}

@@ -27,6 +27,7 @@ use WPFunnels\Admin\Banner\SpecialOccasionBanner;
 use WPFunnels\Admin\Banner\SetupReminderBanner;
 use WPFunnels\Ajax_Handler\Ajax_Handler;
 use WPFunnels\Classes\OrderBumpActions\Wpfnl_Order_Bump_Action;
+use WPFunnels\Classes\TestimonialActions\Wpfnl_Testimonial_Action;
 use WPFunnels\Compatibility\CartLift\Wpfnl_Cart_Lift_Compatibility;
 use WPFunnels\Compatibility\SlimSeo\Wpfnl_Slim_Seo_Compatibility;
 use WPFunnels\Frontend\Wpfnl_Public;
@@ -103,6 +104,8 @@ class Wpfnl
 
 
     public $order_bump_actions;
+
+    public $testimonial_actions;
 
     public $meta;
 
@@ -427,9 +430,10 @@ class Wpfnl
         $this->widget_manager           = Widget_Manager::getInstance()->init();
         $this->page_templates           = new PageTemplates\Manager();
         $this->admin_notice             = new Notice();
-        $this->admin_banner             = new SpecialOccasionBanner('newyear2026', '2025-01-01 00:00:00', '2025-01-07 23:59:59', 'https://getwpfunnels.com/pricing/?utm_source=plugin&utm_medium=dashboard-banner-wpf&utm_campaign=welcome2026');
+        $this->admin_banner             = new SpecialOccasionBanner('eid-ul-fitr-26', '2026-03-16 00:00:01', '2026-03-24 23:59:59', 'https://getwpfunnels.com/pricing/?utm_source=plugin&utm_medium=dashboard-banner-wpf&utm_campaign=eidoffer2026');
         $this->setup_reminder_banner    = new SetupReminderBanner();
         $this->order_bump_actions       = new Wpfnl_Order_Bump_Action();
+        $this->testimonial_actions      = new Wpfnl_Testimonial_Action();
         $this->meta                     = new Wpfnl_Default_Meta();
         $this->shortcodes				= Wpfnl_Shortcodes::getInstance()->init();
 		$this->ajax_handler 			= new Ajax_Handler();

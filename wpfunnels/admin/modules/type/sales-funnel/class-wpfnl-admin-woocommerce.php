@@ -543,7 +543,9 @@ class Wpfunnels_Wc_Checkout extends Wpfnl_Funnel_Type
                 $response[ 'products' ] = array();
             }
 
+            $collapsible_coupon = get_post_meta($step_id, '_wpfnl_checkout_collapsible_coupon', true);
             $response[ 'coupon' ]            = $use_of_coupon;
+            $response[ 'collapsibleCoupon' ] = 'yes' === $collapsible_coupon;
             $response[ 'autoCoupon' ]        = $auto_coupon;
             $response[ 'isMultipleProduct' ] = $isMultipleProduct;
             $response[ 'isQuantity' ]        = $isQuantity;

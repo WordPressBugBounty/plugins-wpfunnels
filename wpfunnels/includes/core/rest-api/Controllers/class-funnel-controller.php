@@ -252,6 +252,34 @@ class FunnelController extends Wpfnl_REST_Controller
 			],
 		]);
 
+		register_rest_route($this->namespace, '/' . $this->rest_base . '/get-optimizations/(?P<step_id>[\d]+)', [
+			[
+				'methods' => \WP_REST_Server::READABLE,
+				'callback' => [
+					$this,
+					'get_optimizations'
+				],
+				'permission_callback' => [
+					$this,
+					'update_items_permissions_check'
+				],
+			],
+		]);
+
+		register_rest_route($this->namespace, '/' . $this->rest_base . '/save-optimizations/', [
+			[
+				'methods' => \WP_REST_Server::EDITABLE,
+				'callback' => [
+					$this,
+					'save_optimizations'
+				],
+				'permission_callback' => [
+					$this,
+					'update_items_permissions_check'
+				],
+			],
+		]);
+
 		register_rest_route($this->namespace, '/' . $this->rest_base . '/get-settings/(?P<step_id>[\d]+)', [
 			[
 				'methods' => \WP_REST_Server::READABLE,
@@ -474,6 +502,141 @@ class FunnelController extends Wpfnl_REST_Controller
 
 
 	/**
+	 * Retrieve checkout optimization settings for a funnel step.
+	 *
+	 * Reads post meta for the given step and returns optimization settings
+	 * including express checkout, field validation, product images display,
+	 * collapsible order summary, and enhanced phone field configuration.
+	 * Falls back to default values when no meta is stored.
+	 *
+	 * @param WP_REST_Request $request Request object. Expects 'step_id' parameter.
+	 * @return WP_REST_Response REST response containing the optimization settings.
+	 */
+	public function get_optimizations($request) {
+		$step_id = $request['step_id'];
+		$express_checkout_enabled  = get_post_meta($step_id, '_wpfnl_express_checkout_enabled', true);
+		$express_checkout_position = get_post_meta($step_id, '_wpfnl_express_checkout_position', true);
+		$field_validation_enabled  = get_post_meta($step_id, '_wpfnl_field_validation_enabled', true);
+		$field_validation_message  = get_post_meta($step_id, '_wpfnl_field_validation_message', true);
+		$display_product_images    = get_post_meta($step_id, '_wpfnl_display_product_images', true);
+		$collapsible_order_summary_enabled = get_post_meta($step_id, '_wpfnl_collapsible_order_summary_enabled', true);
+		$enhanced_phone_field_enabled = get_post_meta($step_id, '_wpfnl_enhanced_phone_field_enabled', true);
+		$validate_phone_number        = get_post_meta($step_id, '_wpfnl_validate_phone_number', true);
+		$save_phone_number_format     = get_post_meta($step_id, '_wpfnl_save_phone_number_format', true);
+		$phone_help_text              = get_post_meta($step_id, '_wpfnl_phone_help_text', true);
+
+		$testimonial_raw     = get_post_meta($step_id, 'wpf_checkout_testimonial', true);
+		$testimonial_default = array(
+			'enabled'     => false,
+			'layout'      => 'layout-1',
+			'position'    => 'after_bump',
+			'testimonial' => array( 'text' => '', 'author' => '', 'rating' => 5 ),
+			'guarantee'   => array( 'headline' => '', 'text' => '', 'days' => 30, 'image' => array( 'id' => 0, 'url' => '' ) ),
+			'benefits'    => array( 'title' => "Here's what you get", 'items' => array() ),
+		);
+		if ( is_array( $testimonial_raw ) ) {
+			$testimonial_config = wp_parse_args( $testimonial_raw, $testimonial_default );
+			// Deep-merge guarantee sub-array so new fields always exist
+			if ( ! isset( $testimonial_config['guarantee'] ) || ! is_array( $testimonial_config['guarantee'] ) ) {
+				$testimonial_config['guarantee'] = $testimonial_default['guarantee'];
+			} else {
+				$testimonial_config['guarantee'] = wp_parse_args( $testimonial_config['guarantee'], $testimonial_default['guarantee'] );
+			}
+		} else {
+			$testimonial_config = $testimonial_default;
+		}
+
+		$response = array(
+			'express_checkout_enabled'  => $express_checkout_enabled  ? $express_checkout_enabled  : 'yes',
+			'express_checkout_position' => $express_checkout_position ? $express_checkout_position : 'top',
+			'field_validation_enabled'  => $field_validation_enabled  ? $field_validation_enabled  : 'no',
+			'field_validation_message'  => $field_validation_message  ? $field_validation_message  : '{field} is required',
+			'display_product_images'    => $display_product_images    ? $display_product_images    : 'no',
+			'collapsible_order_summary_enabled'    => $collapsible_order_summary_enabled    ? $collapsible_order_summary_enabled    : 'yes',
+			'enhanced_phone_field_enabled' => $enhanced_phone_field_enabled ? $enhanced_phone_field_enabled : 'no',
+			'validate_phone_number'        => $validate_phone_number ? $validate_phone_number : 'no',
+			'save_phone_number_format'     => $save_phone_number_format ? $save_phone_number_format : 'without_country_code',
+			'phone_help_text'              => $phone_help_text ? $phone_help_text : '',
+			'testimonial'                  => $testimonial_config,
+		);
+		return $this->prepare_item_for_response($response, $request);
+	}
+
+	public function save_optimizations($request) {
+		$step_id = $request['step_id'];
+		$express_checkout_enabled  = sanitize_text_field($request['express_checkout_enabled']);
+		$express_checkout_position = sanitize_text_field($request['express_checkout_position']);
+		update_post_meta($step_id, '_wpfnl_express_checkout_enabled', $express_checkout_enabled);
+		if ( $express_checkout_position ) {
+			update_post_meta($step_id, '_wpfnl_express_checkout_position', $express_checkout_position);
+		}
+
+		$field_validation_enabled = isset($request['field_validation_enabled']) ? sanitize_text_field($request['field_validation_enabled']) : 'no';
+		$field_validation_message = isset($request['field_validation_message']) ? sanitize_text_field($request['field_validation_message']) : '{field} is required';
+		update_post_meta($step_id, '_wpfnl_field_validation_enabled', $field_validation_enabled);
+		update_post_meta($step_id, '_wpfnl_field_validation_message', $field_validation_message);
+
+		$display_product_images = isset($request['display_product_images']) ? sanitize_text_field($request['display_product_images']) : 'no';
+		update_post_meta($step_id, '_wpfnl_display_product_images', $display_product_images);
+
+		$collapsible_order_summary_enabled = isset($request['collapsible_order_summary_enabled']) ? sanitize_text_field($request['collapsible_order_summary_enabled']) : 'yes';
+		update_post_meta($step_id, '_wpfnl_collapsible_order_summary_enabled', $collapsible_order_summary_enabled);
+
+		$enhanced_phone_field_enabled = isset($request['enhanced_phone_field_enabled']) ? sanitize_text_field($request['enhanced_phone_field_enabled']) : 'no';
+		$validate_phone_number        = isset($request['validate_phone_number']) ? sanitize_text_field($request['validate_phone_number']) : 'no';
+		$save_phone_number_format     = isset($request['save_phone_number_format']) ? sanitize_text_field($request['save_phone_number_format']) : 'without_country_code';
+		$phone_help_text              = isset($request['phone_help_text']) ? sanitize_text_field($request['phone_help_text']) : '';
+
+		update_post_meta($step_id, '_wpfnl_enhanced_phone_field_enabled', $enhanced_phone_field_enabled);
+		update_post_meta($step_id, '_wpfnl_validate_phone_number', $validate_phone_number);
+		update_post_meta($step_id, '_wpfnl_save_phone_number_format', $save_phone_number_format);
+		update_post_meta($step_id, '_wpfnl_phone_help_text', $phone_help_text);
+
+		// Testimonial section
+		if ( isset( $request['testimonial'] ) && is_array( $request['testimonial'] ) ) {
+			$raw = $request['testimonial'];
+
+			$testimonial_data = array(
+				'enabled'  => ! empty( $raw['enabled'] ),
+				'layout'   => sanitize_key( isset( $raw['layout'] ) ? $raw['layout'] : 'layout-1' ),
+				'position' => sanitize_key( isset( $raw['position'] ) ? $raw['position'] : 'after_bump' ),
+				'testimonial' => array(
+					'text'   => isset( $raw['testimonial']['text'] )   ? sanitize_textarea_field( $raw['testimonial']['text'] )   : '',
+					'author' => isset( $raw['testimonial']['author'] ) ? sanitize_text_field( $raw['testimonial']['author'] ) : '',
+					'rating' => isset( $raw['testimonial']['rating'] ) ? max( 1, min( 5, absint( $raw['testimonial']['rating'] ) ) ) : 5,
+				),
+				'guarantee' => array(
+					'headline' => isset( $raw['guarantee']['headline'] ) ? sanitize_text_field( $raw['guarantee']['headline'] ) : '',
+					'text'     => isset( $raw['guarantee']['text'] )     ? sanitize_textarea_field( $raw['guarantee']['text'] ) : '',
+					'days'     => isset( $raw['guarantee']['days'] )     ? max( 1, absint( $raw['guarantee']['days'] ) ) : 30,
+					'image'    => array(
+						'id'  => isset( $raw['guarantee']['image']['id'] )  ? absint( $raw['guarantee']['image']['id'] )                    : 0,
+						'url' => isset( $raw['guarantee']['image']['url'] ) ? esc_url_raw( $raw['guarantee']['image']['url'] ) : '',
+					),
+				),
+				'benefits' => array(
+					'title' => isset( $raw['benefits']['title'] ) ? sanitize_text_field( $raw['benefits']['title'] ) : '',
+					'items' => array(),
+				),
+			);
+
+			if ( isset( $raw['benefits']['items'] ) && is_array( $raw['benefits']['items'] ) ) {
+				foreach ( $raw['benefits']['items'] as $item ) {
+					$testimonial_data['benefits']['items'][] = sanitize_text_field( $item );
+				}
+			}
+
+			update_post_meta( $step_id, 'wpf_checkout_testimonial', $testimonial_data );
+		}
+
+		$response = array(
+			'success' => true,
+			'message' => __('Saved Successfully', 'wpfnl')
+		);
+		return $this->prepare_item_for_response($response, $request);
+	}
+
+	/**
 	 * Get step_type.
 	 *
 	 * @param string $request request.
@@ -486,12 +649,14 @@ class FunnelController extends Wpfnl_REST_Controller
 		$step_id 			= isset($request['step_id']) ? $request['step_id'] : null;
 		$step_type 			= get_post_meta($step_id, '_step_type', true);
 		$custom_script 		= get_post_meta($step_id, '_wpfnl_custom_script', true);
+		$custom_css 		= get_post_meta($step_id, '_wpfnl_custom_css', true);
 
 		$response = array(
 			'step_type' 		=> $step_type,
 			'step_title' 		=> get_the_title($step_id),
 			'step_view_link' 	=> get_post_permalink($step_id),
-			'custom_script' 	=> html_entity_decode($custom_script)
+			'custom_script' 	=> html_entity_decode($custom_script),
+			'custom_css' 		=> html_entity_decode($custom_css)
 		);
 		return $this->prepare_item_for_response($response, $request);
 	}
@@ -1216,6 +1381,8 @@ class FunnelController extends Wpfnl_REST_Controller
 			do_action('wpfunnels/save_mint_automation', $funnel_id, $request['mintSteps']);
 		}
 		Wpfnl_functions::generate_first_step($funnel_id);
+
+		do_action( 'wpfunnels_canvas_saved', absint( $funnel_id ) );
 
 		return rest_ensure_response($response);
 	}

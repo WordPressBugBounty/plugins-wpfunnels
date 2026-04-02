@@ -4,10 +4,9 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
+class ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21
 {
     public static $files = array (
-        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'aed659f3655c497c30e044c41fa917c6' => __DIR__ . '/..' . '/linno/telemetry/src/helpers.php',
         'db1766888a4f96ab813d6f6a38125eb9' => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/functions.php',
@@ -18,7 +17,6 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
     public static $prefixLengthsPsr4 = array (
         'S' => 
         array (
-            'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Component\\Process\\' => 26,
             'Spatie\\TemporaryDirectory\\' => 26,
             'Spatie\\Image\\' => 13,
@@ -29,13 +27,15 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         array (
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
+            'PostHog\\' => 8,
             'PhilipNewcomer\\WP_Ajax_Helper\\' => 30,
         ),
         'L' => 
         array (
-            'Linno\\Telemetry\\' => 16,
+            'LinnoSDK\\Telemetry\\' => 19,
             'League\\MimeTypeDetection\\' => 25,
             'League\\Glide\\' => 13,
+            'League\\Flysystem\\Local\\' => 23,
             'League\\Flysystem\\' => 17,
         ),
         'I' => 
@@ -53,10 +53,6 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
     );
 
     public static $prefixDirsPsr4 = array (
-        'Symfony\\Polyfill\\Php80\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
-        ),
         'Symfony\\Component\\Process\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/process',
@@ -79,18 +75,22 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         ),
         'Psr\\Log\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+            0 => __DIR__ . '/..' . '/psr/log/src',
         ),
         'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
+        'PostHog\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/posthog/posthog-php/lib',
+        ),
         'PhilipNewcomer\\WP_Ajax_Helper\\' => 
         array (
             0 => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/components',
         ),
-        'Linno\\Telemetry\\' => 
+        'LinnoSDK\\Telemetry\\' => 
         array (
             0 => __DIR__ . '/..' . '/linno/telemetry/src',
         ),
@@ -101,6 +101,10 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'League\\Glide\\' => 
         array (
             0 => __DIR__ . '/..' . '/league/glide/src',
+        ),
+        'League\\Flysystem\\Local\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/league/flysystem-local',
         ),
         'League\\Flysystem\\' => 
         array (
@@ -124,8 +128,9 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'Appsero\\Client' => __DIR__ . '/..' . '/appsero/client/src/Client.php',
         'Appsero\\Insights' => __DIR__ . '/..' . '/appsero/client/src/Insights.php',
         'Appsero\\License' => __DIR__ . '/..' . '/appsero/client/src/License.php',
-        'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'Flatted' => __DIR__ . '/../..' . '/includes/core/widgets/block/node_modules/flatted/php/flatted.php',
+        'FlattedString' => __DIR__ . '/../..' . '/includes/core/widgets/block/node_modules/flatted/php/flatted.php',
         'GuzzleHttp\\Psr7\\AppendStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/AppendStream.php',
         'GuzzleHttp\\Psr7\\BufferStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/BufferStream.php',
         'GuzzleHttp\\Psr7\\CachingStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/CachingStream.php',
@@ -283,8 +288,12 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'Intervention\\Image\\Point' => __DIR__ . '/..' . '/intervention/image/src/Intervention/Image/Point.php',
         'Intervention\\Image\\Response' => __DIR__ . '/..' . '/intervention/image/src/Intervention/Image/Response.php',
         'Intervention\\Image\\Size' => __DIR__ . '/..' . '/intervention/image/src/Intervention/Image/Size.php',
+        'League\\Flysystem\\CalculateChecksumFromStream' => __DIR__ . '/..' . '/league/flysystem/src/CalculateChecksumFromStream.php',
+        'League\\Flysystem\\ChecksumAlgoIsNotSupported' => __DIR__ . '/..' . '/league/flysystem/src/ChecksumAlgoIsNotSupported.php',
+        'League\\Flysystem\\ChecksumProvider' => __DIR__ . '/..' . '/league/flysystem/src/ChecksumProvider.php',
         'League\\Flysystem\\Config' => __DIR__ . '/..' . '/league/flysystem/src/Config.php',
         'League\\Flysystem\\CorruptedPathDetected' => __DIR__ . '/..' . '/league/flysystem/src/CorruptedPathDetected.php',
+        'League\\Flysystem\\DecoratedAdapter' => __DIR__ . '/..' . '/league/flysystem/src/DecoratedAdapter.php',
         'League\\Flysystem\\DirectoryAttributes' => __DIR__ . '/..' . '/league/flysystem/src/DirectoryAttributes.php',
         'League\\Flysystem\\DirectoryListing' => __DIR__ . '/..' . '/league/flysystem/src/DirectoryListing.php',
         'League\\Flysystem\\FileAttributes' => __DIR__ . '/..' . '/league/flysystem/src/FileAttributes.php',
@@ -297,22 +306,30 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'League\\Flysystem\\FilesystemWriter' => __DIR__ . '/..' . '/league/flysystem/src/FilesystemWriter.php',
         'League\\Flysystem\\InvalidStreamProvided' => __DIR__ . '/..' . '/league/flysystem/src/InvalidStreamProvided.php',
         'League\\Flysystem\\InvalidVisibilityProvided' => __DIR__ . '/..' . '/league/flysystem/src/InvalidVisibilityProvided.php',
-        'League\\Flysystem\\Local\\LocalFilesystemAdapter' => __DIR__ . '/..' . '/league/flysystem/src/Local/LocalFilesystemAdapter.php',
+        'League\\Flysystem\\Local\\FallbackMimeTypeDetector' => __DIR__ . '/..' . '/league/flysystem-local/FallbackMimeTypeDetector.php',
+        'League\\Flysystem\\Local\\LocalFilesystemAdapter' => __DIR__ . '/..' . '/league/flysystem-local/LocalFilesystemAdapter.php',
         'League\\Flysystem\\MountManager' => __DIR__ . '/..' . '/league/flysystem/src/MountManager.php',
         'League\\Flysystem\\PathNormalizer' => __DIR__ . '/..' . '/league/flysystem/src/PathNormalizer.php',
         'League\\Flysystem\\PathPrefixer' => __DIR__ . '/..' . '/league/flysystem/src/PathPrefixer.php',
         'League\\Flysystem\\PathTraversalDetected' => __DIR__ . '/..' . '/league/flysystem/src/PathTraversalDetected.php',
         'League\\Flysystem\\PortableVisibilityGuard' => __DIR__ . '/..' . '/league/flysystem/src/PortableVisibilityGuard.php',
         'League\\Flysystem\\ProxyArrayAccessToProperties' => __DIR__ . '/..' . '/league/flysystem/src/ProxyArrayAccessToProperties.php',
+        'League\\Flysystem\\ResolveIdenticalPathConflict' => __DIR__ . '/..' . '/league/flysystem/src/ResolveIdenticalPathConflict.php',
         'League\\Flysystem\\StorageAttributes' => __DIR__ . '/..' . '/league/flysystem/src/StorageAttributes.php',
         'League\\Flysystem\\SymbolicLinkEncountered' => __DIR__ . '/..' . '/league/flysystem/src/SymbolicLinkEncountered.php',
+        'League\\Flysystem\\UnableToCheckDirectoryExistence' => __DIR__ . '/..' . '/league/flysystem/src/UnableToCheckDirectoryExistence.php',
+        'League\\Flysystem\\UnableToCheckExistence' => __DIR__ . '/..' . '/league/flysystem/src/UnableToCheckExistence.php',
         'League\\Flysystem\\UnableToCheckFileExistence' => __DIR__ . '/..' . '/league/flysystem/src/UnableToCheckFileExistence.php',
         'League\\Flysystem\\UnableToCopyFile' => __DIR__ . '/..' . '/league/flysystem/src/UnableToCopyFile.php',
         'League\\Flysystem\\UnableToCreateDirectory' => __DIR__ . '/..' . '/league/flysystem/src/UnableToCreateDirectory.php',
         'League\\Flysystem\\UnableToDeleteDirectory' => __DIR__ . '/..' . '/league/flysystem/src/UnableToDeleteDirectory.php',
         'League\\Flysystem\\UnableToDeleteFile' => __DIR__ . '/..' . '/league/flysystem/src/UnableToDeleteFile.php',
+        'League\\Flysystem\\UnableToGeneratePublicUrl' => __DIR__ . '/..' . '/league/flysystem/src/UnableToGeneratePublicUrl.php',
+        'League\\Flysystem\\UnableToGenerateTemporaryUrl' => __DIR__ . '/..' . '/league/flysystem/src/UnableToGenerateTemporaryUrl.php',
+        'League\\Flysystem\\UnableToListContents' => __DIR__ . '/..' . '/league/flysystem/src/UnableToListContents.php',
         'League\\Flysystem\\UnableToMountFilesystem' => __DIR__ . '/..' . '/league/flysystem/src/UnableToMountFilesystem.php',
         'League\\Flysystem\\UnableToMoveFile' => __DIR__ . '/..' . '/league/flysystem/src/UnableToMoveFile.php',
+        'League\\Flysystem\\UnableToProvideChecksum' => __DIR__ . '/..' . '/league/flysystem/src/UnableToProvideChecksum.php',
         'League\\Flysystem\\UnableToReadFile' => __DIR__ . '/..' . '/league/flysystem/src/UnableToReadFile.php',
         'League\\Flysystem\\UnableToResolveFilesystemMount' => __DIR__ . '/..' . '/league/flysystem/src/UnableToResolveFilesystemMount.php',
         'League\\Flysystem\\UnableToRetrieveMetadata' => __DIR__ . '/..' . '/league/flysystem/src/UnableToRetrieveMetadata.php',
@@ -321,6 +338,11 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'League\\Flysystem\\UnixVisibility\\PortableVisibilityConverter' => __DIR__ . '/..' . '/league/flysystem/src/UnixVisibility/PortableVisibilityConverter.php',
         'League\\Flysystem\\UnixVisibility\\VisibilityConverter' => __DIR__ . '/..' . '/league/flysystem/src/UnixVisibility/VisibilityConverter.php',
         'League\\Flysystem\\UnreadableFileEncountered' => __DIR__ . '/..' . '/league/flysystem/src/UnreadableFileEncountered.php',
+        'League\\Flysystem\\UrlGeneration\\ChainedPublicUrlGenerator' => __DIR__ . '/..' . '/league/flysystem/src/UrlGeneration/ChainedPublicUrlGenerator.php',
+        'League\\Flysystem\\UrlGeneration\\PrefixPublicUrlGenerator' => __DIR__ . '/..' . '/league/flysystem/src/UrlGeneration/PrefixPublicUrlGenerator.php',
+        'League\\Flysystem\\UrlGeneration\\PublicUrlGenerator' => __DIR__ . '/..' . '/league/flysystem/src/UrlGeneration/PublicUrlGenerator.php',
+        'League\\Flysystem\\UrlGeneration\\ShardedPrefixPublicUrlGenerator' => __DIR__ . '/..' . '/league/flysystem/src/UrlGeneration/ShardedPrefixPublicUrlGenerator.php',
+        'League\\Flysystem\\UrlGeneration\\TemporaryUrlGenerator' => __DIR__ . '/..' . '/league/flysystem/src/UrlGeneration/TemporaryUrlGenerator.php',
         'League\\Flysystem\\Visibility' => __DIR__ . '/..' . '/league/flysystem/src/Visibility.php',
         'League\\Flysystem\\WhitespacePathNormalizer' => __DIR__ . '/..' . '/league/flysystem/src/WhitespacePathNormalizer.php',
         'League\\Glide\\Api\\Api' => __DIR__ . '/..' . '/league/glide/src/Api/Api.php',
@@ -364,22 +386,33 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'League\\MimeTypeDetection\\GeneratedExtensionToMimeTypeMap' => __DIR__ . '/..' . '/league/mime-type-detection/src/GeneratedExtensionToMimeTypeMap.php',
         'League\\MimeTypeDetection\\MimeTypeDetector' => __DIR__ . '/..' . '/league/mime-type-detection/src/MimeTypeDetector.php',
         'League\\MimeTypeDetection\\OverridingExtensionToMimeTypeMap' => __DIR__ . '/..' . '/league/mime-type-detection/src/OverridingExtensionToMimeTypeMap.php',
-        'Linno\\Telemetry\\Client' => __DIR__ . '/..' . '/linno/telemetry/src/Client.php',
-        'Linno\\Telemetry\\Consent' => __DIR__ . '/..' . '/linno/telemetry/src/Consent.php',
-        'Linno\\Telemetry\\Deactivation' => __DIR__ . '/..' . '/linno/telemetry/src/Deactivation.php',
-        'Linno\\Telemetry\\Drivers\\DriverInterface' => __DIR__ . '/..' . '/linno/telemetry/src/Drivers/DriverInterface.php',
-        'Linno\\Telemetry\\Drivers\\OpenPanelDriver' => __DIR__ . '/..' . '/linno/telemetry/src/Drivers/OpenPanelDriver.php',
-        'Linno\\Telemetry\\EventDispatcher' => __DIR__ . '/..' . '/linno/telemetry/src/EventDispatcher.php',
-        'Linno\\Telemetry\\Helpers\\Utils' => __DIR__ . '/..' . '/linno/telemetry/src/Helpers/Utils.php',
-        'Linno\\Telemetry\\Queue' => __DIR__ . '/..' . '/linno/telemetry/src/Queue.php',
-        'Linno\\Telemetry\\TriggerManager' => __DIR__ . '/..' . '/linno/telemetry/src/TriggerManager.php',
+        'LinnoSDK\\Telemetry\\Client' => __DIR__ . '/..' . '/linno/telemetry/src/Client.php',
+        'LinnoSDK\\Telemetry\\Consent' => __DIR__ . '/..' . '/linno/telemetry/src/Consent.php',
+        'LinnoSDK\\Telemetry\\Deactivation' => __DIR__ . '/..' . '/linno/telemetry/src/Deactivation.php',
+        'LinnoSDK\\Telemetry\\Drivers\\DriverInterface' => __DIR__ . '/..' . '/linno/telemetry/src/Drivers/DriverInterface.php',
+        'LinnoSDK\\Telemetry\\Drivers\\NullDriver' => __DIR__ . '/..' . '/linno/telemetry/src/Drivers/NullDriver.php',
+        'LinnoSDK\\Telemetry\\Drivers\\OpenPanelDriver' => __DIR__ . '/..' . '/linno/telemetry/src/Drivers/OpenPanelDriver.php',
+        'LinnoSDK\\Telemetry\\Drivers\\PostHogDriver' => __DIR__ . '/..' . '/linno/telemetry/src/Drivers/PostHogDriver.php',
+        'LinnoSDK\\Telemetry\\EventDispatcher' => __DIR__ . '/..' . '/linno/telemetry/src/EventDispatcher.php',
+        'LinnoSDK\\Telemetry\\Helpers\\Utils' => __DIR__ . '/..' . '/linno/telemetry/src/Helpers/Utils.php',
+        'LinnoSDK\\Telemetry\\Queue' => __DIR__ . '/..' . '/linno/telemetry/src/Queue.php',
+        'LinnoSDK\\Telemetry\\TriggerManager' => __DIR__ . '/..' . '/linno/telemetry/src/TriggerManager.php',
         'PhilipNewcomer\\WP_Ajax_Helper\\Frontend' => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/components/Frontend.php',
         'PhilipNewcomer\\WP_Ajax_Helper\\Handler' => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/components/Handler.php',
         'PhilipNewcomer\\WP_Ajax_Helper\\Responder' => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/components/Responder.php',
         'PhilipNewcomer\\WP_Ajax_Helper\\Utility' => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/components/Utility.php',
         'PhilipNewcomer\\WP_Ajax_Helper\\Validations' => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/components/Validations.php',
         'PhilipNewcomer\\WP_Ajax_Helper\\Validator' => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/components/Validator.php',
-        'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
+        'PostHog\\Client' => __DIR__ . '/..' . '/posthog/posthog-php/lib/Client.php',
+        'PostHog\\Consumer' => __DIR__ . '/..' . '/posthog/posthog-php/lib/Consumer.php',
+        'PostHog\\Consumer\\File' => __DIR__ . '/..' . '/posthog/posthog-php/lib/Consumer/File.php',
+        'PostHog\\Consumer\\ForkCurl' => __DIR__ . '/..' . '/posthog/posthog-php/lib/Consumer/ForkCurl.php',
+        'PostHog\\Consumer\\LibCurl' => __DIR__ . '/..' . '/posthog/posthog-php/lib/Consumer/LibCurl.php',
+        'PostHog\\Consumer\\Socket' => __DIR__ . '/..' . '/posthog/posthog-php/lib/Consumer/Socket.php',
+        'PostHog\\HttpClient' => __DIR__ . '/..' . '/posthog/posthog-php/lib/HttpClient.php',
+        'PostHog\\HttpResponse' => __DIR__ . '/..' . '/posthog/posthog-php/lib/HttpResponse.php',
+        'PostHog\\PostHog' => __DIR__ . '/..' . '/posthog/posthog-php/lib/PostHog.php',
+        'PostHog\\QueueConsumer' => __DIR__ . '/..' . '/posthog/posthog-php/lib/QueueConsumer.php',
         'Psr\\Http\\Message\\MessageInterface' => __DIR__ . '/..' . '/psr/http-message/src/MessageInterface.php',
         'Psr\\Http\\Message\\RequestFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/RequestFactoryInterface.php',
         'Psr\\Http\\Message\\RequestInterface' => __DIR__ . '/..' . '/psr/http-message/src/RequestInterface.php',
@@ -393,18 +426,16 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'Psr\\Http\\Message\\UploadedFileInterface' => __DIR__ . '/..' . '/psr/http-message/src/UploadedFileInterface.php',
         'Psr\\Http\\Message\\UriFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/UriFactoryInterface.php',
         'Psr\\Http\\Message\\UriInterface' => __DIR__ . '/..' . '/psr/http-message/src/UriInterface.php',
-        'Psr\\Log\\AbstractLogger' => __DIR__ . '/..' . '/psr/log/Psr/Log/AbstractLogger.php',
-        'Psr\\Log\\InvalidArgumentException' => __DIR__ . '/..' . '/psr/log/Psr/Log/InvalidArgumentException.php',
-        'Psr\\Log\\LogLevel' => __DIR__ . '/..' . '/psr/log/Psr/Log/LogLevel.php',
-        'Psr\\Log\\LoggerAwareInterface' => __DIR__ . '/..' . '/psr/log/Psr/Log/LoggerAwareInterface.php',
-        'Psr\\Log\\LoggerAwareTrait' => __DIR__ . '/..' . '/psr/log/Psr/Log/LoggerAwareTrait.php',
-        'Psr\\Log\\LoggerInterface' => __DIR__ . '/..' . '/psr/log/Psr/Log/LoggerInterface.php',
-        'Psr\\Log\\LoggerTrait' => __DIR__ . '/..' . '/psr/log/Psr/Log/LoggerTrait.php',
-        'Psr\\Log\\NullLogger' => __DIR__ . '/..' . '/psr/log/Psr/Log/NullLogger.php',
-        'Psr\\Log\\Test\\DummyTest' => __DIR__ . '/..' . '/psr/log/Psr/Log/Test/DummyTest.php',
-        'Psr\\Log\\Test\\LoggerInterfaceTest' => __DIR__ . '/..' . '/psr/log/Psr/Log/Test/LoggerInterfaceTest.php',
-        'Psr\\Log\\Test\\TestLogger' => __DIR__ . '/..' . '/psr/log/Psr/Log/Test/TestLogger.php',
+        'Psr\\Log\\AbstractLogger' => __DIR__ . '/..' . '/psr/log/src/AbstractLogger.php',
+        'Psr\\Log\\InvalidArgumentException' => __DIR__ . '/..' . '/psr/log/src/InvalidArgumentException.php',
+        'Psr\\Log\\LogLevel' => __DIR__ . '/..' . '/psr/log/src/LogLevel.php',
+        'Psr\\Log\\LoggerAwareInterface' => __DIR__ . '/..' . '/psr/log/src/LoggerAwareInterface.php',
+        'Psr\\Log\\LoggerAwareTrait' => __DIR__ . '/..' . '/psr/log/src/LoggerAwareTrait.php',
+        'Psr\\Log\\LoggerInterface' => __DIR__ . '/..' . '/psr/log/src/LoggerInterface.php',
+        'Psr\\Log\\LoggerTrait' => __DIR__ . '/..' . '/psr/log/src/LoggerTrait.php',
+        'Psr\\Log\\NullLogger' => __DIR__ . '/..' . '/psr/log/src/NullLogger.php',
         'Spatie\\Browsershot\\Browsershot' => __DIR__ . '/..' . '/spatie/browsershot/src/Browsershot.php',
+        'Spatie\\Browsershot\\ChromiumResult' => __DIR__ . '/..' . '/spatie/browsershot/src/ChromiumResult.php',
         'Spatie\\Browsershot\\Exceptions\\CouldNotTakeBrowsershot' => __DIR__ . '/..' . '/spatie/browsershot/src/Exceptions/CouldNotTakeBrowsershot.php',
         'Spatie\\Browsershot\\Exceptions\\ElementNotFound' => __DIR__ . '/..' . '/spatie/browsershot/src/Exceptions/ElementNotFound.php',
         'Spatie\\Browsershot\\Exceptions\\FileDoesNotExistException' => __DIR__ . '/..' . '/spatie/browsershot/src/Exceptions/FileDoesNotExistException.php',
@@ -433,30 +464,32 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'Spatie\\Image\\Image' => __DIR__ . '/..' . '/spatie/image/src/Image.php',
         'Spatie\\Image\\ManipulationSequence' => __DIR__ . '/..' . '/spatie/image/src/ManipulationSequence.php',
         'Spatie\\Image\\Manipulations' => __DIR__ . '/..' . '/spatie/image/src/Manipulations.php',
+        'Spatie\\TemporaryDirectory\\Exceptions\\InvalidDirectoryName' => __DIR__ . '/..' . '/spatie/temporary-directory/src/Exceptions/InvalidDirectoryName.php',
+        'Spatie\\TemporaryDirectory\\Exceptions\\PathAlreadyExists' => __DIR__ . '/..' . '/spatie/temporary-directory/src/Exceptions/PathAlreadyExists.php',
         'Spatie\\TemporaryDirectory\\TemporaryDirectory' => __DIR__ . '/..' . '/spatie/temporary-directory/src/TemporaryDirectory.php',
-        'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
         'Symfony\\Component\\Process\\Exception\\ExceptionInterface' => __DIR__ . '/..' . '/symfony/process/Exception/ExceptionInterface.php',
         'Symfony\\Component\\Process\\Exception\\InvalidArgumentException' => __DIR__ . '/..' . '/symfony/process/Exception/InvalidArgumentException.php',
         'Symfony\\Component\\Process\\Exception\\LogicException' => __DIR__ . '/..' . '/symfony/process/Exception/LogicException.php',
         'Symfony\\Component\\Process\\Exception\\ProcessFailedException' => __DIR__ . '/..' . '/symfony/process/Exception/ProcessFailedException.php',
         'Symfony\\Component\\Process\\Exception\\ProcessSignaledException' => __DIR__ . '/..' . '/symfony/process/Exception/ProcessSignaledException.php',
         'Symfony\\Component\\Process\\Exception\\ProcessTimedOutException' => __DIR__ . '/..' . '/symfony/process/Exception/ProcessTimedOutException.php',
+        'Symfony\\Component\\Process\\Exception\\RunProcessFailedException' => __DIR__ . '/..' . '/symfony/process/Exception/RunProcessFailedException.php',
         'Symfony\\Component\\Process\\Exception\\RuntimeException' => __DIR__ . '/..' . '/symfony/process/Exception/RuntimeException.php',
         'Symfony\\Component\\Process\\ExecutableFinder' => __DIR__ . '/..' . '/symfony/process/ExecutableFinder.php',
         'Symfony\\Component\\Process\\InputStream' => __DIR__ . '/..' . '/symfony/process/InputStream.php',
+        'Symfony\\Component\\Process\\Messenger\\RunProcessContext' => __DIR__ . '/..' . '/symfony/process/Messenger/RunProcessContext.php',
+        'Symfony\\Component\\Process\\Messenger\\RunProcessMessage' => __DIR__ . '/..' . '/symfony/process/Messenger/RunProcessMessage.php',
+        'Symfony\\Component\\Process\\Messenger\\RunProcessMessageHandler' => __DIR__ . '/..' . '/symfony/process/Messenger/RunProcessMessageHandler.php',
         'Symfony\\Component\\Process\\PhpExecutableFinder' => __DIR__ . '/..' . '/symfony/process/PhpExecutableFinder.php',
         'Symfony\\Component\\Process\\PhpProcess' => __DIR__ . '/..' . '/symfony/process/PhpProcess.php',
+        'Symfony\\Component\\Process\\PhpSubprocess' => __DIR__ . '/..' . '/symfony/process/PhpSubprocess.php',
         'Symfony\\Component\\Process\\Pipes\\AbstractPipes' => __DIR__ . '/..' . '/symfony/process/Pipes/AbstractPipes.php',
         'Symfony\\Component\\Process\\Pipes\\PipesInterface' => __DIR__ . '/..' . '/symfony/process/Pipes/PipesInterface.php',
         'Symfony\\Component\\Process\\Pipes\\UnixPipes' => __DIR__ . '/..' . '/symfony/process/Pipes/UnixPipes.php',
         'Symfony\\Component\\Process\\Pipes\\WindowsPipes' => __DIR__ . '/..' . '/symfony/process/Pipes/WindowsPipes.php',
         'Symfony\\Component\\Process\\Process' => __DIR__ . '/..' . '/symfony/process/Process.php',
         'Symfony\\Component\\Process\\ProcessUtils' => __DIR__ . '/..' . '/symfony/process/ProcessUtils.php',
-        'Symfony\\Polyfill\\Php80\\Php80' => __DIR__ . '/..' . '/symfony/polyfill-php80/Php80.php',
-        'Symfony\\Polyfill\\Php80\\PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/PhpToken.php',
-        'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
         'UninstallCleanup' => __DIR__ . '/../..' . '/includes/utils/class-wpfnl-uninstall-cleanup.php',
-        'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
         'WPFunnels\\Admin\\Banner\\SetupReminderBanner' => __DIR__ . '/../..' . '/admin/class-wpfnl-setup-banner.php',
         'WPFunnels\\Admin\\Banner\\SpecialOccasionBanner' => __DIR__ . '/../..' . '/admin/class-wpfnl-banner.php',
         'WPFunnels\\Admin\\BatchProcessing\\BatchProcessingController' => __DIR__ . '/../..' . '/admin/BatchProcessing/BatchProcessingController.php',
@@ -496,6 +529,7 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'WPFunnels\\Batch\\Wpfnl_Elementor_Batch' => __DIR__ . '/../..' . '/admin/import-export/batch-processing/elementor/class-wpfnl-elementor-batch.php',
         'WPFunnels\\CPT\\Wpfnl_CPT' => __DIR__ . '/../..' . '/includes/core/classes/class-wpfnl-register-funnel.php',
         'WPFunnels\\Classes\\OrderBumpActions\\Wpfnl_Order_Bump_Action' => __DIR__ . '/../..' . '/classes/class-wpfnl-order-bump-actions.php',
+        'WPFunnels\\Classes\\TestimonialActions\\Wpfnl_Testimonial_Action' => __DIR__ . '/../..' . '/classes/class-wpfnl-testimonial-actions.php',
         'WPFunnels\\Compatibility\\Hpos_Compatibility' => __DIR__ . '/../..' . '/includes/core/compatibility/hpos/class-wpfnl-wc-hpos.php',
         'WPFunnels\\Compatibility\\Plugin\\AstraPro' => __DIR__ . '/../..' . '/includes/core/compatibility/plugin/class-wpfnl-astra-pro.php',
         'WPFunnels\\Compatibility\\Plugin\\CartLift' => __DIR__ . '/../..' . '/includes/core/compatibility/plugin/class-wpfnl-cart-lift.php',
@@ -508,6 +542,7 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
         'WPFunnels\\Compatibility\\Plugin\\SlimSeo' => __DIR__ . '/../..' . '/includes/core/compatibility/plugin/class-wpfnl-slim-seo.php',
         'WPFunnels\\Compatibility\\Plugin\\Tutor' => __DIR__ . '/../..' . '/includes/core/compatibility/plugin/class-wpfnl-tutor.php',
         'WPFunnels\\Compatibility\\Plugin\\Wcml' => __DIR__ . '/../..' . '/includes/core/compatibility/plugin/class-wpfnl-wcml.php',
+        'WPFunnels\\Compatibility\\Plugin\\WooCommerceGermanized' => __DIR__ . '/../..' . '/includes/core/compatibility/plugin/class-wpfnl-woocommerce-germanized.php',
         'WPFunnels\\Compatibility\\Plugin\\Wpfnl_Plugin_Compatibility' => __DIR__ . '/../..' . '/includes/core/compatibility/plugin/class-wpfnl-plugin-compatible.php',
         'WPFunnels\\Compatibility\\Theme\\Wpfnl_Flatsome_Compatibility' => __DIR__ . '/../..' . '/includes/core/compatibility/theme/class-wpfnl-flatsome.php',
         'WPFunnels\\Compatibility\\Theme\\Wpfnl_Theme_Compatibility' => __DIR__ . '/../..' . '/includes/core/compatibility/theme/class-wpfnl-theme-compatible.php',
@@ -675,9 +710,9 @@ class ComposerStaticInit459024df4339810735dc6d69dc2d09d1
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit459024df4339810735dc6d69dc2d09d1::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit459024df4339810735dc6d69dc2d09d1::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit459024df4339810735dc6d69dc2d09d1::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -72,7 +72,27 @@ final class Manager {
      * Inline jquery for editor-end floating label checkout.
      */
     public function wpfnl_checkout_block_editor_assets() {
-        wp_enqueue_script( 'wpfunnels-editor-script', plugins_url( 'block/wpfunnels-editor-script.js', __DIR__ ), [], true );
+        wp_enqueue_script( 'wpfunnels-editor-script', plugins_url( 'block/wpfunnels-editor-script.js', __DIR__ ), ['jquery'], WPFNL_VERSION, true );
+        
+        $post_id = get_the_ID();
+        if ( ! $post_id && isset($_GET['post']) ) {
+            $post_id = intval($_GET['post']);
+        }
+        
+        if ( 'yes' === (get_post_meta($post_id, '_wpfnl_enhanced_phone_field_enabled', true) ? get_post_meta($post_id, '_wpfnl_enhanced_phone_field_enabled', true) : 'no') ) {
+            wp_enqueue_style('intl-tel-input-style', WPFNL_URL . 'public/assets/phone/css/intlTelInput.css', array(), WPFNL_VERSION);
+            wp_enqueue_script('intl-tel-input-script', WPFNL_URL . 'public/assets/phone/js/intlTelInput.min.js', array('jquery'), WPFNL_VERSION, true);
+            wp_enqueue_script('intl-tel-input-utils', WPFNL_URL . 'public/assets/phone/js/utils.js', array('intl-tel-input-script'), WPFNL_VERSION, true);
+            
+            wp_localize_script(
+                'wpfunnels-editor-script',
+                'wpfnl_obj',
+                [
+                    'phone_utils_url' => WPFNL_URL . 'public/assets/phone/js/utils.js',
+                    'phone_help_text' => get_post_meta($post_id, '_wpfnl_phone_help_text', true) ? get_post_meta($post_id, '_wpfnl_phone_help_text', true) : '',
+                ]
+            );
+        }
     }
 
     
