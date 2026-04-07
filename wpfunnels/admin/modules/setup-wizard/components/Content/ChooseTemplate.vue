@@ -2,9 +2,9 @@
 	<div class="wpfnl-mm-choose-template">
 		<!-- Header -->
 		<div class="wpfnl-mm-setup-header">
-			<h2 class="wpfnl-mm-setup-title">Start With a High-Converting Template</h2>
+			<h2 class="wpfnl-mm-setup-title">{{ headerContent.title }}</h2>
 			<p class="wpfnl-mm-setup-subtitle">
-				Pick a ready-made funnel and customize it to match your store.
+				{{ headerContent.subtitle }}
 			</p>
 		</div>
 
@@ -18,7 +18,7 @@
 				@click="selectTemplate(template)"
 			>
 				<div class="wpfnl-mm-template-card-preview">
-					<img :src="template.featured_image" :alt="template.title" v-if="template.featured_image">
+					<img :src="getCardImage(template)" :alt="template.title" v-if="getCardImage(template)">
 					<div class="wpfnl-mm-template-card-overlay">
 						<button class="wpfnl-mm-btn-preview" @click.stop="showPreview(template)">Preview</button>
 					</div>
@@ -29,7 +29,7 @@
 				<div class="wpfnl-mm-template-card-divider"></div>
 				<div class="wpfnl-mm-template-card-body">
 					<h3 class="wpfnl-mm-template-card-title">{{ template.title }}</h3>
-					<span class="wpfnl-mm-template-card-steps" v-if="template.steps">{{ template.steps.length }} Steps</span>
+					<span class="wpfnl-mm-template-card-steps" v-if="template.steps">{{ getDisplayStepCount(template) }} Steps</span>
 				</div>
 			</div>
 		</div>
@@ -60,9 +60,11 @@
 			</div>
 		</div>
 
-		<PreviewTemplate 
-			v-if="showPreviewModal" 
-			:template="previewTemplate" 
+		<PreviewTemplate
+			v-if="showPreviewModal"
+			:template="previewTemplate"
+			:isStoreCheckout="isStoreCheckout"
+			:isSalesFunnel="isSalesFunnel"
 			@close="closePreview"
 			@import="importFromPreview"
 		/>
@@ -100,6 +102,31 @@ export default {
 			previewTab: 'listing'
 		}
 	},
+	computed: {
+		isStoreCheckout() {
+			return this.goal === 'improve-checkout'
+		},
+		isSalesFunnel() {
+			return this.goal === 'sales'
+		},
+		headerContent() {
+			const headers = {
+				'order-value': {
+					title: 'Boost Your Order Value',
+					subtitle: 'Pick a template with upsells and cross-sells to increase your average order value.'
+				},
+				'improve-checkout': {
+					title: 'Optimize Your Checkout Experience',
+					subtitle: 'Choose a streamlined checkout template to reduce cart abandonment.'
+				},
+				'sales': {
+					title: 'Start With a High-Converting Template',
+					subtitle: 'Pick a ready-made funnel and customize it to match your store.'
+				}
+			};
+			return headers[this.goal] || headers['sales'];
+		}
+	},
 	mounted() {
 		this.fetchTemplates();
 	},
@@ -113,9 +140,7 @@ export default {
                 builderParam = 'divi-builder';
             }
 
-            // Determine type based on goal
-            // 'sales' -> 'wc', 'leads' -> 'lead'
-            let typeParam = this.goal === 'sales' ? 'wc' : 'lead';
+            let typeParam = this.goal === 'leads' ? 'lead' : (this.goal === 'improve-checkout' ? 'store_checkout' : 'wc');
 
 			const path = addQueryArgs(`${window.setup_wizard_obj.rest_api_url}wpfunnels/v1/templates/get_templates`, {
 				builder: builderParam,
@@ -125,7 +150,7 @@ export default {
 			apiFetch({ path: path })
 				.then(response => {
 					if (response.success && response.templates && response.templates.length > 0) {
-						this.templates = response.templates;
+						this.templates = this.filterTemplates(response.templates);
 					} else if (builderParam === 'bricks' || builderParam === 'oxygen') {
 						// Fallback to Gutenberg templates if no templates found for Bricks or Oxygen
 						this.fetchGutenbergFallback(typeParam);
@@ -153,7 +178,7 @@ export default {
 			apiFetch({ path: fallbackPath })
 				.then(response => {
 					if (response.success && response.templates) {
-						this.templates = response.templates;
+						this.templates = this.filterTemplates(response.templates);
 					}
 				})
 				.catch(error => {
@@ -163,6 +188,68 @@ export default {
 					this.loading = false;
 				});
 		},
+		filterTemplates(templates) {
+			if (!this.isStoreCheckout && !this.isSalesFunnel) {
+				return templates;
+			}
+
+			// For store checkout, only show templates that have both checkout AND thankyou steps
+			if (this.isStoreCheckout) {
+				return templates
+					.filter(template => {
+						if (!template.steps || !Array.isArray(template.steps)) return false;
+						const stepTypes = template.steps.map(s => s.step_type);
+						return stepTypes.includes('checkout') && stepTypes.includes('thankyou');
+					})
+					.map(template => {
+						// Limit to one checkout + one thankyou step
+						const checkout = template.steps.find(s => s.step_type === 'checkout');
+						const thankyou = template.steps.find(s => s.step_type === 'thankyou');
+						return {
+							...template,
+							steps: [checkout, thankyou].filter(Boolean)
+						};
+					})
+					.sort((a, b) => a.ID - b.ID);
+			}
+
+			// For sales funnel, only show landing, checkout, and thankyou steps
+			if (this.isSalesFunnel) {
+				return templates
+					.filter(template => {
+						if (!template.steps || !Array.isArray(template.steps)) return false;
+						const stepTypes = template.steps.map(s => s.step_type);
+						// Must have at least checkout and thankyou
+						return stepTypes.includes('checkout') && stepTypes.includes('thankyou');
+					})
+					.map(template => {
+						// Keep only one of each: landing, checkout, and thankyou
+						const landing = template.steps.find(s => s.step_type === 'landing');
+						const checkout = template.steps.find(s => s.step_type === 'checkout');
+						const thankyou = template.steps.find(s => s.step_type === 'thankyou');
+						
+						// Return steps in order: landing (if exists), checkout, thankyou
+						const filteredSteps = [landing, checkout, thankyou].filter(Boolean);
+						
+						return {
+							...template,
+							steps: filteredSteps
+						};
+					});
+			}
+
+			return templates;
+		},
+		getCardImage(template) {
+			if (this.isStoreCheckout && template.steps) {
+				// For store checkout, use the checkout step's featured image
+				const checkoutStep = template.steps.find(s => s.step_type === 'checkout');
+				if (checkoutStep && checkoutStep.featured_image) {
+					return checkoutStep.featured_image;
+				}
+			}
+			return template.featured_image;
+		},
 		selectTemplate(template) {
 			if (!template || !template.ID) {
 				console.error('Invalid template:', template);
@@ -170,6 +257,12 @@ export default {
 			}
 			this.selectedTemplateId = template.ID;
 			this.selectedTemplate = template;
+			
+			// Debug log for sales funnel
+			if (this.isSalesFunnel) {
+				console.log('Selected template for sales funnel:', template.title);
+				console.log('Template steps:', template.steps ? template.steps.map(s => s.step_type) : 'none');
+			}
 		},
 		showPreview(template) {
 			this.previewTemplate = template;
@@ -204,6 +297,12 @@ export default {
 		},
 		goBack() {
 			this.$emit('prev-step');
+		},
+		getDisplayStepCount(template) {
+			if (!template.steps) return 0;
+			// Since filterTemplates already filters the steps array,
+			// we can just return the length directly
+			return template.steps.length;
 		},
 		handleContinue() {
 			if (!this.selectedTemplateId) return;

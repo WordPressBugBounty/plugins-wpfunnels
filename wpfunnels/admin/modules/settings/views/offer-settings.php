@@ -10,7 +10,7 @@ $offer_settings = \WPFunnels\Wpfnl_functions::get_offer_settings();
 
 <div class="settings-tab-container">
     <ul class="wpfnl-general-settings-tab-nav">
-        <?php if ( \WPFunnels\Wpfnl_functions::is_global_funnel_activated() && defined('WPFNL_PRO_GB_VERSION') && version_compare( WPFNL_PRO_GB_VERSION, '1.1.7', '>=' ) ){?>
+        <?php if ( \WPFunnels\Wpfnl_functions::is_global_funnel_activated() ){?>
         <li class="inner-tab active" data-tab="tab-skip-cart"><?php esc_html_e('Skip Cart Settings', 'wpfnl'); ?></li>
         <?php } ?>
         <li class="inner-tab" data-tab="tab-order-management"><?php esc_html_e('Order Management', 'wpfnl'); ?></li>
@@ -20,7 +20,7 @@ $offer_settings = \WPFunnels\Wpfnl_functions::get_offer_settings();
 </div>
 
 <!-- Skip Cart Settings Tab -->
-<?php if ( \WPFunnels\Wpfnl_functions::is_global_funnel_activated() && defined('WPFNL_PRO_GB_VERSION') && version_compare( WPFNL_PRO_GB_VERSION, '1.1.7', '>=' ) ){?>
+<?php if ( \WPFunnels\Wpfnl_functions::is_global_funnel_activated() ){?>
 	<div class="wpfnl-tab-content active" id="tab-skip-cart">
 		<div class="wpfnl-box skip-cart-setting">
 			<div class="wpfnl-field-wrapper skip-cart-input-wrapper">

@@ -1050,16 +1050,18 @@
             e.stopPropagation();
         })
 
-        $('body').on('click', function (e) {
-            fnl_name2 = $('.steps-page__fnl-name .funnel-name-input').val()
+        if($('.funnel-name-input').length > 0){
+            $('body').on('click', function (e) {
+                fnl_name2 = $('.steps-page__fnl-name .funnel-name-input').val() || '';
 
-            if(fnl_name2.length === 0){
-                fnl_name2 = fnl_name;
-            }
+                if(fnl_name2.length === 0){
+                    fnl_name2 = fnl_name;
+                }
 
-            $('.steps-page__fnl-name .funnel-name-input').val(fnl_name2).hide()
-            $('.steps-page__fnl-name .funnel-name').text(fnl_name2).show()
-        })
+                $('.steps-page__fnl-name .funnel-name-input').val(fnl_name2).hide()
+                $('.steps-page__fnl-name .funnel-name').text(fnl_name2).show()
+            })
+        }
 
         /**
          * Realtime automation name change on automation drawer
@@ -2984,4 +2986,35 @@
         $('#pro-modal-dropdown-body').toggleClass('show-dropdown')
         $('#pro-modal-dropdown-btn').toggleClass('btn-rotate')
     })
+
+
+    // no funnels screen video popup
+    $(document).on('click', '.no-funnel-play-button', function () {
+        const $popup = $('#no-funnel-video-popup');
+        const $iframe = $('#no-funnel-video-iframe');
+        const videoSrc = $iframe.data('src');
+        
+        // Set the iframe src to start video with autoplay
+        if (videoSrc && !$iframe.attr('src')) {
+            $iframe.attr('src', videoSrc);
+        }
+        
+        $popup.addClass('show');
+        $('body').css('overflow', 'hidden');
+    })
+    
+    $(document).on('click', '#no-funnel-video-popup .video-popup-close, #no-funnel-video-popup', function (e) {
+        // Only close if clicking the close button or overlay (not the content)
+        if ($(e.target).is('#no-funnel-video-popup') || $(e.target).closest('.video-popup-close').length) {
+            const $popup = $('#no-funnel-video-popup');
+            const $iframe = $('#no-funnel-video-iframe');
+            
+            // Remove src to stop the video
+            $iframe.attr('src', '');
+            
+            $popup.removeClass('show');
+            $('body').css('overflow', '');
+        }
+    })
+
 })(jQuery)

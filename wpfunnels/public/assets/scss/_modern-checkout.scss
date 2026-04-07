@@ -152,8 +152,30 @@
 					font-size: 14px;
 					font-weight: 500;
 				}
+				.iti__selected-country-primary {
+					gap: 6px;
+					cursor: pointer;
+
+					&:focus,
+					&:hover {
+						background-color: transparent !important;
+					}
+				}
+				.iti__arrow {
+					margin: 0;
+				}
 				.iti__tel-input {
 					padding-left: 89px!important;
+				}
+				.iti__dropdown-content {
+					max-width: unset !important;
+				}
+				.iti__country-list {
+					.iti__country-name {
+						font-size: 14px;
+						line-height: 1;
+						font-weight: 500;
+					}
 				}
 			}
 		}
@@ -309,6 +331,10 @@
 				.woocommerce-SavedPaymentMethods > li > label,
 				ul.payment_methods > li > label {
 					color: #1A241A;
+
+					&::before {
+						box-sizing: border-box;
+					}
 
 					img {
 						width: 30px;

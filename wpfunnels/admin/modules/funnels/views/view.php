@@ -53,6 +53,16 @@ $live_redirect_link = add_query_arg(
         <nav class="wpfnl-dashboard__nav">
             <?php use WPFunnels\Wpfnl_functions;
             require_once WPFNL_DIR . '/admin/partials/dashboard-nav.php'; ?>
+
+            <?php
+                if ( !$is_pro_active ) {
+                    ?>
+                    <div class="wpfnl-dashboard__nav-right">
+                        <a href="https://getwpfunnels.com/pricing/" class="btn-default" target="_blank" title="Upgrade to Pro" aria-label="Upgrade to Pro">Upgrade to Pro</a>
+                    </div>
+                    <?php
+                }
+            ?>
         </nav>
 
         <div class="dashboard-nav__content">
@@ -151,9 +161,13 @@ $live_redirect_link = add_query_arg(
                         ?>
                     </a>
 
-                    <a href="#" class="import-export wpfnl-import-funnels">
+                    <a href="#" class="import-export <?php echo ( $is_limit_reached && !$is_pro_active ) ? 'wpfnl-import-funnels-limit-reached' : 'wpfnl-import-funnels'; ?>">
                         <?php
-                            require WPFNL_DIR . '/admin/partials/icons/import-icon.php';
+                            if ( $is_limit_reached && !$is_pro_active ) {
+                                require WPFNL_DIR . '/admin/partials/icons/lock-icon.php';
+                            } else {
+                                require WPFNL_DIR . '/admin/partials/icons/import-icon.php';
+                            }
                             echo __('Import', 'wpfnl');
                         ?>
                     </a>
@@ -200,9 +214,9 @@ $live_redirect_link = add_query_arg(
                     </div>
                     <div class="upgrade-to-pro-content">
                         <div class="upgrade-to-pro-message">
-                            <h3>You have hit the limit! Upgrade To Pro for Unlimited Funnels!</h3>
+                            <h3>You have hit the limit! Upgrade to Pro for unlimited funnels!</h3>
                             
-                            <p>You are using the free version of WPFunnels which allows you to create up to 3 funnels. To build more funnels, either move one funnel to trash or Upgrade To Pro.</p>
+                            <p>You are using the free version of WPFunnels which allows you to create up to 3 funnels. To build more funnels, either move one funnel to trash or Upgrade to Pro.</p>
                         </div>
                     </div>
                     <div class="upgrade-to-pro-action">
@@ -305,7 +319,7 @@ $live_redirect_link = add_query_arg(
                             );
                             $isAutomationEnable = get_post_meta( $funnel_id, 'is_automation_enabled', true );
 							$isAutomationData 	= get_post_meta( $funnel_id,'funnel_automation_data',true);
-                            $isGbfInstalled 	= is_plugin_active( 'wpfunnels-pro-gbf/wpfnl-pro-gb.php' );
+                            $isGbfInstalled 	= Wpfnl_functions::is_global_funnel_activated();
                             $start_condition 	= get_post_meta( $funnel_id, 'global_funnel_start_condition', true );
                             $builder 			= Wpfnl_functions::get_page_builder_by_step_id($funnel_id);
                             $utm_settings 		= Wpfnl_functions::get_funnel_utm_settings( $funnel_id );
@@ -666,24 +680,105 @@ $live_redirect_link = add_query_arg(
 
                             <?php if( isset($_GET['page']) && 'wp_funnels' === $_GET['page'] ) {?>
                                 <div class="no-funnel-wrapper">
-                                <?php require WPFNL_DIR . '/admin/partials/icons/no-funnels-icon.php'; ?>
-                                    <h1><?php echo __('Funnels', 'wpfnl'); ?></h1>
-                                    <p class="short-desc"><?php echo __('Convert More Visitors into Customers: A Step-by-Step Funnel Blueprint', 'wpfnl'); ?></p>
+                                    <div class="no-funnel-info">
+                                        <div class="info-content">
+                                            <h2 class="info-title">Create your first funnel</h2>
+                                            <p class="info-description">
+                                                Build a sales funnel with everything you need to generate leads and grow sales.
+                                            </p>
+                                            
+                                            <ul class="info-features">
+                                                <li class="feature-item">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M10.0326 0.699951L3.61589 7.11662L0.699219 4.19995" stroke="#444d5e" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                                    One Click Upsells
+                                                </li>
+                                                <li class="feature-item">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M10.0326 0.699951L3.61589 7.11662L0.699219 4.19995" stroke="#444d5e" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                                    Order Bumps
+                                                </li>
+                                                <li class="feature-item">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M10.0326 0.699951L3.61589 7.11662L0.699219 4.19995" stroke="#444d5e" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                                    A/B Split Testing
+                                                </li>
+                                                <li class="feature-item">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M10.0326 0.699951L3.61589 7.11662L0.699219 4.19995" stroke="#444d5e" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                                    Conversion Templates
+                                                </li>
+                                                <li class="feature-item">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M10.0326 0.699951L3.61589 7.11662L0.699219 4.19995" stroke="#444d5e" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                                    Email Automation
+                                                </li>
+                                                <li class="feature-item">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M10.0326 0.699951L3.61589 7.11662L0.699219 4.19995" stroke="#444d5e" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                                    Analytics
+                                                </li>
+                                            </ul>
 
-                                    <div class="create-new-funnel">
-                                        <a href="#" class="btn-default add-new-funnel-btn">
-                                            <svg width="15" height="15" fill="none" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg"><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7.723 1.387v11.986M1.717 7.38h12.008"/></svg>
+                                            <div class="create-new-funnel">
+                                                <a href="#" class="btn-default add-new-funnel-btn">
+                                                    <svg width="15" height="15" fill="none" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg"><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7.723 1.387v11.986M1.717 7.38h12.008"/></svg>
 
-                                            <?php echo __('Create Your First Funnel', 'wpfnl'); ?>
-                                        </a>
-                                        <a href="#" class="btn-default import-export wpfnl-import-funnels">
-                                            <?php
-                                                require WPFNL_DIR . '/admin/partials/icons/import-icon.php';
-                                                echo __('Import Funnels', 'wpfnl');
+                                                    <?php echo __('Create Funnel', 'wpfnl'); ?>
+                                                </a>
 
-                                            ?>
-                                        </a>
+                                                <a href="#" class="btn-default import-export <?php echo ( $is_limit_reached && !$is_pro_active ) ? 'wpfnl-import-funnels-limit-reached' : 'wpfnl-import-funnels'; ?>">
+                                                    <?php
+                                                        if ( $is_limit_reached && !$is_pro_active ) {
+                                                            require WPFNL_DIR . '/admin/partials/icons/lock-icon.php';
+                                                        } else {
+                                                            require WPFNL_DIR . '/admin/partials/icons/import-icon.php';
+                                                        }
+                                                        echo __('Import Funnels', 'wpfnl');
+                                                    ?>
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                        <div class="video-wrapper">
+                                            <div class="video-preview" tabindex="0" role="button" aria-label="Play video">
+                                                <img
+                                                    src="<?php echo WPFNL_URL . 'admin/assets/images/no-funnel-video-poster.webp'; ?>"
+                                                    alt="no-funnel-video-poster"
+                                                    class="video-poster"
+                                                    width="569"
+                                                    height="373"
+                                                />
+
+                                                <div class="play-overlay">
+                                                    <div class="play-button no-funnel-play-button" >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20" fill="none"><path d="M14.408 7.19013L3.24942 0.312012C2.93046 0.110674 2.56721 0.00302319 2.19661 0C1.61403 0 1.05532 0.246909 0.643373 0.686411C0.231428 1.12591 0 1.722 0 2.34355V17.1052C7.40914e-05 17.5176 0.10371 17.9225 0.300131 18.2778C0.496553 18.6331 0.778589 18.9257 1.11691 19.1253C1.45524 19.3249 1.8375 19.4241 2.22396 19.4127C2.61041 19.4013 2.98695 19.2797 3.31441 19.0604L14.4859 11.5306C14.8333 11.2986 15.1184 10.9746 15.3135 10.5902C15.5086 10.2057 15.607 9.77389 15.5992 9.33678C15.5913 8.89967 15.4775 8.47219 15.2687 8.09598C15.0599 7.71978 14.7634 7.40769 14.408 7.19013Z" fill="#6e42d3"/></svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Video Popup -->
+                                        <div id="no-funnel-video-popup" class="video-popup-overlay" role="dialog" aria-modal="true" aria-labelledby="video-popup-title">
+                                            <div class="video-popup-content" >
+                                                <button class="video-popup-close" aria-label="Close video">
+                                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M1 1L13 13M13 1L1 13" stroke="#1D2327" stroke-width="2" stroke-linecap="round"/>
+                                                    </svg>
+                                                </button>
+
+                                                <h2 id="video-popup-title" class="visually-hidden">Video Tutorial</h2>
+                                                <div class="video-container">
+                                                    <iframe
+                                                        id="no-funnel-video-iframe"
+                                                        width="550"
+                                                        height="310"
+                                                        src=""
+                                                        data-src="https://www.youtube.com/embed/qzdzaEImU48?autoplay=1"
+                                                        title="WPFunnels Tutorial Video"
+                                                        frameborder="0"
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                        allowfullscreen
+                                                    ></iframe>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
+                                    
                                 </div>
                             <?php }else{
                                 ?>
@@ -693,27 +788,6 @@ $live_redirect_link = add_query_arg(
                                 </div>
                                 <?php
                             } ?>
-
-                            <!-- <div class="wpfnl-help-guide">
-                                <button class="setup-guide" type="button" title="<?php //esc_attr_e( 'Setup Guide', 'wpfnl' ) ?>">
-                                    <?php
-                                        //require WPFNL_DIR . '/admin/partials/icons/setup-guide-icon.php';
-                                        //echo __('Setup Guide', 'wpfnl');
-                                    ?>
-                                </button>
-
-                                <div class="wpfnl-canvas-helper">
-                                    <button class="helper-btn wpfnl-helper-btn" type="button" title="<?php //esc_attr_e( 'Help & Resources', 'wpfnl' ) ?>">
-                                        <?php require WPFNL_DIR . '/admin/partials/icons/question-mark-icon.php'; ?>
-                                    </button>
-
-                                    <div class="help-resource" v-if="showHelperResource">
-                                        <a href="" class="single-menu" target="_blank"><?php //__( 'YouTube Video', 'wpfnl' ) ?></a>
-                                        <a href="" class="single-menu" target="_blank"><?php //__( 'Documantation', 'wpfnl' ) ?></a>
-                                        <a href="" class="single-menu" target="_blank"><?php //__( 'Blog', 'wpfnl' ) ?></a>
-                                    </div>
-                                </div>
-                            </div> -->
 
                             <?php
                         }
@@ -832,7 +906,7 @@ $live_redirect_link = add_query_arg(
                             <span class="wpfnl-pro-modal-header-icon">
                                 <?php require WPFNL_DIR . '/admin/partials/icons/unlock-icon.php'; ?>
                             </span>
-                            <h3 class="wpfnl-pro-heading">Unlock Advanced WooCommerce Funnel</h3>
+                            <h3 class="wpfnl-pro-heading">Upgrade to Unlock This Feature</h3>
                         </div>
 
                         <div class="wpfnl-pro-modal-body">
@@ -876,4 +950,5 @@ $live_redirect_link = add_query_arg(
             </div>
     </div>
 
+    <?php require_once WPFNL_DIR . '/admin/partials/helper-resource.php'; ?>
 </div>

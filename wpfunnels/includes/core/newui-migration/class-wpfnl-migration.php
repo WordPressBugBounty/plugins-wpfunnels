@@ -99,8 +99,25 @@ class Migration {
 		// Create an array to store used step types and their corresponding step ids
 		$used_step_types = array();
 		$step_id_array = get_post_meta( $funnel_id,'_steps', true );
+		
+		// Validate funnel flow array structure
+		if ( !is_array($funnel_flow_array) || 
+		     !isset($funnel_flow_array['drawflow']['Home']['data']) || 
+		     !is_array($funnel_flow_array['drawflow']['Home']['data']) ) {
+			return $funnel_flow_array;
+		}
+		
+		// Validate step id array
+		if ( !is_array($step_id_array) || empty($step_id_array) ) {
+			return $funnel_flow_array;
+		}
+		
 		// Loop through each step in funnel
 		foreach ($funnel_flow_array['drawflow']['Home']['data'] as &$step) {
+			if( !is_array( $step ) || !isset($step['data']['step_type']) ){
+				continue;
+			}
+
 			// Find corresponding step in step id data
 			foreach ($step_id_array as $step_id_data) {
 				// Check if step type is the same

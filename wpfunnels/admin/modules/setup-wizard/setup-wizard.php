@@ -307,6 +307,8 @@ class SetupWizard
                 'qubely_img'            => WPFNL_URL .'admin/assets/images/qubely.svg',
                 'quote_img'             => WPFNL_URL .'admin/assets/images/quote-icon.svg',
                 'done_icon'             => WPFNL_URL .'admin/assets/images/done-icon.svg',
+                'generate_funnel_image' => WPFNL_URL .'admin/assets/images/generate-funnel-image.webp',
+                'generate_store_image'  => WPFNL_URL .'admin/assets/images/generate-store-checkout.webp',
                 'admin_email'           => $admin_email,
                 'admin_name'            => $admin_name,
             )

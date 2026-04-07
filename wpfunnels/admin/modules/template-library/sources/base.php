@@ -42,20 +42,101 @@ abstract class Wpfnl_Source_Base
         // rearrange steps order
         $funnel_data 	= get_post_meta( $payload['funnelID'], 'funnel_data', true );
         $funnel_data 	= $funnel_data ? $funnel_data : get_post_meta( $payload['funnelID'], '_funnel_data', true );
+        
+        // Handle if funnel_data is JSON string
+        if (is_string($funnel_data)) {
+            $funnel_data = json_decode($funnel_data, true);
+        }
 
-        $imported_steps = $payload['importedSteps'];
+        $imported_steps = isset($payload['importedSteps']) ? $payload['importedSteps'] : [];
+        
+        // Check if this is a Store Checkout funnel - check both payload flag AND funnel meta
+        $is_store_checkout_flag = isset($payload['is_store_checkout']) && $payload['is_store_checkout'] == 'true';
+        $funnel_type = get_post_meta($payload['funnelID'], '_wpfnl_funnel_type', true);
+        $is_store_checkout = $is_store_checkout_flag && ($funnel_type === 'store_checkout');
+        // For Store Checkout, get all steps and filter to only checkout and thankyou
+        // This handles cases where frontend sends all steps or some steps were created before validation
+        if ($is_store_checkout) {
+            // Get all steps actually created for this funnel
+            $all_funnel_steps = get_posts([
+                'post_type' => WPFNL_STEPS_POST_TYPE,
+                'post_parent' => $payload['funnelID'],
+                'posts_per_page' => -1,
+                'post_status' => 'any',
+                'fields' => 'ids',
+            ]);
+            
+            
+            $filtered_steps = [];
+            foreach ($all_funnel_steps as $step_id) {
+                $step_type = get_post_meta($step_id, '_step_type', true);
+                if (in_array($step_type, ['checkout', 'thankyou'])) {
+                    $filtered_steps[] = $step_id;
+                } else {
+                    wp_delete_post($step_id, true);
+                }
+            }
+            
+            // If query found no steps, use the imported_steps from payload and filter those
+            if (empty($all_funnel_steps) && !empty($imported_steps)) {
+                foreach ($imported_steps as $step_id) {
+                    if ($step_id > 0) {
+                        $step_type = get_post_meta($step_id, '_step_type', true);
+                        if (in_array($step_type, ['checkout', 'thankyou'])) {
+                            $filtered_steps[] = $step_id;
+                        } else {
+                            // Delete steps that shouldn't be in Store Checkout
+                            wp_delete_post($step_id, true);
+                        }
+                    }
+                }
+            }
+            
+            $imported_steps = $filtered_steps;
+        }
 
 		// update the funnel metadata with newly created step
 		$this->save_steps_meta_data( $payload['funnelID'], $imported_steps );
 
+        // Persist the store checkout step ID so the public-facing override can use it
+        if ( $is_store_checkout ) {
+            require_once WPFNL_DIR . 'includes/core/woocommerce/class-wpfnl-store-checkout-override.php';
+            \WPFunnels\WooCommerce\Wpfnl_Store_Checkout_Override::save_checkout_step_id( $payload['funnelID'] );
+        }
+
+        // Filter drawflow data for Store Checkout to remove non-checkout/thankyou nodes
+        if ($is_store_checkout) {
+            
+            if ($funnel_data && is_array($funnel_data) && isset($funnel_data['drawflow']['Home']['data'])) {
+                $node_data = $funnel_data['drawflow']['Home']['data'];
+                $filtered_nodes = $this->filter_store_checkout_nodes($node_data, $imported_steps);
+                $funnel_data['drawflow']['Home']['data'] = $filtered_nodes;
+                update_post_meta($payload['funnelID'], 'funnel_data', $funnel_data);
+                update_post_meta($payload['funnelID'], '_funnel_data', $funnel_data);
+            }
+        }
+        
+        // Filter drawflow data for Sales funnels to remove upsell/downsell nodes
+        $is_sales_funnel = isset($payload['goal']) && $payload['goal'] === 'sales';
+        if ($is_sales_funnel && !$is_store_checkout) {
+            if ($funnel_data && is_array($funnel_data) && isset($funnel_data['drawflow']['Home']['data'])) {
+                $node_data = $funnel_data['drawflow']['Home']['data'];
+                $filtered_nodes = $this->filter_sales_funnel_nodes($node_data, $imported_steps);
+                $funnel_data['drawflow']['Home']['data'] = $filtered_nodes;
+                update_post_meta($payload['funnelID'], 'funnel_data', $funnel_data);
+                update_post_meta($payload['funnelID'], '_funnel_data', $funnel_data);
+            }
+        }
+        
         // Reinitialize the funnel data if Pro is not active and template contains downsell
 		// This removes downsell nodes from the canvas for free users
 		$is_pro_active = apply_filters( 'wpfunnels/is_pro_license_activated', false );
-        if ( !$is_pro_active ) {
+        if ( !$is_pro_active && !$is_store_checkout && $funnel_data && is_array($funnel_data) && isset($funnel_data['drawflow']['Home']['data']) ) {
 			$node_data 									= $funnel_data['drawflow']['Home']['data'];
 			$filter_data 								= $this->filter_node_data($node_data);
 			$funnel_data['drawflow']['Home']['data'] 	= $filter_data;
 			update_post_meta($payload['funnelID'],'funnel_data', $funnel_data);
+			update_post_meta($payload['funnelID'],'_funnel_data', $funnel_data);
 		}
 
         $redirect_link = add_query_arg(
@@ -291,6 +372,160 @@ abstract class Wpfnl_Source_Base
 			$funnel_identifier_json = json_encode($identifier_data, JSON_UNESCAPED_SLASHES);
 			update_post_meta($funnel_id, 'funnel_identifier', $funnel_identifier_json);
 		}
+	}
+
+
+	/**
+	 * Filter drawflow nodes for Store Checkout - only keep checkout and thankyou
+	 *
+	 * @param $steps_array
+	 * @param $imported_steps
+	 * @return array
+	 * @since 3.5.0
+	 */
+	private function filter_store_checkout_nodes( $steps_array, $imported_steps ) {
+		if ( empty($steps_array) ) {
+			return $steps_array;
+		}
+		
+		$filtered_array = [];
+		$checkout_id = null;
+		$thankyou_id = null;
+		
+		// Only keep checkout and thankyou nodes
+		// NOTE: Don't filter by step_id match because canvas has old template IDs, not new DB IDs
+		// Just filter by step_type - the step IDs will be updated by update_step_id_in_funnel_data_and_identifier
+		foreach ($steps_array as $key => $step) {
+			$step_type = isset($step['data']['step_type']) ? $step['data']['step_type'] : '';
+			$step_id = isset($step['data']['step_id']) ? $step['data']['step_id'] : 0;
+			
+			// Keep only checkout and thankyou regardless of step_id
+			if (in_array($step_type, ['checkout', 'thankyou'])) {
+				$filtered_array[$key] = $step;
+				
+				if ($step_type === 'checkout') {
+					$checkout_id = $key;
+				} elseif ($step_type === 'thankyou') {
+					$thankyou_id = $key;
+				}
+			}
+		}
+		
+		// Update connections: checkout -> thankyou
+		if ($checkout_id !== null && $thankyou_id !== null) {
+			$filtered_array[$checkout_id]['outputs'] = [
+				'output_1' => [
+					'connections' => [
+						[
+							'node' => $thankyou_id,
+							'output' => 'input_1'
+						]
+					]
+				]
+			];
+			
+			$filtered_array[$thankyou_id]['inputs'] = [
+				'input_1' => [
+					'connections' => [
+						[
+							'node' => $checkout_id,
+							'input' => 'output_1'
+						]
+					]
+				]
+			];
+		}
+		
+		return $filtered_array;
+	}
+
+	/**
+	 * Filter drawflow nodes for sales funnels to only include landing, checkout, and thankyou
+	 * Remove upsell and downsell nodes
+	 *
+	 * @param array $steps_array
+	 * @param array $imported_steps
+	 * @return array
+	 * @since 3.7.0
+	 */
+	private function filter_sales_funnel_nodes( $steps_array, $imported_steps ) {
+		if ( empty($steps_array) ) {
+			return $steps_array;
+		}
+		
+		$filtered_array = [];
+		$landing_id = null;
+		$checkout_id = null;
+		$thankyou_id = null;
+		
+		// Only keep landing, checkout, and thankyou nodes
+		foreach ($steps_array as $key => $step) {
+			$step_type = isset($step['data']['step_type']) ? $step['data']['step_type'] : '';
+			
+			// Keep only landing, checkout, and thankyou - exclude upsell and downsell
+			if (in_array($step_type, ['landing', 'checkout', 'thankyou'])) {
+				$filtered_array[$key] = $step;
+				
+				if ($step_type === 'landing') {
+					$landing_id = $key;
+				} elseif ($step_type === 'checkout') {
+					$checkout_id = $key;
+				} elseif ($step_type === 'thankyou') {
+					$thankyou_id = $key;
+				}
+			}
+		}
+		
+		// Update connections: landing -> checkout -> thankyou
+		if ($landing_id !== null && $checkout_id !== null && $thankyou_id !== null) {
+			// Landing page outputs to checkout
+			$filtered_array[$landing_id]['outputs'] = [
+				'output_1' => [
+					'connections' => [
+						[
+							'node' => $checkout_id,
+							'output' => 'input_1'
+						]
+					]
+				]
+			];
+			
+			// Checkout receives from landing and outputs to thankyou
+			$filtered_array[$checkout_id]['inputs'] = [
+				'input_1' => [
+					'connections' => [
+						[
+							'node' => $landing_id,
+							'input' => 'output_1'
+						]
+					]
+				]
+			];
+			$filtered_array[$checkout_id]['outputs'] = [
+				'output_1' => [
+					'connections' => [
+						[
+							'node' => $thankyou_id,
+							'output' => 'input_1'
+						]
+					]
+				]
+			];
+			
+			// Thankyou receives from checkout
+			$filtered_array[$thankyou_id]['inputs'] = [
+				'input_1' => [
+					'connections' => [
+						[
+							'node' => $checkout_id,
+							'input' => 'output_1'
+						]
+					]
+				]
+			];
+		}
+		
+		return $filtered_array;
 	}
 
 

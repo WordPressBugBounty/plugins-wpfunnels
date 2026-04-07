@@ -4,28 +4,31 @@
             <span class="wpfnl-loader"></span>
         </div>
 
-        <div id="template-library-modal" class="template-library-modal" style="display: none">
+        <div id="template-library-modal" class="template-library-modal fff" style="display: none">
             <div id="wpfnl-create-funnel__inner-content" class="wpfnl-create-funnel__inner-content">
 
                 <div id="wpfnl-create-funnel__template-wrapper" class="wpfnl-create-funnel__templates-wrapper">
-                    <div class="funnel-templates-header">
+                    <div class="funnel-templates-header" v-if="!isStoreCheckout || showStepsPreview">
                         <div class="template-library-filter-wrapper">
                             <span class="back-form-modal wpfnl-modal-close" title="Back to Funnel list" v-show="!showStepsPreview && !isTemplatePage">
                                 <DoubleAngleLeft/>
                             </span>
-                            
 
-                            <h1 class="header-title" v-if="!showStepsPreview">Find your templates</h1>
+                            <h1 class="header-title" v-if="!showStepsPreview">Choose a Funnel Template</h1>
+                            <button class="sync-library-btn" v-if="!showStepsPreview" @click="syncLibrary" :disabled="syncingLibrary">
+                                <svg :class="{ 'spinning': syncingLibrary }" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                                <span>{{ syncingLibrary ? 'Syncing...' : 'Sync Templates' }}</span>
+                            </button>
                             <div v-else class="wpfnl-template-header-title-wrapper">
                                 <span class="back-form-modal back-to-templates" title="Back to Template" v-show="showStepsPreview" @click="backToTemplates">
                                     <DoubleAngleLeft/>
                                 </span>
                                 <h1 class="header-title">{{activeTemplate.title}}</h1>
-                            </div>                            
+                            </div>
 
                             <ResponsiveSwitcher v-if="showStepsPreview" :setResponsiveView="setResponsiveView"/>
 
-                            <select class="template-type-filter" v-if="template_type.length" v-show="!showStepsPreview" v-model="type" @change="doTemplateCatFilter">
+                            <select class="template-type-filter" v-if="template_type.length" v-show="!showStepsPreview && !isStoreCheckout" v-model="type" @change="doTemplateCatFilter">
                                 <option data-filter="woocommerce" v-for="(tempalateType, index) in template_type" :key="index" :value="tempalateType.slug" :selected="tempalateType.slug == type">
                                     {{tempalateType.label}}
                                 </option>
@@ -78,8 +81,8 @@
                     </div>
                     <!-- /.funnel-templates-header -->
 
-                    <div class="funnel-templates-body" :class="showStepsPreview ? 'no-sidebar': '' ">
-                        <div class="funnel-templates-sidebar" v-if="!showStepsPreview">
+                    <div class="funnel-templates-body" :class="showStepsPreview || isStoreCheckout ? 'no-sidebar': '' ">
+                        <div class="funnel-templates-sidebar" v-if="!showStepsPreview && !isStoreCheckout">
                             <div class="sidebar-tab-nav">
                                 <span class="funnel-templates" :class="{ active: activeTab === 'templates' }" @click="onActivateTab('templates')">Templates</span>
                             </div>
@@ -92,81 +95,121 @@
                         <!-- /.funnel-templates-sidebar -->
 
                         <div class="funnel-templates-content">
+                            <div class="template-cat-filter-loader" :class="(syncingLibrary || templateCatFilterLoader) ? 'show-loader' : ''">
+                                <span class="wpfnl-loader"></span>
+                            </div>
                             <div v-if="activeTab === 'templates'">
                                 <div class="not-clickable-overlay"></div>
 
                                 <!-- funnel name modal. this modal will show when create from scratch -->
-                                <div class="create-funnel-name-modal wpfnl-create-funnel-layout">
+                                <div class="create-funnel-name-modal wpfnl-create-funnel-layout" :class="{ 'store-checkout-layout': isStoreCheckout }">
                                     <span class="close" @click="closeFunnelNameModal" role="button">
                                         <svg width="14" height="14" fill="none" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><path stroke="#7A8B9A" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.5 1.5l-11 11m0-11l11 11"/></svg>
                                     </span>
 
-                                    <div class="modal-body"> 
-                                        <form action="">
-                                            <div class="wpfnl-form-group">
-                                                <label for="funnel-name">Name of your funnel</label>
-                                                <input type="text" name="funnel-name" placeholder="Enter your funnel name" v-model="funnelName"/>
-                                            </div>
+                                    <!-- Store Checkout confirmation modal -->
+                                    <template v-if="isStoreCheckout">
+                                        <div class="modal-body store-checkout-confirm-body">
+                                            <h2 class="store-checkout-modal-title">Create Store Checkout</h2>
+                                            <p class="store-checkout-modal-subtitle">Set up a Store Checkout in just one click:</p>
 
-                                            <p class="layout-title">Select Funnel layout</p>
+                                            <ul class="store-checkout-feature-list">
+                                                <li>
+                                                    <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <circle cx="11" cy="11" r="10.25" stroke="#6E42D3" stroke-width="1.5"/>
+                                                        <path d="M7 11.5L9.5 14L15 8.5" stroke="#6E42D3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                    <span>Checkout Page</span>
+                                                </li>
+                                                <li>
+                                                    <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <circle cx="11" cy="11" r="10.25" stroke="#6E42D3" stroke-width="1.5"/>
+                                                        <path d="M7 11.5L9.5 14L15 8.5" stroke="#6E42D3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                    <span>Thank You Page</span>
+                                                </li>
+                                            </ul>
 
-                                            <div class="funnels-layout-wrapper">
-                                                <div 
-                                                    v-for="(layout, index) in layouts"
-                                                    :class="[
-                                                        selectedFunnelLayout?.value === layout.value ? 'active' : '',
-                                                        layout.value,
-                                                    ]"
-                                                    class="single-layout layout1" 
-                                                    @click="selectFunnelLayout(index, layout)" 
-                                                    :key="index"
-                                                >
-                                                    <a href="https://getwpfunnels.com/pricing/" target="_blank" v-if="!isPro && 0 !==index && 1 !==index "><span class="pro-tag"><svg fill="none" width="22" height="22"  viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="11" fill="#2FCF5C"/><path fill="#fff" d="M15.209 9.236l-1.587.396-1.983-2.471a.926.926 0 00-1.445 0L8.21 9.63l-1.618-.395a.933.933 0 00-1.124 1.124l1.093 3.842a.618.618 0 00.617.451h7.412a.618.618 0 00.618-.45l1.1-3.843a.932.932 0 00-1.1-1.124zM5.172 8.57a.772.772 0 100-1.545.772.772 0 000 1.544zm11.427 0a.772.772 0 100-1.545.772.772 0 000 1.544zm-5.714-2.626a.772.772 0 100-1.544.772.772 0 000 1.544zm3.706 10.964H7.18a.618.618 0 010-1.236h7.411a.618.618 0 110 1.236z"/></svg></span></a>
-                                                    <span class="single-layout-inner" :class="{ 'is-pro': !isPro && 0!==index && 1!==index }">
-                                                        <span class="inner-box">
-                                                            <FunnelLayout1 v-if="'layout1' == layout.value" />
-                                                            <FunnelLayout2 v-if="'layout2' == layout.value" />
-                                                            <FunnelLayout3 v-if="'layout3' == layout.value" />
-                                                            <FunnelLayout4 v-if="'layout4' == layout.value" />
-                                                            <FunnelLayout5 v-if="'layout5' == layout.value" />
-                                                            <FunnelLayout6 v-if="'layout6' == layout.value" />
-                                                        </span>
-                                                    </span>
-                                                </div>
-                                                
-                                            </div>
+                                            <p class="store-checkout-modal-desc">Use ready-made templates from the WPFunnels Library, our custom widget, or shortcodes on each page to set this up easily—no coding needed!</p>
 
                                             <div class="button-area">
-                                                <span class="wpfnl-alert box" style="display: inline-block;" :class="alertClass" v-if="isShowAlert">{{
-                                                    this.alertMessage
-                                                }}</span>
-                                                <button type="submit" @click="createFunnel" :disabled='disabled'>
-                                                    {{createFunnelTitle}}
-                                                </button>
+                                                <span class="wpfnl-alert box" style="display: inline-block;" :class="alertClass" v-if="isShowAlert">{{ this.alertMessage }}</span>
+                                                <div class="store-checkout-modal-actions">
+                                                    <button type="button" class="btn-cancel" @click="closeFunnelNameModal">Cancel</button>
+                                                    <button type="button" class="btn-default btn-create-store-checkout" @click="createFunnel" :disabled="disabled">
+                                                        {{ createFunnelTitle }}
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </form>
-                                    </div>
+                                        </div>
+                                    </template>
+
+                                    <!-- Regular funnel name + layout modal -->
+                                    <template v-else>
+                                        <div class="modal-body">
+                                            <form action="">
+                                                <div class="wpfnl-form-group">
+                                                    <label for="funnel-name">Name of your funnel</label>
+                                                    <input
+                                                        type="text"
+                                                        name="funnel-name"
+                                                        placeholder="Enter your funnel name"
+                                                        v-model="funnelName"
+                                                    />
+                                                </div>
+
+                                                <p class="layout-title">Select Funnel layout</p>
+
+                                                <div class="funnels-layout-wrapper">
+                                                    <div
+                                                        v-for="(layout, index) in layouts"
+                                                        :class="[
+                                                            selectedFunnelLayout?.value === layout.value ? 'active' : '',
+                                                            layout.value,
+                                                        ]"
+                                                        class="single-layout layout1"
+                                                        @click="selectFunnelLayout(index, layout)"
+                                                        :key="index"
+                                                    >
+                                                        <a href="https://getwpfunnels.com/pricing/" target="_blank" v-if="!isPro && 0 !==index && 1 !==index "><span class="pro-tag"><svg fill="none" width="22" height="22"  viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="11" fill="#2FCF5C"/><path fill="#fff" d="M15.209 9.236l-1.587.396-1.983-2.471a.926.926 0 00-1.445 0L8.21 9.63l-1.618-.395a.933.933 0 00-1.124 1.124l1.093 3.842a.618.618 0 00.617.451h7.412a.618.618 0 00.618-.45l1.1-3.843a.932.932 0 00-1.1-1.124zM5.172 8.57a.772.772 0 100-1.545.772.772 0 000 1.544zm11.427 0a.772.772 0 100-1.545.772.772 0 000 1.544zm-5.714-2.626a.772.772 0 100-1.544.772.772 0 000 1.544zm3.706 10.964H7.18a.618.618 0 010-1.236h7.411a.618.618 0 110 1.236z"/></svg></span></a>
+                                                        <span class="single-layout-inner" :class="{ 'is-pro': !isPro && 0!==index && 1!==index }">
+                                                            <span class="inner-box">
+                                                                <FunnelLayout1 v-if="'layout1' == layout.value" />
+                                                                <FunnelLayout2 v-if="'layout2' == layout.value" />
+                                                                <FunnelLayout3 v-if="'layout3' == layout.value" />
+                                                                <FunnelLayout4 v-if="'layout4' == layout.value" />
+                                                                <FunnelLayout5 v-if="'layout5' == layout.value" />
+                                                                <FunnelLayout6 v-if="'layout6' == layout.value" />
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="button-area">
+                                                    <span class="wpfnl-alert box" style="display: inline-block;" :class="alertClass" v-if="isShowAlert">{{
+                                                        this.alertMessage
+                                                    }}</span>
+                                                    <button type="submit" @click="createFunnel" :disabled='disabled'>
+                                                        {{createFunnelTitle}}
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </template>
                                 </div>
 
                                 <div class="templates-title-wrapper" v-if="!showStepsPreview && 'other' !== builder">
-                                    <h2 class="title">{{totalTemplates > 1 ? totalTemplates + ' Templates' : totalTemplates + ' Template'}}</h2>
+                                    <h2 class="title">{{ isStoreCheckout ? 'Store Checkout Templates' : (totalTemplates > 1 ? totalTemplates + ' Templates' : totalTemplates + ' Template') }}</h2>
                                 </div>
 
                                 <div class="wpfnl-create-funnel__templates">
-                                    <div class="template-cat-filter-loader" :class="templateCatFilterLoader ? 'show-loader' : '' ">
-                                        <span class="wpfnl-loader"></span>
-                                    </div>
-
-                                    <div v-show="loader" class="wpfnl-create-funnel__loader">
-                                        <!-- <span class="wpfnl-loader" v-show="templateCatFilterLoader"></span> -->
-                                    </div>
 
                                     <div class="create-funnel__single-template create__from-scratch"
                                         v-if="(showProFilter && !showStepsPreview && !isTemplatePage) || ( 'other' === builder )">
                                         <a id="wpfnl-create-funnel" href="#" class="btn-default" @click="showFunnelNameModal"
-                                        v-if="!isAddNewFunnelButtonDisabled"> <PlusIcon /> Start From scratch </a>
+                                        v-if="!isAddNewFunnelButtonDisabled || isStoreCheckout"> <PlusIcon /> Start From scratch </a>
 
-                                        <div class="funnel-limit-notice" v-if="isAddNewFunnelButtonDisabled">
+                                        <div class="funnel-limit-notice" v-if="isAddNewFunnelButtonDisabled && !isStoreCheckout">
                                             <p><b>You have reached your limit and built 3/3 funnels!</b><br/><br/>
                                                 To create unlimited funnels, please upgrade to Pro.
                                             </p>
@@ -429,6 +472,7 @@ export default {
             showModal: j('#template-library-modal').attr('data-modal-visibility'),
             proUrl: window.template_library_object.pro_url,
             isRemoteFunnel : 'yes' === window.template_library_object.isRemote ? true : false,
+            isStoreCheckout: window.template_library_object.isStoreCheckout || false,
             templates: [],
             activeTemplate: '',
             allTemplates: [],
@@ -462,7 +506,7 @@ export default {
             templateNewName: '',
             funnelName: '',
             isPro  : window.template_library_object.is_pro,
-            createFunnelTitle: 'Create Funnel',
+            createFunnelTitle: window.template_library_object.isStoreCheckout ? 'Create Store Checkout' : 'Create Funnel',
             totalFunnels: window.WPFunnelVars.totalFunnels,
             countActiveFunnels: window.WPFunnelVars.count_active_funnels,
             totalAllowedFunnels: window.WPFunnelVars.totalAllowedFunnels,
@@ -604,7 +648,7 @@ export default {
                                 }
                             ]
                         }
-                        
+
                     ]
                 },
                 {
@@ -687,13 +731,14 @@ export default {
                                 }
                             ]
                         },
-                        
-                        
+
+
                     ]
                 },
             ],
             selectedFunnelLayout : {},
             responsiveView: 'desktop',
+            syncingLibrary: false,
         }
 
     },
@@ -725,9 +770,13 @@ export default {
 		}
 
     },
-    
-    methods: {
 
+    methods: {
+		methods: {
+			isOnStoreCheckoutPage() {
+				console.log(isStoreCheckout);
+			}
+		},
         selectFunnelLayout: function (index, value) {
             if(this.isPro || index === 0 || index === 1 ){
                 if( this.selectedFunnelLayout == value){
@@ -761,15 +810,36 @@ export default {
             if( this.selectedType ){
                 apiFetch({
                     path: addQueryArgs( `${window.template_library_object.rest_api_url}wpfunnels/v1/templates/get_templates`, {
-                        type: this.selectedType
+                        type: this.selectedType,
+                        store_checkout: this.isStoreCheckout ? 'yes' : 'no',
                     } ),
                     method: 'GET'
                 }).then(response => {
                     if (response.success) {
-                        this.templates 		= response.templates
-                        this.allTemplates 	= response.templates
-						this.steps 			= response.steps
-						this.allSteps 		= response.steps
+                        let templates = response.templates
+                        let steps = response.steps
+
+                        // Filter for Store Checkout - only show templates with checkout and thankyou
+                        if (this.isStoreCheckout) {
+                            templates = templates.filter(template => {
+                                if (!template.steps) return false;
+                                let hasCheckout = template.steps.some(step => step.step_type === 'checkout');
+                                let hasThankyou = template.steps.some(step => step.step_type === 'thankyou');
+                                return hasCheckout && hasThankyou;
+                            });
+
+                            steps = steps.filter(step => {
+                                return step.step_type === 'checkout' || step.step_type === 'thankyou';
+                            });
+                        }
+
+                        if (this.isStoreCheckout) {
+                            templates = templates.sort((a, b) => a.ID - b.ID);
+                        }
+                        this.templates 		= templates
+                        this.allTemplates 	= templates
+						this.steps 			= steps
+						this.allSteps 		= steps
                         this.templatesType 	= 'all'
                         this.activeCategory = 'all'
                         this.categories 	= response.categories
@@ -777,7 +847,7 @@ export default {
 						this.loader 		= false
 						this.templateCatFilterLoader = false;
                         if (response.templates) {
-                            this.totalTemplates = this.isAnyPluginMissing === 'yes' ? 0 : response.templates.length
+                            this.totalTemplates = this.isAnyPluginMissing === 'yes' ? 0 : templates.length
                         }
 
                     }
@@ -787,13 +857,25 @@ export default {
 
         },
 
+        syncLibrary: function () {
+            this.syncingLibrary = true;
+            wpAjaxHelperRequest('clear-templates', {})
+                .success(() => {
+                    this.getTemplate();
+                    this.syncingLibrary = false;
+                })
+                .error(() => {
+                    this.syncingLibrary = false;
+                });
+        },
+
         createFunnel: function (e) {
             e.preventDefault();
-            if( !this.funnelName ){
+            if( !this.isStoreCheckout && !this.funnelName ){
                 this.isShowAlert = true;
                 this.alertClass = 'wpfnl-error';
                 this.alertMessage = 'Please enter funnel name';
-                
+
                 setTimeout(() => {
 					this.isShowAlert = false
 				}, 2500);
@@ -801,12 +883,20 @@ export default {
                 return;
             }
 
+            if( this.isStoreCheckout && !this.funnelName ){
+                this.funnelName = 'Store Checkout';
+            }
+
             this.disabled = true;
-            this.createFunnelTitle = "Creating Funnel..."
+            this.loader = true;
+            this.createFunnelTitle = this.isStoreCheckout
+                ? WPFunnelVars.getText?.creating_store_checkout
+                : WPFunnelVars.getText?.creating_funnel;
             var payload = {
                 funnelName: this.funnelName,
                 type      : this.type,
                 selectedFunnelLayout : this.selectedFunnelLayout,
+                is_store_checkout: this.isStoreCheckout ? true : false,
             };
             wpAjaxHelperRequest("create-funnel", payload)
                 .success(function (response) {
@@ -863,8 +953,10 @@ export default {
                     source	: 'remote',
                     remoteID: this.activeTemplate.ID,
 					type    : this.type,
+					is_store_checkout: this.isStoreCheckout ? true : false,
                 },
-                that = this;
+                that = this,
+                _steps = this.filterSteps(this.steps);
 
             that.loaderMessage = 'Please Wait...',
                 this.activeTemplate.title = data.name;
@@ -872,14 +964,19 @@ export default {
             wpAjaxHelperRequest("wpfunnel-import-funnel", data)
                 .success(function (response) {
                     let looper = j.Deferred().resolve(),
-                        first_step_id = 0;
-                    j.when.apply(j, j.map(that.steps, function (step, index) {
-                        looper = looper.then(function () {
-                            return that.createStep(step, response.funnelID, index, that);
-                        });
+                        first_step_id = 0,
+                        importedSteps = [];
+                    j.when.apply(j, j.map(_steps, function (step, index) {
+                        if (that.shouldImportStep(step.step_type)) {
+                            looper = looper.then(function () {
+                                return that.createStep(step, response.funnelID, index, that).then(function(stepResponse) {
+                                    importedSteps.push(stepResponse.stepID);
+                                });
+                            });
+                        }
                         return looper;
                     })).then(function () {
-                        that.afterFunnelCreationRedirect(response.funnelID);
+                        that.afterFunnelCreationRedirect(response.funnelID, importedSteps);
                     });
                 })
                 .error(function (response) {
@@ -912,10 +1009,12 @@ export default {
             return deferred.promise();
         },
 
-        afterFunnelCreationRedirect: function (funnelId) {
+        afterFunnelCreationRedirect: function (funnelId, importedSteps) {
             var payload = {
                 'funnelID': funnelId,
-                'source': 'remote'
+                'source': 'remote',
+                'importedSteps': importedSteps || [],
+                'is_store_checkout': this.isStoreCheckout ? true : false,
             };
             wpAjaxHelperRequest("wpfunnel-after-funnel-creation", payload)
                 .success(function (response) {
@@ -945,18 +1044,41 @@ export default {
             }else {
                 this.templates = this.allTemplates
             }
+
+            // Apply Store Checkout filter if on Store Checkout page
+            if (this.isStoreCheckout) {
+                this.templates = this.templates.filter(template => {
+                    if (!template.steps) return false;
+                    let hasCheckout = template.steps.some(step => step.step_type === 'checkout');
+                    let hasThankyou = template.steps.some(step => step.step_type === 'thankyou');
+                    return hasCheckout && hasThankyou;
+                });
+            }
+
             this.totalTemplates = this.templates.length
         },
 
         doStepCatFilter: function (value) {
             this.activeStepCategory = value === '' ? 'all' : value
             let activeStep = this.activeStep
+            let isStoreCheckout = this.isStoreCheckout
             if (value !== '') {
                 this.steps = this.allSteps.filter(function (step) {
-                    return step.industry.slug === value && step.step_type === activeStep;
+                    let matchesCategory = step.industry.slug === value && step.step_type === activeStep;
+                    // Apply Store Checkout filter
+                    if (isStoreCheckout) {
+                        matchesCategory = matchesCategory && (step.step_type === 'checkout' || step.step_type === 'thankyou');
+                    }
+                    return matchesCategory;
                 });
             } else {
-                this.steps = this.allSteps
+                this.steps = this.allSteps;
+                // Apply Store Checkout filter
+                if (isStoreCheckout) {
+                    this.steps = this.steps.filter(step => {
+                        return step.step_type === 'checkout' || step.step_type === 'thankyou';
+                    });
+                }
             }
         },
 
@@ -973,28 +1095,44 @@ export default {
 
         doStepFreeProFilter: function (value) {
             this.stepTemplateType = value
+            let isStoreCheckout = this.isStoreCheckout
             this.steps = this.allSteps.filter(function (step) {
-                return value === 'pro' ? step.is_pro : !step.is_pro;
+                let matchesType = value === 'pro' ? step.is_pro : !step.is_pro;
+                // Apply Store Checkout filter
+                if (isStoreCheckout) {
+                    matchesType = matchesType && (step.step_type === 'checkout' || step.step_type === 'thankyou');
+                }
+                return matchesType;
             });
         },
 
         doFreeProFilter: function (value) {
             this.templatesType = value
             let activeCategory = this.activeCategory
+            let isStoreCheckout = this.isStoreCheckout
             this.templates = this.allTemplates.filter(function (template) {
-				return (activeCategory === 'all' || template.wpf_funnel_industry?.slug === activeCategory) &&
-					(
-						value === 'all' ||
-						(value === 'pro' && 'pro' === template.templateType) ||
-						(value === 'free' && 'free' === template.templateType) ||
-						(value === 'freemium' && 'freemium' === template.templateType )
-					);
+                let matchesCategory = (activeCategory === 'all' || template.wpf_funnel_industry?.slug === activeCategory);
+                let matchesType = (
+                    value === 'all' ||
+                    (value === 'pro' && 'pro' === template.templateType) ||
+                    (value === 'free' && 'free' === template.templateType) ||
+                    (value === 'freemium' && 'freemium' === template.templateType )
+                );
+                let matchesStoreCheckout = true;
+
+                // Apply Store Checkout filter
+                if (isStoreCheckout && template.steps) {
+                    let hasCheckout = template.steps.some(step => step.step_type === 'checkout');
+                    let hasThankyou = template.steps.some(step => step.step_type === 'thankyou');
+                    matchesStoreCheckout = hasCheckout && hasThankyou;
+                }
+
+				return matchesCategory && matchesType && matchesStoreCheckout;
 			});
             this.totalTemplates = this.templates.length
         },
 
         doTemplateCatFilter: function (e) {
-            this.loader = true;
             this.templateCatFilterLoader = true;
 
             this.selectedType = this.type
@@ -1002,8 +1140,7 @@ export default {
             if(!this.isRemoteFunnel) {
                 this.getTemplate();
             }else{
-                this.loader = false
-                this.templateCatFilterLoader = false
+                this.templateCatFilterLoader = false;
             }
 
         },
@@ -1029,7 +1166,26 @@ export default {
         },
 
         initSteps: function (steps) {
-            this.steps = steps;
+            // Filter steps for Store Checkout to only show one checkout and one thankyou
+            if (this.isStoreCheckout && steps) {
+                let filtered = [];
+                let hasCheckout = false;
+                let hasThankyou = false;
+
+                steps.forEach(step => {
+                    if (step.step_type === 'checkout' && !hasCheckout) {
+                        filtered.push(step);
+                        hasCheckout = true;
+                    } else if (step.step_type === 'thankyou' && !hasThankyou) {
+                        filtered.push(step);
+                        hasThankyou = true;
+                    }
+                });
+
+                this.steps = filtered;
+            } else {
+                this.steps = steps;
+            }
         },
 
         backToTemplates: function (e) {
@@ -1109,6 +1265,46 @@ export default {
         },
         setResponsiveView(view) {
             this.responsiveView = view;
+        },
+
+        filterSteps: function(steps) {
+            let isProActivated = window.WPFunnelVars.isProActivated == 1;
+
+            // Filter for Store Checkout - only checkout and thankyou (one of each)
+            if (this.isStoreCheckout) {
+                let filtered = [];
+                let hasCheckout = false;
+                let hasThankyou = false;
+
+                steps.forEach(step => {
+                    if (step.step_type === 'checkout' && !hasCheckout) {
+                        filtered.push(step);
+                        hasCheckout = true;
+                    } else if (step.step_type === 'thankyou' && !hasThankyou) {
+                        filtered.push(step);
+                        hasThankyou = true;
+                    }
+                });
+
+                return filtered;
+            }
+
+            if (isProActivated) {
+                return steps;
+            } else {
+                return steps.filter((step, index, self) => {
+                    return step.step_type !== 'downsell' &&
+                        index === self.findIndex(s => s.step_type === step.step_type);
+                });
+            }
+        },
+
+        shouldImportStep: function(stepType) {
+            let isProActivated = window.WPFunnelVars.isProActivated == 1;
+            if (isProActivated) {
+                return true;
+            }
+            return !['downsell'].includes(stepType);
         },
 
     }

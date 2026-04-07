@@ -287,8 +287,7 @@ class Wpfnl_Public
 	public function wpfnl_order_bump_cart_item_quantity($quantity, $cart_item, $cart_item_key)
 	{
 		if (isset($cart_item['wpfnl_order_bump']) && $cart_item['wpfnl_order_bump'] && isset($cart_item['wpfnl_ob_quantity'])) {
-			// Return the quantity with the order bump quantity
-			return sprintf('&times;&nbsp;%s', $cart_item['quantity']);
+			return ' <strong class="product-quantity">' . $cart_item['quantity'] . '</strong>';
 		}
 		return $quantity;
 	}

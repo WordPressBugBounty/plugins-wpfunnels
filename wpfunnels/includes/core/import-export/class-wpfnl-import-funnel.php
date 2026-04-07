@@ -108,6 +108,13 @@ class Wpfnl_Import {
             wp_die();
         }
 
+        $is_pro        = apply_filters( 'wpfunnels/is_pro_license_activated', false );
+        $current_count = wp_count_posts( 'wpfunnels' )->publish + wp_count_posts( 'wpfunnels' )->draft;
+        if( !$is_pro && $current_count >= 3 ) {
+            wp_send_json_error( [ 'message' => __( 'You have reached the maximum limit of 3 funnels on the free plan. Upgrade to Pro for unlimited funnels.', 'wpfnl' ) ], 403 );
+            wp_die();
+        }
+
         if( !as_has_scheduled_action( 'wpfnl_import_funnels' ) ) {
             $file = $this->upload_imported_file();
             if( is_wp_error( $file ) ) {
@@ -238,11 +245,21 @@ class Wpfnl_Import {
         if( is_array( $file_data ) ) {
             $funnel       = Wpfnl::$instance->funnel_store;
             $exclude_meta = array( '_is_imported', '_steps_order', '_steps', '_funnel_data');
+            $is_pro       = apply_filters( 'wpfunnels/is_pro_license_activated', false );
             foreach( $file_data as $data ) {
                 if( empty( $data[ 'funnel_id' ] ) ) {
                     $message = __( 'Invalid funnel(s) data.', 'wpfnl-pro' );
                     break;
                 }
+
+                if( !$is_pro ) {
+                    $current_count = wp_count_posts( 'wpfunnels' )->publish + wp_count_posts( 'wpfunnels' )->draft;
+                    if( $current_count >= 3 ) {
+                        $message = __( 'You have reached the maximum limit of 3 funnels on the free plan. Upgrade to Pro for unlimited funnels.', 'wpfnl' );
+                        break;
+                    }
+                }
+
                 $funnel_data = [];
                 $funnel_name = $data[ 'funnel_name' ] ?? 'New Funnel';
                 $funnel_id   = $funnel->create( $funnel_name );

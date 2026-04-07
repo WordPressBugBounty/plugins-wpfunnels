@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21
+class ComposerStaticInit1816045258ba6052304601dc4975d5ab
 {
     public static $files = array (
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
@@ -15,7 +15,7 @@ class ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21
     );
 
     public static $prefixLengthsPsr4 = array (
-        'S' => 
+        'S' =>
         array (
             'Symfony\\Component\\Process\\' => 26,
             'Spatie\\TemporaryDirectory\\' => 26,
@@ -23,14 +23,14 @@ class ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21
             'Spatie\\ImageOptimizer\\' => 22,
             'Spatie\\Browsershot\\' => 19,
         ),
-        'P' => 
+        'P' =>
         array (
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
             'PostHog\\' => 8,
             'PhilipNewcomer\\WP_Ajax_Helper\\' => 30,
         ),
-        'L' => 
+        'L' =>
         array (
             'LinnoSDK\\Telemetry\\' => 19,
             'League\\MimeTypeDetection\\' => 25,
@@ -38,87 +38,87 @@ class ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21
             'League\\Flysystem\\Local\\' => 23,
             'League\\Flysystem\\' => 17,
         ),
-        'I' => 
+        'I' =>
         array (
             'Intervention\\Image\\' => 19,
         ),
-        'G' => 
+        'G' =>
         array (
             'GuzzleHttp\\Psr7\\' => 16,
         ),
-        'A' => 
+        'A' =>
         array (
             'Appsero\\' => 8,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Symfony\\Component\\Process\\' => 
+        'Symfony\\Component\\Process\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/process',
         ),
-        'Spatie\\TemporaryDirectory\\' => 
+        'Spatie\\TemporaryDirectory\\' =>
         array (
             0 => __DIR__ . '/..' . '/spatie/temporary-directory/src',
         ),
-        'Spatie\\Image\\' => 
+        'Spatie\\Image\\' =>
         array (
             0 => __DIR__ . '/..' . '/spatie/image/src',
         ),
-        'Spatie\\ImageOptimizer\\' => 
+        'Spatie\\ImageOptimizer\\' =>
         array (
             0 => __DIR__ . '/..' . '/spatie/image-optimizer/src',
         ),
-        'Spatie\\Browsershot\\' => 
+        'Spatie\\Browsershot\\' =>
         array (
             0 => __DIR__ . '/..' . '/spatie/browsershot/src',
         ),
-        'Psr\\Log\\' => 
+        'Psr\\Log\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/log/src',
         ),
-        'Psr\\Http\\Message\\' => 
+        'Psr\\Http\\Message\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
-        'PostHog\\' => 
+        'PostHog\\' =>
         array (
             0 => __DIR__ . '/..' . '/posthog/posthog-php/lib',
         ),
-        'PhilipNewcomer\\WP_Ajax_Helper\\' => 
+        'PhilipNewcomer\\WP_Ajax_Helper\\' =>
         array (
             0 => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/components',
         ),
-        'LinnoSDK\\Telemetry\\' => 
+        'LinnoSDK\\Telemetry\\' =>
         array (
             0 => __DIR__ . '/..' . '/linno/telemetry/src',
         ),
-        'League\\MimeTypeDetection\\' => 
+        'League\\MimeTypeDetection\\' =>
         array (
             0 => __DIR__ . '/..' . '/league/mime-type-detection/src',
         ),
-        'League\\Glide\\' => 
+        'League\\Glide\\' =>
         array (
             0 => __DIR__ . '/..' . '/league/glide/src',
         ),
-        'League\\Flysystem\\Local\\' => 
+        'League\\Flysystem\\Local\\' =>
         array (
             0 => __DIR__ . '/..' . '/league/flysystem-local',
         ),
-        'League\\Flysystem\\' => 
+        'League\\Flysystem\\' =>
         array (
             0 => __DIR__ . '/..' . '/league/flysystem/src',
         ),
-        'Intervention\\Image\\' => 
+        'Intervention\\Image\\' =>
         array (
             0 => __DIR__ . '/..' . '/intervention/image/src/Intervention/Image',
         ),
-        'GuzzleHttp\\Psr7\\' => 
+        'GuzzleHttp\\Psr7\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
-        'Appsero\\' => 
+        'Appsero\\' =>
         array (
             0 => __DIR__ . '/..' . '/appsero/client/src',
         ),
@@ -596,6 +596,7 @@ class ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21
         'WPFunnels\\Meta\\Wpfnl_Default_Meta' => __DIR__ . '/../..' . '/classes/class-wpfnl-meta.php',
         'WPFunnels\\Metas\\Wpfnl_Step_Meta_keys' => __DIR__ . '/../..' . '/includes/core/data-store/class-wpfnl-step-metas.php',
         'WPFunnels\\Migration\\Migration' => __DIR__ . '/../..' . '/includes/core/newui-migration/class-wpfnl-migration.php',
+        'WPFunnels\\Modules\\Admin\\Automations\\Module' => __DIR__ . '/../..' . '/admin/modules/automations/class-wpfnl-automations.php',
         'WPFunnels\\Modules\\Admin\\Category\\Module' => __DIR__ . '/../..' . '/admin/modules/category/class-wpfnl-category.php',
         'WPFunnels\\Modules\\Admin\\CreateFunnel\\Module' => __DIR__ . '/../..' . '/admin/modules/createFunnel/class-wpfnl-create-funnel.php',
         'WPFunnels\\Modules\\Admin\\Discount\\Module' => __DIR__ . '/../..' . '/admin/modules/discount/class-wpfnl-discount.php',
@@ -629,7 +630,9 @@ class ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21
         'WPFunnels\\Rest\\Controllers\\SettingsController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-settings-controller.php',
         'WPFunnels\\Rest\\Controllers\\SetupWizardController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-setup-wizard-controller.php',
         'WPFunnels\\Rest\\Controllers\\StepController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-step-controller.php',
+        'WPFunnels\\Rest\\Controllers\\StoreCheckoutController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-storecheckout-controller.php',
         'WPFunnels\\Rest\\Controllers\\TemplateLibraryController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-templatelibrary-controller.php',
+        'WPFunnels\\Rest\\Controllers\\WpfnlAutomationController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-automation-controller.php',
         'WPFunnels\\Rest\\Controllers\\Wpfnl_REST_Controller' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-wpfnl-rest-controller.php',
         'WPFunnels\\Rest\\Server' => __DIR__ . '/../..' . '/includes/core/rest-api/class-server.php',
         'WPFunnels\\Rollback' => __DIR__ . '/../..' . '/includes/utils/class-wpfnl-rollback.php',
@@ -641,6 +644,7 @@ class ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21
         'WPFunnels\\TemplateLibrary\\Manager' => __DIR__ . '/../..' . '/admin/modules/template-library/class-manager.php',
         'WPFunnels\\TemplateLibrary\\Wpfnl_Source_Base' => __DIR__ . '/../..' . '/admin/modules/template-library/sources/base.php',
         'WPFunnels\\TemplateLibrary\\Wpfnl_Source_Remote' => __DIR__ . '/../..' . '/admin/modules/template-library/sources/remote.php',
+        'WPFunnels\\Tracking\\EventTracker' => __DIR__ . '/../..' . '/includes/core/Tracking/EventTracker.php',
         'WPFunnels\\Tracking\\Telemetry' => __DIR__ . '/../..' . '/includes/core/Tracking/class-wpfnl-telemetry.php',
         'WPFunnels\\Traits\\SingletonTrait' => __DIR__ . '/../..' . '/includes/core/traits/singleton-trait.php',
         'WPFunnels\\Widgets\\Bricks\\Checkout' => __DIR__ . '/../..' . '/includes/core/widgets/bricks/Checkout.php',
@@ -692,6 +696,7 @@ class ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21
         'WPFunnels\\Widgets\\Oxygen\\Optin' => __DIR__ . '/../..' . '/includes/core/widgets/oxygen/elements/optin/class-optin.php',
         'WPFunnels\\Widgets\\Oxygen\\OrderDetails' => __DIR__ . '/../..' . '/includes/core/widgets/oxygen/elements/order-details/order-details.php',
         'WPFunnels\\Widgets\\Wpfnl_Widgets_Manager' => __DIR__ . '/../..' . '/includes/core/widgets/class-manager.php',
+        'WPFunnels\\WooCommerce\\Wpfnl_Store_Checkout_Override' => __DIR__ . '/../..' . '/includes/core/woocommerce/class-wpfnl-store-checkout-override.php',
         'WPFunnels\\Wpfnl_functions' => __DIR__ . '/../..' . '/includes/utils/class-wpfnl-functions.php',
         'WP_Async_Request' => __DIR__ . '/..' . '/deliciousbrains/wp-background-processing/classes/wp-async-request.php',
         'WP_Background_Process' => __DIR__ . '/..' . '/deliciousbrains/wp-background-processing/classes/wp-background-process.php',
@@ -710,9 +715,9 @@ class ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitebdddc98cec40b14a94a7e55ae601c21::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit1816045258ba6052304601dc4975d5ab::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit1816045258ba6052304601dc4975d5ab::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit1816045258ba6052304601dc4975d5ab::$classMap;
 
         }, null, ClassLoader::class);
     }

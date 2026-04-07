@@ -1,6 +1,6 @@
 <template>
 	<div class="wpfnl-mm-setup-wizard">
-		<Sidebar :currentStep="currentStep" @show-exit-modal="handleShowExitModal" />
+		<Sidebar :currentStep="currentStep" :selectedGoal="selectedGoal" @show-exit-modal="handleShowExitModal" />
 		<Content
 			ref="contentComponent"
 			:currentStep="currentStep"
@@ -9,6 +9,12 @@
 			:selectedTemplate="selectedTemplate"
 			:funnelId="createdFunnelId"
 			:firstStepLink="firstStepLink"
+			:selectedProductId="selectedProductId"
+			:selectedProduct="selectedProduct"
+			:agreeToShare="agreeToShare"
+			:mainProduct="mainProduct"
+			:orderBump="orderBump"
+			:upsellProduct="upsellProduct"
 			@next-step="handleNextStep"
 			@prev-step="handlePrevStep"
 		/>
@@ -40,6 +46,11 @@ export default {
 			selectedTemplate: null,
 			createdFunnelId: null,
 			firstStepLink: '',
+			selectedProductId: null,
+			selectedProduct: null,
+			mainProduct: null,
+			orderBump: null,
+			upsellProduct: null,
 		}
 	},
 
@@ -63,15 +74,29 @@ export default {
 			if (data && data.template) {
 				this.selectedTemplate = data.template;
 			}
+			if (data && data.productId) {
+				this.selectedProductId = data.productId;
+				this.selectedProduct = data.product || null;
+			}
 			if (data && data.funnelId) {
 				this.createdFunnelId = data.funnelId;
 			}
 			if (data && data.firstStepLink) {
 				this.firstStepLink = data.firstStepLink;
 			}
+			if (data && data.mainProduct !== undefined) {
+				this.mainProduct = data.mainProduct;
+			}
+			if (data && data.orderBump !== undefined) {
+				this.orderBump = data.orderBump;
+			}
+			if (data && data.upsell !== undefined) {
+				this.upsellProduct = data.upsell;
+			}
 
 			// Move to next step
-			if (this.currentStep < 5) {
+			const maxSteps = this.getMaxSteps();
+			if (this.currentStep < maxSteps) {
 				this.currentStep++;
 			}
 		},
@@ -86,6 +111,20 @@ export default {
 			if (this.$refs.contentComponent) {
 				this.$refs.contentComponent.showExitModal();
 			}
+		},
+		getMaxSteps() {
+			// Dynamic step calculation based on goal
+			if (this.selectedGoal === 'order-value') {
+				return 6; // Welcome, Setup, ChooseGoal, ChooseTemplate, BuildFunnel, Complete
+			}
+			if (this.selectedGoal === 'improve-checkout') {
+				return 6; // Welcome, Setup, ChooseGoal, ChooseTemplate, GenerateFunnel, Complete
+			}
+			if (this.selectedGoal === 'sales') {
+				return 7; // Welcome, Setup, ChooseGoal, ProductSync, ChooseTemplate, GenerateFunnel, Complete
+			}
+			// Default before goal selection
+			return 5; // Welcome, Setup, ChooseGoal, ChooseTemplate, Complete (initial display)
 		}
 	},
 }

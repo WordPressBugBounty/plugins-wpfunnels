@@ -121,6 +121,22 @@ class Module extends Wpfnl_Admin_Module
             $args['s'] = sanitize_text_field($_GET['s']);
 
         }
+        if( ! defined( 'REMOTE_FUNNEL_VERSION')) {
+            // Exclude Store Checkout funnels from regular funnel listing
+            $args['meta_query'] = [
+                'relation' => 'OR',
+                [
+                    'key'     => '_wpfnl_funnel_type',
+                    'compare' => 'NOT EXISTS',
+                ],
+                [
+                    'key'     => '_wpfnl_funnel_type',
+                    'value'   => 'store_checkout',
+                    'compare' => '!=',
+                ],
+            ];
+        }
+
         return $args;
     }
 
@@ -173,6 +189,22 @@ class Module extends Wpfnl_Admin_Module
       
         if (isset($_GET['s'])) {
             $args['s'] = sanitize_text_field($_GET['s']);
+        }
+
+        if( ! defined( 'REMOTE_FUNNEL_VERSION')) {
+            // Exclude Store Checkout funnels
+            $args['meta_query'] = [
+                'relation' => 'OR',
+                [
+                    'key'     => '_wpfnl_funnel_type',
+                    'compare' => 'NOT EXISTS',
+                ],
+                [
+                    'key'     => '_wpfnl_funnel_type',
+                    'value'   => 'store_checkout',
+                    'compare' => '!=',
+                ],
+            ];
         }
         
         $all_funnels = get_posts($args);

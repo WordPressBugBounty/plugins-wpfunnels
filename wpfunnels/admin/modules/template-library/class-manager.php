@@ -103,7 +103,7 @@ class Manager
 
     public function enqueue_scripts($hook)
     {
-        if (in_array($hook, ['wpfunnels_page_wp_funnels']) || in_array($hook, ['wpfunnels_page_wpf_templates'])) {
+        if (in_array($hook, ['wpfunnels_page_wp_funnels', 'wpfunnels_page_wpf_templates', 'wpfunnels_page_store_checkout'])) {
             $funnel_id = 0;
             if (isset($_GET['page'])) {
                 if ($_GET['page'] === 'edit_funnel') {
@@ -201,6 +201,12 @@ class Manager
     public function get_step_templates($payload)
     {
         $template_data = $this->get_source('remote')->get_funnels();
+        
+        // Filter for Store Checkout - only show checkout and thankyou templates
+        if (isset($_GET['page']) && $_GET['page'] === 'store_checkout') {
+            $template_data = $this->filter_store_checkout_templates($template_data);
+        }
+        
         return [
             'success' => true,
             'data' => $template_data,
@@ -216,6 +222,12 @@ class Manager
     public function get_funnel_templates()
     {
         $template_data = $this->get_source('remote')->get_funnels();
+        
+        // Filter for Store Checkout - only show checkout and thankyou templates
+        if (isset($_GET['page']) && $_GET['page'] === 'store_checkout') {
+            $template_data = $this->filter_store_checkout_templates($template_data);
+        }
+        
         return [
             'success' => true,
             'data' => $template_data,
@@ -280,6 +292,13 @@ class Manager
      */
     public function import_funnel($payload)
     {
+        // Check if Store Checkout flag is sent from frontend
+        if (isset($payload['is_store_checkout']) && $payload['is_store_checkout']) {
+            // Flag is already in payload
+        } elseif (isset($_GET['page']) && $_GET['page'] === 'store_checkout') {
+            // Fallback: check GET parameter
+            $payload['is_store_checkout'] = true;
+        }
         $source = $this->get_source($payload['source']);
         $result = $source->import_funnel($payload);
 
@@ -322,6 +341,17 @@ class Manager
      */
     public function after_funnel_creation($payload)
     {
+        // Check if Store Checkout flag is sent from frontend
+        if (isset($payload['is_store_checkout']) && $payload['is_store_checkout']) {
+            // Flag is already in payload
+        } elseif (isset($_GET['page']) && $_GET['page'] === 'store_checkout') {
+            // Fallback: check GET parameter
+            $payload['is_store_checkout'] = true;
+        } elseif (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'page=store_checkout') !== false) {
+            // Fallback: check referer
+            $payload['is_store_checkout'] = true;
+        }
+        
         $source = $this->get_source($payload['source']);
         return $source->after_funnel_creation($payload);
     }
@@ -431,6 +461,87 @@ class Manager
             $output = array();
         }
         return $output;
+    }
+
+
+    /**
+     * Filter templates for Store Checkout - only checkout and thankyou
+     *
+     * @param array $template_data
+     * @return array
+     * @since 3.5.0
+     */
+    private function filter_store_checkout_templates($template_data)
+    {
+        if (empty($template_data) || !isset($template_data['steps'])) {
+            return $template_data;
+        }
+
+        // Filter steps to only include one checkout and one thankyou
+        $filtered_steps = [];
+        $found_checkout = false;
+        $found_thankyou = false;
+        
+        foreach ($template_data['steps'] as $step) {
+            if (isset($step['step_type'])) {
+                if ($step['step_type'] === 'checkout' && !$found_checkout) {
+                    $filtered_steps[] = $step;
+                    $found_checkout = true;
+                } elseif ($step['step_type'] === 'thankyou' && !$found_thankyou) {
+                    $filtered_steps[] = $step;
+                    $found_thankyou = true;
+                }
+            }
+        }
+
+        // Filter templates to only include those with checkout and thankyou steps
+        $filtered_templates = [];
+        if (isset($template_data['templates'])) {
+            foreach ($template_data['templates'] as $template) {
+                $has_checkout = false;
+                $has_thankyou = false;
+                
+                if (isset($template['steps'])) {
+                    foreach ($template['steps'] as $step) {
+                        if (isset($step['step_type'])) {
+                            if ($step['step_type'] === 'checkout') {
+                                $has_checkout = true;
+                            } elseif ($step['step_type'] === 'thankyou') {
+                                $has_thankyou = true;
+                            }
+                        }
+                    }
+                }
+                
+                // Only include templates that have both checkout and thankyou
+                if ($has_checkout && $has_thankyou) {
+                    // Filter the template's steps to only include one checkout and one thankyou
+                    $filtered_template_steps = [];
+                    $found_checkout = false;
+                    $found_thankyou = false;
+                    
+                    foreach ($template['steps'] as $step) {
+                        if (isset($step['step_type'])) {
+                            if ($step['step_type'] === 'checkout' && !$found_checkout) {
+                                $filtered_template_steps[] = $step;
+                                $found_checkout = true;
+                            } elseif ($step['step_type'] === 'thankyou' && !$found_thankyou) {
+                                $filtered_template_steps[] = $step;
+                                $found_thankyou = true;
+                            }
+                        }
+                    }
+                    
+                    $template['steps'] = $filtered_template_steps;
+                    $filtered_templates[] = $template;
+                }
+            }
+        }
+
+        $template_data['steps'] = $filtered_steps;
+        $template_data['templates'] = $filtered_templates;
+
+        return $template_data;
     }
 
 

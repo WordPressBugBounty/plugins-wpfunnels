@@ -17,16 +17,31 @@ $nav_menus = apply_filters('wpfnl_dashboard_nav_lists', [
             'icon'  => 'overview-icon',
             'page'  => WPFNL_FUNNEL_PAGE_SLUG,
         ],
+        'store_checkout' => [
+            'title' => __('Store Checkout', 'wpfnl'),
+            'icon'  => 'storewide-checkout-icon',
+            'page'  => 'store_checkout',
+        ],
+        'automations' => [
+            'title' => __('Automations', 'wpfnl'),
+            'icon'  => 'automations-icon',
+            'page'  => WPFNL_AUTOMATIONS_SLUG,
+        ],
+        'integrations' => [
+            'title' => __('Integrations', 'wpfnl'),
+            'icon'  => 'settings-icon-2x',
+            'page'  => WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG,
+        ],
         'templates' => [
             'title' => __('Templates', 'wpfnl'),
             'icon'  => 'templates-icon',
             'page'  => WPFNL_TEMPLATE_PAGE_SLUG,
         ],
-        'addons' => [
-            'title' => __('Add-ons', 'wpfnl'),
-            'icon'  => 'addons-icon',
-            'page'  => WPFNL_ADDONS_SLUG,
-        ],
+        // 'addons' => [
+        //     'title' => __('Add-ons', 'wpfnl'),
+        //     'icon'  => 'addons-icon',
+        //     'page'  => WPFNL_ADDONS_SLUG,
+        // ],
         'settings' => [
             'title' => __('Settings', 'wpfnl'),
             'icon'  => 'settings-icon-2x',
@@ -54,7 +69,6 @@ $nav_menus = apply_filters('wpfnl_dashboard_nav_lists', [
 
             <li class="wpfnl-dashboard__nav-li <?php echo $key .' '. $active_class; ?>">
                 <a id="<?php echo "wpfnl-tab-".$key ?>" href="<?php echo esc_url($link); ?>">
-                    <?php include WPFNL_DIR . '/admin/partials/icons/'.$menu['icon'].'.php'; ?>
                     <?php echo $menu['title']; ?>
                 </a>
             </li>

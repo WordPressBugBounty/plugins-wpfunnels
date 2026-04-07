@@ -1655,7 +1655,7 @@ class FunnelController extends Wpfnl_REST_Controller
 		$funnel_id = $request['funnel_id'];
 		$steps = Wpfnl_functions::get_steps($funnel_id);
 
-		if (!is_plugin_active('wpfunnels-pro-gbf/wpfnl-pro-gb.php')) {
+		if ( ! Wpfnl_functions::is_global_funnel_activated() ) {
 			$response = array(
 				'success' => false,
 				'data' => 'Global Funnel is not activated'

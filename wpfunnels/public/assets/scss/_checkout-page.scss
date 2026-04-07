@@ -732,6 +732,10 @@
 
 			#place_order {
 				float: none;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
 				background: $primary-color;
 				border-radius: 6px;
 				color: #fff;
@@ -741,6 +745,23 @@
 				padding: 15px 22px;
 				margin-top: 20px;
 				width: 100%;
+
+				span {
+					color: inherit ;
+				}
+
+				.wpfnl-place-order-icon {
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					line-height: 1;
+
+					svg {
+						display: block;
+						width: 1em;
+						height: 1em;
+					}
+				}
 			}
 
 		}

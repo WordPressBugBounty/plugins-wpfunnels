@@ -510,10 +510,18 @@ class Module extends Wpfnl_Admin_Module
         delete_option(WPFNL_TEMPLATES_OPTION_KEY.'_wc');
         delete_option(WPFNL_TEMPLATES_OPTION_KEY.'_lms');
 
-
+		$builder = Wpfnl_functions::get_builder_type();
+		
         delete_transient('wpfunnels_remote_template_data_wc_' . WPFNL_VERSION);
         delete_transient('wpfunnels_remote_template_data_lms_' . WPFNL_VERSION);
         delete_transient('wpfunnels_remote_template_data_lead_' . WPFNL_VERSION);
+        delete_transient('wpfunnels_remote_template_data_store_checkout_' . WPFNL_VERSION);
+
+		delete_transient('wpfunnels_remote_template_data_wc_'. $builder . '_' . WPFNL_VERSION);
+        delete_transient('wpfunnels_remote_template_data_lms_'. $builder . '_' . WPFNL_VERSION);
+        delete_transient('wpfunnels_remote_template_data_lead_'. $builder . '_' . WPFNL_VERSION);
+        delete_transient('wpfunnels_remote_template_data_store_checkout_'. $builder . '_' . WPFNL_VERSION);
+
         return [
             'success' => true
         ];
@@ -533,6 +541,7 @@ class Module extends Wpfnl_Admin_Module
         delete_transient('wpfunnels_remote_template_data_wc_' . WPFNL_VERSION);
         delete_transient('wpfunnels_remote_template_data_lms_' . WPFNL_VERSION);
         delete_transient('wpfunnels_remote_template_data_lead_' . WPFNL_VERSION);
+        delete_transient('wpfunnels_remote_template_data_store_checkout_' . WPFNL_VERSION);
 		delete_transient('wpfunnels_rollback_versions_' . WPFNL_VERSION);
 		do_action('wpfunnels/after_clear_transient');
 		return array(

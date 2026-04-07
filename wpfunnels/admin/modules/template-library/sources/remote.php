@@ -7,6 +7,7 @@
 namespace WPFunnels\TemplateLibrary;
 
 use WPFunnels\API;
+use WPFunnels\Rest\Controllers\GutenbergCSSController;
 use WPFunnels\Rest\Controllers\TemplateLibraryController;
 use WPFunnels\Wpfnl;
 use WPFunnels\Wpfnl_functions;
@@ -67,7 +68,57 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
         $funnel 	= Wpfnl::$instance->funnel_store;
         $funnel_id 	= $funnel->create();
         $funnel->update_meta($funnel_id, '_is_imported', 'yes');
-        
+        $general_settings = get_option( '_wpfunnels_general_settings' );
+        // Mark as Store Checkout funnel if imported from Store Checkout page
+        if ( isset( $args['is_store_checkout'] ) && $args['is_store_checkout'] === 'true' ) {
+            // Ensure there is only one Store Checkout funnel globally.
+            $existing_store_checkout = get_posts(
+                array(
+                    'post_type'      => 'any',
+                    'post_status'    => 'any',
+                    'meta_key'       => '_wpfnl_funnel_type',
+                    'meta_value'     => 'store_checkout',
+                    'fields'         => 'ids',
+                    'posts_per_page' => 1,
+                )
+            );
+
+            if ( ! empty( $existing_store_checkout ) ) {
+                // A Store Checkout funnel already exists; do not create another.
+                return array(
+                    'success' => false,
+                    'error'   => 'store_checkout_exists',
+                );
+            }
+
+            update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'store_checkout' );
+            $funnel->update_meta( $funnel_id, '_is_store_checkout', 'yes' );
+        }else{
+            if( $funnel_id ){
+                
+                if( isset( $general_settings['funnel_type'] ) ){
+                    if( 'woocommerce' == $general_settings['funnel_type'] ){
+                        $general_settings['funnel_type'] = 'sales';
+                        update_option( '_wpfunnels_general_settings', $general_settings );
+                    }
+                    if( 'sales' == $general_settings['funnel_type'] ){
+                        // Check if LMS add-on is active AND at least one LMS plugin (LearnDash or CreatorLMS) is active
+                        if( Wpfnl_functions::is_lms_addon_active() && Wpfnl_functions::is_any_lms_plugin_active() && isset($args['type']) && 'lms' === $args['type'] ){
+                            update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lms' );
+                        } elseif( Wpfnl_functions::is_wc_active() && isset($args['type']) && 'wc' === $args['type'] ){
+                            update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'wc' );
+                        } elseif( isset($args['type']) && 'lead' === $args['type'] ){
+                            update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lead' );
+                        }
+                    }else{
+                        if( isset($args['type']) && 'lead' === $args['type'] ){
+                            update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lead' );
+                        }
+                    }
+                }
+            }
+        }
+		
         // Set funnel status to draft if specified
         if (isset($args['status']) && $args['status'] === 'draft') {
             wp_update_post([
@@ -75,31 +126,6 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
                 'post_status' => 'draft'
             ]);
         }
-
-		if( $funnel_id ){
-			$general_settings = get_option( '_wpfunnels_general_settings' );
-			if( isset( $general_settings['funnel_type'] ) ){
-				if( 'woocommerce' == $general_settings['funnel_type'] ){
-					$general_settings['funnel_type'] = 'sales';
-					update_option( '_wpfunnels_general_settings', $general_settings );
-				}
-				if( 'sales' == $general_settings['funnel_type'] ){
-					// Check if LMS add-on is active AND at least one LMS plugin (LearnDash or CreatorLMS) is active
-					if( Wpfnl_functions::is_lms_addon_active() && Wpfnl_functions::is_any_lms_plugin_active() && isset($args['type']) && 'lms' === $args['type'] ){
-						update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lms' );
-					} elseif( Wpfnl_functions::is_wc_active() && isset($args['type']) && 'wc' === $args['type'] ){
-						update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'wc' );
-					} elseif( isset($args['type']) && 'lead' === $args['type'] ){
-						update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lead' );
-					}
-				}else{
-					if( isset($args['type']) && 'lead' === $args['type'] ){
-                        update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lead' );
-                    }
-				}
-			}
-		}
-
 
 		$remote_id 		= isset($args['remoteID']) ? $args['remoteID'] : 0;
 		if ( !$remote_id ) {
@@ -110,6 +136,21 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
 		$response		= TemplateLibraryController::get_funnel( $remote_id );
 		$funnel_data 	= isset($response['_funnel_data']) ? $response['_funnel_data'] : $response['funnel_data'];
         
+		// If filtered steps are provided from frontend (e.g. for sales funnels), use those instead
+		if ( isset($args['steps']) && is_array($args['steps']) && !empty($args['steps']) ) {
+			// Replace the steps in funnel_data with filtered steps from frontend
+			if ( is_array($funnel_data) ) {
+				$funnel_data['steps'] = $args['steps'];
+			} elseif ( is_string($funnel_data) ) {
+				// If funnel_data is JSON string, decode, replace, and re-encode
+				$decoded = json_decode($funnel_data, true);
+				if ( is_array($decoded) ) {
+					$decoded['steps'] = $args['steps'];
+					$funnel_data = $decoded;
+				}
+			}
+		}
+		
 		update_post_meta( $funnel_id, '_funnel_data', $funnel_data );
 
         $funnel_title = isset($args['name']) ? $args['name'] : '';
@@ -145,8 +186,23 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
                 'message' => __('No funnel id found', 'wpfnl'),
             ];
         }
+        // Check if this is a Store Checkout funnel and skip non-checkout/thankyou steps
+        $funnel_type = get_post_meta($args['funnelID'], '_wpfnl_funnel_type', true);
+        if ($funnel_type === 'store_checkout') {
+            $step_type = isset($args['step']['step_type']) ? $args['step']['step_type'] : '';
+            // Silently skip non-checkout and non-thankyou steps
+            if (!in_array($step_type, ['checkout', 'thankyou'])) {
+                return [
+                    'success' => true,
+                    'stepID' => 0,
+                    'skipped' => true,
+                    'message' => __('Step skipped for Store Checkout', 'wpfnl'),
+                ];
+            }
+        }
 
         do_action('wpfunnel_step_import_start');
+        
         $response = TemplateLibraryController::get_step($args['step']['ID']);
         $isSingleStep = isset($args['isSingleStep']) && 'yes' === $args['isSingleStep'] ? true : false;
         $title = $response['title'];
@@ -158,7 +214,6 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
         $step = Wpfnl::$instance->step_store;
         $step_id = $step->create_step($args['funnelID'], $title, $args['step']['step_type'], $post_content);
         $step->import_metas($step_id, $post_metas, $isSingleStep );
-
 
         // re-signing the shortcode signature keys if builder type is oxygen
         if( 'oxygen' === Wpfnl_functions::get_builder_type() ) {
@@ -189,6 +244,8 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
                 	)
 				);
 			}
+
+            $this->restore_gutenberg_css( $step_id, $response );
         }
 
         $funnel = Wpfnl::$instance->funnel_store;
@@ -293,6 +350,8 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
                 	)
 				);
 			}
+
+            $this->restore_gutenberg_css( $step_id, $response );
         }
 
         $funnel = Wpfnl::$instance->funnel_store;
@@ -431,16 +490,47 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
     }
 
 
+    /**
+     * Restore generated Gutenberg CSS for imported remote templates.
+     *
+     * Remote step responses may expose the generated block CSS outside post meta,
+     * so rebuild the imported step's CSS meta/file explicitly.
+     *
+     * @param int   $step_id
+     * @param array $response
+     *
+     * @return void
+     */
+    private function restore_gutenberg_css( $step_id, $response ) {
+        $css = '';
 
-    private function save_step_meta_data( $funnel_id, $step_id ) {
-    	if ( !$funnel_id || !$step_id ) {
-			return;
-		}
+        if ( isset( $response['data']['_qubely_css'] ) && is_string( $response['data']['_qubely_css'] ) ) {
+            $css = $response['data']['_qubely_css'];
+        }
 
-    	$step_title = get_the_title( $step_id );
-    	$step_type	= get_post_meta( $step_id, '_step_type', true );
+        if ( ! $css ) {
+            $css = get_post_meta( $step_id, '_wpfunnels_gb_css', true );
+        }
 
-	}
+        if ( ! $css ) {
+            return;
+        }
+
+        $css_controller = new GutenbergCSSController();
+        $css            = $css_controller->set_import_url_to_top_css( $css );
+
+        update_post_meta( $step_id, '_wpfunnels_gb_css', $css );
+
+        $upload_dir = wp_upload_dir();
+        $dir        = trailingslashit( $upload_dir['basedir'] ) . 'wpfunnels/css/';
+        $filename   = sprintf( 'wpfnl-css-%d.css', $step_id );
+
+        if ( ! file_exists( $dir ) ) {
+            wp_mkdir_p( $dir );
+        }
+
+        file_put_contents( $dir . $filename, $css );
+    }
 
 
 	/**

@@ -4,7 +4,7 @@
  * View Add-ons
  *
  * @package
- */
+*/
 
 $lms_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 18" fill="none"><path d="M10.3885 15.3899H1.87768C1.25728 15.3899 0.75 14.8826 0.75 14.2623V1.87762C0.75 1.25716 1.25734 0.75 1.87768 0.75H10.6213C11.2412 0.75 11.7489 1.25722 11.7489 1.87762V16.7503" stroke="#7a8b9a" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"/><path d="M3.85913 3.86351H8.63964" stroke="#7a8b9a" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"/><path d="M3.85913 6.56693H8.63964" stroke="#7a8b9a" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"/><path d="M3.85913 9.26952H5.70269" stroke="#7a8b9a" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"/><path d="M10.3884 15.3898C11.137 15.3898 11.7488 16.0017 11.7488 16.7502" stroke="#7a8b9a" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"/><path d="M13.1093 15.3899H21.62C22.2405 15.3899 22.7478 14.8826 22.7478 14.2623V1.87761C22.7478 1.25716 22.2405 0.75 21.62 0.75H12.8766C12.2566 0.75 11.7488 1.25722 11.7488 1.87761" stroke="#7a8b9a" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"/><path d="M13.1092 15.3898C12.3608 15.3898 11.7488 16.0017 11.7488 16.7502" stroke="#7a8b9a" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"/></svg>';
 
@@ -47,7 +47,7 @@ $addons = array(
         'cta_link'    => 'https://getwpfunnels.com/pricing/',
         'cta_text'    => __('Buy Now', 'wpfnl'),
         'icon'        => $storewide_checkout_icon,
-        'plugin_file' => 'wpfunnels-pro-gbf/wpfnl-pro-gb.php',
+        'plugin_file' => 'wpfunnels-pro/wpfnl-pro.php',
     ),
     array(
         'title'       => __('LMS', 'wpfnl'),
@@ -73,6 +73,9 @@ $addons = array(
 
 // Allow plugins to add their own addons
 $addons = apply_filters('wpfnl_recommended_addons', $addons);
+
+$is_pro_active         = apply_filters( 'wpfunnels/is_pro_license_activated', false );
+
 ?>
 
 <div class="wpfnl">
@@ -81,6 +84,16 @@ $addons = apply_filters('wpfnl_recommended_addons', $addons);
             <nav class="wpfnl-dashboard__nav">
                 <?php use WPFunnels\Wpfnl_functions;
                 require_once WPFNL_DIR . '/admin/partials/dashboard-nav.php'; ?>
+
+                <?php
+                    if ( !$is_pro_active ) {
+                        ?>
+                        <div class="wpfnl-dashboard__nav-right">
+                            <a href="https://getwpfunnels.com/pricing/" class="btn-default" target="_blank" title="Upgrade to Pro" aria-label="Upgrade to Pro">Upgrade to Pro</a>
+                        </div>
+                        <?php
+                    }
+                ?>
             </nav>
 
             <div class="dashboard-nav__content">
@@ -145,4 +158,6 @@ $addons = apply_filters('wpfnl_recommended_addons', $addons);
 
         </div>
     </div>
+
+    <?php require_once WPFNL_DIR . '/admin/partials/helper-resource.php'; ?>
 </div>

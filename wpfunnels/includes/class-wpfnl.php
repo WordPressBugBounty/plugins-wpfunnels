@@ -453,6 +453,11 @@ class Wpfnl
 			if ( ! Wpfnl_functions::is_wpfnl_pro_activated() ) {
 				new Offer\Wpfnl_Offer();
 			}
+
+			// Store Checkout: override the WooCommerce default checkout with the
+			// WPFunnels Store Checkout step (only when a step is configured).
+			require_once WPFNL_DIR . 'includes/core/woocommerce/class-wpfnl-store-checkout-override.php';
+			\WPFunnels\WooCommerce\Wpfnl_Store_Checkout_Override::getInstance();
 		}
 
         $this->export_funnel        = Wpfnl_Export::getInstance()->init_ajax();

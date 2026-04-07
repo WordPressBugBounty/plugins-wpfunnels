@@ -404,7 +404,8 @@ class ProductsController extends Wpfnl_REST_Controller {
 		$funnel_id  = Wpfnl_functions::get_funnel_id_from_step($step_id);
 		$type 	= get_post_meta($funnel_id, '_wpfnl_funnel_type', true);
 		$response = [];
-		$type = !$type ? 'wc' : $type; 
+		// Treat store_checkout and any unknown type as standard WooCommerce
+		$type = ( !$type || 'store_checkout' === $type ) ? 'wc' : $type;
 		$class_object = Wpfnl_Type_Factory::build( $type );
 		if( $class_object ){
 			$response = $class_object->get_items( $step_id );

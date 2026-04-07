@@ -8,12 +8,23 @@
 
 $pro_url = add_query_arg('wpfnl-dashboard', '1', GETWPFUNNEL_PRICING_URL);
 $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
+
 ?>
 <div class="wpfnl">
 
     <div class="wpfnl-dashboard">
         <nav class="wpfnl-dashboard__nav">
             <?php require_once WPFNL_DIR . '/admin/partials/dashboard-nav.php'; ?>
+
+            <?php
+                if ( !$is_pro_active ) {
+                    ?>
+                    <div class="wpfnl-dashboard__nav-right">
+                        <a href="https://getwpfunnels.com/pricing/" class="btn-default" target="_blank" title="Upgrade to Pro" aria-label="Upgrade to Pro">Upgrade to Pro</a>
+                    </div>
+                    <?php
+                }
+            ?>
         </nav>
 
         <div class="dashboard-nav__content">
@@ -271,7 +282,7 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
                         <span class="wpfnl-pro-modal-header-icon">
                             <?php require WPFNL_DIR . '/admin/partials/icons/unlock-icon.php'; ?>
                         </span>
-                        <h3 class="wpfnl-pro-heading">Unlock Advanced WooCommerce Funnel</h3>
+                        <h3 class="wpfnl-pro-heading">Upgrade to Unlock This Feature</h3>
                     </div>
 
                     <div class="wpfnl-pro-modal-body">
@@ -315,5 +326,6 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
         </div>
     </div>
 
+    <?php require_once WPFNL_DIR . '/admin/partials/helper-resource.php'; ?>
 </div>
 <!-- /.wpfnl -->

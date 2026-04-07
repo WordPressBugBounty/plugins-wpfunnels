@@ -43,7 +43,7 @@
 
 				<div class="wpfnl-mm-preview-modal-actions">
 					<button class="wpfnl-mm-btn wpfnl-mm-btn-primary wpfnl-mm-btn-import-modal" @click="importTemplate">
-						Import This Funnel
+						Import
 						<svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 							<path d="M1 6H16M16 6L11 1M16 6L11 11" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 						</svg>
@@ -63,7 +63,7 @@
 				<!-- Steps Navigation -->
 				<div class="wpfnl-mm-preview-steps">
 					<div 
-						v-for="step in template.steps" 
+						v-for="step in displaySteps"
 						:key="step.ID"
 						class="wpfnl-mm-preview-step-card" 
 						:class="{ 'active': activeStep.ID === step.ID }"
@@ -78,7 +78,7 @@
 
 				<!-- Preview Content -->
 				<div class="wpfnl-mm-preview-content" :class="activeView">
-					<div class="wpfnl-mm-preview-device-frame">
+					<div :class="`wpfnl-mm-preview-device-frame ${shouldShowImagePreview(activeStep) ? 'image-preview' : ''}`">
 						<div class="wpfnl-mm-preview-iframe-wrapper">
 							<iframe 
 								:src="activeStep?.link" 
@@ -86,9 +86,14 @@
 								height="100%" 
 								frameborder="0"
 								@load="iframeLoaded"
+								v-if="!shouldShowImagePreview(activeStep)"
 							></iframe>
-							<div class="wpfnl-mm-preview-loader" v-if="isLoading">
+							<div class="wpfnl-mm-preview-loader" v-if="isLoading && !shouldShowImagePreview(activeStep)">
 								<span class="wpfnl-mm-loader"></span>
+							</div>
+
+							<div v-if="shouldShowImagePreview(activeStep)" class="wpfnl-mm-preview-checkout-placeholder">
+								<img :src="getStepImageForView(activeStep)" :alt="activeStep?.title">
 							</div>
 						</div>
 					</div>
@@ -109,6 +114,14 @@ export default {
 				steps: [],
 				title: ''
 			})
+		},
+		isStoreCheckout: {
+			type: Boolean,
+			default: false
+		},
+		isSalesFunnel: {
+			type: Boolean,
+			default: false
 		}
 	},
 	data() {
@@ -118,9 +131,25 @@ export default {
 			isLoading: true
 		}
 	},
+	computed: {
+		displaySteps() {
+			if (!this.template.steps) return [];
+			if (this.isStoreCheckout) {
+				return this.template.steps.filter(s => s.step_type === 'checkout' || s.step_type === 'thankyou');
+			}
+			if (this.isSalesFunnel) {
+				return this.template.steps.filter(s => 
+					s.step_type === 'landing' || 
+					s.step_type === 'checkout' || 
+					s.step_type === 'thankyou'
+				);
+			}
+			return this.template.steps;
+		}
+	},
 	mounted() {
-		if (this.template.steps && this.template.steps.length > 0) {
-			this.activeStep = this.template.steps[0];
+		if (this.displaySteps.length > 0) {
+			this.activeStep = this.displaySteps[0];
 		}
 		// Prevent body scroll when modal is open
 		document.body.style.overflow = 'hidden';
@@ -130,6 +159,33 @@ export default {
 		document.body.style.overflow = '';
 	},
 	methods: {
+		getStepImageForView(step) {
+			if (!step) {
+				return '';
+			}
+
+			if (this.activeView === 'desktop') {
+				return step.desktop_view_image || '';
+			}
+
+			if (this.activeView === 'tablet') {
+				return step.tablet_view_image || '';
+			}
+
+			if (this.activeView === 'mobile') {
+				return step.mobile_view_image || '';
+			}
+
+			return '';
+		},
+		shouldShowImagePreview(step) {
+			const stepType = step?.step_type;
+			if (stepType !== 'checkout' && stepType !== 'thankyou') {
+				return false;
+			}
+
+			return !!this.getStepImageForView(step);
+		},
 		setActiveStep(step) {
 			this.activeStep = step;
 			this.isLoading = true;

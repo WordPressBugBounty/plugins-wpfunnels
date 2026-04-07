@@ -455,9 +455,13 @@ class Module extends Wpfnl_Frontend_Module
 			return;
 		}
 
-        \WC()->cart->empty_cart();
+		$is_store_checkout = 'store_checkout' === get_post_meta( $funnel_id, '_wpfnl_funnel_type', true );
 
-        if( !is_array( $product_array ) || empty( $product_array[ 0 ][ 'id' ] ) ) {
+		if( !$is_store_checkout ) {
+			\WC()->cart->empty_cart();
+		}
+
+        if( !$is_store_checkout && ( !is_array( $product_array ) || empty( $product_array[ 0 ][ 'id' ] ) )) {
             wc_clear_notices();
             wc_add_notice( __( 'No product is added to the funnel. Please add product from checkout step settings.', 'wpfnl' ), 'error' );
             return;

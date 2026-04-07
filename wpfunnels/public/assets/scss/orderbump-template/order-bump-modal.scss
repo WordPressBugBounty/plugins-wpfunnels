@@ -41,7 +41,8 @@
                 width: 100%;
 
                 .variations {
-                width: 100%;
+                    width: 100%;
+                    border: none;
 
                 td,
                 th {
@@ -157,6 +158,10 @@
 
             .woocommerce-product-gallery {
                 width: 100%;
+
+                .woocommerce-product-gallery__trigger {
+                    display: none;
+                }
 
                 .flex-control-thumbs {
                 display: flex;

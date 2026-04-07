@@ -15,7 +15,7 @@
  * Plugin Name:       WPFunnels
  * Plugin URI:        https://getwpfunnels.com
  * Description:       Easiest 💥 Sales Funnel Builder 💥 For WordPress & WooCommerce by WPFunnels - Generate Leads & Craft A Highly-Converting Sales Journey In Minutes
- * Version:           3.9.7
+ * Version:           3.10.0
  * Author:            WPFunnels Team
  * Author URI:        https://getwpfunnels.com
  * License:           GPL-2.0+
@@ -40,7 +40,7 @@ if (!defined('WPINC')) {
  */
 
 if (!defined('WPFNL_VERSION')) {
-	define('WPFNL_VERSION', '3.9.7');
+	define('WPFNL_VERSION', '3.10.0');
 }
 
 if (!defined('WPFNL_FILE')) {
@@ -88,7 +88,10 @@ define('WPFNL_FUNNELS_POST_TYPE', 'wpfunnels');
 define('WPFNL_STEPS_POST_TYPE', 'wpfunnel_steps');
 define('WPFNL_CREATE_FUNNEL_SLUG', 'create_funnel');
 define('WPFNL_GLOBAL_SETTINGS_SLUG', 'wpfnl_settings');
+define('WPFNL_AUTOMATIONS_SLUG', 'wpfnl_automations');
 define('WPFNL_ADDONS_SLUG', 'wpfnl_addons');
+define('WPFNL_STORE_CHECKOUT_SLUG', 'store_checkout');
+define('WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG', 'wpfunnels_integrations');
 define('WPFNL_FUNNEL_PER_PAGE', 10);
 define('WPFNL_TEMPLATES_OPTION_KEY', 'wpfunnels_remote_templates');
 define('WPFNL_TESTS', false);
@@ -202,6 +205,8 @@ function wpfnl_third_party_post_type($post_types)
 	$post_types[] = WPFNL_STEPS_POST_TYPE;
 	return $post_types;
 }
+
+
 
 
 

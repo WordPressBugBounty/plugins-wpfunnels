@@ -99,6 +99,8 @@ class Server
             'report'              	=> 'DashboardController',
             'plugin_installer'      => 'PluginInstallerController',
             'setup_wizard'          => 'SetupWizardController',
+            'store_checkout'        => 'StoreCheckoutController',
+            'automation'            => 'WpfnlAutomationController',
 		));
     }
 

@@ -149,6 +149,7 @@ class Module extends Steps
 
 		$funnel_id = get_post_meta($step_id,'_funnel_id',true);
 		$is_gbf = get_post_meta($funnel_id,'is_global_funnel',true);
+		$is_store_checkout = get_post_meta($funnel_id, '_wpfnl_funnel_type', true) === 'store_checkout';
 
 		$coupon = $payload['coupon'];
 		$isMultipleProduct = $payload['isMultipleProduct'];
@@ -200,7 +201,7 @@ class Module extends Steps
 			];
 		}
 
-		if (!$products) {
+		if (!$products && !$is_store_checkout) {
 			return [
 				'success' => false,
 				'message' => 'No Product Found',

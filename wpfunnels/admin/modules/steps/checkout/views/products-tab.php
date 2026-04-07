@@ -13,6 +13,10 @@ if (isset($_GET['step_id'])) {
     $step_id = filter_input( INPUT_GET, 'step_id', FILTER_VALIDATE_INT );
 }
 
+// Check if this is a Store Checkout
+$funnel_id = get_post_meta($step_id, '_funnel_id', true);
+$is_store_checkout = get_post_meta($funnel_id, '_wpfnl_funnel_type', true) === 'store_checkout';
+
 $coupon_enable = get_post_meta($step_id, '_wpfnl_checkout_coupon', true);
 $coupon_enable_check = '';
 if($coupon_enable == 'yes') {
@@ -129,13 +133,19 @@ if($collapsible_coupon_enable == 'yes') {
 
             <div class="product-single-accordion__sortable-wrapper">
             </div>
-            <?php echo '<h4 class="no-product-notice">' . __('No product added', 'wpfnl') . '</h4>';
+            <?php 
+            if (!$is_store_checkout) {
+                echo '<h4 class="no-product-notice">' . __('No product added', 'wpfnl') . '</h4>';
+            }
+            ?>
         } else {
             ?>
             <div class="product-single-accordion__sortable-wrapper">
             </div>
             <?php
-            echo '<h4 class="no-product-notice">' . __('No product added', 'wpfnl') . '</h4>';
+            if (!$is_store_checkout) {
+                echo '<h4 class="no-product-notice">' . __('No product added', 'wpfnl') . '</h4>';
+            }
         } ?>
 
     </div>

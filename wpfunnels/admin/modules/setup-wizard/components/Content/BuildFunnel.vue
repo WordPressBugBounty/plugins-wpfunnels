@@ -367,11 +367,12 @@
 				<button
 					class="wpfnl-mm-btn wpfnl-mm-btn-primary"
 					@click="handleContinue"
-					:disabled="isProcessing"
+					:disabled="isContinueDisabled"
 				>
-					<span v-if="!isProcessing">Continue</span>
+					<span v-if="!isProcessing && !isGeneratingFunnel">Continue</span>
+					<span v-else-if="isGeneratingFunnel">{{ funnelStatusMessage || 'Creating funnel...' }}</span>
 					<span v-else>Processing...</span>
-					<svg v-if="!isProcessing" width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<svg v-if="!isProcessing && !isGeneratingFunnel" width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<path d="M1 6H16M16 6L11 1M16 6L11 11" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 					</svg>
 					<svg v-else class="wpfnl-spinner" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -410,9 +411,8 @@
 </template>
 
 <script>
-import apiFetch from '@wordpress/api-fetch'
-import { addQueryArgs } from '@wordpress/url'
 import { __ } from '@wordpress/i18n'
+import apiFetch from '@wordpress/api-fetch'
 
 export default {
 	name: 'BuildFunnel',
@@ -473,7 +473,13 @@ export default {
 				checkout: '',
 				upsell: '',
 				thankyou: ''
-			}
+			},
+
+			// Funnel creation state
+			isGeneratingFunnel: false,
+			funnelStatusMessage: '',
+			createdFunnelId: null,
+			createdFirstStepLink: ''
 		}
 	},
 	computed: {
@@ -526,6 +532,13 @@ export default {
 			if (this.hasUpsell) steps.push('upsell')
 			if (this.hasThankyou) steps.push('thankyou')
 			return steps
+		},
+		isContinueDisabled() {
+			// For order-value goal, both main product and order bump must be selected
+			if (this.goal === 'order-value') {
+				return !this.selectedMainProduct || !this.selectedOrderBump || this.isProcessing || this.isGeneratingFunnel
+			}
+			return this.isProcessing || this.isGeneratingFunnel
 		}
 	},
 	mounted() {
@@ -922,10 +935,161 @@ export default {
 			this.$emit('prev-step')
 		},
 
-		async assignProductsToSteps(importedSteps) {
+		async handleContinue() {
+			// For order-value goal, create the funnel directly
+			if (this.goal === 'order-value') {
+				await this.createFunnelForOrderValue();
+				return;
+			}
 
+			// For other goals, emit product selections to the next step (GenerateFunnel)
+			this.$emit('next-step', {
+				mainProduct: this.selectedMainProduct,
+				orderBump: this.selectedOrderBump,
+				upsell: this.selectedUpsell
+			})
+		},
+
+		async createFunnelForOrderValue() {
+			if (!this.template || !this.template.steps) {
+				alert('No template selected. Please go back and select a template.');
+				return;
+			}
+
+			this.isGeneratingFunnel = true;
+			this.funnelStatusMessage = 'Creating your funnel...';
+
+			try {
+				const funnelType = 'sales';
+				const templateType = 'wc';
+
+				// Update general settings
+				await this.updateGeneralSettings(funnelType);
+
+				// Create funnel
+				this.funnelStatusMessage = 'Creating funnel structure...';
+				const funnelResponse = await this.createFunnel(templateType);
+				const funnelId = funnelResponse?.funnelID;
+
+				if (!funnelId) {
+					throw new Error('Funnel could not be created. Please try again.');
+				}
+
+				// Import steps
+				this.funnelStatusMessage = 'Importing template steps...';
+				const { importedSteps, firstStepLink } = await this.importSteps(funnelId);
+
+				// Assign products
+				this.funnelStatusMessage = 'Assigning products...';
+				await this.assignProductsToSteps(importedSteps);
+
+				// Finalize
+				this.funnelStatusMessage = 'Finalizing funnel...';
+				await this.afterFunnelCreation(funnelId, importedSteps);
+
+				this.createdFunnelId = funnelId;
+				this.createdFirstStepLink = firstStepLink;
+				this.isGeneratingFunnel = false;
+				this.funnelStatusMessage = 'Funnel created successfully!';
+
+				// Proceed to Complete step
+				this.$emit('next-step', {
+					funnelId: this.createdFunnelId,
+					firstStepLink: this.createdFirstStepLink
+				});
+
+			} catch (error) {
+				console.error('Funnel creation failed:', error);
+				this.isGeneratingFunnel = false;
+				this.funnelStatusMessage = '';
+				alert(error && error.message ? error.message : 'Unable to create the funnel. Please try again.');
+			}
+		},
+
+		updateGeneralSettings(funnelType) {
+			return new Promise((resolve, reject) => {
+				wpAjaxHelperRequest('update-general-settings', {
+					funnel_type: funnelType,
+					builder: this.builder || 'gutenberg'
+				})
+				.success(() => resolve())
+				.error(error => reject(error));
+			});
+		},
+
+		createFunnel(templateType) {
+			const steps = this.filterStepsForImport(this.template?.steps || []);
+			const data = {
+				steps: steps,
+				name: this.template?.title || 'My Order Value Funnel',
+				source: 'remote',
+				remoteID: this.template?.ID || this.template?.id,
+				type: templateType,
+				status: 'draft'
+			};
+
+			return new Promise((resolve, reject) => {
+				wpAjaxHelperRequest('wpfunnel-import-funnel', data)
+				.success(response => resolve(response || {}))
+				.error(error => reject(error));
+			});
+		},
+
+		filterStepsForImport(steps) {
+			const isProActive = window?.setup_wizard_obj?.is_pro_active === 'yes';
+			return (steps || []).filter(step => {
+				const stepType = step?.step_type || step?.stepType || step?.type;
+				
+				// For order-value, include all steps except downsell if pro is not active
+				if (stepType === 'downsell' && !isProActive) {
+					return false;
+				}
+				
+				return true;
+			});
+		},
+
+		async importSteps(funnelId) {
+			const stepsToImport = this.filterStepsForImport(this.template?.steps || []);
+			const importedSteps = {};
+			let firstStepLink = '';
+
+			for (let index = 0; index < stepsToImport.length; index++) {
+				const step = stepsToImport[index];
+				try {
+					const response = await apiFetch({
+						path: `${window.setup_wizard_obj.rest_api_url}wpfunnels/v1/steps/wpfunnel-import-step`,
+						method: 'POST',
+						data: {
+							step,
+							funnelID: funnelId,
+							source: 'remote',
+							importType: 'templates'
+						}
+					});
+
+					if (response?.stepID && step?.step_type) {
+						importedSteps[step.step_type] = response.stepID;
+					}
+
+					if (index === 0 && response?.stepViewLink) {
+						firstStepLink = response.stepViewLink;
+					}
+				} catch (error) {
+					console.error(`Error importing step ${step?.step_type || index}:`, error);
+				}
+			}
+
+			if (!Object.keys(importedSteps).length) {
+				throw new Error('Unable to import the selected template steps.');
+			}
+
+			return { importedSteps, firstStepLink };
+		},
+
+		async assignProductsToSteps(importedSteps) {
 			// Assign main product to checkout step
-			if (importedSteps.checkout && this.selectedMainProduct) {
+			if (importedSteps.checkout && this.selectedMainProduct && this.selectedMainProduct.id) {
 				try {
 					await apiFetch({
 						path: `${window.setup_wizard_obj.rest_api_url}wpfunnels/v1/checkout/wpfnl-add-product`,
@@ -935,46 +1099,39 @@ export default {
 							step_id: importedSteps.checkout,
 							quantity: 1
 						}
-					})
+					});
 				} catch (error) {
-					console.error('Error assigning main product:', error)
+					console.error('Error assigning main product:', error);
 				}
 			}
 
-			// Assign order bump to checkout step using the proper endpoint with full structure
-			if (importedSteps.checkout && this.selectedOrderBump) {
+			// Assign order bump to checkout step
+			if (importedSteps.checkout && this.selectedOrderBump && this.selectedOrderBump.id) {
 				try {
-					// Get product image from WPFunnels API
 					let productImage = {
 						id: 0,
 						url: window.setup_wizard_obj.plugin_url ? window.setup_wizard_obj.plugin_url + 'admin/assets/images/placeholder.png' : ''
-					}
+					};
 
-					// Fetch product details to get the image
 					try {
 						const productData = await apiFetch({
 							path: `${window.setup_wizard_obj.rest_api_url}wpfunnels/v1/updateSelectedProduct?product=${this.selectedOrderBump.id}`,
 							method: 'GET'
-						})
+						});
 
 						if (productData && productData.img) {
-							// productData.img is an HTML img tag, we need to parse it
-							const imgTag = productData.img
-							
-							// Extract src URL from img tag
-							const srcMatch = imgTag.match(/src="([^"]+)"/)
+							const imgTag = productData.img;
+							const srcMatch = imgTag.match(/src="([^"]+)"/);
 							if (srcMatch) {
-								productImage.url = srcMatch[1]
+								productImage.url = srcMatch[1];
 							}
-							
-							// Extract image ID from wp-image-* class if available
-							const idMatch = imgTag.match(/wp-image-(\d+)/)
+							const idMatch = imgTag.match(/wp-image-(\d+)/);
 							if (idMatch) {
-								productImage.id = parseInt(idMatch[1])
+								productImage.id = parseInt(idMatch[1]);
 							}
 						}
 					} catch (imgError) {
-						console.error('Could not fetch product image, using placeholder:', imgError)
+						console.error('Could not fetch product image, using placeholder:', imgError);
 					}
 
 					const orderBumpData = [{
@@ -990,7 +1147,7 @@ export default {
 						price: '',
 						salePrice: '',
 						quantity: '1',
-						htmlPrice: this.selectedOrderBump.priceHtml,
+						htmlPrice: this.selectedOrderBump.priceHtml || '',
 						numericRegularPrice: '',
 						numericSalePrice: '',
 						discountPrice: '',
@@ -1021,8 +1178,8 @@ export default {
 						obPriceColor: '#E86F2C',
 						obChooseVariantColor: '#F34D01',
 						prePurchaseUpsell: 'no'
-					}]
-					
+					}];
+
 					await apiFetch({
 						path: `${window.setup_wizard_obj.rest_api_url}wpfunnels/v1/order-bump`,
 						method: 'POST',
@@ -1030,168 +1187,49 @@ export default {
 							value: orderBumpData,
 							stepID: importedSteps.checkout
 						}
-					})
+					});
 				} catch (error) {
-					console.error('Error creating order bump:', error)
+					console.error('Error creating order bump:', error);
 				}
 			}
 
-			// Assign upsell product to upsell step - correct format with id and quantity
-			if (importedSteps.upsell && this.selectedUpsell) {
+			// Assign upsell product to upsell step
+			if (importedSteps.upsell && this.selectedUpsell && this.selectedUpsell.id) {
 				try {
-					const productData = {
+					const upsellData = {
 						id: this.selectedUpsell.id,
 						quantity: 1
-					}
-					
+					};
+
 					await apiFetch({
 						path: `${window.setup_wizard_obj.rest_api_url}wpfunnels/v1/offer/saveUpsellData/`,
 						method: 'POST',
 						data: {
 							step_id: importedSteps.upsell,
-							product: JSON.stringify(productData)
+							product: JSON.stringify(upsellData)
 						}
-					})
+					});
 				} catch (error) {
-					console.error('Error assigning upsell product:', error)
+					console.error('Error assigning upsell product:', error);
 				}
 			}
 		},
 
-		async handleContinue() {
-			this.isProcessing = true
+		afterFunnelCreation(funnelId, importedSteps) {
+			const payload = {
+				funnelID: funnelId,
+				source: 'remote',
+				importedSteps: Object.values(importedSteps || {})
+			};
 
-			try {
-				if (!this.template) {
-					console.error('No template selected')
-					this.isProcessing = false
-					return
-				}
-
-				// Step 1: Map goal to funnel type
-				const funnelType = this.goal === 'leads' ? 'lead' : 'sales'
-				
-				// Step 2: Determine template type based on goal
-				let templateType = 'lead'
-				if (funnelType === 'sales') {
-					// Check if WooCommerce is active for wc type
-					templateType = funnelType === 'sales' ? 'wc' : 'lead'
-				}
-
-				// Step 3: Update general settings (funnel type and builder)
-				await new Promise((resolve, reject) => {
-					wpAjaxHelperRequest('update-general-settings', {
-						funnel_type: funnelType,
-						builder: this.builder
-					})
-					.success(() => resolve())
-					.error((error) => reject(error))
-				})
-
-				// Step 4: Create funnel using wpfunnel-import-funnel
-				const funnelResponse = await new Promise((resolve, reject) => {
-					wpAjaxHelperRequest('wpfunnel-import-funnel', {
-						steps: this.template.steps || [],
-						name: this.template.title || 'My First Funnel',
-						source: 'remote',
-						remoteID: this.template.ID || this.template.id,
-						type: templateType,
-						status: 'draft'
-					})
-					.success((response) => resolve(response))
-					.error((error) => reject(error))
-				})
-
-				if (!funnelResponse.funnelID) {
-					throw new Error('Failed to create funnel')
-				}
-
-				const funnelID = funnelResponse.funnelID
-
-			// Step 5: Import each step and track step IDs
-			const steps = this.template.steps || []
-			
-			// Check if pro is active
-			const isProActive = window.setup_wizard_obj?.is_pro_active === 'yes'
-
-			
-			// Filter out downsell steps if pro is not active (downsell is a Pro feature)
-			const stepsToImport = steps.filter(step => {
-				// Check multiple possible field names for step type
-				const stepType = step.step_type || step.stepType || step.type
-				
-				// Skip downsell if pro is not active
-				if (stepType === 'downsell' && !isProActive) {
-					return false
-				}
-				
-				return true
-			})
-			
-			
-			let stepCount = 0
-			const importedSteps = {}  // Store step IDs by step type
-			let firstStepLink = ''  // Store the first step's view link
-
-			for (let i = 0; i < stepsToImport.length; i++) {
-				const step = stepsToImport[i]
-				
-				try {
-					const stepResponse = await apiFetch({
-						path: `${window.setup_wizard_obj.rest_api_url}wpfunnels/v1/steps/wpfunnel-import-step`,
-						method: 'POST',
-						data: {
-							step: step,
-							funnelID: funnelID,
-							source: 'remote',
-							importType: 'templates'
-						}
-					})
-					
-					// Store step ID by type
-					if (stepResponse.stepID && step.step_type) {
-						importedSteps[step.step_type] = stepResponse.stepID
-					}
-					
-					// Store the first step's view link
-					if (i === 0 && stepResponse.stepViewLink) {
-						firstStepLink = stepResponse.stepViewLink
-					}
-					
-					stepCount++
-
-				} catch (error) {
-					console.error(`Error importing step ${i + 1}:`, error)
-				}
-				}
-
-			// Step 6: Assign products to steps
-			await this.assignProductsToSteps(importedSteps)
-
-			// Step 7: Call after-funnel-creation
-				await new Promise((resolve, reject) => {
-					wpAjaxHelperRequest('wpfunnel-after-funnel-creation', {
-						funnelID: funnelID,
-						source: 'remote'
-					})
-					.success((response) => {
-						resolve(response)
-					})
-					.error((error) => {
-						console.error('After funnel creation error:', error)
-						resolve()
-					})
-				})
-
-				// Success! Emit next-step event with funnelId and firstStepLink to go to Complete step
-				this.isProcessing = false
-				this.$emit('next-step', { funnelId: funnelID, firstStepLink: firstStepLink })
-
-			} catch (error) {
-				console.error('Error creating funnel:', error)
-				alert('An error occurred while creating the funnel. Please try again.')
-				this.isProcessing = false
-			}
+			return new Promise(resolve => {
+				wpAjaxHelperRequest('wpfunnel-after-funnel-creation', payload)
+				.success(response => resolve(response))
+				.error(error => {
+					console.error('After funnel creation error:', error);
+					resolve();
+				});
+			});
 		},
 	}
 }

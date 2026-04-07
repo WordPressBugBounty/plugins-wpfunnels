@@ -534,11 +534,6 @@
 body.toplevel_page_wpfunnels {
   background: #F6F5FA;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard {
-  display: flex;
-  gap: 88px;
-  flex-flow: row wrap;
-}
 body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .pro-tag {
   position: absolute;
   top: 10px;
@@ -576,116 +571,7 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   z-index: 9;
   border-radius: 10px;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-sidebar {
-  width: 110px;
-  background: #fff;
-  box-shadow: 1px 0px 2px rgba(190, 190, 215, 0.14);
-  position: relative;
-  height: auto;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-sidebar .wpfnl-logo {
-  padding: 36px;
-  border-bottom: 1px solid #E5E8F3;
-  margin-bottom: 25px;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-sidebar .wpfnl-dashboard-sidebar-menu {
-  padding: 0;
-  margin: 0;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-sidebar .wpfnl-dashboard-sidebar-menu .wpfnl-dashboard-sidebar-menu-item a {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  text-decoration: none;
-  padding: 17px;
-  padding-top: 20px;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-sidebar .wpfnl-dashboard-sidebar-menu .wpfnl-dashboard-sidebar-menu-item a svg path {
-  stroke: #7A8B9A;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-sidebar .wpfnl-dashboard-sidebar-menu .wpfnl-dashboard-sidebar-menu-item a span.wpfnl-sidebar-menu-label {
-  color: #7A8B9A;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-sidebar .wpfnl-dashboard-sidebar-menu .wpfnl-dashboard-sidebar-menu-item.active a {
-  position: relative;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-sidebar .wpfnl-dashboard-sidebar-menu .wpfnl-dashboard-sidebar-menu-item.active a svg path {
-  stroke: #6E42D3;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-sidebar .wpfnl-dashboard-sidebar-menu .wpfnl-dashboard-sidebar-menu-item.active a span.wpfnl-sidebar-menu-label {
-  color: #6E42D3;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-sidebar .wpfnl-dashboard-sidebar-menu .wpfnl-dashboard-sidebar-menu-item.active a:after {
-  content: "";
-  position: absolute;
-  right: 0px;
-  top: 10%;
-  height: 70px;
-  width: 3px;
-  background: #6E42D3;
-  border-radius: 10px 0px 0px 10px;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body {
-  min-height: 100vh;
-  width: calc(100% - 280px);
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-header {
-  background: #FFF;
-  filter: drop-shadow(0px 1px 1px rgba(182, 185, 191, 0.3));
-  margin-top: 0;
-  padding: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  border-radius: 0 0 10px 10px;
-  overflow: hidden;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-header .wpfnl-dashboard-header-title {
-  color: #363B4E;
-  font-size: 24px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: 1;
-  margin: 0;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-header .wpfnl-dashboard-buttons-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-header .wpfnl-dashboard-buttons-wrapper .wpfnl-dashboard-header-button {
-  border-radius: 10px;
-  border: 1px solid #E4E6EB;
-  background: #FFF;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
-  text-decoration: none;
-  color: #2D3149;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 13px;
-  height: 40px;
-  padding: 0 16px;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-header .wpfnl-dashboard-buttons-wrapper .wpfnl-dashboard-header-button:nth-child(2) svg {
-  width: 20px;
-  height: 20px;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-header .wpfnl-dashboard-buttons-wrapper .wpfnl-dashboard-header-button svg {
-  width: 16px;
-  height: 16px;
-}
+
 body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper {
   margin-top: 50px;
 }
@@ -1058,11 +944,6 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   margin-top: 17px;
 }
 
-@media only screen and (max-width: 1699px) {
-  body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-sidebar {
-    width: 104px;
-  }
-}
 @media only screen and (max-width: 1399px) {
   body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-header {
     padding: 20px;
@@ -1072,7 +953,8 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
     gap: 50px;
   }
   body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body {
-    width: calc(100% - 190px);
+    width: 100%;
+    padding-right: 20px;
   }
   body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container {
     grid-template-columns: repeat(3, 1fr);

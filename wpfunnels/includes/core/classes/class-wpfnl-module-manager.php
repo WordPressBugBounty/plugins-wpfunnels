@@ -57,6 +57,7 @@ class Wpfnl_Modules_Manager extends Base_Manager {
                 'funnels',
                 'funnel',
                 'settings',
+                'automations',
                 'steps' => array(
                     'landing',
                     'thankyou',

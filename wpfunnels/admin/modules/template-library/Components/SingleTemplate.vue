@@ -7,7 +7,7 @@
 				<svg width="30" height="30" fill="none" stroke="#363B4E" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" class="icon icon-tabler icon-tabler-arrow-narrow-left" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke="none" d="M0 0h24v24H0z"/><path d="M5 12h14M5 12l4 4m-4-4l4-4"/></svg>
 			</span>
 			<h2 class="title">
-				{{ steps.length > 1 ? steps.length + ' Steps' : steps.length + ' Step' }}
+				{{ stepCount > 1 ? stepCount + ' Steps' : stepCount + ' Step' }}
 			</h2>
 		</div>
 
@@ -49,13 +49,13 @@
 					<a href="#" class="btn-default steps-preview" @click="toggleStepsPreview"> Preview </a>
 				</div>
 
-				<div class="template-image-wrapper" :style="{ backgroundImage: `url(${templatedata.featured_image})` }" >
+				<div class="template-image-wrapper" :style="{ backgroundImage: `url(${previewImage})` }" >
 				</div>
 			</div>
 
 			<div class="funnel-template-info">
 				<span class="title">{{ templatedata.title }}</span>
-				<span class="steps">{{ templatedata.steps.length }} steps</span>
+				<span class="steps">{{ stepCount }} steps</span>
 			</div>
 		</div>
 	</div>
@@ -101,6 +101,45 @@ export default {
 			showBackBtn: false,
 			disabled: false,
 			isProActivated: window.WPFunnelVars.isProActivated,
+			isStoreCheckout: window.template_library_object.isStoreCheckout || false,
+		}
+	},
+	computed: {
+		previewImage: function() {
+			if ( this.isStoreCheckout && this.templatedata.steps ) {
+				const checkoutStep = this.templatedata.steps.find( s => s.step_type === 'checkout' );
+				if ( checkoutStep && checkoutStep.featured_image ) {
+					return checkoutStep.featured_image;
+				}
+			}
+			return this.templatedata.featured_image;
+		},
+		displaySteps: function() {
+			if (!this.steps) return [];
+			
+			// Filter for Store Checkout - only show one checkout and one thankyou
+			if (this.isStoreCheckout) {
+				let filtered = [];
+				let hasCheckout = false;
+				let hasThankyou = false;
+				
+				this.steps.forEach(step => {
+					if (step.step_type === 'checkout' && !hasCheckout) {
+						filtered.push(step);
+						hasCheckout = true;
+					} else if (step.step_type === 'thankyou' && !hasThankyou) {
+						filtered.push(step);
+						hasThankyou = true;
+					}
+				});
+				
+				return filtered;
+			}
+			
+			return this.steps;
+		},
+		stepCount: function() {
+			return this.displaySteps.length;
 		}
 	},
 	mounted() {
@@ -131,6 +170,7 @@ export default {
 					name: this.templatedata.title,
 					remoteID: this.templatedata.ID,
 					type: this.type,
+					is_store_checkout: this.isStoreCheckout ? true : false,
 				},
 				that = this,
 				_steps = this.filterSteps(this.steps)
@@ -170,6 +210,26 @@ export default {
 		},
 		filterSteps: function(steps) {
 			let isProActivated = window.WPFunnelVars.isProActivated == 1;
+			
+			// Filter for Store Checkout - only checkout and thankyou (one of each)
+			if (this.isStoreCheckout) {
+				let filtered = [];
+				let hasCheckout = false;
+				let hasThankyou = false;
+				
+				steps.forEach(step => {
+					if (step.step_type === 'checkout' && !hasCheckout) {
+						filtered.push(step);
+						hasCheckout = true;
+					} else if (step.step_type === 'thankyou' && !hasThankyou) {
+						filtered.push(step);
+						hasThankyou = true;
+					}
+				});
+				
+				return filtered;
+			}
+			
 			if (isProActivated) {
 				return steps;
 			} else {
@@ -207,6 +267,7 @@ export default {
 				templateType		: templateType,
 				importedSteps		: importedSteps,
 				source				: 'remote',
+				is_store_checkout	: this.isStoreCheckout ? true : false,
 			}
 			wpAjaxHelperRequest('wpfunnel-after-funnel-creation', payload)
 				.success(function(response) {
@@ -219,7 +280,8 @@ export default {
 		toggleStepsPreview: function(e) {
 			e.preventDefault()
 			this.$emit('toggleStepsPreview')
-			this.$emit('initSteps', this.steps)
+			// Pass filtered steps to parent for Store Checkout
+			this.$emit('initSteps', this.displaySteps)
 			this.$emit('setActiveTemplate', this.templatedata)
 		},
 	},

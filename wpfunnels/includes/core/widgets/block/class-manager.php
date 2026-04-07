@@ -73,6 +73,7 @@ final class Manager {
      */
     public function wpfnl_checkout_block_editor_assets() {
         wp_enqueue_script( 'wpfunnels-editor-script', plugins_url( 'block/wpfunnels-editor-script.js', __DIR__ ), ['jquery'], WPFNL_VERSION, true );
+        $this->enqueue_imported_template_inline_css();
         
         $post_id = get_the_ID();
         if ( ! $post_id && isset($_GET['post']) ) {
@@ -93,6 +94,31 @@ final class Manager {
                 ]
             );
         }
+    }
+
+    /**
+     * Enqueue imported Gutenberg template inline CSS in editor mode.
+     */
+    private function enqueue_imported_template_inline_css() {
+        $post_id = get_the_ID();
+
+        if ( ! $post_id && isset( $_GET['post'] ) ) {
+            $post_id = intval( $_GET['post'] );
+        }
+
+        if ( ! $post_id ) {
+            return;
+        }
+
+        $custom_css = get_post_meta( $post_id, 'rex_gutenberg_css', true );
+
+        if ( ! $custom_css ) {
+            return;
+        }
+
+        wp_register_style( 'rex-gutenberg-css', false );
+        wp_enqueue_style( 'rex-gutenberg-css' );
+        wp_add_inline_style( 'rex-gutenberg-css', $custom_css );
     }
 
     

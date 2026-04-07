@@ -15,6 +15,11 @@ class Wpfnl_Type_Factory {
 
     public static function build($module)
     {
+        // Store Checkout funnels behave like standard WooCommerce funnels
+        if ( 'store_checkout' === $module ) {
+            $module = 'wc';
+        }
+
         $class_name = "WPFunnels\\Admin\\FunnelType\\Wpfunnels_".ucfirst($module)."_Checkout";
         
         if (!class_exists(ucfirst($class_name))) {

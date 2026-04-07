@@ -1,6 +1,6 @@
 <template>
 	<button
-        class="btn-default"
+        class="btn-default wpfnl-create-product-btn"
         id="wpfnl-create-product-btn"
         data-id=""
         @click="showCreateProductModal"
@@ -66,7 +66,7 @@ export default {
 		},
 		removeCreateProductModal: function () {
 			this.isCreateProduct = false
-			j('#wpfnl-create-product').empty()
+			jQuery('#wpfnl-create-product').empty()
 		},
     }
 }

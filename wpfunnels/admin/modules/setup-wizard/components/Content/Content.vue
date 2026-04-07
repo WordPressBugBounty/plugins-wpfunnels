@@ -1,36 +1,120 @@
 <template>
 	<div class="wpfnl-mm-setup-wizard-content">
-		<ChooseGoal
+		<!-- Common Steps -->
+		<Welcome
 			v-if="currentStep === 1"
 			@next-step="handleNextStep"
 			@prev-step="handlePrevStep"
 		/>
+		
 		<Setup
 			v-if="currentStep === 2"
 			:selectedGoal="selectedGoal"
 			@next-step="handleNextStep"
 			@prev-step="handlePrevStep"
 		/>
-		<ChooseTemplate
+		
+		<ChooseGoal
 			v-if="currentStep === 3"
 			:builder="selectedBuilder"
-			:goal="selectedGoal"
 			@next-step="handleNextStep"
 			@prev-step="handlePrevStep"
 		/>
+
+		<!-- Dynamic Steps based on Goal -->
+		
+		<!-- order-value: ChooseTemplate -> BuildFunnel -> Complete -->
+		<ChooseTemplate
+			v-if="currentStep === 4 && selectedGoal === 'order-value'"
+			:goal="selectedGoal"
+			:builder="selectedBuilder"
+			@next-step="handleNextStep"
+			@prev-step="handlePrevStep"
+		/>
+
 		<BuildFunnel
-			v-if="currentStep === 4"
+			v-if="currentStep === 5 && selectedGoal === 'order-value'"
 			:template="selectedTemplate"
 			:goal="selectedGoal"
 			:builder="selectedBuilder"
 			@next-step="handleNextStep"
 			@prev-step="handlePrevStep"
 		/>
+
 		<Complete
-			v-if="currentStep === 5"
+			v-if="currentStep === 6 && selectedGoal === 'order-value'"
 			:funnelId="funnelId"
 			:firstStepLink="firstStepLink"
 			:selectedGoal="selectedGoal"
+			:agreeToShare="agreeToShare"
+		/>
+
+		<!-- improve-checkout: ChooseTemplate -> GenerateFunnel -> Complete -->
+		<ChooseTemplate
+			v-if="currentStep === 4 && selectedGoal === 'improve-checkout'"
+			:goal="selectedGoal"
+			:builder="selectedBuilder"
+			@next-step="handleNextStep"
+			@prev-step="handlePrevStep"
+		/>
+
+		<GenerateFunnel
+			v-if="currentStep === 5 && selectedGoal === 'improve-checkout'"
+			:template="selectedTemplate"
+			:goal="selectedGoal"
+			:builder="selectedBuilder"
+			:mainProduct="mainProduct"
+			:orderBump="orderBump"
+			:upsellProduct="upsellProduct"
+			@next-step="handleNextStep"
+			@prev-step="handlePrevStep"
+		/>
+
+		<Complete
+			v-if="currentStep === 6 && selectedGoal === 'improve-checkout'"
+			:funnelId="funnelId"
+			:firstStepLink="firstStepLink"
+			:selectedGoal="selectedGoal"
+			:agreeToShare="agreeToShare"
+		/>
+
+		<!-- sales: ProductSync -> ChooseTemplate -> GenerateFunnel -> Complete -->
+		<ProductSync
+			v-if="currentStep === 4 && selectedGoal === 'sales'"
+			:goal="selectedGoal"
+			:builder="selectedBuilder"
+			:selectedProductId="selectedProductId"
+			@next-step="handleNextStep"
+			@prev-step="handlePrevStep"
+		/>
+
+		<ChooseTemplate
+			v-if="currentStep === 5 && selectedGoal === 'sales'"
+			:goal="selectedGoal"
+			:builder="selectedBuilder"
+			@next-step="handleNextStep"
+			@prev-step="handlePrevStep"
+		/>
+
+		<GenerateFunnel
+			v-if="currentStep === 6 && selectedGoal === 'sales'"
+			:template="selectedTemplate"
+			:goal="selectedGoal"
+			:builder="selectedBuilder"
+			:selectedProduct="selectedProduct"
+			:mainProduct="mainProduct"
+			:orderBump="orderBump"
+			:upsellProduct="upsellProduct"
+			@next-step="handleNextStep"
+			@prev-step="handlePrevStep"
+		/>
+
+		<Complete
+			v-if="currentStep === 7 && selectedGoal === 'sales'"
+			:funnelId="funnelId"
+			:firstStepLink="firstStepLink"
+			:selectedGoal="selectedGoal"
+			:agreeToShare="agreeToShare"
 		/>
 
 		<div class="wpfnl-mm-help-btn">
@@ -75,6 +159,9 @@ import Setup from './Setup.vue'
 import ChooseTemplate from './ChooseTemplate.vue'
 import BuildFunnel from './BuildFunnel.vue'
 import Complete from './Complete.vue'
+import Welcome from './Welcome.vue'
+import ProductSync from './ProductSync.vue'
+import GenerateFunnel from './GenerateFunnel.vue'
 
 export default {
     name: 'Content',
@@ -84,6 +171,9 @@ export default {
 		ChooseTemplate,
 		BuildFunnel,
 		Complete,
+		Welcome,
+		ProductSync,
+		GenerateFunnel,
 	},
 	props: {
 		currentStep: {
@@ -102,6 +192,14 @@ export default {
 			type: Object,
 			default: null
 		},
+		selectedProductId: {
+			type: [Number, String],
+			default: null
+		},
+		selectedProduct: {
+			type: Object,
+			default: null
+		},
 		funnelId: {
 			type: [Number, String],
 			default: null
@@ -109,6 +207,22 @@ export default {
 		firstStepLink: {
 			type: String,
 			default: ''
+		},
+		agreeToShare: {
+			type: Boolean,
+			default: false
+		},
+		mainProduct: {
+			type: Object,
+			default: null
+		},
+		orderBump: {
+			type: Object,
+			default: null
+		},
+		upsellProduct: {
+			type: Object,
+			default: null
 		}
 	},
 	data() {

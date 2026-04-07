@@ -114,6 +114,7 @@ class RemoteFunnelsController extends Wpfnl_REST_Controller {
 
         $seo_title = get_post_meta($funnel_id, 'seo_title', true);
         $seo_description = get_post_meta($funnel_id, 'seo_description', true);
+        $is_store_checkout = get_post_meta($funnel_id, '_wpfnl_funnel_type', true);
 
         $response['success'] = true;
         $response['industries'] = $industries;
@@ -127,6 +128,7 @@ class RemoteFunnelsController extends Wpfnl_REST_Controller {
         $response['thumbnailID'] = $thumbnail_id;
         $response['seoTitle'] = $seo_title;
         $response['seoDescription'] = $seo_description;
+        $response['isStoreCheckout'] = $template_type === 'store_checkout' ? 'yes' : 'no';
         return $this->prepare_item_for_response( $response, $request );
     }
 
@@ -153,8 +155,14 @@ class RemoteFunnelsController extends Wpfnl_REST_Controller {
     public function get_step_properties($request) {
         $step_id  = $request['step_id'];
         $thumbnail_id = get_post_meta($step_id, '_thumbnail_id', true);
+        $desktop_view_image_id = get_post_meta($step_id, '_step_desktop_view_image_id', true);
+        $tablet_view_image_id = get_post_meta($step_id, '_step_tablet_view_image_id', true);
+        $mobile_view_image_id = get_post_meta($step_id, '_step_mobile_view_image_id', true);
         $custom_url   = get_post_meta($step_id, '_step_custom_url', true);
         $featured_image_src = '';
+        $desktop_view_image_src = '';
+        $tablet_view_image_src = '';
+        $mobile_view_image_src = '';
         if($thumbnail_id) {
             $featured_image = wp_get_attachment_image_src($thumbnail_id);
             if($featured_image) {
@@ -163,9 +171,43 @@ class RemoteFunnelsController extends Wpfnl_REST_Controller {
         } else {
             $thumbnail_id = '';
         }
+
+        if($desktop_view_image_id) {
+            $desktop_view_image = wp_get_attachment_image_src($desktop_view_image_id);
+            if($desktop_view_image) {
+                $desktop_view_image_src = $desktop_view_image[0];
+            }
+        } else {
+            $desktop_view_image_id = '';
+        }
+
+        if($tablet_view_image_id) {
+            $tablet_view_image = wp_get_attachment_image_src($tablet_view_image_id);
+            if($tablet_view_image) {
+                $tablet_view_image_src = $tablet_view_image[0];
+            }
+        } else {
+            $tablet_view_image_id = '';
+        }
+
+        if($mobile_view_image_id) {
+            $mobile_view_image = wp_get_attachment_image_src($mobile_view_image_id);
+            if($mobile_view_image) {
+                $mobile_view_image_src = $mobile_view_image[0];
+            }
+        } else {
+            $mobile_view_image_id = '';
+        }
+
         $response['success'] = true;
         $response['featuredImage'] = $featured_image_src;
         $response['thumbnailID'] = $thumbnail_id;
+        $response['desktopViewImage'] = $desktop_view_image_src;
+        $response['desktopViewImageID'] = $desktop_view_image_id;
+        $response['tabletViewImage'] = $tablet_view_image_src;
+        $response['tabletViewImageID'] = $tablet_view_image_id;
+        $response['mobileViewImage'] = $mobile_view_image_src;
+        $response['mobileViewImageID'] = $mobile_view_image_id;
         $response['customUrl'] = $custom_url;
         return $this->prepare_item_for_response( $response, $request );
     }

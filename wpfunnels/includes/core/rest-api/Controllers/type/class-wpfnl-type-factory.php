@@ -15,6 +15,11 @@ class Wpfnl_Controller_Type_Factory {
 
     public static function build($module)
     {
+        // Store Checkout funnels behave like standard WooCommerce funnels
+        if ( 'store_checkout' === $module ) {
+            $module = 'wc';
+        }
+
         $class_name = "WPFunnels\\Controller\\Wpfnl_Controller_".ucfirst($module);
         if (!class_exists(ucfirst($class_name))) {
             throw new \Exception('Invalid Condition Module.');

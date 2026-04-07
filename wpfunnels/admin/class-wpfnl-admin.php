@@ -80,7 +80,10 @@ class Wpfnl_Admin
 		'wpfunnels_page_edit_funnel',
 		'wpfunnels_page_create_funnel',
 		'wpfunnels_page_wpfnl_settings',
+		'wpfunnels_page_wpfnl_automations',
 		'wpfunnels_page_wpfnl_addons',
+		'wpfunnels_page_store_checkout',
+		'wpfunnels_page_wpfunnels_integrations',
 		'wpfunnels_page_wpf-license',
 		'wpfunnels_page_email-builder',
 		'wpfunnels_page_wp_funnels',
@@ -105,6 +108,7 @@ class Wpfnl_Admin
 		add_filter('plugin_action_links_' . WPFNL_BASE, [$this, 'add_funnel_action_links']);
 		add_filter('locale', array($this, 'change_local_for_funnel_canvas'));
 		if (is_admin()) {
+			add_filter('admin_body_class', [$this, 'add_wpfunnels_admin_body_class']);
 			add_filter('wp_dropdown_pages', array($this, 'show_funnel_steps_on_reading'));
 			add_filter('gettext', [$this, 'wpfnl_customizing_checkout_text'], 10, 3);
 			add_action('admin_init', [$this, 'wpfnl_add_type_meta']);
@@ -149,6 +153,7 @@ class Wpfnl_Admin
 				delete_transient('wpfunnels_remote_template_data_wc_' . WPFNL_VERSION);
 				delete_transient('wpfunnels_remote_template_data_lms_' . WPFNL_VERSION);
 				delete_transient('wpfunnels_remote_template_data_lead_' . WPFNL_VERSION);
+				delete_transient('wpfunnels_remote_template_data_store_checkout_' . WPFNL_VERSION);
 				update_option('_is_wpfunnels_new_templates_synced', 'yes');
 			}
 		});
@@ -1037,7 +1042,7 @@ class Wpfnl_Admin
 				'isAnyPluginMissing' => Wpfnl_functions::is_any_plugin_missing(),
 				'isGlobalFunnelActivated' => Wpfnl_functions::is_global_funnel_activated(),
 				'isGlobalFunnel' => Wpfnl_functions::is_global_funnel($funnel_id),
-				'GBFVersion' => defined('WPFNL_PRO_GB_VERSION') ? WPFNL_PRO_GB_VERSION : '',
+				'GBFVersion' => defined('WPFNL_PRO_GBF_VERSION') ? WPFNL_PRO_GBF_VERSION : ( defined('WPFNL_PRO_GB_VERSION') ? WPFNL_PRO_GB_VERSION : '' ),
 				'isSkipOffer' => $this->is_skip_offer(),
 				'paymentMethod' => $this->get_payment_method(),
 				'shippingMethod' => $this->get_shipping_method(),
@@ -1051,6 +1056,7 @@ class Wpfnl_Admin
 				'lmsVersion' => (defined('WPFNL_PRO_LMS_VERSION') || defined('WPFUNNELS_PRO_LMS_VERSION')) && defined('LEARNDASH_VERSION') ? version_compare(LEARNDASH_VERSION, '4.2.1.1', '>=') : false,
 				'global_funnel_type' => Wpfnl_functions::get_global_funnel_type(),
 				'individual_funnel_type' => get_post_meta($funnel_id, '_wpfnl_funnel_type', true),
+				'isStoreCheckout' => get_post_meta($funnel_id, '_wpfnl_funnel_type', true) === 'store_checkout',
 				'gbf_set_condition_steps' => $this->get_gbf_steps($funnel_id),
 				'reconfigurable_condition_data' => $this->get_reconfigurable_condition_data($funnel_id),
 				'mint_steps' => $this->mint_step_settings($funnel_id),
@@ -1078,7 +1084,7 @@ class Wpfnl_Admin
 				'user_role_manager_data' => Wpfnl_functions::get_user_role_settings(),
 				'availableGateways' => Wpfnl_functions::get_enabled_payment_gateways(),
 				'guidedTour' => Wpfnl_functions::get_guided_tour(),
-				'isWPFIntegrationActive' => Wpfnl_functions::is_integrations_addon_active(),
+				'isWPFIntegrationActive' => apply_filters( 'wpfunnels/is_integration_license_active', false ),
 			));
 			wp_localize_script(
 				$this->plugin_name,
@@ -1103,6 +1109,7 @@ class Wpfnl_Admin
 				'is_mint_active' => Wpfnl_functions::is_mint_mrm_active(),
 				'settingsSteps' => Wpfnl_functions::get_settings_steps(),
 				'isRemote' => Wpfnl_functions::maybe_remote_funnel(),
+				'isStoreCheckout' => 'wpfunnels_page_store_checkout' === $hook,
 			)
 			);
 
@@ -1154,7 +1161,7 @@ class Wpfnl_Admin
 					'nonce' => wp_create_nonce('wp_rest'),
 					'priceConfig' => Wpfnl_functions::get_wc_price_config(),
 					'isProActivated' => apply_filters('wpfunnels/is_wpfnl_pro_active', false),
-					'isWPFIntegrationActive' => Wpfnl_functions::is_integrations_addon_active(),
+					'isWPFIntegrationActive' => apply_filters( 'wpfunnels/is_integration_license_active', false ),
 					'getText' => Wpfnl_functions::get_text(),
 					'admin_url' => admin_url(),
 				));
@@ -1320,8 +1327,13 @@ class Wpfnl_Admin
 	 */
 	public function is_skip_offer()
 	{
-		if (defined('WPFNL_PRO_GB_VERSION')) {
-			return version_compare(WPFNL_PRO_GB_VERSION, "1.0.9", ">=");
+		// GBF is now built into WPFunnels Pro — always available when GBF is activated.
+		if ( Wpfnl_functions::is_global_funnel_activated() ) {
+			return true;
+		}
+		// Legacy: standalone addon still active.
+		if ( defined('WPFNL_PRO_GB_VERSION') ) {
+			return version_compare( WPFNL_PRO_GB_VERSION, '1.0.9', '>=' );
 		}
 		return false;
 	}
@@ -1539,7 +1551,7 @@ class Wpfnl_Admin
 	public function maybe_gbf($funnel_id)
 	{
 
-		if (is_plugin_active('wpfunnels-pro-gbf/wpfnl-pro-gb.php')) {
+		if ( Wpfnl_functions::is_global_funnel_activated() ) {
 			if ($funnel_id) {
 				$is_gbf = get_post_meta($funnel_id, 'is_global_funnel', true);
 				if ('yes' == $is_gbf) {
@@ -1606,6 +1618,7 @@ class Wpfnl_Admin
 			delete_transient('wpfunnels_remote_template_data_wc_' . WPFNL_VERSION);
 			delete_transient('wpfunnels_remote_template_data_lms_' . WPFNL_VERSION);
 			delete_transient('wpfunnels_remote_template_data_lead_' . WPFNL_VERSION);
+			delete_transient('wpfunnels_remote_template_data_store_checkout_' . WPFNL_VERSION);
 		}
 	}
 
@@ -1637,6 +1650,7 @@ class Wpfnl_Admin
 			delete_transient('wpfunnels_remote_template_data_wc_' . WPFNL_VERSION);
 			delete_transient('wpfunnels_remote_template_data_lms_' . WPFNL_VERSION);
 			delete_transient('wpfunnels_remote_template_data_lead_' . WPFNL_VERSION);
+			delete_transient('wpfunnels_remote_template_data_store_checkout_' . WPFNL_VERSION);
 		}
 	}
 
@@ -1774,6 +1788,25 @@ class Wpfnl_Admin
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Add body class for WPFunnels admin pages.
+	 *
+	 * @param string $classes Current body classes.
+	 * @return string Modified body classes.
+	 * @since 3.9.5
+	 */
+	public function add_wpfunnels_admin_body_class($classes)
+	{
+		// Check if we're on a WPFunnels admin page.
+		$screen = get_current_screen();
+		
+		if ($screen && in_array($screen->id, $this->page_hooks)) {
+			$classes .= ' wpfunnels-body';
+		}
+		
+		return $classes;
 	}
 
 

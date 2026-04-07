@@ -420,6 +420,10 @@ class Wpfnl_functions {
 			return true;
 		}
 
+		if ( $page === 'wpfnl_automations' && $key === 'automations' ) {
+			return true;
+		}
+
 		if ( $page === 'wpfnl_settings' && $key === 'settings' ) {
 			return true;
 		}
@@ -431,6 +435,16 @@ class Wpfnl_functions {
 		if ( $page === 'wpfunnels_integrations' && $key === 'integrations' ) {
 			return true;
 		}
+
+		if ( $page === WPFNL_TEMPLATE_PAGE_SLUG && $key === 'templates' ) {
+			return true;
+		}
+
+		if ( $page === WPFNL_STORE_CHECKOUT_SLUG && $key === 'store_checkout' ) {
+			return true;
+		}
+
+		return false;
 	}
 
 
@@ -2434,7 +2448,8 @@ class Wpfnl_functions {
 			),
 		);
 
-		if ( defined( 'WPFNL_PRO_GB_VERSION' ) && version_compare( WPFNL_PRO_GB_VERSION, '1.0.7', '>=' ) ) {
+		// 'all_product' trigger is available when GBF is active (built into Pro) or via legacy addon >= 1.0.7.
+		if ( self::is_global_funnel_activated() || ( defined( 'WPFNL_PRO_GB_VERSION' ) && version_compare( WPFNL_PRO_GB_VERSION, '1.0.7', '>=' ) ) ) {
 			$addons['global_funnel']['features']['trigger_options']['all_product'] = __( 'Any product is selected', 'wpfnl' );
 		}
 		return apply_filters( 'wpfunnels/supported-addons', $addons );
@@ -3041,14 +3056,14 @@ class Wpfnl_functions {
 		);
 
 		// If funnel type is set to lead only, show only lead templates
-		if ( isset( $general_settings['funnel_type'] ) && 'lead' === $general_settings['funnel_type'] ) {
-			$types = array(
-				array(
-					'slug'  => 'lead',
-					'label' => 'Lead Gen Templates',
-				),
-			);
-		}
+		// if ( isset( $general_settings['funnel_type'] ) && 'lead' === $general_settings['funnel_type'] ) {
+		// 	$types = array(
+		// 		array(
+		// 			'slug'  => 'lead',
+		// 			'label' => 'Lead Gen Templates',
+		// 		),
+		// 	);
+		// }
 		
 		return apply_filters( 'wpfunnels/modify_template_type', $types );
 
@@ -3253,6 +3268,7 @@ class Wpfnl_functions {
 		delete_transient( 'wpfunnels_remote_template_data_wc_' . WPFNL_VERSION );
 		delete_transient( 'wpfunnels_remote_template_data_lms_' . WPFNL_VERSION );
 		delete_transient( 'wpfunnels_remote_template_data_lead_' . WPFNL_VERSION );
+		delete_transient( 'wpfunnels_remote_template_data_store_checkout_' . WPFNL_VERSION );
 	}
 
 
@@ -3362,6 +3378,10 @@ class Wpfnl_functions {
 		return false;
 	}
 
+	public static function is_mail_mint_pro_license_active() {
+		return apply_filters( 'is_mail_mint_pro_license_active', false );
+	}
+
 	/**
 	 * Check if mint automation exist for a funnel by funnel id.
 	 *
@@ -3371,6 +3391,24 @@ class Wpfnl_functions {
 	 */
 	public static function maybe_automation_exist_for_a_funnel( $funnel_id ) {
 		return apply_filters( 'wpfunnels/maybe_automation_exist_for_a_funnel', false, $funnel_id );
+	}
+
+	/**
+	 * Retrieve all automations
+	 *
+	 * @param int $page Current page number
+	 * @param int $per_page Number of items per page
+	 * @return array Array of automation data with pagination info
+	 * @since  3.7.0
+	 */
+	public static function retrieve_all_automations( $page = 1, $per_page = 10 ){
+		return apply_filters( 'wpfunnels/retrieve_all_automations', array(
+			'data' => array(),
+			'total' => 0,
+			'total_pages' => 0,
+			'current_page' => $page,
+			'per_page' => $per_page,
+		), $page, $per_page );
 	}
 
 	/**
@@ -4558,11 +4596,13 @@ class Wpfnl_functions {
 			'integrations'                                => __( 'Integrations', 'wpfnl' ),
 			'publish'                                     => __( 'Publish', 'wpfnl' ),
 			'draft'                                       => __( 'Draft', 'wpfnl' ),
+			'enable'                                      => __( 'Enable', 'wpfnl' ),
+			'disable'                                     => __( 'Disable', 'wpfnl' ),
 			'delete'                                      => __( 'Delete', 'wpfnl' ),
 			'trash'                                       => __( 'Trash', 'wpfnl' ),
 			'deleting'                                    => __( 'Deleting...', 'wpfnl' ),
 			'settings'                                    => __( 'Settings', 'wpfnl' ),
-			'youtube_video'                               => __( 'YouTube Video', 'wpfnl' ),
+			'youtube_video'                               => __( 'Videos', 'wpfnl' ),
 			'documentation'                               => __( 'Documentation', 'wpfnl' ),
 			'blog'                                        => __( 'Blog', 'wpfnl' ),
 			'select_template_industries'                  => __( 'Select Template Industries', 'wpfnl' ),
@@ -4709,16 +4749,16 @@ class Wpfnl_functions {
 			'validation_message_label'                    => __( 'Validation error message', 'wpfnl' ),
 
 			// ----Global Funnel Offer Mode------
-			'offer_selection_mode'                        => __( 'Offer Selection Mode:', 'wpfnl' ),
-			'manual'                                      => __( 'Manual', 'wpfnl' ),
-			'auto_match'                                  => __( 'Auto-match', 'wpfnl' ),
+			'offer_selection_mode'                        => __( 'How Should the Offer be Selected?', 'wpfnl' ),
+			'manual'                                      => __( 'Specific Product', 'wpfnl' ),
+			'auto_match'                                  => __( 'Auto-match from Store', 'wpfnl' ),
 			'recommended'                                 => __( 'Recommended', 'wpfnl' ),
 			'add_existing_product'                        => __( 'Add Existing Product', 'wpfnl' ),
 			'create_product'                              => __( 'Create Product', 'wpfnl' ),
 			'product'                                     => __( 'PRODUCT', 'wpfnl' ),
 			'total_price'                                 => __( 'TOTAL PRICE', 'wpfnl' ),
 			'no_product_yet'                              => __( 'No Product Yet', 'wpfnl' ),
-			'fallback_behavior'                           => __( 'Fallback Behavior', 'wpfnl' ),
+			'fallback_behavior'                           => __( 'If No product Matches', 'wpfnl' ),
 			'fallback_description'                        => __( 'What should happen when no rules match the main product?', 'wpfnl' ),
 			'dont_show_upsell'                            => __( "Don’t show this offer", 'wpfnl' ),
 			'skip_upsell_description'                     => __( 'Skip the offer if no rules match.', 'wpfnl' ),
@@ -5023,7 +5063,7 @@ class Wpfnl_functions {
 			'ob_checkbox_label'                           => __( 'Grab this offer with one click!', 'wpfnl' ),
 			'ob_product_details'                          => __( 'Get this scratch proof 6D Tempered Glass Screen Protector for your iPhone. Keep your phone safe and sound just like a new one.', 'wpfnl' ),
 			'ob_preview_tooltip'                          => __( 'The width of the order bump may vary depending on the page/container size on the Checkout Page or the device screen size.', 'wpfnl' ),
-			'choose_offers'                               => __( 'Choose Offers', 'wpfnl' ),
+			'choose_offers'                               => __( 'Which Products to Pick from', 'wpfnl' ),
 			'choose_offers_condition'                     => __( 'Select the rule that determines which product(s) will be automatically recommended as the upsell.', 'wpfnl' ),
 			'select_product'                              => __( 'Select Product', 'wpfnl' ),
 			'select_product_tooltip'                      => __( 'Choose the product that you want to offer as order bump at the checkout.', 'wpfnl' ),
@@ -5228,6 +5268,7 @@ class Wpfnl_functions {
 			'create_a_funnel'                             => __( 'Create A Funnel', 'wpfnl' ),
 			'how_to_use_this_funnel'                      => __( 'How to use this funnel', 'wpfnl' ),
 			'creating_funnel'                             => __( 'Creating Funnel...', 'wpfnl' ),
+			'creating_store_checkout'                     => __( 'Creating Store Checkout...', 'wpfnl' ),
 			'write_funnel_name'                           => __( 'Write Funnel Name', 'wpfnl' ),
 			'templates'                                   => __( 'Templates', 'wpfnl' ),
 			'template'                                    => __( 'Template', 'wpfnl' ),
@@ -5781,8 +5822,8 @@ class Wpfnl_functions {
 			$is_gbf        = get_post_meta( $funnel_id, 'is_global_funnel', true );
 			$offer_product = '';
 			if ( 'yes' === $is_gbf && ( 'upsell' === $step_type || 'downsell' === $step_type ) ) {
-				if ( is_plugin_active( 'wpfunnels-pro-gbf/wpfnl-pro-gb.php' ) ) {
-					$instance    = new Wpfnl_Pro_GB_Functions();
+				if ( self::is_global_funnel_activated() ) {
+					$instance    = new \WPFunnelsPro\GBF\Wpfnl_Pro_GBF_Functions();
 					$offer_rules = get_post_meta( $step_id, 'global_funnel_' . $step_type . '_rules', true );
 					$quantity    = isset( $offer_rules['quantity'] ) ? $offer_rules['quantity'] : 1;
 					$rules_type  = isset( $offer_rules['type'] ) ? $offer_rules['type'] : '';

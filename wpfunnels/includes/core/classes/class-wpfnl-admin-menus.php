@@ -24,9 +24,21 @@ class Wpfnl_Menus
         add_filter('admin_head', [$this, 'remove_notices_from_funnel_window'], 10, 2);
         add_action('admin_init', [$this, 'disallow_all_step_view']);
         add_action('admin_footer', [$this, 'doc_link_with_new_page']);
+        add_filter('wpfnl_dashboard_nav_lists', [$this, 'add_store_checkout_nav'], 15, 1);
 
-        if( isset($_GET['page']) && ( 'edit_funnel' === $_GET['page'] || 'wpfunnels_integrations' === $_GET['page'] ) ) {
-			add_filter( "admin_body_class", array($this, 'add_folded_menu_class') );
+        if( isset($_GET['page']) && 'edit_funnel' === $_GET['page'] ) {
+			$funnel_id = isset($_GET['id']) ? absint($_GET['id']) : 0;
+			$funnel_type = $funnel_id ? get_post_meta($funnel_id, '_wpfnl_funnel_type', true) : '';
+			if ( 'store_checkout' === $funnel_type ) {
+				add_filter( 'parent_file', function( $parent_file ) {
+					return WPFNL_MAIN_PAGE_SLUG;
+				});
+				add_filter( 'submenu_file', function( $submenu_file ) {
+					return WPFNL_STORE_CHECKOUT_SLUG;
+				});
+			} else {
+				add_filter( "admin_body_class", array($this, 'add_folded_menu_class') );
+			}
 		}
     }
 
@@ -72,6 +84,47 @@ class Wpfnl_Menus
 
         add_submenu_page(
             WPFNL_MAIN_PAGE_SLUG,
+            __('Store Checkout', 'wpfnl'),
+            __('Store Checkout', 'wpfnl'),
+			Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
+            WPFNL_STORE_CHECKOUT_SLUG,
+            [$this, 'render_store_checkout_page']
+        );
+
+        add_submenu_page(
+            WPFNL_MAIN_PAGE_SLUG,
+            __('Automations', 'wpfnl'),
+            __('Automations', 'wpfnl'),
+			Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
+            WPFNL_AUTOMATIONS_SLUG,
+            [$this, 'render_automations_page']
+        );
+
+        $integrations_in_pro = defined( 'WPFNL_PRO_VERSION' ) && version_compare( WPFNL_PRO_VERSION, '2.9.0', '>=' );
+        $legacy_addon_active = is_plugin_active( 'wpfunnels-pro-integrations/wpfunnels-pro-integrations.php' );
+
+        if ( $integrations_in_pro || ! $legacy_addon_active ) {
+            // Pro owns the integrations menu; access is controlled by plan check inside the page renderer.
+            add_submenu_page(
+                WPFNL_MAIN_PAGE_SLUG,
+                __('Integrations', 'wpfnl'),
+                __('Integrations', 'wpfnl'),
+                Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
+                WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG,
+                [$this, 'render_integration_page']
+            );
+        } else {
+            /**
+             * After setup menu of WPFunnels.
+             * Legacy fallback for users still running the old addon.
+             *
+             * @since 1.0.0
+             */
+            do_action( 'wpfunnels/after_setup_menu');
+        }
+
+        add_submenu_page(
+            WPFNL_MAIN_PAGE_SLUG,
             __('Templates', 'wpfnl'),
             __('Templates', 'wpfnl'),
 			Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
@@ -79,21 +132,20 @@ class Wpfnl_Menus
             [$this, 'render_funnel_template_page']
         );
 
-        add_submenu_page(
-            WPFNL_MAIN_PAGE_SLUG,
-            __('Add-ons', 'wpfnl'),
-            __('Add-ons', 'wpfnl'),
-			Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
-            WPFNL_ADDONS_SLUG,
-            [$this, 'render_addons_page']
-        );
+        // add_submenu_page(
+        //     WPFNL_MAIN_PAGE_SLUG,
+        //     __('Add-ons', 'wpfnl'),
+        //     __('Add-ons', 'wpfnl'),
+		// 	Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
+        //     WPFNL_ADDONS_SLUG,
+        //     [$this, 'render_addons_page']
+        // );
 
-        /**
-		 * After setup menu of WPFunnels.
-		 *
-		 * @since 1.0.0
-		 */
-		do_action( 'wpfunnels/after_setup_menu');
+
+        // Show Integrations menu if WPFunnels Pro Integrations is deactivated
+        if ( ! function_exists( 'is_plugin_active' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
 
         add_submenu_page(
             WPFNL_MAIN_PAGE_SLUG,
@@ -104,13 +156,13 @@ class Wpfnl_Menus
             [$this, 'render_settings_page']
         );
 
-        add_submenu_page(
-            WPFNL_MAIN_PAGE_SLUG,
-            __('Documentation', 'wpfnl'),
-            '<span id="wpfnl-documentation">'. __('Documentation', 'wpfnl').'</span>',
-			Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
-            'https://getwpfunnels.com/resources/'
-        );
+        // add_submenu_page(
+        //     WPFNL_MAIN_PAGE_SLUG,
+        //     __('Documentation', 'wpfnl'),
+        //     '<span id="wpfnl-documentation">'. __('Documentation', 'wpfnl').'</span>',
+		// 	Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
+        //     'https://getwpfunnels.com/resources/'
+        // );
 
         add_submenu_page(
             WPFNL_MAIN_PAGE_SLUG,
@@ -264,6 +316,11 @@ class Wpfnl_Menus
         Wpfnl::$instance->module_manager->get_admin_modules('settings')->get_view();
     }
 
+    public function render_automations_page()
+    {
+        Wpfnl::$instance->module_manager->get_admin_modules('automations')->get_view();
+    }
+
 
     /**
      * Render addons page
@@ -273,6 +330,82 @@ class Wpfnl_Menus
     public function render_addons_page()
     {
         require_once WPFNL_DIR . 'admin/modules/addons/view.php';
+    }
+
+
+    /**
+     * Render Store Checkout page
+     *
+     * @since 3.5.0
+     */
+    public function render_store_checkout_page()
+    {
+        // Check if a Store Checkout already exists
+        $store_checkout = $this->get_store_checkout_funnel();
+
+        if ($store_checkout) {
+            // Redirect to the canvas view
+            $redirect_url = esc_url_raw(
+                add_query_arg(
+                    [
+                        'page'      => WPFNL_EDIT_FUNNEL_SLUG,
+                        'id'        => $store_checkout->ID,
+                        'step_id'   => 0,
+                    ],
+                    admin_url('admin.php')
+                )
+            );
+            wp_safe_redirect($redirect_url);
+            exit;
+        } else {
+            // Show template selection screen
+            require WPFNL_DIR . '/admin/modules/store-checkout/views/store-checkout.php';
+        }
+    }
+
+    /**
+     * Render Integration page
+     *
+     * @since 1.0.0
+     */
+    public function render_integration_page()
+    {
+        // Show Integrations page only if WPFunnels Pro Integrations is deactivated
+        if ( ! function_exists( 'is_plugin_active' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        if ( has_action( 'wpfunnels/render_integrations_page' ) ) {
+            // Pro plugin has registered its renderer — delegate (plan gate applied inside).
+            do_action( 'wpfunnels/render_integrations_page' );
+        } elseif ( ! is_plugin_active( 'wpfunnels-pro-integrations/wpfunnels-pro-integrations.php' ) ) {
+            require_once WPFNL_DIR . 'admin/modules/integration/view.php';
+        }
+    }
+
+
+    /**
+     * Get Store Checkout funnel if exists
+     *
+     * @return WP_Post|false
+     * @since 3.5.0
+     */
+    private function get_store_checkout_funnel()
+    {
+        $args = [
+            'post_type'      => WPFNL_FUNNELS_POST_TYPE,
+            'posts_per_page' => 1,
+            'post_status'    => ['publish', 'draft'],
+            'meta_query'     => [
+                [
+                    'key'   => '_wpfnl_funnel_type',
+                    'value' => 'store_checkout',
+                ],
+            ],
+        ];
+
+        $funnels = get_posts($args);
+        return !empty($funnels) ? $funnels[0] : false;
     }
 
 
@@ -376,5 +509,37 @@ class Wpfnl_Menus
 	 */
 	public function remove_admin_notices() {
 		echo '<style>.update-nag, .updated, .error, .is-dismissible, .notice { display: none; } .wpfnl-import-notice {display: block!important; margin: 15px 15px 15px 0px;} .wpfunnels-notice {display: block; margin-left: 0px; margin-right: 25px;}</style>';
+	}
+
+
+	/**
+	 * Add Store Checkout to dashboard navigation
+	 *
+	 * @param array $list Navigation list
+	 * @return array Modified navigation list
+	 * @since 3.5.0
+	 */
+	public function add_store_checkout_nav( $list ) {
+		if ( ! is_array( $list ) ) {
+			return $list;
+		}
+
+		// Insert Store Checkout before settings
+		$new_list = array();
+
+		foreach ( $list as $key => $item ) {
+			// Insert Store Checkout before settings
+			if ( $key === 'settings' ) {
+				$new_list['store_checkout'] = array(
+					'title' => __('Store Checkout', 'wpfnl'),
+					'icon'  => 'storewide-checkout-icon',
+					'page'  => 'store_checkout',
+				);
+			}
+
+			$new_list[$key] = $item;
+		}
+
+		return $new_list;
 	}
 }

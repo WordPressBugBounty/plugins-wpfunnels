@@ -214,26 +214,39 @@ class Module extends Wpfnl_Admin_Module
         $funnel = Wpfnl::$instance->funnel_store;
         $funnel->read($funnel_id);
 
+        $funnel_type = get_post_meta($funnel_id, '_wpfnl_funnel_type', true);
+        $is_store_checkout = 'store_checkout' === $funnel_type;
+
         if ($funnel->get_step_ids()) {
             foreach ($funnel->get_step_ids() as $step_id) {
-                $post_data = array(
-                    'ID' => $step_id,
-                    'post_status' => 'trash',
-                );
-                wp_update_post($post_data);
+                if ( $is_store_checkout ) {
+                    wp_delete_post( $step_id, true );
+                } else {
+                    $post_data = array(
+                        'ID' => $step_id,
+                        'post_status' => 'trash',
+                    );
+                    wp_update_post($post_data);
+                }
             }
         }
         do_action('wpfunnels/before_trash_funnel', $funnel_id );
 
-        $post_data = array(
-            'ID' => $funnel_id,
-            'post_status' => 'trash',
-        );
-        wp_update_post($post_data);
+        if ( $is_store_checkout ) {
+            wp_delete_post( $funnel_id, true );
+        } else {
+            $post_data = array(
+                'ID' => $funnel_id,
+                'post_status' => 'trash',
+            );
+            wp_update_post($post_data);
+        }
+
+        $page_slug = $is_store_checkout ? WPFNL_STORE_CHECKOUT_SLUG : WPFNL_FUNNEL_PAGE_SLUG;
 
         $redirect_link = add_query_arg(
             [
-                'page' => WPFNL_FUNNEL_PAGE_SLUG,
+                'page' => $page_slug,
             ],
             admin_url('admin.php')
         );

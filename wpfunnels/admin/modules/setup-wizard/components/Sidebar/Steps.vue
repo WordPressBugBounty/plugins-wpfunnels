@@ -11,7 +11,7 @@
         >
             <div class="wpfnl-mm-setup-wizard-step-number">
                 <svg v-if="currentStep > index + 1" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="8" cy="8" r="8" fill="#2FCF5C"/>
+                    <circle cx="8" cy="8" r="8" fill="#239654"/>
                     <path d="M11.3333 5.33334L6.66667 10L4.66667 8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 <span v-else>{{ index + 1 }}</span>
@@ -28,17 +28,68 @@ export default {
         currentStep: {
             type: Number,
             default: 1
+        },
+        selectedGoal: {
+            type: String,
+            default: ''
         }
     },
-    data() {
-        return {
-            steps: [
+    computed: {
+        steps() {
+            // Before goal selection or default view - show 5 generic steps
+            if (!this.selectedGoal || this.currentStep <= 3) {
+                return [
+                    'Welcome',
+                    'Setup',
+                    'Choose Goal',
+                    'Choose Template',
+                    'Complete'
+                ];
+            }
+
+            // After goal selection - show dynamic steps based on goal
+            if (this.selectedGoal === 'order-value') {
+                return [
+                    'Welcome',
+                    'Setup',
+                    'Choose Goal',
+                    'Choose Template',
+                    'Build Funnel',
+                    'Complete'
+                ];
+            }
+
+            if (this.selectedGoal === 'improve-checkout') {
+                return [
+                    'Welcome',
+                    'Setup',
+                    'Choose Goal',
+                    'Choose Template',
+                    'Generate Funnel',
+                    'Complete'
+                ];
+            }
+
+            if (this.selectedGoal === 'sales') {
+                return [
+                    'Welcome',
+                    'Setup',
+                    'Choose Goal',
+                    'Product Sync',
+                    'Choose Template',
+                    'Generate Funnel',
+                    'Complete'
+                ];
+            }
+
+            // Fallback to default
+            return [
                 'Welcome',
                 'Setup',
+                'Choose Goal',
                 'Choose Template',
-                'Build Funnel',
                 'Complete'
-            ]
+            ];
         }
     },
 }

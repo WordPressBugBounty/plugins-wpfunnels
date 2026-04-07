@@ -376,30 +376,13 @@ class Notice {
 
 
     /**
-	 * GBF compatability notice for update version to 2.4.15 or higher. If someone wants to update, he/she has to install 1.0.18 or higher version of WPFunnels Pro - Global Funnel
+	 * GBF compatibility notice — no longer needed as GBF is now built into WPFunnels Pro.
+	 *
+	 * Kept as a no-op to avoid breaking any callers.
+	 *
+	 * @since 2.9.1
 	 */
 	public static function gbf_compatability_notice(){
-		global $current_screen;
-		$is_gbf_active 	 = Wpfnl_functions::is_plugin_activated('wpfunnels-pro-gbf/wpfnl-pro-gb.php');
-		if ( $is_gbf_active ){
-            if ( version_compare(WPFNL_VERSION, '2.4.15', '>=') && version_compare(WPFNL_PRO_GB_VERSION, '1.0.18', '<') ) {
-                if ( 'plugins' === $current_screen->parent_base || 'wp_funnels' === $current_screen->parent_base ){
-                    $options = array(
-                        'id' => '',
-                        'title' => 'wpfunnels-basic',
-                        'description' => __("Please update the WPFunnels Pro - Global Funnel to version 1.0.18 or higher. Ignore if already updated.", 'wpfnl'),
-                        'description' => __("You are using an older version of WPFunnels Pro - Global Funnel. Please update to v1.0.18 or above to avoid any discrepancies with the latest WPFunnels (Basic) plugin.", 'wpfnl'),
-                        'classes' => [ 'notice', 'wpfnl-notice' ], // We include WP's default notice class so it will be properly handled by WP's js handler
-                        'type' => 'update-plugin',
-                        'dismissible' => true,
-                        'icon' => '',
-                    );
-                    self::print_notice($options);
-                }
-
-            }
-
-		}
 		return false;
 	}
 
@@ -607,11 +590,8 @@ class Notice {
      */
     public function hide_update_notice_on_builder(){
         global $current_screen;
-        if( "wpfunnels_page_email-builder" === $current_screen->base ||  "toplevel_page_wpfunnels" === $current_screen->base){
+        if( "wpfunnels_page_email-builder" === $current_screen->base ||  "toplevel_page_wpfunnels" === $current_screen->base || "wpfunnels_page_wpfnl_automations" === $current_screen->base ){
             remove_all_actions( 'admin_notices' );
         }
     }
-
-
-
 }

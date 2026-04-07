@@ -219,18 +219,24 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 	 * @return WP_REST_Response
 	 */
 	public function get_templates( $request ) {
-		// Determine available template types based on active plugins
-		$default_type = 'wc'; // Default to WooCommerce which is always available
-		
-		$funnel_template_type = isset( $_GET['type'] ) ? $_GET['type'] : $default_type;
-        // Map 'sales' to 'wc' if passed, as API uses 'wc'
-        if ( 'sales' === $funnel_template_type ) {
-            $funnel_template_type = 'wc';
-        }
+		$type_param = isset( $_GET['type'] ) ? sanitize_key( $_GET['type'] ) : 'wc';
+		$store_checkout_param = isset( $_GET['store_checkout'] ) ? sanitize_key( $_GET['store_checkout'] ) : 'no';
+
+		// Map frontend goal types to API template types.
+		// 'store_checkout' (improve-checkout goal) passes through as-is.
+		// 'sales' / 'order-value' goals send 'wc'; keep backward-compat mapping here too.
+		$type_map = array(
+			'sales' => 'wc',
+			'lead'  => 'lead',
+		);
+		$funnel_template_type = isset( $type_map[ $type_param ] ) ? $type_map[ $type_param ] : $type_param;
 
 		$step                 = isset( $_GET['step'] ) ? $_GET['step'] : false;
 		$builder              = isset( $_GET['builder'] ) ? $_GET['builder'] : false;
-
+		if( 'yes' === $store_checkout_param ) {
+			$funnel_template_type = 'store_checkout';
+		}
+		
 		$templates            = $this->get_funnels_data( $funnel_template_type, $step, array(), false, $builder );
 		$templates			  = $this->prepare_custom_step($templates);
 		$templates['success'] = true;
@@ -317,6 +323,7 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 		$builder_type = $builder ? $builder : Wpfnl_functions::get_builder_type();
 		$cache_key    = 'wpfunnels_remote_template_data_' . $type . '_' . $builder_type . '_' . WPFNL_VERSION;
 		$data         = get_transient( $cache_key );
+		$data 	   = false; // Disable cache to make sure we are always getting the latest templates. We can remove this line once we are sure there is no issue with the API response time.
 		if ( $data ) {
 			return;
 		}
@@ -332,7 +339,7 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 			} elseif ( 'bricks' === $builder_type ) {
 				$template_url = 'https://brickstemplates.getwpfunnels.com/wp-json/wpfunnels/v1/get_all_funnels/';
 			}
-
+			
 			// get all templates
 			$params = array(
 				'per_page'      => 100,
@@ -373,6 +380,7 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 			$templates = array();
 			if ( $template_data['data'] ) {
 				foreach ( $template_data['data'] as $key => $template ) {
+					
 					$i              = 0;
 					$thankyou_count = 0;
 					if( isset($template['page_builder']) && 'gutenberg' === $template['page_builder'] ){
@@ -380,7 +388,10 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 							continue;
 						}
 					}
-					
+					if( isset($template['is_store_checkout']) && $template['is_store_checkout'] && 'store_checkout' !== $type ) {
+						continue;
+					}
+
 					foreach ( $template['steps'] as $_step ) {
 						if ( $thankyou_count && 'thankyou' === $_step['step_type'] ) {
 							continue;

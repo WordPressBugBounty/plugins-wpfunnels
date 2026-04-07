@@ -610,6 +610,7 @@ class SettingsController extends Wpfnl_REST_Controller {
                 delete_transient('wpfunnels_remote_template_data_wc_' . WPFNL_VERSION);
                 delete_transient('wpfunnels_remote_template_data_lms_' . WPFNL_VERSION);
                 delete_transient('wpfunnels_remote_template_data_lead_' . WPFNL_VERSION);
+                delete_transient('wpfunnels_remote_template_data_store_checkout_' . WPFNL_VERSION);
             }
 
             $response = [
