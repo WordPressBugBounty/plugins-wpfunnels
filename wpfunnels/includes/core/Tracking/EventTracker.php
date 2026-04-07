@@ -46,7 +46,7 @@ class EventTracker{
         add_action( 'wpfunnels_plugin_deactivated', array( $this, 'on_plugin_deactivated' ) );
         add_action( 'wpfunnels_after_funnel_creation', array( $this, 'on_after_funnel_creation' ) );
         add_action( 'wpfunnels/funnel_order_placed', array( $this, 'funnel_order_placed' ), 10, 3 );
-        add_action( 'wpfunnels_setup_wizard_complete', array( $this, 'on_setup_wizard_complete' ), 10, 2 );
+        add_action( 'wpfunnels_setup_wizard_complete', array( $this, 'on_setup_wizard_complete' ), 10, 3 );
     }
 
     /**
@@ -297,12 +297,13 @@ class EventTracker{
      *
      * @param int $funnel_id The ID of the funnel associated with the setup wizard.
      * @param string $action The action taken during the setup wizard.
+     * @param string $goal The goal achieved during the setup wizard.
      *
      * @return void
      *
      * @since 1.17.10
      */    
-    public function on_setup_wizard_complete($funnel_id, $action): void
+    public function on_setup_wizard_complete($funnel_id, $action, $goal): void
     {
         coderex_telemetry_track(
             WPFNL_FILE,
@@ -310,6 +311,7 @@ class EventTracker{
             array(
                 'funnel_id' => $funnel_id,
                 'action'    => $action,
+                'goal'      => $goal,
                 'time'      => current_time('mysql'),
             )
         );

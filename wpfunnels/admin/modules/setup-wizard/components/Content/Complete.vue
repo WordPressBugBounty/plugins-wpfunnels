@@ -60,16 +60,7 @@
 				</button>
 			</div>
 
-			<!-- Consent Checkbox -->
-			<div class="wpfnl-mm-choose-goal-consent">
-				<label class="wpfnl-mm-checkbox">
-					<input type="checkbox" id="consent-checkbox" v-model="shareConsent" />
-					<span class="wpfnl-mm-checkbox-checkmark"></span>
-					<span class="wpfnl-mm-checkbox-label">
-						I agree to share usage data to personalize my experience and improve this product.
-					</span>
-				</label>
-			</div>
+	
 		</div>
 	</div>
 </template>
@@ -104,8 +95,10 @@ export default {
 			videoUrl: '',
 			contactRequestInFlight: false,
 			contactCreated: false,
-			shareConsent: this.agreeToShare !== false
 		}
+	},
+	mounted() {
+		this.maybeCreateContact();
 	},
 	computed: {
 		isStoreCheckout() {
@@ -138,7 +131,7 @@ export default {
 	},
 	methods: {
 		maybeCreateContact() {
-			if (!this.shareConsent || this.contactCreated || this.contactRequestInFlight) {
+			if (!this.agreeToShare || this.contactCreated || this.contactRequestInFlight) {
 				return;
 			}
 

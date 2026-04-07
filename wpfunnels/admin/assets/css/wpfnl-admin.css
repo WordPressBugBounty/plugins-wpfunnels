@@ -8196,10 +8196,6 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
     margin-right: 0;
   }
 }
-.step-settings__single-tab-content,
-.checkout-product-setting-tab__content-wrapper {
-  /* Conditional Funnel dummy/upgrade preview */
-}
 .step-settings__single-tab-content .product-mode-selection,
 .checkout-product-setting-tab__content-wrapper .product-mode-selection {
   border-radius: 10px;
@@ -8324,6 +8320,10 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   color: #6b7280;
   line-height: 1.5;
   margin: 0;
+}
+.step-settings__single-tab-content,
+.checkout-product-setting-tab__content-wrapper {
+  /* Conditional Funnel dummy/upgrade preview */
 }
 .step-settings__single-tab-content .conditional-funnel-preview,
 .checkout-product-setting-tab__content-wrapper .conditional-funnel-preview {
@@ -9781,10 +9781,6 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   box-shadow: 0px 5px 20px rgba(148, 135, 180, 0.15);
   border-radius: 10px;
   margin-bottom: 15px;
-  /* Upgrade overlay - full screen backdrop */
-  /* Upgrade modal card */
-  /* Locked auto-match label styling */
-  /*-----Rule Groups Styles-----*/
 }
 .checkout-order-bump-setting-tab__content-wrapper:last-child {
   margin-bottom: 0;
@@ -10591,6 +10587,9 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 .checkout-order-bump-setting-tab__content-wrapper .ob-settings-category.conditional-rules .ob-settings-wrapper .enable-conditional .wpfnl-tooltip p {
   color: #ffffff;
 }
+.checkout-order-bump-setting-tab__content-wrapper {
+  /* Upgrade overlay - full screen backdrop */
+}
 .checkout-order-bump-setting-tab__content-wrapper .ob-upgrade-overlay {
   position: fixed;
   inset: 0;
@@ -10600,6 +10599,9 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   align-items: center;
   justify-content: center;
   padding: 20px;
+}
+.checkout-order-bump-setting-tab__content-wrapper {
+  /* Upgrade modal card */
 }
 .checkout-order-bump-setting-tab__content-wrapper .ob-upgrade-modal {
   position: relative;
@@ -10657,8 +10659,14 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   text-decoration: none;
   color: #fff !important;
 }
+.checkout-order-bump-setting-tab__content-wrapper {
+  /* Locked auto-match label styling */
+}
 .checkout-order-bump-setting-tab__content-wrapper .ob-automatch-locked {
   opacity: 0.6;
+}
+.checkout-order-bump-setting-tab__content-wrapper {
+  /*-----Rule Groups Styles-----*/
 }
 .checkout-order-bump-setting-tab__content-wrapper .rule-groups-container {
   width: 100%;
@@ -10990,7 +10998,7 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   .checkout-order-bump-setting-tab__content-wrapper .order-bump-template-preview-area {
     width: 45%;
   }
-  .checkout-order-bump-setting-tab__content-wrapper .wpfnl-field-wrapper::not(".no-title-checkbox") {
+  .checkout-order-bump-setting-tab__content-wrapper .wpfnl-field-wrapper::not('.no-title-checkbox') {
     margin-bottom: 18px;
     display: block;
   }
@@ -14392,6 +14400,10 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   background: linear-gradient(180deg, rgba(60, 37, 111, 0) 37.658%, rgba(75, 52, 129, 0.3) 74.038%);
   border-radius: 16px;
 }
+.wpfunnels-setup .wpfnl-mm-setup-wizard .wpfnl-mm-setup-wizard-content .wpfnl-mm-complete .wpfnl-mm-complete-video-wrapper .wpfnl-mm-complete-video .wpfnl-mm-complete-video-iframe {
+  width: 100%;
+  height: 100%;
+}
 .wpfunnels-setup .wpfnl-mm-setup-wizard .wpfnl-mm-setup-wizard-content .wpfnl-mm-complete .wpfnl-mm-complete-video-wrapper .wpfnl-mm-complete-video .wpfnl-mm-complete-video-player {
   position: absolute;
   bottom: 18px;
@@ -15136,7 +15148,6 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   justify-content: center;
   height: 508px;
   position: relative;
-  /* HTML: <div class="loader"></div> */
 }
 .wpfunnels-setup .wpfnl-mm-setup-wizard .wpfnl-generate-funnel-container .generate-funnel-overlay {
   position: absolute;
@@ -15171,6 +15182,9 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 .wpfunnels-setup .wpfnl-mm-setup-wizard .wpfnl-generate-funnel-container.generating .generate-funnel-overlay {
   justify-content: center;
   backdrop-filter: blur(5px);
+}
+.wpfunnels-setup .wpfnl-mm-setup-wizard .wpfnl-generate-funnel-container {
+  /* HTML: <div class="loader"></div> */
 }
 .wpfunnels-setup .wpfnl-mm-setup-wizard .wpfnl-generate-funnel-container .generate-loader {
   width: 50px;
@@ -29437,11 +29451,11 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   .wpfnl-free-vs-pro-comparison-wrapper .table-content-wrapper {
     padding: 0 20px;
   }
-  .wpfnl-free-vs-pro-comparison-wrapper .table-content-wrapper .comparison-table thead th {
-    padding: 16px 5px;
-  }
   .wpfnl-free-vs-pro-comparison-wrapper .table-content-wrapper .comparison-table thead th.regular, .wpfnl-free-vs-pro-comparison-wrapper .table-content-wrapper .comparison-table thead th.popular {
     width: 145px;
+  }
+  .wpfnl-free-vs-pro-comparison-wrapper .table-content-wrapper .comparison-table thead th {
+    padding: 16px 5px;
   }
   .wpfnl-free-vs-pro-comparison-wrapper .table-content-wrapper .comparison-table thead th:first-child, .wpfnl-free-vs-pro-comparison-wrapper .table-content-wrapper .comparison-table thead th:last-child {
     padding: 16px 10px 16px 5px;
@@ -30299,7 +30313,6 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 }
 #wpfnl-toaster-wrapper {
   display: none;
-  /* -------Warn notification alert toast------------ */
 }
 #wpfnl-toaster-wrapper.quick-toastify-successful-notification .quick-toastify-alert-toast {
   position: fixed;
@@ -30344,6 +30357,9 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 }
 #wpfnl-toaster-wrapper.quick-toastify-successful-notification .quick-toastify-successful-notification.quick-toastify-hide {
   display: none;
+}
+#wpfnl-toaster-wrapper {
+  /* -------Warn notification alert toast------------ */
 }
 #wpfnl-toaster-wrapper.quick-toastify-warn-notification .quick-toastify-alert-toast {
   position: fixed;

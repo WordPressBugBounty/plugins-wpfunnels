@@ -58,7 +58,7 @@ class Telemetry {
      * plugin activation or other core flows.
      */
     private function __construct() {
-        if ( ! class_exists( '\\Linno\\Telemetry\\Client' ) ) {
+        if ( ! class_exists( '\\LinnoSDK\\Telemetry\\Client' ) ) {
             return;
         }
 

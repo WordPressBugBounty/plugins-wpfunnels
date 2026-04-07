@@ -24,6 +24,17 @@
                 </div>
             </div>
 
+            <!-- Consent Checkbox -->
+            <div class="wpfnl-mm-choose-goal-consent">
+                <label class="wpfnl-mm-checkbox">
+                    <input type="checkbox" id="consent-checkbox" v-model="agreeToShare" />
+                    <span class="wpfnl-mm-checkbox-checkmark"></span>
+                    <span class="wpfnl-mm-checkbox-label">
+                        I agree to share usage data to personalize my experience and improve this product.
+                    </span>
+                </label>
+            </div>
+
             <figure class="welcome-image">
                 <img :src="welcomeImage" alt="WPFunnels Setup" width="725" height="388" />
             </figure>
@@ -33,6 +44,7 @@
 </template>
 
 <script>
+	import apiFetch from '@wordpress/api-fetch';
 	import Sales from './Icons/Sales.vue';
 	import Leads from './Icons/Leads.vue';
 export default {
@@ -46,9 +58,43 @@ export default {
 			selectedGoal: 'sales', // Default to sales funnel as shown in design
 			agreeToShare: true, // Default to checked as shown in design
             welcomeImage: window.setup_wizard_obj.welcome_image,
+			contactRequestInFlight: false,
+			contactCreated: false,
 		}
 	},
 	methods: {
+		maybeCreateContact() {
+			if (!this.agreeToShare || this.contactCreated || this.contactRequestInFlight) {
+				return;
+			}
+
+			const wizardObj = window.setup_wizard_obj || {};
+			const restApiUrl = wizardObj.rest_api_url;
+			if (!restApiUrl) {
+				return;
+			}
+
+			const payload = {
+				email: wizardObj.admin_email,
+				name: wizardObj.admin_name
+			};
+
+			this.contactRequestInFlight = true;
+			apiFetch({
+				path: `${restApiUrl}wpfunnels/v1/settings/create-contact/`,
+				method: 'POST',
+				data: payload
+			})
+				.then(() => {
+					this.contactCreated = true;
+				})
+				.catch(error => {
+					console.error('Error creating contact:', error);
+				})
+				.finally(() => {
+					this.contactRequestInFlight = false;
+				});
+		},
 		selectGoal(goal) {
 			this.selectedGoal = goal;
 		},
@@ -60,6 +106,7 @@ export default {
 				return;
 			}
 
+			this.maybeCreateContact();
 			this.proceedToNextStep();
 		},
 		proceedToNextStep() {
