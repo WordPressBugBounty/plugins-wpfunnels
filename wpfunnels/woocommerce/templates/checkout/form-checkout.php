@@ -19,7 +19,13 @@ if( class_exists( '\WPFunnels\Wpfnl_functions' ) && \WPFunnels\Wpfnl_functions::
 	require_once WPFNL_DIR . '/public/modules/checkout/templates/modern-checkout-form.php';
 
 } else {
-	require_once WPFNL_DIR . '/public/modules/checkout/templates/default-checkout-form.php';
+	if ( isset( $_SESSION[ 'checkout_layout' ] ) && ('wpfnl-modern-multistep' === $_SESSION[ 'checkout_layout' ]) ) {
+		require_once WPFNL_DIR . '/public/modules/checkout/templates/modern-checkout-form.php';
+
+	}else {
+		require_once WPFNL_DIR . '/public/modules/checkout/templates/default-checkout-form.php';
+	}
+
 }
 // session_destroy();
 ?>

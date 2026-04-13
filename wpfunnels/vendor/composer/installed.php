@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'wpfunnels/wpfunnels',
-        'pretty_version' => 'dev-master',
-        'version' => 'dev-master',
-        'reference' => '1bdea71e18e34c3c7b35fa08a387a93f19688c78',
+        'pretty_version' => 'dev-develop',
+        'version' => 'dev-develop',
+        'reference' => '2c9adf0258b42180631276b23932a33ffd453ed8',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -85,7 +85,7 @@
         'linno/telemetry' => array(
             'pretty_version' => 'dev-posthog',
             'version' => 'dev-posthog',
-            'reference' => '32e7975d19bf532f7762a76a34f150e050cb609a',
+            'reference' => '5b2cd03ec9bbda733119ce86c5623c8d4a5bdd37',
             'type' => 'library',
             'install_path' => __DIR__ . '/../linno/telemetry',
             'aliases' => array(),
@@ -158,9 +158,9 @@
             'dev_requirement' => false,
         ),
         'spatie/browsershot' => array(
-            'pretty_version' => '3.61.0',
-            'version' => '3.61.0.0',
-            'reference' => '14d75679390b8b84a71b3a17dc5905928deeb887',
+            'pretty_version' => 'v3.x-dev',
+            'version' => '3.9999999.9999999.9999999-dev',
+            'reference' => '360da4f4968bff07d4b914689c0f0ffd907d4bb9',
             'type' => 'library',
             'install_path' => __DIR__ . '/../spatie/browsershot',
             'aliases' => array(),
@@ -212,9 +212,9 @@
             'dev_requirement' => false,
         ),
         'wpfunnels/wpfunnels' => array(
-            'pretty_version' => 'dev-master',
-            'version' => 'dev-master',
-            'reference' => '1bdea71e18e34c3c7b35fa08a387a93f19688c78',
+            'pretty_version' => 'dev-develop',
+            'version' => 'dev-develop',
+            'reference' => '2c9adf0258b42180631276b23932a33ffd453ed8',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

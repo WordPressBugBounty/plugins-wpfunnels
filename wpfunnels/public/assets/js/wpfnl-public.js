@@ -2186,6 +2186,173 @@
             }
         });
 
+		// ----start modern multistep checkout toggle----
+		var wpfnlMultistepOrder = ['information', 'shipping', 'payment'];
+
+		/**
+		 * Returns the jQuery set of containers to validate for a given step.
+		 */
+		function wpfnlGetStepContainers(step) {
+			var $containers = $();
+			if ('information' === step) {
+				$containers = $('.wpfnl-modern-multistep .wpfnl-modern-section--customer-information')
+					.add('.wpfnl-modern-multistep .wpfnl-billing-fields');
+			} else if ('shipping' === step) {
+				$containers = $('.wpfnl-modern-multistep .woocommerce-additional-fields');
+				if ($('#ship-to-different-address-checkbox').is(':checked')) {
+					$containers = $containers.add('.wpfnl-modern-multistep .wpfnl-shipping-fields');
+				}
+			}
+			return $containers;
+		}
+
+		/**
+		 * Returns true if all visible required fields in the given step are filled.
+		 */
+		function wpfnlIsStepValid(step) {
+			var isValid = true;
+			wpfnlGetStepContainers(step).find('.form-row.validate-required').each(function () {
+				if (!isValid) return false; // break early
+
+				var $row = $(this);
+				if (!$row.is(':visible')) return; // skip hidden rows
+
+				var $select    = $row.find('select').first();
+				var $checkbox  = $row.find('input[type="checkbox"]').first();
+				var $textInput = $row.find('input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), textarea').first();
+
+				if ($select.length) {
+					if (!$select.val()) isValid = false;
+				} else if ($checkbox.length) {
+					if (!$checkbox.is(':checked')) isValid = false;
+				} else if ($textInput.length) {
+					if (!$.trim($textInput.val())) isValid = false;
+				}
+			});
+			return isValid;
+		}
+
+		function wpfnlSyncNextStepBtn(activeStep) {
+			var $btn = $('.wpfnl-modern-multistep-navigation .next-step-btn');
+			if (!$btn.length) return;
+			var currentIndex = wpfnlMultistepOrder.indexOf(activeStep);
+			var nextIndex = currentIndex + 1;
+			if (nextIndex < wpfnlMultistepOrder.length) {
+				$btn.attr('current-step', activeStep);
+				$btn.attr('next-step', wpfnlMultistepOrder[nextIndex]);
+			} else {
+				$btn.prop('disabled', true);
+				return;
+			}
+			wpfnlValidateCurrentStep();
+		}
+
+		function wpfnlValidateCurrentStep() {
+			var $btn = $('.wpfnl-modern-multistep-navigation .next-step-btn');
+			if (!$btn.length) return;
+			var currentStep = $btn.attr('current-step') || 'information';
+			$btn.prop('disabled', !wpfnlIsStepValid(currentStep));
+		}
+
+		// Live validation — re-check whenever a field value changes
+		$(document).on(
+			'input change',
+			'.wpfnl-modern-multistep .wpfnl-modern-section--customer-information input, ' +
+			'.wpfnl-modern-multistep .wpfnl-billing-fields input, ' +
+			'.wpfnl-modern-multistep .wpfnl-billing-fields select, ' +
+			'.wpfnl-modern-multistep .wpfnl-shipping-fields input, ' +
+			'.wpfnl-modern-multistep .wpfnl-shipping-fields select, ' +
+			'.wpfnl-modern-multistep .woocommerce-additional-fields input, ' +
+			'.wpfnl-modern-multistep .woocommerce-additional-fields textarea',
+			wpfnlValidateCurrentStep
+		);
+
+		// Re-check when ship-to-different-address toggle changes
+		$(document).on('change', '#ship-to-different-address-checkbox', wpfnlValidateCurrentStep);
+
+		// Re-check after WooCommerce refreshes the checkout fragments
+		$(document.body).on('updated_checkout', wpfnlValidateCurrentStep);
+
+		// Initial check on page load
+		wpfnlValidateCurrentStep();
+
+		function initModernMultistepCheckoutToggle(target) {
+			if ( 'information' == target ) {
+				$('.wpfnl-modern-multistep .wpfnl-modern-section--customer-information').show();
+				$('.wpfnl-modern-multistep .wpfnl-billing-fields').show();
+
+				$('.wpfnl-modern-multistep .wpfnl-shipping-fields').hide();
+				$('.wpfnl-modern-multistep .woocommerce-additional-fields').hide();
+				$('.wpfnl-modern-multistep .wpfnl-modern-section--payment').hide();
+				$('.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation').show();
+				$('.wpfnl-modern-multistep .money-back-guarantee-text').show();
+
+			}else if ( 'shipping' == target ) {
+				$('.wpfnl-modern-multistep .wpfnl-modern-section--customer-information').hide();
+				$('.wpfnl-modern-multistep .wpfnl-billing-fields').hide();
+
+				$('.wpfnl-modern-multistep .wpfnl-shipping-fields').show();
+				$('.wpfnl-modern-multistep .woocommerce-additional-fields').show();
+				$('.wpfnl-modern-multistep .wpfnl-modern-section--payment').hide();
+				$('.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation').show();
+				$('.wpfnl-modern-multistep .money-back-guarantee-text').show();
+
+			}else if ( 'payment' == target ) {
+				$('.wpfnl-modern-multistep .wpfnl-modern-section--customer-information').hide();
+				$('.wpfnl-modern-multistep .wpfnl-billing-fields').hide();
+
+				$('.wpfnl-modern-multistep .wpfnl-shipping-fields').hide();
+				$('.wpfnl-modern-multistep .woocommerce-additional-fields').hide();
+				$('.wpfnl-modern-multistep .wpfnl-modern-section--payment').show();
+				$('.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation').hide();
+				$('.wpfnl-modern-multistep .money-back-guarantee-text').hide();
+			}
+		}
+
+		$(document).on('click', '.wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step-btn', function (e) {
+			e.preventDefault();
+			var target = $(this).data('step');
+
+			// Determine the currently active step
+			var $activeBtn = $('.wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step.active .wpfnl-modern-multistep-nav-step-btn');
+			var currentStep = $activeBtn.length ? $activeBtn.data('step') : wpfnlMultistepOrder[0];
+			var currentIndex = wpfnlMultistepOrder.indexOf(currentStep);
+			var targetIndex  = wpfnlMultistepOrder.indexOf(target);
+
+			// Navigating forward — block if current step is invalid
+			if (targetIndex > currentIndex && !wpfnlIsStepValid(currentStep)) {
+				return;
+			}
+
+			var $btn = $(this);
+			var $nav = $btn.closest('.wpfnl-modern-multistep-nav');
+			var $li = $btn.closest('li');
+			$li.addClass('active').siblings().removeClass('active');
+			$li.prevAll('li[data-step]').addClass('completed');
+			$li.nextAll('li[data-step]').removeClass('completed');
+
+			$nav.find('.wpfnl-modern-multistep-nav-step-btn')
+				.attr('aria-selected', 'false')
+				.attr('tabindex', '-1');
+			$btn.attr('aria-selected', 'true').attr('tabindex', '0');
+			initModernMultistepCheckoutToggle(target);
+			wpfnlSyncNextStepBtn(target);
+		});
+
+		$(document).on('click', '.wpfnl-modern-multistep-navigation .next-step-btn', function (e) {
+			e.preventDefault();
+			var $btn = $(this);
+			var nextStep = $btn.attr('next-step');
+			if (!nextStep) return;
+
+			// Trigger nav tab click to update classes and panel visibility
+			$('.wpfnl-modern-multistep-nav-step-btn[data-step="' + nextStep + '"]').trigger('click');
+
+			// Sync button attributes to the new active step
+			wpfnlSyncNextStepBtn(nextStep);
+		});
+		// ----end modern multistep checkout toggle----
+
 
     })
 })(jQuery)

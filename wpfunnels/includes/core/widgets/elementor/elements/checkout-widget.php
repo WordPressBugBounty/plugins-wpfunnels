@@ -1,7 +1,7 @@
 <?php
 /**
  * Checkout widgets
- * 
+ *
  * @package
  */
 namespace WPFunnels\Widgets\Elementor;
@@ -297,7 +297,7 @@ class Checkout_Form extends Widget_Base
                 $products[$id] = $title ? $title : '';
             }
         }
-        
+
         return $products;
     }
 
@@ -333,7 +333,8 @@ class Checkout_Form extends Widget_Base
 			'wpfnl-col-1' 		        => __('1 Column Checkout', 'wpfnl'),
 			'wpfnl-col-2' 		        => __('2 Column Checkout', 'wpfnl'),
 			'wpfnl-2-step' 	            => __('2 Step Checkout', 'wpfnl'),
-			'wpfnl-multistep' 	        => __('Multistep Checkout', 'wpfnl'),
+			// 'wpfnl-multistep' 	        => __('Multistep Checkout', 'wpfnl'),
+			'wpfnl-modern-multistep' 	=> __('Modern Multistep Checkout', 'wpfnl'),
 			'wpfnl-express-checkout' 	=> __('Express Checkout', 'wpfnl'),
             'wpfnl-modern-checkout' 	=> __('Modern Checkout', 'wpfnl'),
             'wpfnl-modern-one-column' => __('Modern One Column Checkout', 'wpfnl'),
@@ -1289,7 +1290,7 @@ class Checkout_Form extends Widget_Base
                 'type' => Controls_Manager::COLOR,
                 'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > label:before, 
+                    '{{WRAPPER}} .wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > label:before,
                     {{WRAPPER}} .wpfnl-checkout .woocommerce-checkout #payment ul.payment_methods > li > label:before' => 'border-color: {{VALUE}};',
                 ],
             ]
@@ -1305,7 +1306,7 @@ class Checkout_Form extends Widget_Base
                     '{{WRAPPER}} .wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > input[type=radio]:checked + label:before,
                     {{WRAPPER}} .wpfnl-checkout .woocommerce-checkout #payment ul.payment_methods > li > input[type=radio]:checked + label:before' => 'border-color: {{VALUE}};',
 
-                    '{{WRAPPER}} .wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > input[type=radio]:checked + label:after, 
+                    '{{WRAPPER}} .wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > input[type=radio]:checked + label:after,
                     {{WRAPPER}} .wpfnl-checkout .woocommerce-checkout #payment ul.payment_methods > li > input[type=radio]:checked + label:after' => 'background-color: {{VALUE}};',
                 ],
                 'separator' => 'after'
@@ -1350,7 +1351,7 @@ class Checkout_Form extends Widget_Base
                 'separator' => 'after'
             ]
         );
-        
+
 
         $this->add_control(
             'payment_method_border_style',
@@ -2148,7 +2149,7 @@ class Checkout_Form extends Widget_Base
                     {{WRAPPER}} .wpfnl-checkout .woocommerce-billing-fields .form-row textarea,
                     {{WRAPPER}} .wpfnl-checkout .woocommerce-billing-fields .select2-container--default .select2-selection--single,
                     {{WRAPPER}} .wpfnl-checkout .woocommerce-billing-fields .form-row select.select,
-                    {{WRAPPER}} .wpfnl-checkout .woocommerce-billing-fields .form-row select, 
+                    {{WRAPPER}} .wpfnl-checkout .woocommerce-billing-fields .form-row select,
                     {{WRAPPER}} .wpfnl-checkout.floating-label #customer_details #wpfnl_checkout_billing .form-row:not(.create-account) > label' => 'background-color: {{VALUE}};',
                 ],
             ]
@@ -2241,7 +2242,7 @@ class Checkout_Form extends Widget_Base
                     {{WRAPPER}} .wpfnl-checkout .woocommerce-account-fields .form-row input.input-text,
                     {{WRAPPER}} .wpfnl-checkout form .woocommerce-billing-fields .form-row textarea,
                     {{WRAPPER}} .wpfnl-checkout form .woocommerce-billing-fields select.select,
-                    {{WRAPPER}} .wpfnl-checkout form .woocommerce-billing-fields .form-row select, 
+                    {{WRAPPER}} .wpfnl-checkout form .woocommerce-billing-fields .form-row select,
                     {{WRAPPER}} .wpfnl-checkout.floating-label #customer_details #wpfnl_checkout_billing .form-row:not(.create-account) input.input-text:not(#billing_address_2, #shipping_address_2),
                     {{WRAPPER}} .wpfnl-checkout.floating-label #customer_details #wpfnl_checkout_billing .form-row:not(.create-account) textarea' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 
@@ -2258,7 +2259,7 @@ class Checkout_Form extends Widget_Base
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em'],
                 'selectors' => [
-                    '{{WRAPPER}} .wpfnl-checkout form .woocommerce-billing-fields p.form-row:not(#billing_address_1_field), 
+                    '{{WRAPPER}} .wpfnl-checkout form .woocommerce-billing-fields p.form-row:not(#billing_address_1_field),
                     {{WRAPPER}} .wpfnl-checkout .woocommerce-account-fields .form-row' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
 
@@ -2450,7 +2451,7 @@ class Checkout_Form extends Widget_Base
             {{WRAPPER}} .wpfnl-checkout .woocommerce-additional-fields .form-row textarea,
             {{WRAPPER}} .wpfnl-checkout .woocommerce-shipping-fields .select2-container--default .select2-selection--single,
             {{WRAPPER}} .wpfnl-checkout .woocommerce-shipping-fields .form-row select.select,
-            {{WRAPPER}} .wpfnl-checkout .woocommerce-shipping-fields .form-row select, 
+            {{WRAPPER}} .wpfnl-checkout .woocommerce-shipping-fields .form-row select,
             {{WRAPPER}} .wpfnl-checkout.floating-label #customer_details #wpfnl_checkout_shipping .form-row:not(.create-account) > label' => 'background-color: {{VALUE}};',
                 ],
             ]
@@ -3364,7 +3365,7 @@ class Checkout_Form extends Widget_Base
 		$floating_label = isset($settings['checkout_floating_label']) ? $settings['checkout_floating_label'] : '';
 
         /**
-         * Check if pro is activated or not 
+         * Check if pro is activated or not
         */
         if( !Wpfnl_functions::is_wpfnl_pro_activated() && ('wpfnl-multistep' === $checkout_layout || 'wpfnl-express-checkout' === $checkout_layout) ) {
 			$checkout_layout = 'wpfnl-col-2';
@@ -3376,14 +3377,14 @@ class Checkout_Form extends Widget_Base
 		$_SESSION[ 'checkout_layout' ] = $checkout_layout;
 
         /**
-         * Check if pro is activated and wpfnl-express-checkout selected 
+         * Check if pro is activated and wpfnl-express-checkout selected
         */
         if( Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-express-checkout' === $checkout_layout ) {
 			$checkout_layout .= ' wpfnl-multistep';
 		}
 
         /**
-         * Check if pro is activated and wpfnl-express-checkout selected 
+         * Check if pro is activated and wpfnl-express-checkout selected
         */
         if( Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-2-step' === $checkout_layout ) {
 			$checkout_layout .= ' wpfnl-multistep';
@@ -3395,6 +3396,15 @@ class Checkout_Form extends Widget_Base
                 $checkout_layout .= ' wpfnl-modern-checkout';
             }
         }
+
+		/**
+         * Check if pro is activated and wpfnl-modern-multistep selected
+        */
+        if( Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-modern-multistep' === $checkout_layout ) {
+			$checkout_layout .= ' wpfnl-modern-checkout';
+		}
+
+
         query_posts('post_type="checkout"');
 
         // Persist layout and floating label so the shortcode / template picks them up.

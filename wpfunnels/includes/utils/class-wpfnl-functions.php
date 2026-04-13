@@ -1672,6 +1672,67 @@ class Wpfnl_functions {
 
 
 	/**
+	 * Count funnels that are NOT store checkout type.
+	 *
+	 * Used to enforce the free-plan 3-funnel limit without counting
+	 * store checkout funnels against that quota.
+	 *
+	 * @param array $statuses Post statuses to include. Defaults to publish + draft.
+	 * @return int
+	 * @since 3.6.0
+	 */
+	public static function count_non_store_checkout_funnels( $statuses = array( 'publish', 'draft' ) ) {
+		$args = array(
+			'post_type'        => WPFNL_FUNNELS_POST_TYPE,
+			'post_status'      => $statuses,
+			'posts_per_page'   => -1,
+			'suppress_filters' => true,
+			'fields'           => 'ids',
+			'meta_query'       => array(
+				'relation' => 'OR',
+				array(
+					'key'     => '_wpfnl_funnel_type',
+					'compare' => 'NOT EXISTS',
+				),
+				array(
+					'key'     => '_wpfnl_funnel_type',
+					'value'   => 'store_checkout',
+					'compare' => '!=',
+				),
+			),
+		);
+		return count( get_posts( $args ) );
+	}
+
+
+	/**
+	 * Count store checkout funnels.
+	 *
+	 * Used to enforce the free-plan 3-store-checkout limit.
+	 *
+	 * @param array $statuses Post statuses to include. Defaults to publish + draft.
+	 * @return int
+	 * @since 3.6.0
+	 */
+	public static function count_store_checkout_funnels( $statuses = array( 'publish', 'draft' ) ) {
+		$args = array(
+			'post_type'        => WPFNL_FUNNELS_POST_TYPE,
+			'post_status'      => $statuses,
+			'posts_per_page'   => -1,
+			'suppress_filters' => true,
+			'fields'           => 'ids',
+			'meta_query'       => array(
+				array(
+					'key'     => '_wpfnl_funnel_type',
+					'value'   => 'store_checkout',
+					'compare' => '=',
+				),
+			),
+		);
+		return count( get_posts( $args ) );
+	}
+
+	/**
 	 * Check if the module is pro or
 	 * not
 	 *
@@ -1732,11 +1793,15 @@ class Wpfnl_functions {
 	public static function wpfnl_rest_check_manager_permissions( $object, $context = 'read' ) {
 
 		$objects = array(
+			'funnels'   => 'wpf_manage_funnels',
 			'settings'  => 'wpf_manage_funnels',
 			'templates' => 'wpf_manage_funnels',
 			'steps'     => 'wpf_manage_funnels',
 			'products'  => 'wpf_manage_funnels',
 		);
+		if ( ! isset( $objects[ $object ] ) ) {
+			return false;
+		}
 		return current_user_can( $objects[ $object ] );
 	}
 

@@ -73,6 +73,27 @@ class Telemetry {
                     'api_key' => self::POSTHOG_API_KEY,
                     'host'  => 'https://eu.i.posthog.com',
                 ],
+                'review_prompt' => [
+                    'webhook'              => 'https://getwpfunnels.com/wp-json/mrm/v1/form/44/webhook/receive?token=b553ed8f2d6f9ff1612b4fe79c19ff9ee8a30c170eb547f1aba9376eb7ac8039',
+                    'min_feedback_length'  => 50,
+                    'snooze_schedule'      => [ 7, 30, 90 ],
+                    'nps_question'         => 'How likely are you to recommend WPFunnels to your friends or colleagues?',
+                    'low_score_threshold'  => 7,
+                    'review_url'           => 'https://wordpress.org/support/plugin/wpfunnels/reviews/#new-post',
+                    'support_url'          => 'https://getwpfunnels.com/support/',
+                    'privacy_url'          => 'https://getwpfunnels.com/privacy-policy/',
+                    'installed_option_key' => 'wpfunnels_installed_time',
+                    'position'             => 'bottom-right',
+                    'allowed_screens'      => [
+                        WPFNL_MAIN_PAGE_SLUG,
+                        WPFNL_FUNNEL_PAGE_SLUG,
+                        WPFNL_TEMPLATE_PAGE_SLUG,
+                        WPFNL_SETTINGS_SLUG,
+                        WPFNL_GLOBAL_SETTINGS_SLUG,
+                        WPFNL_EDIT_FUNNEL_SLUG,
+                        WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG,
+                    ],
+                ],
             ] );
         } catch ( \Exception $e ) {
             return;

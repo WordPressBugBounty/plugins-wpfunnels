@@ -589,12 +589,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/CODEREXLTD/linno-telemetry.git",
-                "reference": "32e7975d19bf532f7762a76a34f150e050cb609a"
+                "reference": "5b2cd03ec9bbda733119ce86c5623c8d4a5bdd37"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CODEREXLTD/linno-telemetry/zipball/32e7975d19bf532f7762a76a34f150e050cb609a",
-                "reference": "32e7975d19bf532f7762a76a34f150e050cb609a",
+                "url": "https://api.github.com/repos/CODEREXLTD/linno-telemetry/zipball/5b2cd03ec9bbda733119ce86c5623c8d4a5bdd37",
+                "reference": "5b2cd03ec9bbda733119ce86c5623c8d4a5bdd37",
                 "shasum": ""
             },
             "require": {
@@ -605,7 +605,7 @@
                 "mockery/mockery": "^1.5",
                 "phpunit/phpunit": "^9.5"
             },
-            "time": "2026-04-02T09:28:26+00:00",
+            "time": "2026-04-13T11:13:03+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -962,17 +962,17 @@
         },
         {
             "name": "spatie/browsershot",
-            "version": "3.61.0",
-            "version_normalized": "3.61.0.0",
+            "version": "v3.x-dev",
+            "version_normalized": "3.9999999.9999999.9999999-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/browsershot.git",
-                "reference": "14d75679390b8b84a71b3a17dc5905928deeb887"
+                "reference": "360da4f4968bff07d4b914689c0f0ffd907d4bb9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/browsershot/zipball/14d75679390b8b84a71b3a17dc5905928deeb887",
-                "reference": "14d75679390b8b84a71b3a17dc5905928deeb887",
+                "url": "https://api.github.com/repos/spatie/browsershot/zipball/360da4f4968bff07d4b914689c0f0ffd907d4bb9",
+                "reference": "360da4f4968bff07d4b914689c0f0ffd907d4bb9",
                 "shasum": ""
             },
             "require": {
@@ -986,7 +986,7 @@
                 "pestphp/pest": "^1.20",
                 "spatie/phpunit-snapshot-assertions": "^4.2.3"
             },
-            "time": "2023-12-21T10:00:28+00:00",
+            "time": "2023-12-29T12:51:22+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1019,7 +1019,7 @@
                 "webpage"
             ],
             "support": {
-                "source": "https://github.com/spatie/browsershot/tree/3.61.0"
+                "source": "https://github.com/spatie/browsershot/tree/main"
             },
             "funding": [
                 {

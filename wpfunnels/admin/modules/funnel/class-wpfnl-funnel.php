@@ -331,15 +331,7 @@ class Module extends Wpfnl_Admin_Module
      */
     private function maybe_restore_allowed(){
         if( !Wpfnl_functions::is_pro_license_activated() ){
-            $args = [
-                'post_type'         => WPFNL_FUNNELS_POST_TYPE,
-                'posts_per_page'    => -1,
-                'suppress_filters'  => true,
-                'fields'            => 'ids'
-            ];
-            $args['post_status'] = array('publish', 'draft');
-            $all_funnels = get_posts($args);
-            $total_funnels = count( $all_funnels );
+            $total_funnels = Wpfnl_functions::count_non_store_checkout_funnels( array( 'publish', 'draft' ) );
             if( (int)$total_funnels < 3 ){
                 return true;
             }

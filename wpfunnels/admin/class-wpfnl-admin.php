@@ -119,11 +119,6 @@ class Wpfnl_Admin
 			// Register Dashboard Widgets.
 			add_action('wp_dashboard_setup', [$this, 'wpfnl_register_dashboard_widgets']);
 
-			if (file_exists(WPFNL_ADMIN_DIR . 'class-wpfnl-review-prompt.php')) {
-				require_once WPFNL_ADMIN_DIR . 'class-wpfnl-review-prompt.php';
-				new \WPFunnels\Admin\Wpfnl_Review_Prompt();
-			}
-
 			if (isset($_GET['page']) && 'edit_funnel' === $_GET['page']) {
 				wp_cache_flush();
 			}
@@ -949,6 +944,11 @@ class Wpfnl_Admin
 				if (isset($_GET['step_id'])) {
 					$step_id = filter_input(INPUT_GET, 'step_id', FILTER_VALIDATE_INT);
 				}
+
+				// For store checkout funnels, resolve the checkout step ID when not in URL.
+				if ( empty( $step_id ) && 'store_checkout' === get_post_meta( $funnel_id, '_wpfnl_funnel_type', true ) ) {
+					$step_id = \WPFunnels\WooCommerce\Wpfnl_Store_Checkout_Conditions::get_checkout_step_id_for_funnel( $funnel_id );
+				}
 			}
 
 			/**
@@ -985,12 +985,14 @@ class Wpfnl_Admin
 			 * As they want
 			 */
 			$is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
-			$count_funnels = wp_count_posts('wpfunnels')->publish + wp_count_posts('wpfunnels')->draft + wp_count_posts('wpfunnels')->trash;
-			$count_active_funnels = wp_count_posts('wpfunnels')->publish + wp_count_posts('wpfunnels')->draft;
+			$count_funnels = Wpfnl_functions::count_non_store_checkout_funnels( array( 'publish', 'draft', 'trash' ) );
+			$count_active_funnels = Wpfnl_functions::count_non_store_checkout_funnels();
 			$total_allowed_funnels = 3;
 			if ($is_pro_active) {
 				$total_allowed_funnels = -1;
 			}
+			$count_store_checkouts        = Wpfnl_functions::count_store_checkout_funnels();
+			$total_allowed_store_checkouts = $is_pro_active ? -1 : 3;
 
 			$wc_currency_symbol = '$';
 			if (function_exists('get_woocommerce_currency_symbol')) {
@@ -1035,6 +1037,8 @@ class Wpfnl_Admin
 				'isProActivated' => $is_pro_active,
 				'totalFunnels' => $count_funnels,
 				'count_active_funnels' => $count_active_funnels,
+				'totalStoreCheckouts' => $count_store_checkouts,
+				'totalAllowedStoreCheckouts' => $total_allowed_store_checkouts,
 				'product_url' => $product_url,
 				'totalAllowedFunnels' => $total_allowed_funnels,
 				'builder' => $builder,
@@ -1092,7 +1096,9 @@ class Wpfnl_Admin
 				array(
 				'ajaxurl' => esc_url_raw(admin_url('admin-ajax.php')),
 				'rest_api_url' => esc_url_raw(get_rest_url()),
-				'dashboard_url' => esc_url_raw(admin_url('admin.php?page=' . WPFNL_FUNNEL_PAGE_SLUG)),
+				'dashboard_url' => ( $funnel_id && get_post_meta( $funnel_id, '_wpfnl_funnel_type', true ) === 'store_checkout' )
+					? esc_url_raw(admin_url('admin.php?page=store_checkout'))
+					: esc_url_raw(admin_url('admin.php?page=' . WPFNL_FUNNEL_PAGE_SLUG)),
 				'settings_url' => esc_url_raw(admin_url('admin.php?page=settings')),
 				'home_url' => esc_url_raw(home_url()),
 				'funnel_id' => $funnel_id,

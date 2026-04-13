@@ -8,7 +8,7 @@
  * @package
  */
 $is_pro_active         = apply_filters( 'wpfunnels/is_pro_license_activated', false );
-$count_funnels         = wp_count_posts('wpfunnels')->publish + wp_count_posts('wpfunnels')->draft;
+$count_funnels         = \WPFunnels\Wpfnl_functions::count_non_store_checkout_funnels();
 $total_allowed_funnels = 3;
 $is_limit_reached      = ($count_funnels >= 3);
 

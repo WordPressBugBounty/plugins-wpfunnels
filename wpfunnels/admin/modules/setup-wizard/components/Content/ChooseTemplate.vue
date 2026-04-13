@@ -196,6 +196,7 @@ export default {
 			// For store checkout, only show templates that have both checkout AND thankyou steps
 			if (this.isStoreCheckout) {
 				return templates
+					.filter(template => template.templateType !== 'pro')
 					.filter(template => {
 						if (!template.steps || !Array.isArray(template.steps)) return false;
 						const stepTypes = template.steps.map(s => s.step_type);

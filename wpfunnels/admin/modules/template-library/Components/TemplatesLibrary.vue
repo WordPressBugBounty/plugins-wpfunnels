@@ -8,13 +8,13 @@
             <div id="wpfnl-create-funnel__inner-content" class="wpfnl-create-funnel__inner-content">
 
                 <div id="wpfnl-create-funnel__template-wrapper" class="wpfnl-create-funnel__templates-wrapper">
-                    <div class="funnel-templates-header" v-if="!isStoreCheckout || showStepsPreview">
-                        <div class="template-library-filter-wrapper">
-                            <span class="back-form-modal wpfnl-modal-close" title="Back to Funnel list" v-show="!showStepsPreview && !isTemplatePage">
+                    <div class="funnel-templates-header">
+                        <div class="template-library-filter-wrapper" :class="{ 'is-store-checkout': isStoreCheckout }">
+                            <span class="back-form-modal wpfnl-modal-close" :title="isStoreCheckout ? 'Back to Store Checkout List' : 'Back to Funnel list'" v-show="!showStepsPreview && !isTemplatePage">
                                 <DoubleAngleLeft/>
                             </span>
 
-                            <h1 class="header-title" v-if="!showStepsPreview">Choose a Funnel Template</h1>
+                            <h1 class="header-title" v-if="!showStepsPreview">{{ isStoreCheckout ? 'Choose a Store Checkout Template' : 'Choose a Funnel Template' }}</h1>
                             <button class="sync-library-btn" v-if="!showStepsPreview" @click="syncLibrary" :disabled="syncingLibrary">
                                 <svg :class="{ 'spinning': syncingLibrary }" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
                                 <span>{{ syncingLibrary ? 'Syncing...' : 'Sync Templates' }}</span>
@@ -207,11 +207,17 @@
                                     <div class="create-funnel__single-template create__from-scratch"
                                         v-if="(showProFilter && !showStepsPreview && !isTemplatePage) || ( 'other' === builder )">
                                         <a id="wpfnl-create-funnel" href="#" class="btn-default" @click="showFunnelNameModal"
-                                        v-if="!isAddNewFunnelButtonDisabled || isStoreCheckout"> <PlusIcon /> Start From scratch </a>
+                                        v-if="!isAddNewFunnelButtonDisabled"> <PlusIcon /> Start From scratch </a>
 
                                         <div class="funnel-limit-notice" v-if="isAddNewFunnelButtonDisabled && !isStoreCheckout">
                                             <p><b>You have reached your limit and built 3/3 funnels!</b><br/><br/>
                                                 To create unlimited funnels, please upgrade to Pro.
+                                            </p>
+                                        </div>
+
+                                        <div class="funnel-limit-notice" v-if="isAddNewFunnelButtonDisabled && isStoreCheckout">
+                                            <p><b>You have reached your limit of 3/3 store checkouts!</b><br/><br/>
+                                                To create unlimited store checkouts, please upgrade to Pro.
                                             </p>
                                         </div>
 
@@ -510,6 +516,8 @@ export default {
             totalFunnels: window.WPFunnelVars.totalFunnels,
             countActiveFunnels: window.WPFunnelVars.count_active_funnels,
             totalAllowedFunnels: window.WPFunnelVars.totalAllowedFunnels,
+            totalStoreCheckouts: window.WPFunnelVars.totalStoreCheckouts || 0,
+            totalAllowedStoreCheckouts: window.WPFunnelVars.totalAllowedStoreCheckouts || 3,
             dependencyPlugins: window.WPFunnelVars.dependencyPlugins,
             isAnyPluginMissing: window.WPFunnelVars.isAnyPluginMissing,
 			isProActivated: window.WPFunnelVars.isProActivated,
@@ -746,6 +754,9 @@ export default {
     computed: {
         isAddNewFunnelButtonDisabled: function () {
             if (!this.isProActivated) {
+                if (this.isStoreCheckout) {
+                    return parseInt(this.totalStoreCheckouts) >= parseInt(this.totalAllowedStoreCheckouts);
+                }
                 if (parseInt(this.countActiveFunnels) >= parseInt(this.totalAllowedFunnels)) {
                     return true
                 }

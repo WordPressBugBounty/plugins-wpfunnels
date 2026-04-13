@@ -835,6 +835,58 @@ body.wpfnl-theme-style-removed {
   padding-right: 12px;
   width: 180px;
 }
+.wpfnl-checkout table.woocommerce-checkout-review-order-table th:last-child,
+.wpfnl-checkout table.woocommerce-checkout-review-order-table td:last-child {
+  width: 110px;
+  text-align: right;
+}
+.wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .product-name-wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: 16px;
+  row-gap: 7px;
+}
+.wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .product-name-text-wrapper {
+  width: calc(100% - 80px);
+}
+.wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .product-thumbnail {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+.wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .product-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .product-thumbnail .product-quantity {
+  background: #0639FF;
+  width: 20px;
+  height: 20px;
+  color: #FFF;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  position: absolute;
+  right: -8px;
+  top: -8px;
+}
+.wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .product-name-text {
+  color: #1A241A;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .quantity-selct-wrapper {
   border-radius: 6px;
   border: 1px solid #D1D5DC;
@@ -853,9 +905,9 @@ body.wpfnl-theme-style-removed {
   padding: 7px;
   line-height: 1;
   margin: 0;
+  border: 1px solid #D1D5DC;
   border-top: none;
   border-bottom: none;
-  border-color: #D1D5DC;
   border-radius: 0;
   color: #1A241A;
   font-size: 14px;
@@ -870,6 +922,10 @@ body.wpfnl-theme-style-removed {
 .wpfnl-checkout table.woocommerce-checkout-review-order-table tfoot .woocommerce-shipping-totals td {
   font-size: 16px;
   font-weight: 600;
+}
+.wpfnl-checkout table.woocommerce-checkout-review-order-table tfoot td:last-child {
+  text-align: right;
+  width: 110px;
 }
 .wpfnl-checkout table.woocommerce-checkout-review-order-table tfoot td strong {
   font-weight: 700;
@@ -3360,6 +3416,9 @@ body.rtl .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-colu
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-checkout-left #wc-stripe-express-checkout-button-separator {
   margin-bottom: 20px;
   margin-top: 20px !important;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
 }
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-checkout-left .wpfnl-customer-shipping {
   border: 1px solid #E5E7EB;
@@ -3383,6 +3442,8 @@ body.rtl .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-colu
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-checkout-right {
   grid-area: right;
   padding: 30px;
+  border-left: 1px solid #e5e7eb;
+  margin-left: -1px;
 }
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-section--customer-information {
   margin-bottom: 24px;
@@ -3396,24 +3457,29 @@ body.rtl .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-colu
   border-radius: 10px;
   padding: 21px 24px 24px;
 }
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom,
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields {
   margin-bottom: 24px;
 }
-.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields:before, .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields:after,
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom:before, .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom:after,
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields:before,
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields:after,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields:before,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields:after,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields:before,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields:after {
   display: none;
 }
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row,
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row {
   margin: 0;
   width: 100%;
 }
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row > label,
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row > label,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row > label,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row > label {
@@ -3423,6 +3489,19 @@ body.rtl .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-colu
   font-weight: 500;
   line-height: 1;
 }
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row input[type=text],
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row input[type=email],
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row input[type=password],
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row input[type=number],
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row input[type=tel],
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row input[type=date],
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row input[type=month],
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row input[type=week],
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row input[type=time],
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row input[type=datetime],
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row select,
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row input.input-text,
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row textarea,
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=text],
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=email],
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=password],
@@ -3470,6 +3549,7 @@ body.rtl .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-colu
   padding: 10px 15px;
   color: #0A0A0A;
 }
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row .select2-container .select2-selection--single .select2-selection__rendered,
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row .select2-container .select2-selection--single .select2-selection__rendered,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row .select2-container .select2-selection--single .select2-selection__rendered,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row .select2-container .select2-selection--single .select2-selection__rendered {
@@ -3478,6 +3558,7 @@ body.rtl .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-colu
   color: #0A0A0A;
   font-weight: 500;
 }
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row .select2-container--default .select2-selection--single,
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row .select2-container--default .select2-selection--single,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row .select2-container--default .select2-selection--single,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row .select2-container--default .select2-selection--single {
@@ -3490,6 +3571,7 @@ body.rtl .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-colu
   padding: 0;
   background: #F3F3F5;
 }
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row .select2-container--focus .select2-selection,
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row .select2-container--focus .select2-selection,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row .select2-container--focus .select2-selection,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row .select2-container--focus .select2-selection {
@@ -3497,45 +3579,54 @@ body.rtl .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-colu
   outline: none;
   background: #F3F3F5;
 }
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row .iti__country-container,
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row .iti__country-container,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row .iti__country-container,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row .iti__country-container {
   left: 7px;
 }
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row .iti .iti__selected-dial-code,
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row .iti .iti__selected-dial-code,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row .iti .iti__selected-dial-code,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row .iti .iti__selected-dial-code {
   font-size: 14px;
   font-weight: 500;
 }
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row .iti__selected-country-primary,
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row .iti__selected-country-primary,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row .iti__selected-country-primary,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row .iti__selected-country-primary {
   gap: 6px;
   cursor: pointer;
 }
-.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row .iti__selected-country-primary:focus, .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row .iti__selected-country-primary:hover,
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row .iti__selected-country-primary:focus, .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row .iti__selected-country-primary:hover,
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row .iti__selected-country-primary:focus,
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row .iti__selected-country-primary:hover,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row .iti__selected-country-primary:focus,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row .iti__selected-country-primary:hover,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row .iti__selected-country-primary:focus,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row .iti__selected-country-primary:hover {
   background-color: transparent !important;
 }
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row .iti__arrow,
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row .iti__arrow,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row .iti__arrow,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row .iti__arrow {
   margin: 0;
 }
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row .iti__tel-input,
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row .iti__tel-input,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row .iti__tel-input,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row .iti__tel-input {
   padding-left: 89px !important;
 }
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row .iti__dropdown-content,
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row .iti__dropdown-content,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row .iti__dropdown-content,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row .iti__dropdown-content {
   max-width: unset !important;
 }
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row .iti__country-list .iti__country-name,
 .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row .iti__country-list .iti__country-name,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row .iti__country-list .iti__country-name,
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row .iti__country-list .iti__country-name {
@@ -3762,60 +3853,13 @@ body.rtl .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-colu
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-order-summary table.woocommerce-checkout-review-order-table tbody td:last-child {
   text-align: right;
   padding-right: 0 !important;
-  width: 80px;
+  width: 110px;
 }
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-order-summary table.woocommerce-checkout-review-order-table tbody td .woocommerce-Price-amount.amount {
   color: #1A241A;
   font-size: 16px;
   font-weight: 400;
   line-height: 1;
-}
-.wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-order-summary table.woocommerce-checkout-review-order-table tbody .product-name-wrapper {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-  gap: 16px;
-  row-gap: 7px;
-}
-.wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-order-summary table.woocommerce-checkout-review-order-table tbody .product-name-text-wrapper {
-  width: calc(100% - 80px);
-}
-.wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-order-summary table.woocommerce-checkout-review-order-table tbody .product-name-text {
-  color: #1A241A;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-order-summary table.woocommerce-checkout-review-order-table .product-thumbnail {
-  position: relative;
-  width: 64px;
-  height: 64px;
-}
-.wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-order-summary table.woocommerce-checkout-review-order-table .product-thumbnail img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 10px;
-}
-.wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-order-summary table.woocommerce-checkout-review-order-table .product-thumbnail .product-quantity {
-  background: #0639FF;
-  width: 20px;
-  height: 20px;
-  color: #FFF;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  position: absolute;
-  right: -8px;
-  top: -8px;
 }
 .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-order-summary table.woocommerce-checkout-review-order-table tfoot th {
   color: #686B7D;
@@ -3865,6 +3909,99 @@ body.rtl .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-colu
 }
 .wpfnl-checkout.wpfnl-modern-one-column .wpfnl-modern-checkout-right {
   grid-area: unset;
+  border-left: 0;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav {
+  margin-bottom: 40px;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-steps {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step {
+  display: flex;
+  align-items: center;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: rgba(254, 126, 109, 0.4);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step-btn:focus-visible {
+  outline: 2px solid #0639FF;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step-btn:hover {
+  color: #FE7E6D;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step.completed .wpfnl-modern-multistep-nav-step-btn,
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step.active .wpfnl-modern-multistep-nav-step-btn {
+  color: #FE7E6D;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-sep {
+  display: flex;
+  align-items: center;
+  color: #D1D5DB;
+  flex-shrink: 0;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation .next-step-btn {
+  color: #FFF;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: capitalize;
+  border-radius: 10px;
+  background-color: #FE7E6D;
+  cursor: pointer;
+  border: none;
+  padding: 14px 21px;
+  display: block;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation .next-step-btn:hover {
+  background-color: #ee6a59;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation .next-step-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  user-select: none;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation .next-step-btn:focus {
+  outline: 2px solid #f9c0b8;
+  outline-offset: 2px;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .money-back-guarantee-text {
+  color: #1A241A;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+  margin-top: 20px;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-shipping-fields {
+  display: none;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .woocommerce-additional-fields {
+  display: none;
+}
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-section--payment {
+  display: none;
 }
 
 @media only screen and (max-width: 1399px) {
@@ -3942,6 +4079,8 @@ body.rtl .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-colu
   .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-checkout-right {
     position: relative;
     padding-bottom: 0;
+    border-left: none;
+    margin-left: 0;
   }
   .wpfnl-checkout.wpfnl-modern-one-column .wpfnl-modern-checkout-right {
     position: relative;
@@ -3950,9 +4089,30 @@ body.rtl .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-colu
   .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-order-summary {
     margin-bottom: 0;
   }
+  .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav {
+    margin-bottom: 24px;
+  }
+  .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-testimonial-section {
+    display: none;
+  }
+  .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-testimonial-benefits {
+    display: none;
+  }
   .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-order-summary table.woocommerce-checkout-review-order-table {
     padding-top: 20px;
     margin: 0;
+  }
+  .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step-btn {
+    font-size: 15px;
+  }
+  .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation .next-step-btn {
+    font-size: 15px;
+    border-radius: 8px;
+    padding: 10px 15px;
+  }
+  .wpfnl-checkout.wpfnl-modern-multistep .money-back-guarantee-text {
+    font-size: 14px;
+    margin-top: 10px;
   }
 }
 @media only screen and (max-width: 575px) {

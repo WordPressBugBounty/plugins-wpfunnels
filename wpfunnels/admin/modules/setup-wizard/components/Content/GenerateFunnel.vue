@@ -211,7 +211,7 @@ export default {
 				name: this.isStoreCheckout ? 'Store Checkout' : (this.filteredTemplate?.title || 'My First Funnel'),
 				source: 'remote',
 				type: templateType,
-				status: 'draft'
+				status: this.isStoreCheckout ? 'publish' : 'draft'
 			};
 			
 			// Always pass remoteID - backend needs it to create funnel

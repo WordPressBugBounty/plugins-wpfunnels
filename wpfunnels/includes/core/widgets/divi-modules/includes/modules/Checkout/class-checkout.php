@@ -1031,7 +1031,8 @@ class WPFNL_Checkout extends ET_Builder_Module {
 					'wpfnl-col-1'       	  => __( '1 Column Checkout' ,'wpfnl'),
 					'wpfnl-col-2'       	  => __( '2 Column Checkout' ,'wpfnl'),
 					'wpfnl-2-step'       	  => __( '2 Step Checkout' ,'wpfnl'),
-					'wpfnl-multistep'   	  => __( 'Multistep Checkout','wpfnl' ),
+					// 'wpfnl-multistep'   	  => __( 'Multistep Checkout','wpfnl' ),
+					'wpfnl-modern-multistep'  => __('Modern Multistep Checkout', 'wpfnl'),
 					'wpfnl-express-checkout'  => __( 'Express Checkout','wpfnl' ),
                     'wpfnl-modern-checkout'   => __( 'Modern Checkout','wpfnl' ),
                     'wpfnl-modern-one-column' => __( 'Modern One Column Checkout','wpfnl' ),
@@ -1118,6 +1119,13 @@ class WPFNL_Checkout extends ET_Builder_Module {
 			if( false === strpos( $checkout_layout, 'wpfnl-modern-checkout' ) ) {
 				$checkout_layout .= ' wpfnl-modern-checkout';
 			}
+		}
+
+		/**
+         * Check if pro is activated and wpfnl-modern-multistep selected
+        */
+        if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-modern-multistep' === $checkout_layout ) {
+			$checkout_layout .= ' wpfnl-modern-checkout';
 		}
 
 		//-----floating label class-----

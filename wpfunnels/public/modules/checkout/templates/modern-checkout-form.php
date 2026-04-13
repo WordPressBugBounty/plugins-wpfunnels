@@ -53,6 +53,9 @@ if ( empty( $default_email ) ) {
 if ( empty( $default_email ) ) {
 	$default_email = $current_user_email;
 }
+
+$checkout_layout = isset( $_SESSION['checkout_layout'] ) ? $_SESSION['checkout_layout'] : '';
+
 ?>
 
 <?php
@@ -77,6 +80,66 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 	<!-- Left Column: Customer Information, Billing, Additional Information, Payment -->
 	<div class="wpfnl-modern-checkout-left">
 
+		<?php if ( 'wpfnl-modern-multistep' === $checkout_layout ) : ?>
+			<nav class="wpfnl-modern-multistep-nav" aria-label="<?php esc_attr_e( 'Checkout steps', 'wpfnl' ); ?>">
+				<ul class="wpfnl-modern-multistep-nav-steps" role="tablist" aria-orientation="horizontal">
+					<li class="wpfnl-modern-multistep-nav-step active" role="presentation" data-step="information">
+						<button
+							type="button"
+							class="wpfnl-modern-multistep-nav-step-btn"
+							role="tab"
+							id="wpfnl-step-tab-information"
+							aria-controls="wpfnl-step-panel-information"
+							aria-selected="true"
+							data-step="information"
+						>
+							<?php esc_html_e( 'Information', 'wpfnl' ); ?>
+						</button>
+					</li>
+
+					<li class="wpfnl-modern-multistep-nav-sep" aria-hidden="true" role="presentation">
+						<svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+							<path d="M1 1L6 5.5L1 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+					</li>
+
+					<li class="wpfnl-modern-multistep-nav-step" role="presentation" data-step="shipping">
+						<button
+							type="button"
+							class="wpfnl-modern-multistep-nav-step-btn"
+							role="tab"
+							id="wpfnl-step-tab-shipping"
+							aria-controls="wpfnl-step-panel-shipping"
+							aria-selected="false"
+							data-step="shipping"
+						>
+							<?php esc_html_e( 'Shipping', 'wpfnl' ); ?>
+						</button>
+					</li>
+
+					<li class="wpfnl-modern-multistep-nav-sep" aria-hidden="true" role="presentation">
+						<svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+							<path d="M1 1L6 5.5L1 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+					</li>
+
+					<li class="wpfnl-modern-multistep-nav-step" role="presentation" data-step="payment">
+						<button
+							type="button"
+							class="wpfnl-modern-multistep-nav-step-btn"
+							role="tab"
+							id="wpfnl-step-tab-payment"
+							aria-controls="wpfnl-step-panel-payment"
+							aria-selected="false"
+							data-step="payment"
+						>
+							<?php esc_html_e( 'Payment', 'wpfnl' ); ?>
+						</button>
+					</li>
+				</ul>
+			</nav>
+		<?php endif; ?>
+
 		<form name="checkout" method="post" class="checkout woocommerce-checkout <?php echo esc_attr( $loged_in_cls . ' ' . $create_acc_field ); ?>" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">
 
 			<?php if ( $checkout->get_checkout_fields() ) : ?>
@@ -84,7 +147,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 				<?php do_action( 'woocommerce_checkout_before_customer_details' ); ?>
 
 				<!-- Customer Information Section -->
-				<div class="wpfnl-modern-section wpfnl-modern-section--customer-information">
+				<div class="wpfnl-modern-section wpfnl-modern-section--customer-information" >
 					<div class="wpfnl-modern-section__content">
 						<div class="wpfnl-customer-info" id="customer_info">
 							<div class="wpfnl-customer-info__notice"></div>
@@ -227,6 +290,25 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 
 		</form>
 
+		<?php if ( 'wpfnl-modern-multistep' === $checkout_layout ) : ?>
+			<div class="wpfnl-modern-multistep-navigation">
+				<button
+					type="button"
+					class="next-step-btn"
+					aria-label="Proceed to the next step"
+					current-step="information"
+					next-step="shipping"
+				>
+					Proceed to Next Step
+				</button>
+			</div>
+			<p class="money-back-guarantee-text">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="18" viewBox="0 0 16 18" fill="none"><path d="M6.5626 0.989293L2.50097 2.51953C1.56492 2.86953 0.799805 3.9765 0.799805 4.96953V11.0172C0.799805 11.9777 1.43469 13.2393 2.20794 13.8172L5.70794 16.43C6.85562 17.2928 8.74399 17.2928 9.89166 16.43L13.3917 13.8172C14.1649 13.2393 14.7998 11.9777 14.7998 11.0172V4.96953C14.7998 3.96836 14.0347 2.86139 13.0986 2.51139L9.03701 0.989293C8.34515 0.736967 7.23818 0.736967 6.5626 0.989293Z" stroke="#838383" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.38965 8.83577L6.70011 10.1462L10.2001 6.64624" stroke="#838383" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+				<?php esc_html_e( '100% Money Back Guarantee On All Plans.', 'wpfnl' ); ?>
+			</p>
+		<?php endif; ?>
+
 	</div>
 	<!-- /.wpfnl-modern-checkout-left -->
 
@@ -238,7 +320,9 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 
 			<?php do_action( 'woocommerce_checkout_before_order_review_heading' ); ?>
 
-			<h3 id="order_review_heading"><?php echo wp_kses_post( apply_filters( 'wpfunnels_woo_order_text', esc_html__( 'Your order', 'woocommerce' ) ) ); ?></h3>
+			<h3 id="order_review_heading">
+				<?php echo wp_kses_post( apply_filters( 'wpfunnels_woo_order_text', esc_html__( 'Your order', 'woocommerce' ) ) ); ?>
+			</h3>
 
 			<?php do_action( 'woocommerce_checkout_before_order_review' ); ?>
 

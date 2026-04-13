@@ -336,31 +336,14 @@ class Wpfnl_Menus
     /**
      * Render Store Checkout page
      *
+     * Since 3.6.0 multiple store checkouts are allowed, so this page always
+     * shows the listing rather than redirecting to a single canvas.
+     *
      * @since 3.5.0
      */
     public function render_store_checkout_page()
     {
-        // Check if a Store Checkout already exists
-        $store_checkout = $this->get_store_checkout_funnel();
-
-        if ($store_checkout) {
-            // Redirect to the canvas view
-            $redirect_url = esc_url_raw(
-                add_query_arg(
-                    [
-                        'page'      => WPFNL_EDIT_FUNNEL_SLUG,
-                        'id'        => $store_checkout->ID,
-                        'step_id'   => 0,
-                    ],
-                    admin_url('admin.php')
-                )
-            );
-            wp_safe_redirect($redirect_url);
-            exit;
-        } else {
-            // Show template selection screen
-            require WPFNL_DIR . '/admin/modules/store-checkout/views/store-checkout.php';
-        }
+        require WPFNL_DIR . '/admin/modules/store-checkout/views/store-checkout-listing.php';
     }
 
     /**
@@ -382,7 +365,6 @@ class Wpfnl_Menus
             require_once WPFNL_DIR . 'admin/modules/integration/view.php';
         }
     }
-
 
     /**
      * Get Store Checkout funnel if exists

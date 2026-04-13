@@ -65,35 +65,38 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
 	 */
     public function import_funnel($args = [])
     {
+        $is_pro             = apply_filters( 'wpfunnels/is_pro_license_activated', false );
+        $is_store_checkout  = isset( $args['is_store_checkout'] ) && $args['is_store_checkout'] === 'true';
+
+        if ( ! $is_pro ) {
+            if ( $is_store_checkout ) {
+                $sc_count = \WPFunnels\Wpfnl_functions::count_store_checkout_funnels();
+                if ( $sc_count >= 3 ) {
+                    return array(
+                        'success' => false,
+                        'message' => __( 'You have reached the maximum limit of 3 store checkouts on the free plan. Upgrade to Pro for unlimited store checkouts.', 'wpfnl' ),
+                    );
+                }
+            } else {
+                $funnel_count = \WPFunnels\Wpfnl_functions::count_non_store_checkout_funnels();
+                if ( $funnel_count >= 3 ) {
+                    return array(
+                        'success' => false,
+                        'message' => __( 'You have reached the maximum limit of 3 funnels on the free plan. Upgrade to Pro for unlimited funnels.', 'wpfnl' ),
+                    );
+                }
+            }
+        }
+
         $funnel 	= Wpfnl::$instance->funnel_store;
         $funnel_id 	= $funnel->create();
         $funnel->update_meta($funnel_id, '_is_imported', 'yes');
         $general_settings = get_option( '_wpfunnels_general_settings' );
         // Mark as Store Checkout funnel if imported from Store Checkout page
-        if ( isset( $args['is_store_checkout'] ) && $args['is_store_checkout'] === 'true' ) {
-            // Ensure there is only one Store Checkout funnel globally.
-            $existing_store_checkout = get_posts(
-                array(
-                    'post_type'      => 'any',
-                    'post_status'    => 'any',
-                    'meta_key'       => '_wpfnl_funnel_type',
-                    'meta_value'     => 'store_checkout',
-                    'fields'         => 'ids',
-                    'posts_per_page' => 1,
-                )
-            );
-
-            if ( ! empty( $existing_store_checkout ) ) {
-                // A Store Checkout funnel already exists; do not create another.
-                return array(
-                    'success' => false,
-                    'error'   => 'store_checkout_exists',
-                );
-            }
-
+        if ( $is_store_checkout ) {
             update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'store_checkout' );
             $funnel->update_meta( $funnel_id, '_is_store_checkout', 'yes' );
-        }else{
+        } else {
             if( $funnel_id ){
                 
                 if( isset( $general_settings['funnel_type'] ) ){
@@ -187,8 +190,10 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
             ];
         }
         // Check if this is a Store Checkout funnel and skip non-checkout/thankyou steps
+        // Only applies to bulk/funnel-template imports, not single step imports from the canvas
+        $is_single_step = isset($args['isSingleStep']) && 'yes' === $args['isSingleStep'];
         $funnel_type = get_post_meta($args['funnelID'], '_wpfnl_funnel_type', true);
-        if ($funnel_type === 'store_checkout') {
+        if ( ! $is_single_step && $funnel_type === 'store_checkout') {
             $step_type = isset($args['step']['step_type']) ? $args['step']['step_type'] : '';
             // Silently skip non-checkout and non-thankyou steps
             if (!in_array($step_type, ['checkout', 'thankyou'])) {
@@ -273,7 +278,7 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
         $response = [
             'success' 		=> true,
             'stepID' 		=> $step_id,
-			'stepEditLink'	=> get_edit_post_link($step_id),
+			'stepEditLink'	=> get_edit_post_link($step_id, 'raw') ?? admin_url( 'post.php?post=' . $step_id . '&action=edit' ),
 			'stepViewLink'	=> $view_link,
             'abTestingSettingsData'=> $this->get_default_start_setting($step_id),
         ];
@@ -371,7 +376,7 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
         $response = [
             'success' 		=> true,
             'stepID' 		=> $step_id,
-			'stepEditLink'	=> get_edit_post_link($step_id),
+			'stepEditLink'	=> get_edit_post_link($step_id, 'raw') ?? admin_url( 'post.php?post=' . $step_id . '&action=edit' ),
 			'stepViewLink'	=> get_permalink($step_id),
         ];
 

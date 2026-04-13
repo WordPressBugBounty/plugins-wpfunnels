@@ -45,17 +45,6 @@ class Module extends Wpfnl_Admin_Module
     {
         // Check if this is a Store Checkout import
         $is_store_checkout = isset($payload['is_store_checkout']) && filter_var($payload['is_store_checkout'], FILTER_VALIDATE_BOOLEAN);
-        
-        // Validate Store Checkout creation
-        if ($is_store_checkout) {
-            $existing_store_checkout = $this->get_store_checkout_funnel();
-            if ($existing_store_checkout) {
-                return [
-                    'success' => false,
-                    'message' => __('A Store Checkout already exists. Please delete the existing one before creating a new one.', 'wpfnl'),
-                ];
-            }
-        }
 
         $funnel = Wpfnl::$instance->funnel_store;
         $funnel_id = $funnel->create($payload['funnelName']);

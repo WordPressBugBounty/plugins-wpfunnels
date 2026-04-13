@@ -822,6 +822,10 @@ body.wpfnl-theme-style-removed {
 .wpfnl-checkout table.woocommerce-checkout-review-order-table td.product-total {
   padding-right: 12px;
   width: 180px;
+  text-align: right;
+}
+.wpfnl-checkout table.woocommerce-checkout-review-order-table tfoot td:last-child {
+  text-align: right;
 }
 .wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name input {
   height: 40px;
@@ -834,6 +838,88 @@ body.wpfnl-theme-style-removed {
 .wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name input[type=number]::-webkit-outer-spin-button {
   opacity: 1;
 }
+
+.wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .product-name-wrapper {
+	 display: flex;
+	 flex-flow: row wrap;
+	 align-items: center;
+	 gap: 16px;
+	 row-gap: 7px;
+}
+ .wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .product-name-text-wrapper {
+	 width: calc(100% - 80px);
+}
+ .wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .product-thumbnail {
+	 position: relative;
+	 width: 64px;
+	 height: 64px;
+}
+ .wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .product-thumbnail img {
+	 width: 100%;
+	 height: 100%;
+	 object-fit: cover;
+	 border-radius: 10px;
+}
+ .wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .product-thumbnail .product-quantity {
+	 background: #0639ff;
+	 width: 20px;
+	 height: 20px;
+	 color: #fff;
+	 font-size: 12px;
+	 font-weight: 400;
+	 line-height: 1;
+	 display: flex;
+	 align-items: center;
+	 justify-content: center;
+	 border-radius: 10px;
+	 position: absolute;
+	 right: -8px;
+	 top: -8px;
+}
+ .wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .product-name-text {
+	 color: #1a241a;
+	 font-size: 14px;
+	 font-weight: 500;
+	 line-height: 1.3;
+	 display: -webkit-box;
+	 -webkit-line-clamp: 2;
+	 -webkit-box-orient: vertical;
+	 overflow: hidden;
+}
+ .wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .quantity-selct-wrapper {
+	 border-radius: 6px;
+	 border: 1px solid #d1d5dc;
+	 display: inline-flex;
+	 margin-top: 6px;
+}
+ .wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .quantity-selct-wrapper > button {
+	 border: none;
+	 background: none;
+	 padding: 5px 8px;
+	 cursor: pointer;
+}
+ .wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name input {
+	 height: 28px;
+	 width: 32px;
+	 padding: 7px;
+	 line-height: 1;
+	 margin: 0;
+	 border: 1px solid #d1d5dc;
+	 border-top: none;
+	 border-bottom: none;
+	 border-radius: 0;
+	 color: #1a241a;
+	 font-size: 14px;
+	 text-align: center;
+}
+ .wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name input:focus {
+	 border-color: #d1d5dc;
+}
+ .wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name input::-webkit-inner-spin-button {
+	 display: none;
+}
+
+
 .wpfnl-checkout table.woocommerce-checkout-review-order-table tfoot .woocommerce-shipping-totals td {
   font-size: 16px;
   font-weight: 600;
@@ -6924,14 +7010,14 @@ body.rtl .wpfnl-order-bump__template-style14 .template-preview-wrapper .product-
 	 margin: 0;
 	 width: 100%;
 }
- .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row > label, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row > label, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row > label {
+.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields-custom .form-row > label, .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row > label, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row > label, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row > label {
 	 margin-bottom: 8px;
 	 color: #686b7d;
 	 font-size: 16px;
 	 font-weight: 500;
 	 line-height: 1;
 }
- .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=text], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=text], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=text], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=email], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=email], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=email], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=password], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=password], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=password], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=number], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=number], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=number], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=tel], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=tel], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=tel], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=date], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=date], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=date], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=month], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=month], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=month], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=week], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=week], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=week], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=time], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=time], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=time], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=datetime], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=datetime], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=datetime], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row select, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row select, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row select, .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input.input-text, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input.input-text, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input.input-text, .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row textarea, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row textarea, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row textarea {
+ .wpfnl-checkout.wpfnl-modern-checkout ..woocommerce-billing-fields-custom .form-row input[type=email], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=text], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=text], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=text], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=email], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=email], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=email], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=password], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=password], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=password], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=number], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=number], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=number], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=tel], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=tel], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=tel], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=date], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=date], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=date], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=month], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=month], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=month], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=week], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=week], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=week], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=time], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=time], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=time], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input[type=datetime], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input[type=datetime], .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input[type=datetime], .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row select, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row select, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row select, .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row input.input-text, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row input.input-text, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row input.input-text, .wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields .form-row textarea, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-shipping-fields .form-row textarea, .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-fields .form-row textarea {
 	 font-size: 14px;
 	 font-weight: 500;
 	 border-radius: 8px;
@@ -7129,7 +7215,7 @@ body.rtl .wpfnl-order-bump__template-style14 .template-preview-wrapper .product-
 	 font-weight: 500;
 	 line-height: 1.2;
 	 margin-bottom: 25px;
-	 display: none;
+	 display: none!important;
 }
  .wpfnl-checkout.wpfnl-modern-checkout .wpfnl-modern-order-summary .woocommerce-checkout-review-order {
 	 width: 100%;
@@ -7414,6 +7500,116 @@ body.rtl .wpfnl-order-bump__template-style14 .template-preview-wrapper .product-
 		 font-size: 14px;
 	}
 }
+
+.wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav {
+	 margin-bottom: 40px;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-steps {
+	 display: flex;
+	 align-items: center;
+	 gap: 10px;
+	 list-style: none;
+	 margin: 0;
+	 padding: 0;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step {
+	 display: flex;
+	 align-items: center;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step-btn {
+	 background: none;
+	 border: none;
+	 padding: 0;
+	 cursor: pointer;
+	 color: #fe7e6d66;
+	 font-size: 18px;
+	 font-weight: 500;
+	 line-height: 1;
+	 transition: color 0.2s ease;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step-btn:focus-visible {
+	 outline: 2px solid #0639ff;
+	 outline-offset: 3px;
+	 border-radius: 3px;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step-btn:hover {
+	 color: #fe7e6d;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step.completed .wpfnl-modern-multistep-nav-step-btn, .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step.active .wpfnl-modern-multistep-nav-step-btn {
+	 color: #fe7e6d;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-sep {
+	 display: flex;
+	 align-items: center;
+	 color: #d1d5db;
+	 flex-shrink: 0;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation .next-step-btn {
+	 color: #fff;
+	 text-align: center;
+	 font-size: 18px;
+	 font-weight: 500;
+	 line-height: 1.2;
+	 text-transform: capitalize;
+	 border-radius: 10px;
+	 background-color: #fe7e6d;
+	 cursor: pointer;
+	 border: none;
+	 padding: 14px 21px;
+	 display: block;
+	 width: 100%;
+	 transition: all 0.3s ease;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation .next-step-btn:hover {
+	 background-color: #ee6a59;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation .next-step-btn:disabled {
+	 opacity: 0.6;
+	 cursor: not-allowed;
+	 user-select: none;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation .next-step-btn:focus {
+	 outline: 2px solid #f9c0b8;
+	 outline-offset: 2px;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .money-back-guarantee-text {
+	 color: #1a241a;
+	 font-size: 15px;
+	 font-weight: 500;
+	 line-height: 1.4;
+	 display: flex;
+	 align-items: center;
+	 gap: 4px;
+	 justify-content: center;
+	 margin-top: 20px;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-shipping-fields {
+	 display: none;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .woocommerce-additional-fields {
+	 display: none;
+}
+ .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-section--payment {
+	 display: none;
+}
+ @media only screen and (max-width: 991px) {
+	 .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav {
+		 margin-bottom: 24px;
+	}
+	 .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-nav .wpfnl-modern-multistep-nav-step-btn {
+		 font-size: 15px;
+	}
+	 .wpfnl-checkout.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation .next-step-btn {
+		 font-size: 15px;
+		 border-radius: 8px;
+		 padding: 10px 15px;
+	}
+	 .wpfnl-checkout.wpfnl-modern-multistep .money-back-guarantee-text {
+		 font-size: 14px;
+		 margin-top: 10px;
+	}
+}
+
 
 
 /* --------- Testimonial Section ------- */

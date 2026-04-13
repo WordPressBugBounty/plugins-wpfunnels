@@ -2,7 +2,7 @@
 /**
  * Namespace declaration for the Checkout class.
  * This class is part of the WPFunnels\Widgets\Bricks namespace.
- * 
+ *
  * @package WPFunnels\Widgets\Bricks
  */
 namespace WPFunnels\Widgets\Bricks;
@@ -23,9 +23,9 @@ if (! defined('ABSPATH')) {
 
 /**
  * Class Checkout
- * 
+ *
  * Represents a checkout element.
- * 
+ *
  */
 class Checkout extends Element
 {
@@ -39,7 +39,7 @@ class Checkout extends Element
 
      /**
      * Return localised element label
-     * 
+     *
      * @return string
      * @since 3.1.0
      */
@@ -58,7 +58,8 @@ class Checkout extends Element
 			'wpfnl-col-1' 		        => __('1 Column Checkout', 'wpfnl'),
 			'wpfnl-col-2' 		        => __('2 Column Checkout', 'wpfnl'),
 			'wpfnl-2-step' 	            => __('2 Step Checkout', 'wpfnl'),
-			'wpfnl-multistep' 	        => __('Multistep Checkout', 'wpfnl'),
+			// 'wpfnl-multistep' 	        => __('Multistep Checkout', 'wpfnl'),
+			'wpfnl-modern-multistep' 	=> __('Modern Multistep Checkout', 'wpfnl'),
 			'wpfnl-express-checkout' 	=> __('Express Checkout', 'wpfnl'),
 			'wpfnl-modern-checkout' 	=> __('Modern Checkout', 'wpfnl'),
 			'wpfnl-modern-one-column' => __('Modern One Column Checkout', 'wpfnl'),
@@ -91,9 +92,9 @@ class Checkout extends Element
 
     /**
      * Controls the checkout content for the Checkout widget.
-     * 
+     *
      * @since 3.1.0
-     * 
+     *
      * @access public
      */
     public function checkout_content_control() {
@@ -137,9 +138,9 @@ class Checkout extends Element
 
     /**
      * Registers the ob control.
-     * 
+     *
      * @since 3.1.0
-     * 
+     *
      * @access public
      */
     public function ob_register_control(){
@@ -446,7 +447,7 @@ class Checkout extends Element
 
     }
 
-    
+
     /**
      * Register Shipping Fields Style Controls.
      *
@@ -587,7 +588,7 @@ class Checkout extends Element
 				[
 					'property' => 'font',
 					'selector' => '.wpfnl-checkout.floating-label #customer_details #wpfnl_checkout_shipping .form-row:not(.create-account) textarea',
-                ],				
+                ],
 			],
 		];
         $this->controls['shipping_input_bgcolor'] = [
@@ -619,7 +620,7 @@ class Checkout extends Element
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-checkout.floating-label #customer_details #wpfnl_checkout_shipping .form-row:not(.create-account) > label',
-                ],				
+                ],
 			],
 		];
         $this->controls['shipping_input_border_style'] = [
@@ -646,7 +647,7 @@ class Checkout extends Element
 				[
 					'property' => 'border',
 					'selector' => '.wpfnl-checkout .woocommerce-shipping-fields .form-row select',
-				],				
+				],
 			],
 		];
         $this->controls['shipping_input_padding'] = [
@@ -681,7 +682,7 @@ class Checkout extends Element
 				[
 					'property' => 'padding',
 					'selector' => '.wpfnl-checkout .woocommerce-shipping-fields .select2-container .select2-selection--single .select2-selection__rendered',
-				],				
+				],
 			],
 		];
         $this->controls['shipping_input_margin'] = [
@@ -692,14 +693,14 @@ class Checkout extends Element
 				[
 					'property' => 'margin',
 					'selector' => '.wpfnl-checkout form .woocommerce-shipping-fields p.form-row:not(#shipping_address_1_field)',
-				],				
+				],
 			],
 		];
         // ----end input field style------
 
     }
 
-    
+
     /**
      * Register Order table Style Controls.
      *
@@ -720,7 +721,7 @@ class Checkout extends Element
 				[
 					'property' => 'font',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #order_review_heading',
-                ],				
+                ],
 			],
 		];
         $this->controls['order_heading_margin'] = [
@@ -731,7 +732,7 @@ class Checkout extends Element
 				[
 					'property' => 'margin',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #order_review_heading',
-				],				
+				],
 			],
 		];
         $this->controls['order_heading_padding'] = [
@@ -742,7 +743,7 @@ class Checkout extends Element
 				[
 					'property' => 'padding',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #order_review_heading',
-				],				
+				],
 			],
 		];
 		// ----order table heading style------
@@ -792,17 +793,17 @@ class Checkout extends Element
 				[
 					'property' => 'border-color',
 					'selector' => '.wpfnl-checkout .woocommerce table.shop_table tbody td',
-				],				
+				],
 				[
 					'property' => 'border-color',
 					'selector' => '.wpfnl-checkout .woocommerce table.shop_table tfoot td',
-				],				
+				],
 				[
 					'property' => 'border-color',
 					'selector' => '.wpfnl-checkout .woocommerce table.shop_table tfoot th',
-				],				
+				],
 			],
-		];		
+		];
         $this->controls['order_table_radius'] = [
             'group' => 'wpfunnels_checkout_order_tbl_style',
             'label' => esc_html__( 'Border Radius', 'wpfnl' ),
@@ -818,7 +819,7 @@ class Checkout extends Element
 				'style',
 				'color',
 			],
-            
+
         ];
         $this->controls['order_table_cell_padding'] = [
 			'group' => 'wpfunnels_checkout_order_tbl_style',
@@ -860,14 +861,14 @@ class Checkout extends Element
 					'property' => 'margin',
 					'selector' => '.wpfnl-checkout .woocommerce table.shop_table',
 				],
-				
+
 			],
 		];
         // ----end order table style------
 
     }
 
-    
+
     /**
      * Register Payment Section Style Controls.
      *
@@ -887,9 +888,9 @@ class Checkout extends Element
 				[
 					'property' => 'color',
 					'selector' => '.wpfnl-checkout #payment .place-order p',
-				],			
+				],
 			],
-		];	
+		];
 		$this->controls['payment_section_link_color'] = [
 			'group' => 'wpfunnels_checkout_payment_style',
 			'label' => esc_html__( 'Link Color', 'wpfnl' ),
@@ -900,7 +901,7 @@ class Checkout extends Element
 					'selector' => '.wpfnl-checkout #payment .place-order a',
 				],
 			],
-		];	
+		];
 		$this->controls['payment_section_bg_color'] = [
 			'group' => 'wpfunnels_checkout_payment_style',
 			'label' => esc_html__( 'Background Color', 'wpfnl' ),
@@ -911,7 +912,7 @@ class Checkout extends Element
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment',
 				],
 			],
-		];	
+		];
         $this->controls['payment_section_typography'] = [
 			'group' => 'wpfunnels_checkout_payment_style',
 			'label' => esc_html__( 'Typography', 'wpfnl' ),
@@ -920,11 +921,11 @@ class Checkout extends Element
 				[
 					'property' => 'font',
 					'selector' => '.wpfnl-checkout #payment .place-order',
-                ],				
+                ],
 				[
 					'property' => 'font',
 					'selector' => '.wpfnl-checkout #payment .place-order p',
-                ],				
+                ],
 			],
 		];
 		$this->controls['payment_section_radius'] = [
@@ -942,7 +943,7 @@ class Checkout extends Element
 				'style',
 				'color',
 			],
-            
+
         ];
 		// ----end payment section global style------
 
@@ -967,7 +968,7 @@ class Checkout extends Element
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment div.payment_box',
                 ],
 			],
-		];	
+		];
         $this->controls['payment_method_bg_color'] = [
 			'group' => 'wpfunnels_checkout_payment_style',
 			'label' => esc_html__( 'Background Color', 'wpfnl' ),
@@ -976,10 +977,10 @@ class Checkout extends Element
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment ul.payment_methods',
-				],								
+				],
 			],
-		];	
-		
+		];
+
 		$this->controls['radio_button_separator'] = [
 			'group' => 'wpfunnels_checkout_payment_style',
 			'type'  => 'separator',
@@ -993,11 +994,11 @@ class Checkout extends Element
 				[
 					'property' => 'border-color',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > label:before',
-				],								
+				],
 				[
 					'property' => 'border-color',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment ul.payment_methods > li > label:before',
-				],								
+				],
 			],
 		];
 		$this->controls['payment_method_radio_color'] = [
@@ -1008,19 +1009,19 @@ class Checkout extends Element
 				[
 					'property' => 'border-color',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > input[type=radio]:checked + label:before',
-				],								
+				],
 				[
 					'property' => 'border-color',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment ul.payment_methods > li > input[type=radio]:checked + label:before',
-				],								
+				],
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods > li > input[type=radio]:checked + label:after',
-				],								
+				],
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment ul.payment_methods > li > input[type=radio]:checked + label:after',
-				],								
+				],
 			],
 		];
 
@@ -1037,11 +1038,11 @@ class Checkout extends Element
 				[
 					'property' => 'border-color',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > label:before',
-				],								
+				],
 				[
 					'property' => 'border-color',
 					'selector' => '.wpfnl-checkout #mailpoet_woocommerce_checkout_optin_field #mailpoet_woocommerce_checkout_optin',
-				],								
+				],
 			],
 		];
 		$this->controls['saved_payment_checkbox_color'] = [
@@ -1052,11 +1053,11 @@ class Checkout extends Element
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > input[type=checkbox]:checked + label:before',
-				],								
+				],
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-checkout #mailpoet_woocommerce_checkout_optin_field #mailpoet_woocommerce_checkout_optin:checked',
-				],																			
+				],
 			],
 		];
 		$this->controls['saved_payment_checkbox_tic_color'] = [
@@ -1067,7 +1068,7 @@ class Checkout extends Element
 				[
 					'property' => 'border-color',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > label:after',
-				],								
+				],
 			],
 		];
 
@@ -1096,7 +1097,7 @@ class Checkout extends Element
 					'property' => 'padding',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment ul.payment_methods',
 				],
-				
+
 			],
 		];
         $this->controls['payment_method_margin'] = [
@@ -1108,7 +1109,7 @@ class Checkout extends Element
 					'property' => 'margin',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment ul.payment_methods',
 				],
-				
+
 			],
 		];
         // ----end payment method style------
@@ -1128,7 +1129,7 @@ class Checkout extends Element
 				[
 					'property' => 'color',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment div.payment_box',
-				],								
+				],
 			],
 		];
 		$this->controls['payment_box_bg_color'] = [
@@ -1139,11 +1140,11 @@ class Checkout extends Element
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment div.payment_box',
-				],								
+				],
 				[
 					'property' => 'border-bottom-color',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment div.payment_box:before',
-				],								
+				],
 			],
 		];
 		$this->controls['payment_box_typography'] = [
@@ -1172,7 +1173,7 @@ class Checkout extends Element
 				'style',
 				'color',
 			],
-            
+
         ];
 		$this->controls['payment_box_padding'] = [
 			'group' => 'wpfunnels_checkout_payment_style',
@@ -1183,7 +1184,7 @@ class Checkout extends Element
 					'property' => 'padding',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment div.payment_box',
 				],
-				
+
 			],
 		];
         $this->controls['payment_box_margin'] = [
@@ -1195,7 +1196,7 @@ class Checkout extends Element
 					'property' => 'margin',
 					'selector' => '.wpfnl-checkout .woocommerce-checkout #payment div.payment_box',
 				],
-				
+
 			],
 		];
         // ----end payment box style------
@@ -1218,7 +1219,7 @@ class Checkout extends Element
 				[
 					'property' => 'font',
 					'selector' => '.wpfnl-checkout .woocommerce #payment #place_order',
-                ],				
+                ],
 			],
 		];
 		$this->controls['order_button_bg_color'] = [
@@ -1277,7 +1278,7 @@ class Checkout extends Element
 					'property' => 'padding',
 					'selector' => '.wpfnl-checkout .woocommerce #payment #place_order',
 				],
-				
+
 			],
 		];
         $this->controls['order_button_margin'] = [
@@ -1289,14 +1290,14 @@ class Checkout extends Element
 					'property' => 'margin',
 					'selector' => '.wpfnl-checkout .woocommerce #payment #place_order',
 				],
-				
+
 			],
 		];
 	}
 
 
 	/**
-     * Register Coupon Form Style Controls. 
+     * Register Coupon Form Style Controls.
      *
      * @since  3.1.0
      * @access public
@@ -1348,7 +1349,7 @@ class Checkout extends Element
 				[
 					'property' => 'font',
 					'selector' => '.wpfnl-checkout .woocommerce-form-coupon-toggle .wc-block-components-notice-banner__content',
-                ],				
+                ],
 			],
 		];
 		$this->controls['coupon_toggle_border'] = [
@@ -1370,7 +1371,7 @@ class Checkout extends Element
 				[
 					'property' => 'padding',
 					'selector' => '.wpfnl-checkout .woocommerce-form-coupon-toggle .wc-block-components-notice-banner',
-				],								
+				],
 			],
 		];
         $this->controls['coupon_toggle_margin'] = [
@@ -1382,7 +1383,7 @@ class Checkout extends Element
 					'property' => 'margin',
 					'selector' => '.wpfnl-checkout .woocommerce-form-coupon-toggle .wc-block-components-notice-banner',
 				],
-				
+
 			],
 		];
 
@@ -1422,7 +1423,7 @@ class Checkout extends Element
 				[
 					'property' => 'font',
 					'selector' => '.wpfnl-checkout .woocommerce form.woocommerce-form-coupon p',
-                ],				
+                ],
 			],
 		];
 		$this->controls['coupon_form_box_border'] = [
@@ -1444,7 +1445,7 @@ class Checkout extends Element
 				[
 					'property' => 'padding',
 					'selector' => '.wpfnl-checkout .woocommerce form.woocommerce-form-coupon',
-				],								
+				],
 			],
 		];
         $this->controls['coupon_form_box_margin'] = [
@@ -1456,7 +1457,7 @@ class Checkout extends Element
 					'property' => 'margin',
 					'selector' => '.wpfnl-checkout .woocommerce form.woocommerce-form-coupon',
 				],
-				
+
 			],
 		];
 
@@ -1504,7 +1505,7 @@ class Checkout extends Element
 				[
 					'property' => 'font',
 					'selector' => '.wpfnl-checkout .woocommerce form.woocommerce-form-coupon .input-text',
-                ],				
+                ],
 			],
 		];
 		$this->controls['coupon_input_field_border'] = [
@@ -1526,7 +1527,7 @@ class Checkout extends Element
 				[
 					'property' => 'padding',
 					'selector' => '.wpfnl-checkout .woocommerce form.woocommerce-form-coupon .input-text',
-				],								
+				],
 			],
 		];
 
@@ -1544,7 +1545,7 @@ class Checkout extends Element
 				[
 					'property' => 'font',
 					'selector' => '.wpfnl-checkout .woocommerce form.woocommerce-form-coupon button.button',
-                ],				
+                ],
 			],
 		];
 		$this->controls['coupon_button_bg_color'] = [
@@ -1555,7 +1556,7 @@ class Checkout extends Element
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-checkout .woocommerce form.woocommerce-form-coupon button.button',
-				],				
+				],
 			],
 		];
 		$this->controls['coupon_button_box_shadow'] = [
@@ -1595,7 +1596,7 @@ class Checkout extends Element
 				[
 					'property' => 'padding',
 					'selector' => '.wpfnl-checkout .woocommerce form.woocommerce-form-coupon button.button',
-				],								
+				],
 			],
 		];
 
@@ -1603,7 +1604,7 @@ class Checkout extends Element
 
 
 	/**
-     * Register Form valiation info Style Controls. 
+     * Register Form valiation info Style Controls.
      *
      * @since  3.1.0
      * @access public
@@ -1747,7 +1748,7 @@ class Checkout extends Element
 
 
 	/**
-     * Register Multistep Style Controls. 
+     * Register Multistep Style Controls.
      *
      * @since  3.1.0
      * @access public
@@ -1779,7 +1780,7 @@ class Checkout extends Element
 				[
 					'property' => 'font',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-wizard li .step-title',
-                ],				
+                ],
 			],
 		];
 
@@ -1811,7 +1812,7 @@ class Checkout extends Element
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-wizard:before',
-				],				
+				],
 			],
 		];
 		$this->controls['step_normal_box_bgcolor'] = [
@@ -1823,7 +1824,7 @@ class Checkout extends Element
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-wizard li .step-icon',
-				],				
+				],
 			],
 		];
 		$this->controls['step_normal_icon_color'] = [
@@ -1835,7 +1836,7 @@ class Checkout extends Element
 				[
 					'property' => 'fill',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-wizard li .step-icon svg path',
-				],				
+				],
 			],
 		];
 		$this->controls['step_normal_box_border_style'] = [
@@ -1846,7 +1847,7 @@ class Checkout extends Element
 				[
 					'property' => 'border',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-wizard li .step-icon',
-				],				
+				],
 			],
 			'exclude' => [
 				'radius'
@@ -1868,11 +1869,11 @@ class Checkout extends Element
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-wizard > li.completed:before',
-				],				
+				],
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-wizard > li.current:before',
-				],				
+				],
 			],
 		];
 		$this->controls['step_active_box_bgcolor'] = [
@@ -1884,11 +1885,11 @@ class Checkout extends Element
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-wizard li.completed .step-icon',
-				],				
+				],
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-wizard li.current .step-icon',
-				],				
+				],
 			],
 		];
 		$this->controls['step_active_icon_color'] = [
@@ -1900,11 +1901,11 @@ class Checkout extends Element
 				[
 					'property' => 'fill',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-wizard li.completed .step-icon svg path',
-				],				
+				],
 				[
 					'property' => 'fill',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-wizard li.current .step-icon svg path',
-				],				
+				],
 			],
 		];
 		$this->controls['step_active_box_border_style'] = [
@@ -1915,11 +1916,11 @@ class Checkout extends Element
 				[
 					'property' => 'border',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-wizard li.completed .step-icon',
-				],				
+				],
 				[
 					'property' => 'border',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-wizard li.current .step-icon',
-				],				
+				],
 			],
 			'exclude' => [
 				'radius'
@@ -1940,7 +1941,7 @@ class Checkout extends Element
 				[
 					'property' => 'color',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-navigation button[type=button]',
-				],												
+				],
 			],
 		];
 		$this->controls['step_navigation_btn_bgcolor'] = [
@@ -1951,7 +1952,7 @@ class Checkout extends Element
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-navigation button[type=button]',
-				],												
+				],
 			],
 		];
 		$this->controls['step_navigation_btn_typography'] = [
@@ -1962,7 +1963,7 @@ class Checkout extends Element
 				[
 					'property' => 'font',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-navigation button[type=button]',
-                ],				
+                ],
 			],
 		];
 		$this->controls['step_navigation_btn_radius'] = [
@@ -1989,7 +1990,7 @@ class Checkout extends Element
 				[
 					'property' => 'padding',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-navigation button[type=button]',
-				],								
+				],
 			],
 		];
 
@@ -2007,7 +2008,7 @@ class Checkout extends Element
 				[
 					'property' => 'color',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-navigation button[type=button]:not(:disabled):hover',
-				],												
+				],
 			],
 		];
 		$this->controls['step_navigation_btn_hover_bgcolor'] = [
@@ -2018,16 +2019,16 @@ class Checkout extends Element
 				[
 					'property' => 'background-color',
 					'selector' => '.wpfnl-multistep .wpfnl-multistep-navigation button[type=button]:not(:disabled):hover',
-				],												
+				],
 			],
 		];
 
 	}
 
-    
+
     /**
      * Set builder control groups
-     * 
+     *
      * @since 3.1.0
       * @access public
      */
@@ -2083,7 +2084,7 @@ class Checkout extends Element
 
     /**
      * Set builder controls
-     * 
+     *
      * @since 3.1.0
      */
     public function set_controls(){
@@ -2099,7 +2100,7 @@ class Checkout extends Element
         $this->register_coupon_form_style_controls();
         $this->register_error_style_controls();
         $this->register_multistep_style_controls();
-        
+
     }
 
 
@@ -2136,21 +2137,21 @@ class Checkout extends Element
 		$_SESSION[ 'checkout_layout' ] = $checkout_layout;
 
         /**
-         * Check if pro is activated or not 
+         * Check if pro is activated or not
         */
         if( !Wpfnl_functions::is_wpfnl_pro_activated() && ('wpfnl-multistep' === $checkout_layout || 'wpfnl-express-checkout' === $checkout_layout) ) {
 			$checkout_layout = 'wpfnl-col-2';
 		}
 
         /**
-         * Check if pro is activated and wpfnl-express-checkout selected 
+         * Check if pro is activated and wpfnl-express-checkout selected
         */
         if( Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-express-checkout' === $checkout_layout ) {
 			$checkout_layout .= ' wpfnl-multistep';
 		}
 
         /**
-         * Check if pro is activated and wpfnl-express-checkout selected 
+         * Check if pro is activated and wpfnl-express-checkout selected
         */
         if( Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-2-step' === $checkout_layout ) {
 			$checkout_layout .= ' wpfnl-multistep';
@@ -2162,6 +2163,14 @@ class Checkout extends Element
                 $checkout_layout .= ' wpfnl-modern-checkout';
             }
         }
+
+		/**
+         * Check if pro is activated and wpfnl-modern-multistep selected
+        */
+        if( Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-modern-multistep' === $checkout_layout ) {
+			$checkout_layout .= ' wpfnl-modern-checkout';
+		}
+
         query_posts('post_type="checkout"');
 
         // load woo templates from wpf plugin
@@ -2171,7 +2180,7 @@ class Checkout extends Element
 
 		$ob_settings = $this->get_order_bump_settings_for_preview($checkout_id);
 		do_action('wpfunnels/bricks_render_order_bump', $checkout_id, $ob_settings);
-	
+
 		do_action( 'wpfunnels/before_bricks_checkout_form', $settings );
 		do_action( 'wpfunnels/before_checkout_form', $checkout_id );
 
@@ -2196,7 +2205,7 @@ class Checkout extends Element
 	 *
 	 * @param $post_id
 	 * @param $widget_settings
-	 * 
+	 *
 	 * @return mixed
 	 *
 	 * @since 2.0.4
@@ -2211,7 +2220,7 @@ class Checkout extends Element
 	 *
 	 * @param $order_bump_settings
 	 * @param $widget_settings
-	 * 
+	 *
 	 * @return mixed
 	 *
 	 * @since 2.0.4

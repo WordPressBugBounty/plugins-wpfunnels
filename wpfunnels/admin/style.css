@@ -3807,6 +3807,9 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   justify-content: space-between;
   width: 100%;
 }
+.template-library-modal .funnel-templates-header .template-library-filter-wrapper.is-store-checkout .pro-free__filter {
+  margin-left: auto !important;
+}
 .template-library-modal .funnel-templates-header .back-form-modal {
   height: 38px;
   width: 38px;

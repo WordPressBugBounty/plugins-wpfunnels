@@ -1,7 +1,7 @@
 <?php
 /**
  * Checkout form
- * 
+ *
  * @package
  */
 namespace WPFunnels\Widgets\Gutenberg\BlockTypes;
@@ -194,7 +194,7 @@ class CheckoutForm extends AbstractDynamicBlock {
 
         $icon_svgs = array(
             'lock1'    => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" data-name="Layer 1" id="Layer_1" viewBox="0 0 128 128"><defs><style>.cls-1{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:8px;}</style></defs><title/><path class="cls-1" d="M40,53V35A24,24,0,0,1,64,11h0A24,24,0,0,1,88,35V45a8,8,0,0,1-8,8H36a8,8,0,0,0-8,8v46a8,8,0,0,0,8,8H92a8,8,0,0,0,8-8"/><path class="cls-1" d="M80,53H92a8,8,0,0,1,8,8v46"/><circle fill="currentColor" cx="64" cy="82" r="8"/></svg>',
-            
+
             'lock2'    => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32"><g id="Layer_11" fill="currentColor" data-name="Layer 11"><path d="m24 11.57h-.53v-3.1a7.47 7.47 0 1 0 -14.94 0v3.1h-.53a4 4 0 0 0 -4 4v11.43a4 4 0 0 0 4 4h16a4 4 0 0 0 4-4v-11.43a4 4 0 0 0 -4-4zm-13.47-3.1a5.47 5.47 0 1 1 10.94 0v3.1h-10.94zm15.47 18.53a2 2 0 0 1 -2 2h-16a2 2 0 0 1 -2-2v-11.43a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="m16 17.926a1.948 1.948 0 0 0 -1.354 3.348v2.371a1 1 0 0 0 1 1h.708a1 1 0 0 0 1-1v-2.371a1.948 1.948 0 0 0 -1.354-3.348z"/></g></svg>',
 
             'cart1'    => '<svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="24" height="24" id="Layer_1" enable-background="new 0 0 64 64" height="512" viewBox="0 0 64 64" width="512"><g><g><path d="m25.308 61.679c-3.514 0-6.373-2.859-6.373-6.373s2.859-6.372 6.373-6.372 6.373 2.858 6.373 6.372-2.859 6.373-6.373 6.373zm0-8.745c-1.308 0-2.373 1.064-2.373 2.372 0 1.309 1.064 2.373 2.373 2.373s2.373-1.064 2.373-2.373c0-1.308-1.064-2.372-2.373-2.372z"/><path d="m47.462 61.679c-3.514 0-6.372-2.859-6.372-6.373s2.858-6.372 6.372-6.372 6.373 2.858 6.373 6.372-2.86 6.373-6.373 6.373zm0-8.745c-1.308 0-2.372 1.064-2.372 2.372 0 1.309 1.064 2.373 2.372 2.373 1.309 0 2.373-1.064 2.373-2.373 0-1.308-1.065-2.372-2.373-2.372z"/></g><path d="m52.128 43.994h-31.419c-3.057 0-5.668-2.081-6.35-5.061l-6.521-28.477c-.086-.376-.346-.698-.696-.86l-5.409-2.507c-1.252-.58-1.797-2.066-1.217-3.319.58-1.252 2.067-1.797 3.319-1.217l5.409 2.507c1.743.807 3.04 2.407 3.468 4.28l6.521 28.479c.158.692.765 1.176 1.476 1.176h31.419c.708 0 1.314-.481 1.476-1.171l5.07-21.813c.145-.62-.119-1.071-.288-1.284-.17-.214-.55-.572-1.186-.572h-37c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5h37c1.999 0 3.857.897 5.101 2.462s1.696 3.579 1.244 5.526l-5.071 21.814c-.691 2.965-3.3 5.037-6.346 5.037z"/></g></svg>',
@@ -329,7 +329,7 @@ class CheckoutForm extends AbstractDynamicBlock {
      *
      * @param $attributes
      * @param $post
-     * 
+     *
      * @return array|string
      */
     protected function get_generated_dynamic_styles( $attributes, $post ) {
@@ -497,11 +497,11 @@ class CheckoutForm extends AbstractDynamicBlock {
             ),
 
             //-----payment method checkbox color--------
-            '.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > label:before, 
+            '.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > label:before,
             .wpfnl-checkout #mailpoet_woocommerce_checkout_optin_field #mailpoet_woocommerce_checkout_optin' => array(
                 'border-color' => isset( $attributes['paymentCheckboxDefaultColor'] ) ? $attributes['paymentCheckboxDefaultColor'] : ''
             ),
-            '.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > input[type=checkbox]:checked + label:before, 
+            '.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > input[type=checkbox]:checked + label:before,
             .wpfnl-checkout #mailpoet_woocommerce_checkout_optin_field #mailpoet_woocommerce_checkout_optin:checked' => array(
                 'border-color' => isset( $attributes['paymentCheckboxColor'] ) ? $attributes['paymentCheckboxColor'] : '',
                 'background-color' => isset( $attributes['paymentCheckboxColor'] ) ? $attributes['paymentCheckboxColor'] : ''
@@ -628,7 +628,7 @@ class CheckoutForm extends AbstractDynamicBlock {
      * Get the styles for the wrapper element (background image, color).
      *
      * @param array       $attributes Block attributes. Default empty array.
-     * 
+     *
      * @return string
      */
     public function get_styles( $attributes ) {
@@ -641,7 +641,7 @@ class CheckoutForm extends AbstractDynamicBlock {
      * Get class names for the block container.
      *
      * @param array $attributes Block attributes. Default empty array.
-     * 
+     *
      * @return string
      */
     public function get_classes( $attributes ) {
@@ -693,16 +693,25 @@ class CheckoutForm extends AbstractDynamicBlock {
         if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-express-checkout' === $checkout_layout ){
             $checkout_layout .= ' wpfnl-multistep';
         }
-        
+
         if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-2-step' === $checkout_layout ){
             $checkout_layout .= ' wpfnl-multistep';
         }
-        
+
+		if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-modern-multistep' === $checkout_layout ){
+            $checkout_layout .= ' wpfnl-modern-checkout';
+        }
+
+		if( 'wpfnl-modern-one-column' === $checkout_layout ){
+            $checkout_layout .= ' wpfnl-modern-checkout';
+        }
+
         if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && 'floating-label' === $floating_label ){
             $floating_label .= ' floating-label';
         }
 
-       
+
+
 		$attributes 		= wp_parse_args( $get_attributes, $this->defaults );
 
 		$dynamic_css 		= $this->generate_assets( $attributes );

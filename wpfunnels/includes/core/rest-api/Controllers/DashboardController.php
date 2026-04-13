@@ -259,13 +259,29 @@ class DashboardController extends Wpfnl_REST_Controller
 		$has_upsell = false;
 		$has_real_order = false;
 		$has_funnel_created = false;
+		$has_store_checkout_created = false;
 
-		// ── Step 1: Check for published funnels ──
+		// Meta query to exclude store checkout funnels
+		$exclude_sc_meta = array(
+			'relation' => 'OR',
+			array(
+				'key'     => '_wpfnl_funnel_type',
+				'compare' => 'NOT EXISTS',
+			),
+			array(
+				'key'     => '_wpfnl_funnel_type',
+				'value'   => 'store_checkout',
+				'compare' => '!=',
+			),
+		);
+
+		// ── Step 1: Check for published funnels (excluding store checkouts) ──
 		$funnels = get_posts(array(
 			'post_type' => WPFNL_FUNNELS_POST_TYPE,
 			'post_status' => 'publish',
 			'numberposts' => -1,
 			'fields' => 'ids',
+			'meta_query' => $exclude_sc_meta,
 		));
 
 		if (!empty($funnels)) {
@@ -280,9 +296,25 @@ class DashboardController extends Wpfnl_REST_Controller
 				'post_status' => array('publish', 'draft'),
 				'numberposts' => 1,
 				'fields' => 'ids',
+				'meta_query' => $exclude_sc_meta,
 			));
 			$has_funnel_created = !empty($draft_funnels);
 		}
+
+		// ── Check for store checkout funnels separately ──
+		$sc_funnels = get_posts(array(
+			'post_type'   => WPFNL_FUNNELS_POST_TYPE,
+			'post_status' => array('publish', 'draft'),
+			'numberposts' => 1,
+			'fields'      => 'ids',
+			'meta_query'  => array(
+				array(
+					'key'   => '_wpfnl_funnel_type',
+					'value' => 'store_checkout',
+				),
+			),
+		));
+		$has_store_checkout_created = !empty($sc_funnels);
 
 		// ── Step 2: Check for order bump & upsell across all published funnels ──
 		if (!empty($funnels)) {
@@ -359,6 +391,7 @@ class DashboardController extends Wpfnl_REST_Controller
 		$steps_status = array(
 			'woocommerce_connected' => $is_wc_active,
 			'funnel_created' => $has_funnel_created,
+			'store_checkout_created' => $has_store_checkout_created,
 			'order_bump_added' => $has_order_bump,
 			'upsell_added' => $has_upsell,
 			'test_order_placed' => $has_real_order,
@@ -395,9 +428,14 @@ class DashboardController extends Wpfnl_REST_Controller
 	public function check_has_funnels( \WP_REST_Request $request ) {
 		global $wpdb;
 
+		// Count only non-store-checkout funnels
 		$funnel_count = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = %s",
+				"SELECT COUNT(*) FROM {$wpdb->posts} p
+				 LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = '_wpfnl_funnel_type'
+				 WHERE p.post_type = %s
+				 AND p.post_status IN ('publish', 'draft')
+				 AND (pm.meta_value IS NULL OR pm.meta_value != 'store_checkout')",
 				'wpfunnels'
 			)
 		);

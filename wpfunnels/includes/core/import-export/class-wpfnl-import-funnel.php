@@ -109,11 +109,6 @@ class Wpfnl_Import {
         }
 
         $is_pro        = apply_filters( 'wpfunnels/is_pro_license_activated', false );
-        $current_count = wp_count_posts( 'wpfunnels' )->publish + wp_count_posts( 'wpfunnels' )->draft;
-        if( !$is_pro && $current_count >= 3 ) {
-            wp_send_json_error( [ 'message' => __( 'You have reached the maximum limit of 3 funnels on the free plan. Upgrade to Pro for unlimited funnels.', 'wpfnl' ) ], 403 );
-            wp_die();
-        }
 
         if( !as_has_scheduled_action( 'wpfnl_import_funnels' ) ) {
             $file = $this->upload_imported_file();
@@ -253,10 +248,20 @@ class Wpfnl_Import {
                 }
 
                 if( !$is_pro ) {
-                    $current_count = wp_count_posts( 'wpfunnels' )->publish + wp_count_posts( 'wpfunnels' )->draft;
-                    if( $current_count >= 3 ) {
-                        $message = __( 'You have reached the maximum limit of 3 funnels on the free plan. Upgrade to Pro for unlimited funnels.', 'wpfnl' );
-                        break;
+                    $imported_type         = isset( $data['funnel_meta']['_wpfnl_funnel_type'][0] ) ? $data['funnel_meta']['_wpfnl_funnel_type'][0] : '';
+                    $is_importing_sc       = ( 'store_checkout' === $imported_type );
+                    if ( $is_importing_sc ) {
+                        $current_count = \WPFunnels\Wpfnl_functions::count_store_checkout_funnels();
+                        if ( $current_count >= 3 ) {
+                            $message = __( 'You have reached the maximum limit of 3 store checkouts on the free plan. Upgrade to Pro for unlimited store checkouts.', 'wpfnl' );
+                            break;
+                        }
+                    } else {
+                        $current_count = \WPFunnels\Wpfnl_functions::count_non_store_checkout_funnels();
+                        if( $current_count >= 3 ) {
+                            $message = __( 'You have reached the maximum limit of 3 funnels on the free plan. Upgrade to Pro for unlimited funnels.', 'wpfnl' );
+                            break;
+                        }
                     }
                 }
 

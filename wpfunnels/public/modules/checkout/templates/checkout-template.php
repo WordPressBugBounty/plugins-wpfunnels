@@ -29,7 +29,13 @@ if( 'wpfnl-modern-one-column' === $checkout_layout || 'wpfnl-modern-checkout' ==
 		$checkout_layout .= ' wpfnl-modern-checkout';
 	}
 }
+
+if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-modern-multistep' === $checkout_layout ) {
+	$checkout_layout .= ' wpfnl-modern-checkout';
+}
+
 ?>
+
 <div id="wpfnl-checkout-form" class="wpfnl-checkout  <?php echo esc_attr( $checkout_layout ); ?>  <?php echo esc_attr( $floating_label ); ?> ">
 	<?php
 	$checkout_html = do_shortcode( '[woocommerce_checkout]' );

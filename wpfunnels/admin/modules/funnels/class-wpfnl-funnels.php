@@ -151,12 +151,27 @@ class Module extends Wpfnl_Admin_Module
      */
     public function init_all_funnels($limit = 10, $offset = 0)
     {
+        // Exclude store checkout funnels from live/trash counts
+        $exclude_sc_meta = [
+            'relation' => 'OR',
+            [
+                'key'     => '_wpfnl_funnel_type',
+                'compare' => 'NOT EXISTS',
+            ],
+            [
+                'key'     => '_wpfnl_funnel_type',
+                'value'   => 'store_checkout',
+                'compare' => '!=',
+            ],
+        ];
+
         $args = [
-            'post_type'         => WPFNL_FUNNELS_POST_TYPE, // Ensure this constant is correctly defined.
-            'posts_per_page'    => -1,  // Fetch all posts.
+            'post_type'         => WPFNL_FUNNELS_POST_TYPE,
+            'posts_per_page'    => -1,
             'suppress_filters'  => true,
-            'fields'            => 'ids', // Fetch only the IDs for performance.
-            'post_status'       =>  array('publish', 'draft')
+            'fields'            => 'ids',
+            'post_status'       => array('publish', 'draft'),
+            'meta_query'        => $exclude_sc_meta,
         ];
         
         $total_live_funnel = get_posts($args);
@@ -164,11 +179,12 @@ class Module extends Wpfnl_Admin_Module
 
 
         $args = [
-            'post_type'         => WPFNL_FUNNELS_POST_TYPE, // Ensure this constant is correctly defined.
-            'posts_per_page'    => -1,  // Fetch all posts.
+            'post_type'         => WPFNL_FUNNELS_POST_TYPE,
+            'posts_per_page'    => -1,
             'suppress_filters'  => true,
-            'fields'            => 'ids', // Fetch only the IDs for performance.
-            'post_status'       =>  array('trash')
+            'fields'            => 'ids',
+            'post_status'       => array('trash'),
+            'meta_query'        => $exclude_sc_meta,
         ];
         
         $total_trash_funnel = get_posts($args);

@@ -590,7 +590,7 @@ class Notice {
      */
     public function hide_update_notice_on_builder(){
         global $current_screen;
-        if( "wpfunnels_page_email-builder" === $current_screen->base ||  "toplevel_page_wpfunnels" === $current_screen->base || "wpfunnels_page_wpfnl_automations" === $current_screen->base ){
+        if( "wpfunnels_page_email-builder" === $current_screen->base ||  "toplevel_page_wpfunnels" === $current_screen->base || "wpfunnels_page_wpfnl_automations" === $current_screen->base || "wpfunnels_page_store_checkout" === $current_screen->base ){
             remove_all_actions( 'admin_notices' );
         }
     }
