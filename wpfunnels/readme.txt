@@ -5,7 +5,7 @@ Tags: woocommerce funnel builder, order bump, one click upsell, custom checkout,
 Requires at least: 6.1
 Tested up to:  6.9.4
 Requires PHP: 7.4
-Stable tag:  3.10.2
+Stable tag:  3.10.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -504,6 +504,9 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.10.3 (2026-04-13) =
+* Bugifx: Resolved style issue in funnel checkout
 
 = 3.10.2 (2026-04-13) =
 * Enhancement: Allow to create multiple store checkout with conditions

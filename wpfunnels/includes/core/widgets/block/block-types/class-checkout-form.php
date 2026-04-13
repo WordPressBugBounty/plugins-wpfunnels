@@ -698,7 +698,7 @@ class CheckoutForm extends AbstractDynamicBlock {
             $checkout_layout .= ' wpfnl-multistep';
         }
 
-		if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-modern-multistep' === $checkout_layout ){
+		if('wpfnl-modern-multistep' === $checkout_layout ){
             $checkout_layout .= ' wpfnl-modern-checkout';
         }
 

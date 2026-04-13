@@ -55,14 +55,17 @@ do_action( 'wpfunnel_review_order_before_cart_contents' );
 					if ( isset( $_POST['post_data'] ) ) {
 						parse_str( $_POST['post_data'], $post_data );
 						if ( isset( $post_data['_wpfunnels_checkout_id'] ) ) {
-							$step_id = $post_data['_wpfunnels_checkout_id'];	
+							$step_id = $post_data['_wpfunnels_checkout_id'];
 						}
 					}
 				} else {
 					$step_id = get_the_ID();
 				}
-				
+
 				$isQuantity = get_post_meta($step_id, '_wpfnl_quantity_support',true);
+				if( !\WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() ) {
+					$isQuantity = 'no';
+				}
 				?>
 
 				<tr class="<?php echo esc_attr( apply_filters( 'woocommerce_cart_item_class', 'cart_item', $cart_item, $cart_item_key ) ); ?>">
@@ -74,7 +77,7 @@ do_action( 'wpfunnel_review_order_before_cart_contents' );
 									<?php
 										$thumbnail = apply_filters( 'woocommerce_cart_item_thumbnail', $_product->get_image( 'thumbnail' ), $cart_item, $cart_item_key );
 										echo $thumbnail; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-									
+
 										if($isQuantity === 'no'){
 											echo apply_filters( 'woocommerce_checkout_cart_item_quantity', ' <strong class="product-quantity">' . sprintf( '%s', $cart_item['quantity'] ) . '</strong>', $cart_item, $cart_item_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 										}
@@ -162,7 +165,8 @@ do_action( 'wpfunnel_review_order_before_cart_contents' );
 					$data        = \WPFunnels\Wpfnl_functions::get_sanitized_get_post();
 					$checkout_id = isset( $data[ 'post' ][ 'step_id' ] ) ? $data[ 'post' ][ 'step_id' ] : 0;
 				}
-				if( (\WPFunnels\Wpfnl_functions::maybe_express_checkout( $checkout_id ) || in_array( get_post_meta( $checkout_id, '_wpfnl_checkout_layout', true ), array( 'wpfnl-modern-checkout', 'wpfnl-modern-one-column' ), true )) && \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() ) {
+
+				if( (\WPFunnels\Wpfnl_functions::maybe_express_checkout( $checkout_id ) || in_array( get_post_meta( $checkout_id, '_wpfnl_checkout_layout', true ), array( 'wpfnl-modern-checkout', 'wpfnl-modern-one-column' ), true )) ) {
 					$shipping_method = WC()->session->get( 'chosen_shipping_methods' );
 					$shipping_method = isset( $shipping_method[0] ) ? $shipping_method[0] : '';
 					$shipping_cost = '';

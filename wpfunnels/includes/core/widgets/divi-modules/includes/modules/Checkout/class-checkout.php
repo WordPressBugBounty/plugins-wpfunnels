@@ -1124,7 +1124,7 @@ class WPFNL_Checkout extends ET_Builder_Module {
 		/**
          * Check if pro is activated and wpfnl-modern-multistep selected
         */
-        if( \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && 'wpfnl-modern-multistep' === $checkout_layout ) {
+        if('wpfnl-modern-multistep' === $checkout_layout ) {
 			$checkout_layout .= ' wpfnl-modern-checkout';
 		}
 

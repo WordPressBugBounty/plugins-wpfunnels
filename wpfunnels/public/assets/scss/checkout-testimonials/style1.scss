@@ -1,128 +1,129 @@
-.wpfnl-testimonial-section {
-    margin-top: 40px;
-}
+.wpfnl-modern-checkout {
+	.wpfnl-testimonial-section {
+		margin-top: 40px;
+	}
 
-.wpfnl-checkout-testimonial1 {
-	max-width: 430px;
+	.wpfnl-checkout-testimonial1 {
+		max-width: 430px;
 
-	.wpfnl-testimonial-quote-icon {
-		margin-bottom: 14px;
+		.wpfnl-testimonial-quote-icon {
+			margin-bottom: 14px;
 
-		svg {
-			display: block;
+			svg {
+				display: block;
+			}
+		}
+
+		.wpfnl-testimonial-stars {
+			display: flex;
+			align-items: center;
+			gap: 1px;
+			margin-bottom: 10px;
+
+			.wpfnl-testimonial-star {
+				font-size: 20px;
+				line-height: 1;
+			}
+
+			.wpfnl-testimonial-star-filled {
+				color: #F5A623;
+			}
+
+			.wpfnl-testimonial-star-empty {
+				color: #D1D5DB;
+			}
+		}
+
+		.wpfnl-testimonial-text {
+			margin: 0 0 14px;
+			color: #686B7D;
+			font-size: 16px;
+			font-weight: 400;
+			line-height: 1.5;
+		}
+
+		.wpfnl-testimonial-author {
+			margin: 0;
+			color: #1A241A;
+			font-size: 16px;
+			font-weight: 600;
+			line-height: 1.2;
 		}
 	}
 
-	.wpfnl-testimonial-stars {
-		display: flex;
-		align-items: center;
-		gap: 1px;
-		margin-bottom: 10px;
+	//----- Benefits block -----
+	.wpfnl-testimonial-benefits {
+		margin: 32px 0;
 
-		.wpfnl-testimonial-star {
-			font-size: 20px;
-			line-height: 1;
+		.wpfnl-testimonial-benefits-title {
+			margin: 0 0 20px;
+			color: #1A241A;
+			font-size: 24px;
+			font-weight: 500;
+			line-height: 1.2;
 		}
 
-		.wpfnl-testimonial-star-filled {
-			color: #F5A623;
+		.wpfnl-testimonial-benefits-list {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
 		}
 
-		.wpfnl-testimonial-star-empty {
-			color: #D1D5DB;
+		.wpfnl-testimonial-benefits-item {
+			display: flex;
+			align-items: center;
+			gap: 12px;
 		}
-	}
 
-	.wpfnl-testimonial-text {
-		margin: 0 0 14px;
-		color: #686B7D;
-		font-size: 16px;
-		font-weight: 400;
-		line-height: 1.5;
-	}
-
-	.wpfnl-testimonial-author {
-		margin: 0;
-		color: #1A241A;
-		font-size: 16px;
-		font-weight: 600;
-		line-height: 1.2;
-	}
-}
-
-
-//----- Benefits block -----
-.wpfnl-testimonial-benefits {
-	margin: 32px 0;
-
-	.wpfnl-testimonial-benefits-title {
-		margin: 0 0 20px;
-		color: #1A241A;
-		font-size: 24px;
-		font-weight: 500;
-		line-height: 1.2;
-	}
-
-	.wpfnl-testimonial-benefits-list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
-	}
-
-	.wpfnl-testimonial-benefits-item {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
-
-	.wpfnl-testimonial-check-icon {
-		flex-shrink: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 28px;
-		height: 28px;
-
-		svg {
-			display: block;
+		.wpfnl-testimonial-check-icon {
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 			width: 28px;
 			height: 28px;
+
+			svg {
+				display: block;
+				width: 28px;
+				height: 28px;
+			}
 		}
-	}
 
-	.wpfnl-testimonial-benefits-item-text {
-		color: #686B7D;
-		font-size: 16px;
-		font-weight: 400;
-		line-height: 1.4;
-		display: block;
-	}
+		.wpfnl-testimonial-benefits-item-text {
+			color: #686B7D;
+			font-size: 16px;
+			font-weight: 400;
+			line-height: 1.4;
+			display: block;
+		}
 
+	}
 }
 
 @media only screen and (max-width: 991px){
-	.wpfnl-checkout-testimonial1 {
+	.wpfnl-modern-checkout .wpfnl-checkout-testimonial1 {
 		max-width: 550px;
 	}
-	.wpfnl-checkout-testimonial1 .wpfnl-testimonial-text {
+	.wpfnl-modern-checkout .wpfnl-checkout-testimonial1 .wpfnl-testimonial-text {
 		font-size: 15px;
 	}
 
-	.wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-title {
+	.wpfnl-modern-checkout .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-title {
 		font-size: 20px;
 	}
 
-	.wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-item {
+	.wpfnl-modern-checkout .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-item {
 		gap: 9px;
 	}
-	.wpfnl-testimonial-benefits .wpfnl-testimonial-check-icon {
+	.wpfnl-modern-checkout .wpfnl-testimonial-benefits .wpfnl-testimonial-check-icon {
 		width: 23px;
 		height: 23px;
 	}
-	.wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-item-text {
+	.wpfnl-modern-checkout .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-item-text {
 		font-size: 15px;
 	}
 
