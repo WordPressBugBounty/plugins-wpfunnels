@@ -255,7 +255,7 @@ function wpfnl_sc_rule_tooltip( $rule, $condition_labels, $total_rules = 1 ) {
                         </div>
                         <div class="wpfnl-sc-analytics-card__content">
                             <span class="card-title"><?php esc_html_e( 'Total Revenue', 'wpfnl' ); ?></span>
-                            <span class="card-value"><?php echo wp_kses_post( wc_price( $sc_analytics['total_revenue'] ) ); ?></span>
+                            <span class="card-value"><?php echo function_exists( 'wc_price' ) ? wp_kses_post( wc_price( $sc_analytics['total_revenue'] ) ) : esc_html( $sc_analytics['total_revenue'] ); ?></span>
                         </div>
                     </div>
 
@@ -267,7 +267,7 @@ function wpfnl_sc_rule_tooltip( $rule, $condition_labels, $total_rules = 1 ) {
                         </div>
                         <div class="wpfnl-sc-analytics-card__content">
                             <span class="card-title"><?php esc_html_e( 'Avg. Order Value', 'wpfnl' ); ?></span>
-                            <span class="card-value"><?php echo wp_kses_post( wc_price( $sc_analytics['aov'] ) ); ?></span>
+                            <span class="card-value"><?php echo function_exists( 'wc_price' ) ? wp_kses_post( wc_price( $sc_analytics['aov'] ) ) : esc_html( $sc_analytics['aov'] ); ?></span>
                         </div>
                     </div>
 
@@ -279,7 +279,7 @@ function wpfnl_sc_rule_tooltip( $rule, $condition_labels, $total_rules = 1 ) {
                         </div>
                         <div class="wpfnl-sc-analytics-card__content">
                             <span class="card-title"><?php esc_html_e( 'Bump Offer Revenue', 'wpfnl' ); ?></span>
-                            <span class="card-value"><?php echo wp_kses_post( wc_price( $sc_analytics['orderbump_revenue'] ) ); ?></span>
+                            <span class="card-value"><?php echo function_exists( 'wc_price' ) ? wp_kses_post( wc_price( $sc_analytics['orderbump_revenue'] ) ) : esc_html( $sc_analytics['orderbump_revenue'] ); ?></span>
                         </div>
                     </div>
                 </div>
