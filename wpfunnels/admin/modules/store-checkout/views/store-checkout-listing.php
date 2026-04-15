@@ -767,7 +767,7 @@ function wpfnl_sc_rule_tooltip( $rule, $condition_labels, $total_rules = 1 ) {
                                                         width="550"
                                                         height="310"
                                                         src=""
-                                                        data-src="https://www.youtube.com/embed/qzdzaEImU48?autoplay=1"
+                                                        data-src="https://www.youtube.com/embed/GrzIRl5jfBE?autoplay=1"
                                                         title="WPFunnels Store Checkout Tutorial"
                                                         frameborder="0"
                                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

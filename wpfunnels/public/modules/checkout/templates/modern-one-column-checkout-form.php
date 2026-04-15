@@ -72,6 +72,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 }
 ?>
 
+
 <div class="wpfnl-modern-one-column-wrapper wpfnl-modern-checkout-wrapper">
 
 	<form name="checkout" method="post" class="checkout woocommerce-checkout <?php echo esc_attr( $loged_in_cls . ' ' . $create_acc_field ); ?>" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">

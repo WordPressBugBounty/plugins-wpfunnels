@@ -2130,9 +2130,9 @@
             if (window.wpfnl_obj && window.wpfnl_obj.collapsible_order_summary_enabled !== 'no') {
                 var $table = $('.woocommerce-checkout-review-order-table');
                 if ($table.length > 0 && $('.wpfnl-mobile-order-summary-toggle').length === 0) {
-                    var toggleHtml = '<div class="wpfnl-mobile-order-summary-toggle" style="display:none; padding: 10px 14px; background: #f8f8f8; cursor: pointer; border: 1px solid #e2e8f0; border-bottom: none; border-radius: 10px; font-weight: 600; color: #1e293b; align-items: center; justify-content: space-between; margin-bottom: 0;">' +
-                                     '<span class="wpfnl-mos-text" style="color: #1A241A; font-size: 16px;">Show order summary</span>' +
-                                     '<span class="wpfnl-mos-icon" style="transition: transform 0.3s ease; font-size: 12px;">▼</span>' +
+                    var toggleHtml = '<div class="wpfnl-mobile-order-summary-toggle">' +
+                                     '<span class="wpfnl-mos-text">Show order summary</span>' +
+                                     '<span class="wpfnl-mos-icon">▼</span>' +
                                      '</div>';
                     $(toggleHtml).insertBefore($table);
 
@@ -2141,11 +2141,14 @@
                         var $icon = $(this).find('.wpfnl-mos-icon');
                         var $text = $(this).find('.wpfnl-mos-text');
 
+						$(this).toggleClass('active-toggle');
+
                         $content.slideToggle(300, function() {
                             var isVisible = $content.is(':visible');
                             $text.text(isVisible ? 'Hide order summary' : 'Show order summary');
                             $icon.css('transform', isVisible ? 'rotate(180deg)' : 'rotate(0deg)');
                         });
+
                     });
                 }
 
@@ -2156,7 +2159,6 @@
                             // Already handled
                         } else if (!$('.woocommerce-checkout-review-order-table').hasClass('wpfnl-mos-collapsed')) {
                             $('.woocommerce-checkout-review-order-table').hide().addClass('wpfnl-mos-collapsed');
-                            $('.wpfnl-mobile-order-summary-toggle').css('border-bottom', '1px solid #e2e8f0').css('border-radius', '4px');
                             $('.wpfnl-mobile-order-summary-toggle .wpfnl-mos-text').text('Show order summary');
                             $('.wpfnl-mobile-order-summary-toggle .wpfnl-mos-icon').css('transform', 'rotate(0deg)');
                         }

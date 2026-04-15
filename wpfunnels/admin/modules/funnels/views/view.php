@@ -768,7 +768,7 @@ $live_redirect_link = add_query_arg(
                                                         width="550"
                                                         height="310"
                                                         src=""
-                                                        data-src="https://www.youtube.com/embed/qzdzaEImU48?autoplay=1"
+                                                        data-src="https://www.youtube.com/embed/GrzIRl5jfBE?autoplay=1"
                                                         title="WPFunnels Tutorial Video"
                                                         frameborder="0"
                                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

@@ -161,6 +161,16 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 	$create_acc_field = ' no-create-acc-field ';
 }
 
+
+// ---------- Instant checkout step include ---------
+$funnel_id = get_post_meta(get_the_ID(), '_funnel_id', true);
+$is_store_checkout = get_post_meta($funnel_id, '_wpfnl_funnel_type', true) === 'store_checkout';
+
+$is_instant_checkout = true;
+if( isset( $_SESSION['checkout_layout'] ) && ( 'wpfnl-express-checkout' !== isset( $_SESSION['checkout_layout']) && 'wpfnl-multistep' !== isset( $_SESSION['checkout_layout']) && 'wpfnl-2-step' !== isset( $_SESSION['checkout_layout']) && 'wpfnl-modern-multistep' !== isset( $_SESSION['checkout_layout']) ) && $is_instant_checkout && $is_store_checkout){
+	include WPFNL_DIR.'public/modules/checkout/templates/instant-checkout-step.php';
+}
+
 ?>
 
 	<form name="checkout" method="post" class="checkout woocommerce-checkout <?php echo $loged_in_cls.' '.$create_acc_field; ?>" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">
@@ -170,27 +180,27 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 			<?php do_action( 'woocommerce_checkout_before_customer_details' ); ?>
 
 			<div class="col2-set" id="customer_details">
-				<?php 
+				<?php
 					/**
 					 * Fires before customer details in checkout page
 					 * @since 2.8.21
 					 */
-					do_action( 'wpfunnels/before_customer_details' ); 
+					do_action( 'wpfunnels/before_customer_details' );
 				?>
 				<div class="col-1" id="wpfnl_checkout_billing">
 					<?php do_action( 'woocommerce_checkout_billing' ); ?>
-					
+
 				</div>
 
 				<div class="col-2" id="wpfnl_checkout_shipping">
 					<?php do_action( 'woocommerce_checkout_shipping' ); ?>
 				</div>
-				<?php 
+				<?php
 					/**
 					 * Fires after customer details in checkout page
 					 * @since 2.8.21
 					 */
-					do_action( 'wpfunnels/after_customer_details' ); 
+					do_action( 'wpfunnels/after_customer_details' );
 				?>
 			</div>
 

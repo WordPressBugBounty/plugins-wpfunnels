@@ -73,6 +73,18 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 	echo esc_html( apply_filters( 'woocommerce_checkout_must_be_logged_in_message', __( 'You must be logged in to checkout.', 'wpfnl' ) ) );
 	return;
 }
+
+?>
+
+<?php
+	$funnel_id = get_post_meta(get_the_ID(), '_funnel_id', true);
+	$is_store_checkout = get_post_meta($funnel_id, '_wpfnl_funnel_type', true) === 'store_checkout';
+
+	// ---------- Instant checkout step include ---------
+	$is_instant_checkout = true;
+	if( isset( $_SESSION['checkout_layout'] ) && ( 'wpfnl-express-checkout' !== $checkout_layout && 'wpfnl-multistep' !== $checkout_layout && 'wpfnl-2-step' !== $checkout_layout && 'wpfnl-modern-multistep' !== $checkout_layout ) && $is_instant_checkout && $is_store_checkout){
+		include WPFNL_DIR.'public/modules/checkout/templates/instant-checkout-step.php';
+	}
 ?>
 
 <div class="wpfnl-modern-checkout-wrapper">

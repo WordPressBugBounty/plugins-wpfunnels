@@ -13,9 +13,7 @@ if( class_exists( '\WPFunnels\Wpfnl_functions' ) && \WPFunnels\Wpfnl_functions::
 	require_once WPFNL_DIR . '/public/modules/checkout/templates/two-step-checkout.php';
 
 } else if( isset( $_SESSION[ 'checkout_layout' ] ) && ('wpfnl-modern-checkout' === $_SESSION[ 'checkout_layout' ]) || ('wpfnl-modern-one-column' === $_SESSION[ 'checkout_layout' ]) ) {
-	$checkout_layout = $_SESSION[ 'checkout_layout' ];
-	unset( $_SESSION[ 'checkout_layout' ] );
-	// load modern two-column checkout layout
+
 	require_once WPFNL_DIR . '/public/modules/checkout/templates/modern-checkout-form.php';
 
 } else {

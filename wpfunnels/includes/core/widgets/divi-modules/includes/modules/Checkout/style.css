@@ -7613,59 +7613,59 @@ body.rtl .wpfnl-order-bump__template-style14 .template-preview-wrapper .product-
 
 
 /* --------- Testimonial Section ------- */
-.wpfnl-testimonial-section {
+.wpfnl-checkout .wpfnl-testimonial-section {
 	 margin-top: 40px;
 }
- .wpfnl-checkout-testimonial1 {
+ .wpfnl-checkout .wpfnl-checkout-testimonial1 {
 	 max-width: 430px;
 }
- .wpfnl-checkout-testimonial1 .wpfnl-testimonial-quote-icon {
+ .wpfnl-checkout .wpfnl-checkout-testimonial1 .wpfnl-testimonial-quote-icon {
 	 margin-bottom: 14px;
 }
- .wpfnl-checkout-testimonial1 .wpfnl-testimonial-quote-icon svg {
+ .wpfnl-checkout .wpfnl-checkout-testimonial1 .wpfnl-testimonial-quote-icon svg {
 	 display: block;
 }
- .wpfnl-checkout-testimonial1 .wpfnl-testimonial-stars {
+ .wpfnl-checkout .wpfnl-checkout-testimonial1 .wpfnl-testimonial-stars {
 	 display: flex;
 	 align-items: center;
 	 gap: 1px;
 	 margin-bottom: 10px;
 }
- .wpfnl-checkout-testimonial1 .wpfnl-testimonial-stars .wpfnl-testimonial-star {
+ .wpfnl-checkout .wpfnl-checkout-testimonial1 .wpfnl-testimonial-stars .wpfnl-testimonial-star {
 	 font-size: 20px;
 	 line-height: 1;
 }
- .wpfnl-checkout-testimonial1 .wpfnl-testimonial-stars .wpfnl-testimonial-star-filled {
+ .wpfnl-checkout .wpfnl-checkout-testimonial1 .wpfnl-testimonial-stars .wpfnl-testimonial-star-filled {
 	 color: #f5a623;
 }
- .wpfnl-checkout-testimonial1 .wpfnl-testimonial-stars .wpfnl-testimonial-star-empty {
+ .wpfnl-checkout .wpfnl-checkout-testimonial1 .wpfnl-testimonial-stars .wpfnl-testimonial-star-empty {
 	 color: #d1d5db;
 }
- .wpfnl-checkout-testimonial1 .wpfnl-testimonial-text {
+ .wpfnl-checkout .wpfnl-checkout-testimonial1 .wpfnl-testimonial-text {
 	 margin: 0 0 14px;
 	 color: #686b7d;
 	 font-size: 16px;
 	 font-weight: 400;
 	 line-height: 1.5;
 }
- .wpfnl-checkout-testimonial1 .wpfnl-testimonial-author {
+ .wpfnl-checkout .wpfnl-checkout-testimonial1 .wpfnl-testimonial-author {
 	 margin: 0;
 	 color: #1a241a;
 	 font-size: 16px;
 	 font-weight: 600;
 	 line-height: 1.2;
 }
- .wpfnl-testimonial-benefits {
+ .wpfnl-checkout .wpfnl-testimonial-benefits {
 	 margin-top: 32px;
 }
- .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-title {
+ .wpfnl-checkout .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-title {
 	 margin: 0 0 20px;
 	 color: #1a241a;
 	 font-size: 24px;
 	 font-weight: 500;
 	 line-height: 1.2;
 }
- .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-list {
+ .wpfnl-checkout .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-list {
 	 list-style: none;
 	 margin: 0;
 	 padding: 0;
@@ -7673,12 +7673,12 @@ body.rtl .wpfnl-order-bump__template-style14 .template-preview-wrapper .product-
 	 flex-direction: column;
 	 gap: 16px;
 }
- .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-item {
+ .wpfnl-checkout .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-item {
 	 display: flex;
 	 align-items: center;
 	 gap: 12px;
 }
- .wpfnl-testimonial-benefits .wpfnl-testimonial-check-icon {
+ .wpfnl-checkout .wpfnl-testimonial-benefits .wpfnl-testimonial-check-icon {
 	 flex-shrink: 0;
 	 display: flex;
 	 align-items: center;
@@ -7686,12 +7686,12 @@ body.rtl .wpfnl-order-bump__template-style14 .template-preview-wrapper .product-
 	 width: 28px;
 	 height: 28px;
 }
- .wpfnl-testimonial-benefits .wpfnl-testimonial-check-icon svg {
+ .wpfnl-checkout .wpfnl-testimonial-benefits .wpfnl-testimonial-check-icon svg {
 	 display: block;
 	 width: 28px;
 	 height: 28px;
 }
- .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-item-text {
+ .wpfnl-checkout .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-item-text {
 	 color: #686b7d;
 	 font-size: 16px;
 	 font-weight: 400;
@@ -7699,23 +7699,23 @@ body.rtl .wpfnl-order-bump__template-style14 .template-preview-wrapper .product-
 	 display: block;
 }
  @media only screen and (max-width: 991px) {
-	 .wpfnl-checkout-testimonial1 {
+	 .wpfnl-checkout .wpfnl-checkout-testimonial1 {
 		 max-width: 550px;
 	}
-	 .wpfnl-checkout-testimonial1 .wpfnl-testimonial-text {
+	 .wpfnl-checkout .wpfnl-checkout-testimonial1 .wpfnl-testimonial-text {
 		 font-size: 15px;
 	}
-	 .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-title {
+	 .wpfnl-checkout .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-title {
 		 font-size: 20px;
 	}
-	 .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-item {
+	 .wpfnl-checkout .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-item {
 		 gap: 9px;
 	}
-	 .wpfnl-testimonial-benefits .wpfnl-testimonial-check-icon {
+	 .wpfnl-checkout .wpfnl-testimonial-benefits .wpfnl-testimonial-check-icon {
 		 width: 23px;
 		 height: 23px;
 	}
-	 .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-item-text {
+	 .wpfnl-checkout .wpfnl-testimonial-benefits .wpfnl-testimonial-benefits-item-text {
 		 font-size: 15px;
 	}
 }
@@ -7780,4 +7780,101 @@ body.rtl .wpfnl-order-bump__template-style14 .template-preview-wrapper .product-
 	 .wpfnl-testimonial-trust-badge .wpfnl-testimonial-trust-card .wpfnl-testimonial-headline {
 		 font-size: 17px;
 	}
+}
+
+
+/* Instant checkout step style */
+.wpfnl-checkout .wpfnl-instant-checkout-step {
+	 padding: 22px 0;
+	 border-bottom: 1px solid #e5e8f3;
+	 margin-bottom: 30px;
+}
+ .wpfnl-checkout .wpfnl-instant-checkout-step .wpfnl-instant-checkout-steps-list {
+	 display: flex;
+	 align-items: center;
+	 justify-content: center;
+	 list-style: none;
+	 margin: 0;
+	 padding: 0;
+	 gap: 16px;
+}
+ @media (max-width: 520px) {
+	 .wpfnl-checkout .wpfnl-instant-checkout-step .wpfnl-instant-checkout-steps-list {
+		 gap: 8px;
+	}
+}
+ .wpfnl-checkout .wpfnl-instant-checkout-step .wpfnl-instant-checkout-step-item {
+	 display: flex;
+	 align-items: center;
+	 gap: 8px;
+	 color: #8c93a8;
+	 font-size: 15px;
+	 font-weight: 400;
+}
+ @media (max-width: 520px) {
+	 .wpfnl-checkout .wpfnl-instant-checkout-step .wpfnl-instant-checkout-step-item {
+		 font-size: 14px;
+	}
+}
+ .wpfnl-checkout .wpfnl-instant-checkout-step .wpfnl-instant-checkout-step-item:not(:first-child)::before {
+	 content: "";
+	 display: block;
+	 width: 60px;
+	 height: 1px;
+	 background: #d8dce8;
+	 margin-right: 8px;
+}
+ @media (max-width: 520px) {
+	 .wpfnl-checkout .wpfnl-instant-checkout-step .wpfnl-instant-checkout-step-item:not(:first-child)::before {
+		 width: 20px;
+		 margin-right: 2px;
+	}
+}
+ .wpfnl-checkout .wpfnl-instant-checkout-step .wpfnl-instant-checkout-step-item.active {
+	 color: #363b4e;
+	 font-weight: 600;
+}
+ .wpfnl-checkout .wpfnl-instant-checkout-step .wpfnl-instant-checkout-step-item.active .wpfnl-instant-checkout-step-radio {
+	 border-color: #6e42d3;
+}
+ .wpfnl-checkout .wpfnl-instant-checkout-step .wpfnl-instant-checkout-step-item.active .wpfnl-instant-checkout-step-radio::after {
+	 opacity: 1;
+	 transform: translate(-50%, -50%) scale(1);
+}
+ .wpfnl-checkout .wpfnl-instant-checkout-step .wpfnl-instant-checkout-step-radio {
+	 display: inline-block;
+	 width: 20px;
+	 height: 20px;
+	 border: 2px solid #d8dce8;
+	 border-radius: 50%;
+	 position: relative;
+	 flex-shrink: 0;
+}
+ @media (max-width: 520px) {
+	 .wpfnl-checkout .wpfnl-instant-checkout-step .wpfnl-instant-checkout-step-radio {
+		 width: 16px;
+		 height: 16px;
+	}
+}
+ .wpfnl-checkout .wpfnl-instant-checkout-step .wpfnl-instant-checkout-step-radio::after {
+	 content: "";
+	 position: absolute;
+	 top: 50%;
+	 left: 50%;
+	 width: 8px;
+	 height: 8px;
+	 background: #6e42d3;
+	 border-radius: 50%;
+	 transform: translate(-50%, -50%) scale(0);
+	 opacity: 0;
+	 transition: opacity 0.2s ease, transform 0.2s ease;
+}
+ @media (max-width: 520px) {
+	 .wpfnl-checkout .wpfnl-instant-checkout-step .wpfnl-instant-checkout-step-radio::after {
+		 width: 6px;
+		 height: 6px;
+	}
+}
+ .wpfnl-checkout .wpfnl-instant-checkout-step .wpfnl-instant-checkout-step-label {
+	 white-space: nowrap;
 }
