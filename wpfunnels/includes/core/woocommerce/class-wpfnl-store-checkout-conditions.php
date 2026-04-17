@@ -133,7 +133,7 @@ class Wpfnl_Store_Checkout_Conditions {
 			}
 			if ( 'checkout' === get_post_meta( $step_id, '_step_type', true ) ) {
 				$post = get_post( $step_id );
-				if ( $post && 'publish' === $post->post_status ) {
+				if ( $post && in_array( $post->post_status, array( 'publish', 'draft' ), true ) ) {
 					return $step_id;
 				}
 			}

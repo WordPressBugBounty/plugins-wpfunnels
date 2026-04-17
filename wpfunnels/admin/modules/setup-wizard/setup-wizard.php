@@ -351,6 +351,13 @@ class SetupWizard
         }
         $plugins[] = ['name' => 'bricks', 'slug' => 'bricks', 'type' => 'theme', 'path' => 'bricks', 'status' => $bricks_status];
 
+        $is_divi_theme_active = Wpfnl_functions::wpfnl_is_theme_active('Divi');
+        $divi_status = $is_divi_theme_active ? 'activated' : 'uninstalled';
+        if (Wpfnl_functions::maybe_theme_installed('Divi') && !$is_divi_theme_active ) {
+            $divi_status = 'installed';
+        }
+        $plugins[] = ['name' => 'divi', 'slug' => 'divi', 'type' => 'theme', 'path' => 'Divi', 'status' => $divi_status];
+
         return $plugins;
     }
 

@@ -391,6 +391,26 @@ class FunnelController extends Wpfnl_REST_Controller
 			)
 		);
 
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<funnel_id>\d+)/convert-to-store-checkout',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::EDITABLE,
+					'callback'            => array( $this, 'convert_to_store_checkout' ),
+					'permission_callback' => array( $this, 'update_items_permissions_check' ),
+					'args'                => array(
+						'funnel_id' => array(
+							'required'          => true,
+							'validate_callback' => function ( $param ) {
+								return is_numeric( $param );
+							},
+						),
+					),
+				),
+			)
+		);
+
 	}
 
 	/**
@@ -1886,6 +1906,138 @@ class FunnelController extends Wpfnl_REST_Controller
 		$funnel_controller = Module::instance();
 
 		return $funnel_controller->trash_marked_funnels($payload);
+	}
+
+
+	/**
+	 * Convert a regular funnel to a Store Checkout funnel.
+	 *
+	 * Sets the funnel type to store_checkout, removes any landing steps
+	 * permanently, and ensures the checkout step is first.
+	 *
+	 * @param WP_REST_Request $request
+	 * @return WP_REST_Response|WP_Error
+	 * @since 3.10.6
+	 */
+	public function convert_to_store_checkout( $request ) {
+		$funnel_id = absint( $request['funnel_id'] );
+
+		if ( ! $funnel_id ) {
+			return new WP_Error(
+				'rest_invalid_funnel_id',
+				__( 'Invalid funnel ID.', 'wpfnl' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		// Set funnel type to store_checkout.
+		update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'store_checkout' );
+
+		// Get current steps order.
+		$steps_order = get_post_meta( $funnel_id, '_steps_order', true );
+		if ( ! is_array( $steps_order ) ) {
+			$steps_order = array();
+		}
+
+		// Find and permanently delete all landing steps.
+		$new_steps_order = array();
+		foreach ( $steps_order as $step ) {
+			if ( isset( $step['step_type'] ) && 'landing' === $step['step_type'] ) {
+				wp_delete_post( absint( $step['id'] ), true );
+			} else {
+				$new_steps_order[] = $step;
+			}
+		}
+
+		// Sort so checkout step comes first.
+		usort( $new_steps_order, function( $a, $b ) {
+			$priority = array( 'checkout' => 0, 'thankyou' => 1, 'upsell' => 2, 'downsell' => 3 );
+			$a_priority = isset( $priority[ $a['step_type'] ] ) ? $priority[ $a['step_type'] ] : 99;
+			$b_priority = isset( $priority[ $b['step_type'] ] ) ? $priority[ $b['step_type'] ] : 99;
+			return $a_priority - $b_priority;
+		} );
+
+		// Re-index to avoid serialization issues.
+		$new_steps_order = array_values( $new_steps_order );
+
+		// Persist both step meta keys that the codebase reads from.
+		update_post_meta( $funnel_id, '_steps_order', $new_steps_order );
+		update_post_meta( $funnel_id, '_steps', $new_steps_order );
+
+		// Update _first_step to the checkout step.
+		foreach ( $new_steps_order as $step ) {
+			if ( isset( $step['step_type'] ) && 'checkout' === $step['step_type'] ) {
+				Wpfnl_functions::update_funnel_first_step( $funnel_id, $step['id'] );
+				break;
+			}
+		}
+
+		// Remove landing step nodes from funnel canvas data and clean up dangling connections.
+		$funnel_data = get_post_meta( $funnel_id, '_funnel_data', true );
+		if ( is_array( $funnel_data ) && isset( $funnel_data['drawflow']['Home']['data'] ) ) {
+			// Collect landing node IDs first.
+			$landing_node_ids = array();
+			foreach ( $funnel_data['drawflow']['Home']['data'] as $node_id => $node ) {
+				if ( isset( $node['data']['step_type'] ) && 'landing' === $node['data']['step_type'] ) {
+					$landing_node_ids[] = (string) $node_id;
+				}
+			}
+
+			// Remove landing nodes.
+			foreach ( $landing_node_ids as $landing_node_id ) {
+				unset( $funnel_data['drawflow']['Home']['data'][ $landing_node_id ] );
+			}
+
+			// Clean up input/output connections in remaining nodes that referenced landing nodes.
+			foreach ( $funnel_data['drawflow']['Home']['data'] as $node_id => &$node ) {
+				// Clean inputs.
+				if ( isset( $node['inputs'] ) && is_array( $node['inputs'] ) ) {
+					foreach ( $node['inputs'] as $input_key => &$input ) {
+						if ( isset( $input['connections'] ) && is_array( $input['connections'] ) ) {
+							$input['connections'] = array_values( array_filter(
+								$input['connections'],
+								function( $conn ) use ( $landing_node_ids ) {
+									return ! in_array( (string) $conn['node'], $landing_node_ids, true );
+								}
+							) );
+						}
+					}
+					unset( $input );
+				}
+				// Clean outputs.
+				if ( isset( $node['outputs'] ) && is_array( $node['outputs'] ) ) {
+					foreach ( $node['outputs'] as $output_key => &$output ) {
+						if ( isset( $output['connections'] ) && is_array( $output['connections'] ) ) {
+							$output['connections'] = array_values( array_filter(
+								$output['connections'],
+								function( $conn ) use ( $landing_node_ids ) {
+									return ! in_array( (string) $conn['node'], $landing_node_ids, true );
+								}
+							) );
+						}
+					}
+					unset( $output );
+				}
+			}
+			unset( $node );
+
+			update_post_meta( $funnel_id, '_funnel_data', $funnel_data );
+		}
+
+		// Return the checkout step ID so the frontend can use it immediately.
+		$checkout_step_id = null;
+		foreach ( $new_steps_order as $step ) {
+			if ( isset( $step['step_type'] ) && 'checkout' === $step['step_type'] ) {
+				$checkout_step_id = $step['id'];
+				break;
+			}
+		}
+
+		return rest_ensure_response( array(
+			'success'          => true,
+			'message'          => __( 'Funnel converted to Store Checkout successfully.', 'wpfnl' ),
+			'checkout_step_id' => $checkout_step_id,
+		) );
 	}
 
 }

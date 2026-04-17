@@ -120,10 +120,12 @@ export default {
 			const getPlugins = window?.setup_wizard_obj?.getPlugins || [];
 			const oxygenData = getPlugins.find(p => p.name === 'oxygen');
 			const bricksData = getPlugins.find(p => p.name === 'bricks');
+			const diviData = getPlugins.find(p => p.name === 'divi');
 
 			const builderChecks = [
 				{ id: 'elementor', installed: window?.setup_wizard_obj?.is_elementor_installed === 'yes', active: window?.setup_wizard_obj?.is_elementor_active === 'yes' },
 				{ id: 'bricks', installed: bricksData?.status === 'activated' || bricksData?.status === 'installed', active: bricksData?.status === 'activated' },
+				{ id: 'divi', installed: diviData?.status === 'activated' || diviData?.status === 'installed', active: diviData?.status === 'activated' },
 				{ id: 'oxygen', installed: oxygenData?.status === 'activated' || oxygenData?.status === 'installed', active: oxygenData?.status === 'activated' }
 			];
 

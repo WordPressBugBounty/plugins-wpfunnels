@@ -1,7 +1,27 @@
 <template>
     <div>
-        <div class="create-funnel-loader-overlay" id="create-funnel-loader" v-if="loader">
-            <span class="wpfnl-loader"></span>
+        <div class="create-funnel-loader-overlay create-funnel-shimmer-overlay" id="create-funnel-loader" v-if="loader">
+            <!-- shimmer header -->
+            <div class="wpfnl-tpl-shimmer-header-bar">
+                <div class="wpfnl-tpl-shimmer-block wpfnl-tpl-shimmer-title"></div>
+                <div class="wpfnl-tpl-shimmer-block wpfnl-tpl-shimmer-btn"></div>
+            </div>
+            <!-- shimmer body: sidebar + content -->
+            <div class="wpfnl-tpl-shimmer-body">
+                <div class="wpfnl-tpl-shimmer-sidebar">
+                    <div class="wpfnl-tpl-shimmer-block wpfnl-tpl-shimmer-sidebar-title"></div>
+                    <div class="wpfnl-tpl-shimmer-block wpfnl-tpl-shimmer-sidebar-item" v-for="n in 8" :key="'s'+n"></div>
+                </div>
+                <div class="wpfnl-tpl-shimmer-content">
+                    <div class="wpfnl-tpl-shimmer-grid">
+                        <div class="wpfnl-tpl-shimmer-card" v-for="n in 8" :key="n">
+                            <div class="wpfnl-tpl-shimmer-block wpfnl-tpl-shimmer-card-img"></div>
+                            <div class="wpfnl-tpl-shimmer-block wpfnl-tpl-shimmer-card-text"></div>
+                            <div class="wpfnl-tpl-shimmer-block wpfnl-tpl-shimmer-card-badge"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="template-library-modal" class="template-library-modal fff" style="display: none">
@@ -95,10 +115,16 @@
                         <!-- /.funnel-templates-sidebar -->
 
                         <div class="funnel-templates-content">
-                            <div class="template-cat-filter-loader" :class="(syncingLibrary || templateCatFilterLoader) ? 'show-loader' : ''">
-                                <span class="wpfnl-loader"></span>
+                            <div class="wpfnl-tpl-filter-shimmer" v-if="syncingLibrary || templateCatFilterLoader">
+                                <div class="wpfnl-tpl-shimmer-grid">
+                                    <div class="wpfnl-tpl-shimmer-card" v-for="n in 8" :key="'filter-shimmer-' + n">
+                                        <div class="wpfnl-tpl-shimmer-block wpfnl-tpl-shimmer-card-img"></div>
+                                        <div class="wpfnl-tpl-shimmer-block wpfnl-tpl-shimmer-card-text"></div>
+                                        <div class="wpfnl-tpl-shimmer-block wpfnl-tpl-shimmer-card-badge"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div v-if="activeTab === 'templates'">
+                            <div v-else-if="activeTab === 'templates'">
                                 <div class="not-clickable-overlay"></div>
 
                                 <!-- funnel name modal. this modal will show when create from scratch -->

@@ -5,7 +5,7 @@ Tags: woocommerce funnel builder, order bump, one click upsell, custom checkout,
 Requires at least: 6.1
 Tested up to:  6.9.4
 Requires PHP: 7.4
-Stable tag:  3.10.5
+Stable tag:  3.10.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -293,12 +293,21 @@ Join our bustling funnel community and connect with thousands of WooCommerce sto
 [🤝 Join Now](https://www.facebook.com/groups/wpfunnels/)
 
 ## Privacy Policy
-WPFunnels uses [Appsero](https://appsero.com/privacy-policy/) and [OpenPanel](https://openpanel.dev/privacy) to collect limited telemetry data after user consent. This helps us troubleshoot issues and improve the product.
+If you explicitly **opt in** to usage tracking, we collect specific telemetry data via **PostHog** to improve plugin performance and troubleshoot issues.
 
-No data is collected by default. Data collection starts only after a user allows it via the admin notice.
+### What Data is Collected?
+No data is collected by default. If you provide consent, the following information is gathered:
+* **System Environment:** WordPress version, PHP version, and active theme/plugin names.
+* **Plugin Details:** Product Feed Manager version and non-sensitive configuration settings.
+* **Usage Patterns:** Feature usage and in-plugin page views.
+* **Contact Info:** Site administrator email address.
 
-We do not collect or store any personal or sensitive information, and collected data is not shared with third parties.
+---
 
+### How to Request Data Removal
+You can revoke your consent at any time. If you would like your previously collected data to be deleted from our systems, please contact us at:
+
+**Email:** [support@getwpfunnels.com](mailto:support@getwpfunnels.com)
 
 == Installation ==
 1. Upload the WP Funnels to the `/wp-content/plugins/` directory
@@ -504,6 +513,11 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.10.6 (2026-04-17) =
+* New: Allowed to convert sales funnel to store checkout
+* Enhancement: Reduced page speed impact for WPFunnels
+* Enhancement: Removed inconsistent page loader
 
 = 3.10.5 (2026-04-15) =
 * New: Released a new template for Store Checkout

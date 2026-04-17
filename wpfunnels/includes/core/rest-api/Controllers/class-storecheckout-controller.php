@@ -398,11 +398,21 @@ class StoreCheckoutController extends Wpfnl_REST_Controller {
 		$step_id = (int) $request->get_param( 'step_id' );
 
 		if ( ! $step_id || WPFNL_STEPS_POST_TYPE !== get_post_type( $step_id ) ) {
-			return new WP_Error(
-				'invalid_step',
-				__( 'Invalid step ID provided.', 'wpfnl' ),
-				array( 'status' => 400 )
-			);
+			// If the step_id is actually a funnel ID, try to resolve the checkout step from it.
+			$resolved_step_id = null;
+			if ( $step_id && WPFNL_FUNNELS_POST_TYPE === get_post_type( $step_id ) ) {
+				$resolved_step_id = Wpfnl_Store_Checkout_Conditions::get_checkout_step_id_for_funnel( $step_id );
+			}
+
+			if ( ! $resolved_step_id ) {
+				return new WP_Error(
+					'invalid_step',
+					__( 'Invalid step ID provided.', 'wpfnl' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			$step_id = $resolved_step_id;
 		}
 
 		$condition = Wpfnl_Store_Checkout_Conditions::get_condition( $step_id );

@@ -76,6 +76,7 @@ class Wpfnl_Admin
 		'wpfunnels_page_trash_funnels',
 		'wpfunnels_page_wpf_feature_comparison',
 		'wpfunnels_page_wp_funnel_settings',
+		'wpfunnels_page_wpfnl_settings',
 		'wpfunnels_page_wp_global_store',
 		'wpfunnels_page_edit_funnel',
 		'wpfunnels_page_create_funnel',

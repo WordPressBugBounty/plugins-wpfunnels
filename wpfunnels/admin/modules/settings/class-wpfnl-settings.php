@@ -79,6 +79,7 @@ class Module extends Wpfnl_Admin_Module
 	private $page_hooks = [
 		'toplevel_page_wp_funnels',
 		'wp-funnels_page_wp_funnel_settings',
+		'wpfunnels_page_wpfnl_settings',
 		'wp-funnels_page_edit_funnel',
 		'wp-funnels_page_create_funnel',
 		'wp-funnels_page_wpfnl_settings',
@@ -136,8 +137,11 @@ class Module extends Wpfnl_Admin_Module
     }
 
 
-    public function enqueue_scripts()
+    public function enqueue_scripts( $hook )
     {
+        if ( ! in_array( $hook, $this->page_hooks, true ) ) {
+            return;
+        }
         wp_enqueue_script('settings', plugin_dir_url(__FILE__) . 'js/settings.js', ['jquery'], WPFNL_VERSION, true);
     }
 
