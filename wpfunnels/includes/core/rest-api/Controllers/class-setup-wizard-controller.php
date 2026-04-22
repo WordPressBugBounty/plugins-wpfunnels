@@ -31,6 +31,84 @@ class SetupWizardController extends Wpfnl_REST_Controller {
     public function register_routes() {
         register_rest_route(
             $this->namespace,
+            '/' . $this->rest_base . '/save-consent',
+            array(
+                array(
+                    'methods'             => WP_REST_Server::CREATABLE,
+                    'callback'            => array( $this, 'save_consent' ),
+                    'permission_callback' => function () {
+                        return current_user_can( 'manage_options' );
+                    },
+                    'args' => array(
+                        'consented' => array(
+                            'description' => __( 'Whether the user agreed to data sharing.', 'wpfnl' ),
+                            'type'        => 'boolean',
+                            'required'    => true,
+                        ),
+                    ),
+                ),
+            )
+        );
+
+        register_rest_route(
+            $this->namespace,
+            '/' . $this->rest_base . '/track-step',
+            array(
+                array(
+                    'methods'             => WP_REST_Server::CREATABLE,
+                    'callback'            => array( $this, 'track_step' ),
+                    'permission_callback' => function () {
+                        return current_user_can( 'manage_options' );
+                    },
+                    'args' => array(
+                        'event_type' => array(
+                            'description'       => __( 'Step event type: viewed, completed, or abandoned.', 'wpfnl' ),
+                            'type'              => 'string',
+                            'required'          => true,
+                            'sanitize_callback' => 'sanitize_key',
+                            'enum'              => array( 'viewed', 'completed', 'abandoned' ),
+                        ),
+                        'step_name' => array(
+                            'description'       => __( 'Step slug identifier.', 'wpfnl' ),
+                            'type'              => 'string',
+                            'required'          => true,
+                            'sanitize_callback' => 'sanitize_key',
+                        ),
+                        'step_index' => array(
+                            'description'       => __( '1-based step position.', 'wpfnl' ),
+                            'type'              => 'integer',
+                            'required'          => false,
+                            'sanitize_callback' => 'absint',
+                            'default'           => 0,
+                        ),
+                        'goal' => array(
+                            'description'       => __( 'Selected goal slug.', 'wpfnl' ),
+                            'type'              => 'string',
+                            'required'          => false,
+                            'sanitize_callback' => 'sanitize_text_field',
+                            'default'           => '',
+                        ),
+                        'time_on_step' => array(
+                            'description'       => __( 'Seconds spent on this step.', 'wpfnl' ),
+                            'type'              => 'integer',
+                            'required'          => false,
+                            'sanitize_callback' => 'absint',
+                            'default'           => 0,
+                        ),
+                        'total_steps' => array(
+                            'description'       => __( 'Total number of steps in the wizard for this goal path.', 'wpfnl' ),
+                            'type'              => 'integer',
+                            'required'          => false,
+                            'sanitize_callback' => 'absint',
+                            'default'           => 0,
+                        ),
+                    ),
+                ),
+            )
+        );
+
+        register_rest_route(
+            $this->namespace,
             '/' . $this->rest_base . '/complete-step',
             array(
                 array(
@@ -51,6 +129,20 @@ class SetupWizardController extends Wpfnl_REST_Controller {
                             'type'              => 'string',
                             'required'          => false,
                             'sanitize_callback' => 'sanitize_text_field',
+                        ),
+                        'goal' => array(
+                            'description'       => __( 'Selected goal slug.', 'wpfnl' ),
+                            'type'              => 'string',
+                            'required'          => false,
+                            'sanitize_callback' => 'sanitize_text_field',
+                            'default'           => '',
+                        ),
+                        'total_steps' => array(
+                            'description'       => __( 'Total number of steps in the wizard for this goal path.', 'wpfnl' ),
+                            'type'              => 'integer',
+                            'required'          => false,
+                            'sanitize_callback' => 'absint',
+                            'default'           => 0,
                         ),
                     ),
                 ),
@@ -95,9 +187,10 @@ class SetupWizardController extends Wpfnl_REST_Controller {
      * @return \WP_REST_Response
      */
     public function complete_step( WP_REST_Request $request ) {
-        $funnel_id = isset( $request['funnelId'] ) ? absint( $request['funnelId'] ) : 0;
-        $action    = isset( $request['action'] ) ? sanitize_text_field( $request['action'] ) : '';
-        $goal      = isset( $request['goal'] ) ? sanitize_text_field( $request['goal'] ) : '';
+        $funnel_id   = isset( $request['funnelId'] ) ? absint( $request['funnelId'] ) : 0;
+        $action      = isset( $request['action'] ) ? sanitize_text_field( $request['action'] ) : '';
+        $goal        = isset( $request['goal'] ) ? sanitize_text_field( $request['goal'] ) : '';
+        $total_steps = isset( $request['total_steps'] ) ? absint( $request['total_steps'] ) : 0;
 
         /**
          * Fires when setup wizard completes an action.
@@ -108,9 +201,79 @@ class SetupWizardController extends Wpfnl_REST_Controller {
          */
         do_action( 'wpfunnels_setup_wizard_complete', $funnel_id, $action, $goal );
 
+        // Fire the unified onboarding outcome event.
+        $telemetry = \WPFunnels\Tracking\Telemetry::instance();
+        if ( $telemetry ) {
+            $telemetry->track_onboarding_progress( [
+                'outcome'         => 'completed',
+                'last_step_name'  => 'complete',
+                'last_step_index' => $total_steps ?: null,
+                'total_steps'     => $total_steps,
+                'goal'            => $goal,
+                'funnel_id'       => $funnel_id,
+            ] );
+        }
+
         return rest_ensure_response( array(
             'success' => true,
         ) );
+    }
+
+    /**
+     * Persist the user's telemetry consent decision.
+     *
+     * Called from Welcome.vue when the user clicks "Start setup" so that
+     * subsequent per-step tracking calls pass the SDK's opt-in gate.
+     *
+     * @param WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public function save_consent( WP_REST_Request $request ) {
+        $consented = (bool) $request['consented'];
+        $telemetry = \WPFunnels\Tracking\Telemetry::instance();
+        if ( $telemetry ) {
+            $telemetry->save_consent( $consented );
+        }
+        return rest_ensure_response( array( 'success' => true ) );
+    }
+
+    /**
+     * Receive an onboarding step event from the setup wizard frontend.
+     *
+     * For viewed/completed events, dispatches track_onboarding_step().
+     * For abandoned events, dispatches the unified track_onboarding_progress()
+     * with outcome 'exited' — no separate abandoned event is fired.
+     *
+     * @param WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public function track_step( WP_REST_Request $request ) {
+        $data = array(
+            'event_type'   => $request['event_type'],
+            'step_name'    => $request['step_name'],
+            'step_index'   => (int) $request['step_index'],
+            'goal'         => (string) $request['goal'],
+            'time_on_step' => (int) $request['time_on_step'],
+            'total_steps'  => (int) ( $request['total_steps'] ?? 0 ),
+        );
+
+        $telemetry = \WPFunnels\Tracking\Telemetry::instance();
+        if ( $telemetry ) {
+            if ( 'abandoned' === $data['event_type'] ) {
+                $telemetry->track_onboarding_progress( [
+                    'outcome'        => 'exited',
+                    'last_step_name' => $data['step_name'],
+                    'last_step_index'=> $data['step_index'],
+                    'total_steps'    => $data['total_steps'],
+                    'goal'           => $data['goal'],
+                    'funnel_id'      => 0,
+                ] );
+            } else {
+                $telemetry->track_onboarding_step( $data );
+            }
+        }
+
+        return rest_ensure_response( array( 'success' => true ) );
     }
 
     /**

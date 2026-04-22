@@ -3,9 +3,9 @@ Contributors: coderexltd, getwpfunnels, coderexco
 Donate link: https://getwpfunnels.com/
 Tags: woocommerce funnel builder, order bump, one click upsell, custom checkout, sales funnel builder, lead generation, sales funnels
 Requires at least: 6.1
-Tested up to:  6.9.4
+Tested up to:  6.9
 Requires PHP: 7.4
-Stable tag:  3.10.6
+Stable tag:  3.10.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -298,7 +298,7 @@ If you explicitly **opt in** to usage tracking, we collect specific telemetry da
 ### What Data is Collected?
 No data is collected by default. If you provide consent, the following information is gathered:
 * **System Environment:** WordPress version, PHP version, and active theme/plugin names.
-* **Plugin Details:** Product Feed Manager version and non-sensitive configuration settings.
+* **Plugin Details:** WPFunnels version and non-sensitive configuration settings.
 * **Usage Patterns:** Feature usage and in-plugin page views.
 * **Contact Info:** Site administrator email address.
 
@@ -513,6 +513,11 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.10.7 (2026-04-22) =
+* Enhancement: Reduced template loading speed on setup wizard 
+* Enhancement: Removed inconsistent loader on template page 
+* Enhancement: Updated tracking data
 
 = 3.10.6 (2026-04-17) =
 * New: Allowed to convert sales funnel to store checkout

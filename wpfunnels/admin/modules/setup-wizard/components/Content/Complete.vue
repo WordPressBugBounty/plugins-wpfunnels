@@ -20,7 +20,7 @@
 						alt="Video Poster"
 						class="wpfnl-mm-complete-video-image"
 					/>
-					<div class="wpfnl-mm-complete-video-overlay"></div>
+					<div class="wpfnl-mm-complete-video-overlay" @click="playVideo"></div>
 				</div>
 				<!-- YouTube iframe -->
 				<iframe
@@ -168,15 +168,18 @@ export default {
 			return wizardObj.wizard_video_poster || ''
 		},
 		handleCompleteStep(action) {
-			// Emit event to parent component
 			const wizardObj = window.setup_wizard_obj || {}
 			const restApiUrl = wizardObj.rest_api_url || wizardObj.rest_url || ''
+			const totalSteps = this.selectedGoal === 'sales' ? 7
+				: (this.selectedGoal === 'order-value' || this.selectedGoal === 'improve-checkout') ? 6
+				: 5;
 			const requestArgs = {
 				method: 'POST',
 				data: {
 					funnelId: this.funnelId,
 					action: action,
-					goal: this.selectedGoal
+					goal: this.selectedGoal,
+					total_steps: totalSteps,
 				}
 			}
 
@@ -187,32 +190,26 @@ export default {
 				requestArgs.path = '/wpfunnels/v1/setup-wizard/complete-step'
 			}
 
-			apiFetch(requestArgs)
-
+			return apiFetch(requestArgs).catch(() => {})
 		},
-		viewFunnel() {
+		async viewFunnel() {
 			this.maybeCreateContact();
-			this.handleCompleteStep('viewFunnel')
+			await this.handleCompleteStep('viewFunnel')
 			const wizardObj = window.setup_wizard_obj || {}
-			// For store checkout, redirect to the funnel editor
 			if (this.isStoreCheckout) {
 				const adminUrl = wizardObj.admin_url || ''
 				window.location.href = `${adminUrl}admin.php?page=edit_funnel&id=${this.funnelId}`
 				return
 			}
-			// Open the first step preview in a new tab
 			if (this.firstStepLink) {
 				window.open(this.firstStepLink, '_blank')
 			} else {
-				console.error('No first step link available')
-				alert('Unable to open the funnel preview. Please go to the dashboard to view your funnel.')
 				window.location.href = wizardObj.dashboard_url || `${wizardObj.admin_url}admin.php?page=wpfunnels`
 			}
 		},
-		goToDashboard() {
+		async goToDashboard() {
 			this.maybeCreateContact();
-			this.handleCompleteStep('goToDashboard')
-			// Navigate to the funnels dashboard
+			await this.handleCompleteStep('goToDashboard')
 			const wizardObj = window.setup_wizard_obj || {}
 			window.location.href = wizardObj.dashboard_url || `${wizardObj.admin_url}admin.php?page=wpfunnels`
 		},

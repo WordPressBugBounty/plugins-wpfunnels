@@ -28,6 +28,7 @@
 			v-if="currentStep === 4 && selectedGoal === 'order-value'"
 			:goal="selectedGoal"
 			:builder="selectedBuilder"
+			:prefetchedTemplates="prefetchedTemplates"
 			@next-step="handleNextStep"
 			@prev-step="handlePrevStep"
 		/>
@@ -54,6 +55,7 @@
 			v-if="currentStep === 4 && selectedGoal === 'improve-checkout'"
 			:goal="selectedGoal"
 			:builder="selectedBuilder"
+			:prefetchedTemplates="prefetchedTemplates"
 			@next-step="handleNextStep"
 			@prev-step="handlePrevStep"
 		/>
@@ -92,6 +94,7 @@
 			v-if="currentStep === 5 && selectedGoal === 'sales'"
 			:goal="selectedGoal"
 			:builder="selectedBuilder"
+			:prefetchedTemplates="prefetchedTemplates"
 			@next-step="handleNextStep"
 			@prev-step="handlePrevStep"
 		/>
@@ -223,6 +226,10 @@ export default {
 		upsellProduct: {
 			type: Object,
 			default: null
+		},
+		prefetchedTemplates: {
+			type: Object,
+			default: () => ({})
 		}
 	},
 	data() {
@@ -250,7 +257,55 @@ export default {
 			this.isExitModalVisible = false
 		},
 		confirmExit() {
-			window.location.href = window.setup_wizard_obj.dashboard_url || '/wp-admin/';
+			this.trackAbandoned(() => {
+				window.location.href = window.setup_wizard_obj.dashboard_url || '/wp-admin/';
+			});
+		},
+		trackAbandoned(callback) {
+			const wizardObj = window.setup_wizard_obj || {};
+			const restApiUrl = wizardObj.rest_api_url || '';
+			const base = restApiUrl ? (restApiUrl.endsWith('/') ? restApiUrl : restApiUrl + '/') : null;
+
+			if (!base) {
+				callback();
+				return;
+			}
+
+			const url = base + 'wpfunnels/v1/setup-wizard/track-step';
+			const nonce = wizardObj.nonce || '';
+
+			fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-WP-Nonce': nonce,
+				},
+				body: JSON.stringify({
+					event_type: 'abandoned',
+					step_name: this.getCurrentStepName(),
+					step_index: this.currentStep,
+					goal: this.selectedGoal,
+					time_on_step: 0,
+					total_steps: this.getTotalSteps(),
+				}),
+			}).catch(() => {}).finally(callback);
+		},
+		getTotalSteps() {
+			const g = this.selectedGoal;
+			if (g === 'sales') return 7;
+			if (g === 'order-value' || g === 'improve-checkout') return 6;
+			return 5; // default before goal selection
+		},
+		getCurrentStepName() {
+			const s = this.currentStep;
+			const g = this.selectedGoal;
+			if (s === 1) return 'welcome';
+			if (s === 2) return 'environment_check';
+			if (s === 3) return 'choose_goal';
+			if (g === 'order-value')     return { 4: 'choose_template', 5: 'build_funnel',    6: 'complete'        }[s] || 'unknown';
+			if (g === 'improve-checkout') return { 4: 'choose_template', 5: 'generate_funnel', 6: 'complete'        }[s] || 'unknown';
+			if (g === 'sales')            return { 4: 'product_sync',    5: 'choose_template', 6: 'generate_funnel', 7: 'complete' }[s] || 'unknown';
+			return 'unknown';
 		}
 	}
 }

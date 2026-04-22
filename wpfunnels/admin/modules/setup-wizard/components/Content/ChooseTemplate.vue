@@ -34,8 +34,19 @@
 			</div>
 		</div>
 
-        <div v-else class="wpfnl-mm-loader-wrapper">
-            <span class="wpfnl-mm-loader"></span>
+        <div v-else class="wpfnl-mm-templates-grid wpfnl-mm-templates-skeleton">
+            <div
+                v-for="n in 6"
+                :key="n"
+                class="wpfnl-mm-template-card wpfnl-mm-template-card--skeleton"
+            >
+                <div class="wpfnl-mm-template-card-preview wpfnl-mm-skeleton-block"></div>
+                <div class="wpfnl-mm-template-card-divider"></div>
+                <div class="wpfnl-mm-template-card-body">
+                    <div class="wpfnl-mm-skeleton-block wpfnl-mm-skeleton-title"></div>
+                    <div class="wpfnl-mm-skeleton-block wpfnl-mm-skeleton-steps"></div>
+                </div>
+            </div>
         </div>
 
 		<!-- Buttons -->
@@ -89,6 +100,10 @@ export default {
 		goal: {
 			type: String,
 			default: 'sales'
+		},
+		prefetchedTemplates: {
+			type: Object,
+			default: () => ({})
 		}
 	},
 	data() {
@@ -128,7 +143,24 @@ export default {
 		}
 	},
 	mounted() {
-		this.fetchTemplates();
+		const cached = this.prefetchedTemplates[this.goal];
+		if (cached && cached.length > 0) {
+			this.templates = this.filterTemplates(cached);
+			this.loading = false;
+		} else {
+			this.fetchTemplates();
+		}
+	},
+	watch: {
+		// Handle race condition: component mounted before prefetch completed.
+		prefetchedTemplates(val) {
+			if (!this.loading) return;
+			const cached = val[this.goal];
+			if (cached && cached.length > 0) {
+				this.templates = this.filterTemplates(cached);
+				this.loading = false;
+			}
+		},
 	},
 	methods: {
 		fetchTemplates() {
@@ -258,12 +290,6 @@ export default {
 			}
 			this.selectedTemplateId = template.ID;
 			this.selectedTemplate = template;
-			
-			// Debug log for sales funnel
-			if (this.isSalesFunnel) {
-				console.log('Selected template for sales funnel:', template.title);
-				console.log('Template steps:', template.steps ? template.steps.map(s => s.step_type) : 'none');
-			}
 		},
 		showPreview(template) {
 			this.previewTemplate = template;

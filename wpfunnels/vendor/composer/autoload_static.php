@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit1816045258ba6052304601dc4975d5ab
+class ComposerStaticInit6a4dbaa228ee162865a721c9d74c83a5
 {
     public static $files = array (
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
@@ -129,8 +129,6 @@ class ComposerStaticInit1816045258ba6052304601dc4975d5ab
         'Appsero\\Insights' => __DIR__ . '/..' . '/appsero/client/src/Insights.php',
         'Appsero\\License' => __DIR__ . '/..' . '/appsero/client/src/License.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'Flatted' => __DIR__ . '/../..' . '/includes/core/widgets/block/node_modules/flatted/php/flatted.php',
-        'FlattedString' => __DIR__ . '/../..' . '/includes/core/widgets/block/node_modules/flatted/php/flatted.php',
         'GuzzleHttp\\Psr7\\AppendStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/AppendStream.php',
         'GuzzleHttp\\Psr7\\BufferStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/BufferStream.php',
         'GuzzleHttp\\Psr7\\CachingStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/CachingStream.php',
@@ -644,7 +642,6 @@ class ComposerStaticInit1816045258ba6052304601dc4975d5ab
         'WPFunnels\\TemplateLibrary\\Manager' => __DIR__ . '/../..' . '/admin/modules/template-library/class-manager.php',
         'WPFunnels\\TemplateLibrary\\Wpfnl_Source_Base' => __DIR__ . '/../..' . '/admin/modules/template-library/sources/base.php',
         'WPFunnels\\TemplateLibrary\\Wpfnl_Source_Remote' => __DIR__ . '/../..' . '/admin/modules/template-library/sources/remote.php',
-        'WPFunnels\\Tracking\\EventTracker' => __DIR__ . '/../..' . '/includes/core/Tracking/EventTracker.php',
         'WPFunnels\\Tracking\\Telemetry' => __DIR__ . '/../..' . '/includes/core/Tracking/class-wpfnl-telemetry.php',
         'WPFunnels\\Traits\\SingletonTrait' => __DIR__ . '/../..' . '/includes/core/traits/singleton-trait.php',
         'WPFunnels\\Widgets\\Bricks\\Checkout' => __DIR__ . '/../..' . '/includes/core/widgets/bricks/Checkout.php',
@@ -716,9 +713,9 @@ class ComposerStaticInit1816045258ba6052304601dc4975d5ab
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit1816045258ba6052304601dc4975d5ab::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit1816045258ba6052304601dc4975d5ab::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit1816045258ba6052304601dc4975d5ab::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit6a4dbaa228ee162865a721c9d74c83a5::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit6a4dbaa228ee162865a721c9d74c83a5::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit6a4dbaa228ee162865a721c9d74c83a5::$classMap;
 
         }, null, ClassLoader::class);
     }
