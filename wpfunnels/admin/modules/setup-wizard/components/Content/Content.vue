@@ -1,133 +1,26 @@
 <template>
 	<div class="wpfnl-mm-setup-wizard-content">
-		<!-- Common Steps -->
 		<Welcome
 			v-if="currentStep === 1"
 			@next-step="handleNextStep"
 			@prev-step="handlePrevStep"
 		/>
-		
+
 		<Setup
 			v-if="currentStep === 2"
-			:selectedGoal="selectedGoal"
 			@next-step="handleNextStep"
 			@prev-step="handlePrevStep"
 		/>
-		
-		<ChooseGoal
+
+		<StoreCheckout
 			v-if="currentStep === 3"
 			:builder="selectedBuilder"
-			@next-step="handleNextStep"
-			@prev-step="handlePrevStep"
-		/>
-
-		<!-- Dynamic Steps based on Goal -->
-		
-		<!-- order-value: ChooseTemplate -> BuildFunnel -> Complete -->
-		<ChooseTemplate
-			v-if="currentStep === 4 && selectedGoal === 'order-value'"
-			:goal="selectedGoal"
-			:builder="selectedBuilder"
 			:prefetchedTemplates="prefetchedTemplates"
-			@next-step="handleNextStep"
-			@prev-step="handlePrevStep"
-		/>
-
-		<BuildFunnel
-			v-if="currentStep === 5 && selectedGoal === 'order-value'"
-			:template="selectedTemplate"
-			:goal="selectedGoal"
-			:builder="selectedBuilder"
-			@next-step="handleNextStep"
-			@prev-step="handlePrevStep"
-		/>
-
-		<Complete
-			v-if="currentStep === 6 && selectedGoal === 'order-value'"
-			:funnelId="funnelId"
-			:firstStepLink="firstStepLink"
-			:selectedGoal="selectedGoal"
 			:agreeToShare="agreeToShare"
-		/>
-
-		<!-- improve-checkout: ChooseTemplate -> GenerateFunnel -> Complete -->
-		<ChooseTemplate
-			v-if="currentStep === 4 && selectedGoal === 'improve-checkout'"
-			:goal="selectedGoal"
-			:builder="selectedBuilder"
-			:prefetchedTemplates="prefetchedTemplates"
-			@next-step="handleNextStep"
 			@prev-step="handlePrevStep"
+			@store-checkout-phase="onStoreCheckoutPhase"
 		/>
 
-		<GenerateFunnel
-			v-if="currentStep === 5 && selectedGoal === 'improve-checkout'"
-			:template="selectedTemplate"
-			:goal="selectedGoal"
-			:builder="selectedBuilder"
-			:mainProduct="mainProduct"
-			:orderBump="orderBump"
-			:upsellProduct="upsellProduct"
-			@next-step="handleNextStep"
-			@prev-step="handlePrevStep"
-		/>
-
-		<Complete
-			v-if="currentStep === 6 && selectedGoal === 'improve-checkout'"
-			:funnelId="funnelId"
-			:firstStepLink="firstStepLink"
-			:selectedGoal="selectedGoal"
-			:agreeToShare="agreeToShare"
-		/>
-
-		<!-- sales: ProductSync -> ChooseTemplate -> GenerateFunnel -> Complete -->
-		<ProductSync
-			v-if="currentStep === 4 && selectedGoal === 'sales'"
-			:goal="selectedGoal"
-			:builder="selectedBuilder"
-			:selectedProductId="selectedProductId"
-			@next-step="handleNextStep"
-			@prev-step="handlePrevStep"
-		/>
-
-		<ChooseTemplate
-			v-if="currentStep === 5 && selectedGoal === 'sales'"
-			:goal="selectedGoal"
-			:builder="selectedBuilder"
-			:prefetchedTemplates="prefetchedTemplates"
-			@next-step="handleNextStep"
-			@prev-step="handlePrevStep"
-		/>
-
-		<GenerateFunnel
-			v-if="currentStep === 6 && selectedGoal === 'sales'"
-			:template="selectedTemplate"
-			:goal="selectedGoal"
-			:builder="selectedBuilder"
-			:selectedProduct="selectedProduct"
-			:mainProduct="mainProduct"
-			:orderBump="orderBump"
-			:upsellProduct="upsellProduct"
-			@next-step="handleNextStep"
-			@prev-step="handlePrevStep"
-		/>
-
-		<Complete
-			v-if="currentStep === 7 && selectedGoal === 'sales'"
-			:funnelId="funnelId"
-			:firstStepLink="firstStepLink"
-			:selectedGoal="selectedGoal"
-			:agreeToShare="agreeToShare"
-		/>
-
-		<div class="wpfnl-mm-help-btn">
-			<button class="wpfnl-mm-help-btn-circle" @click="showHelp">
-				<svg xmlns="http://www.w3.org/2000/svg" width="10" height="15" viewBox="0 0 10 15" fill="none">
-					<path d="M3.33203 0.235352C5.47393 -0.253449 7.61976 0.613333 8.55859 2.32812C9.33918 3.75474 9.12761 5.42966 7.99805 6.70312C7.6808 7.06053 7.34119 7.37444 7.00879 7.68066C6.23955 8.39045 5.70822 8.90509 5.56836 9.60938L5.54492 9.75293V9.76367L5.54004 10.2842C5.53577 10.8632 5.06526 11.328 4.48828 11.3281H4.47852C3.89713 11.3229 3.42931 10.8469 3.43457 10.2656L3.44043 9.69043V9.68945C3.44043 9.66013 3.44126 9.62985 3.44434 9.60059L3.44531 9.59961C3.60093 7.96652 4.68307 6.96278 5.58105 6.13477C5.8834 5.85561 6.1754 5.5871 6.42383 5.30664L6.42285 5.30566C6.72981 4.95955 7.19762 4.22567 6.71191 3.33887C6.43459 2.83155 5.95887 2.5097 5.43066 2.34473C4.90323 2.18009 4.31698 2.16973 3.80371 2.28711C2.7091 2.5372 2.30991 3.47128 2.1709 3.98926C2.02032 4.55057 1.44282 4.8834 0.880859 4.7334C0.319196 4.58278 -0.014292 4.00565 0.135742 3.44434C0.586504 1.76221 1.75249 0.596951 3.33203 0.235352Z" fill="white" stroke="white" stroke-width="0.2"/>
-					<path d="M3.74121 12.9888C4.12882 12.6015 4.83802 12.6015 5.22559 12.9888L5.22656 12.9897C5.42546 13.1834 5.53605 13.4566 5.53613 13.73C5.53613 14.008 5.42666 14.2767 5.23242 14.4771C5.03181 14.6722 4.76248 14.7827 4.4834 14.7827C4.20964 14.7827 3.93533 14.6718 3.74121 14.478L3.74023 14.4771L3.66992 14.4009C3.51523 14.215 3.42969 13.9748 3.42969 13.73C3.42977 13.4566 3.54122 13.1834 3.74023 12.9897L3.74121 12.9888Z" fill="white" stroke="white" stroke-width="0.2"/>
-				</svg>
-			</button>
-		</div>
 
 		<!-- Exit Confirmation Modal -->
 		<div class="wpfnl-exit-modal-overlay" v-if="isExitModalVisible" @click.self="closeExitModal">
@@ -142,7 +35,7 @@
 						Are you sure you want to exit? Your progress won't be saved and you'll need to start over later.
 					</p>
 				</div>
-				
+
 				<div class="wpfnl-exit-modal-actions">
 					<button class="wpfnl-exit-modal-btn wpfnl-exit-modal-btn-secondary" @click="closeExitModal">
 						Continue Setup
@@ -157,57 +50,23 @@
 </template>
 
 <script>
-import ChooseGoal from './ChooseGoal.vue'
 import Setup from './Setup.vue'
-import ChooseTemplate from './ChooseTemplate.vue'
-import BuildFunnel from './BuildFunnel.vue'
-import Complete from './Complete.vue'
 import Welcome from './Welcome.vue'
-import ProductSync from './ProductSync.vue'
-import GenerateFunnel from './GenerateFunnel.vue'
+import StoreCheckout from './StoreCheckout.vue'
 
 export default {
     name: 'Content',
 	components: {
-		ChooseGoal,
 		Setup,
-		ChooseTemplate,
-		BuildFunnel,
-		Complete,
 		Welcome,
-		ProductSync,
-		GenerateFunnel,
+		StoreCheckout,
 	},
 	props: {
 		currentStep: {
 			type: Number,
 			default: 1
 		},
-		selectedGoal: {
-			type: String,
-			default: ''
-		},
 		selectedBuilder: {
-			type: String,
-			default: ''
-		},
-		selectedTemplate: {
-			type: Object,
-			default: null
-		},
-		selectedProductId: {
-			type: [Number, String],
-			default: null
-		},
-		selectedProduct: {
-			type: Object,
-			default: null
-		},
-		funnelId: {
-			type: [Number, String],
-			default: null
-		},
-		firstStepLink: {
 			type: String,
 			default: ''
 		},
@@ -215,30 +74,16 @@ export default {
 			type: Boolean,
 			default: false
 		},
-		mainProduct: {
-			type: Object,
-			default: null
-		},
-		orderBump: {
-			type: Object,
-			default: null
-		},
-		upsellProduct: {
-			type: Object,
-			default: null
-		},
 		prefetchedTemplates: {
-			type: Object,
-			default: () => ({})
+			type: Array,
+			default: () => []
 		}
 	},
 	data() {
 		return {
-			isExitModalVisible: false
+			isExitModalVisible: false,
+			storeCheckoutPhase: 'select',
 		}
-	},
-	mounted() {
-
 	},
 	methods: {
 		handleNextStep(data) {
@@ -247,8 +92,9 @@ export default {
 		handlePrevStep() {
 			this.$emit('prev-step');
 		},
-		showHelp() {
-			window.open('https://getwpfunnels.com/docs/getting-started-with-wpfunnels/', '_blank');
+		onStoreCheckoutPhase(phase) {
+			this.storeCheckoutPhase = phase;
+			this.$emit('store-checkout-phase', phase);
 		},
 		showExitModal() {
 			this.isExitModalVisible = true
@@ -274,6 +120,16 @@ export default {
 			const url = base + 'wpfunnels/v1/setup-wizard/track-step';
 			const nonce = wizardObj.nonce || '';
 
+			// Use 'skipped' outcome when user reached step 3 template selection but didn't import
+			// Use 'abandoned' (→ 'exited') for earlier exits
+			const stepName = this.currentStep === 1 ? 'welcome'
+				: this.currentStep === 2 ? 'required_installation'
+				: 'store_checkout';
+
+			const eventType = (this.currentStep === 3 && this.storeCheckoutPhase === 'select')
+				? 'skipped'
+				: 'abandoned';
+
 			fetch(url, {
 				method: 'POST',
 				headers: {
@@ -281,32 +137,15 @@ export default {
 					'X-WP-Nonce': nonce,
 				},
 				body: JSON.stringify({
-					event_type: 'abandoned',
-					step_name: this.getCurrentStepName(),
+					event_type: eventType,
+					step_name: stepName,
 					step_index: this.currentStep,
-					goal: this.selectedGoal,
+					goal: 'improve-checkout',
 					time_on_step: 0,
-					total_steps: this.getTotalSteps(),
+					total_steps: 3,
 				}),
 			}).catch(() => {}).finally(callback);
 		},
-		getTotalSteps() {
-			const g = this.selectedGoal;
-			if (g === 'sales') return 7;
-			if (g === 'order-value' || g === 'improve-checkout') return 6;
-			return 5; // default before goal selection
-		},
-		getCurrentStepName() {
-			const s = this.currentStep;
-			const g = this.selectedGoal;
-			if (s === 1) return 'welcome';
-			if (s === 2) return 'environment_check';
-			if (s === 3) return 'choose_goal';
-			if (g === 'order-value')     return { 4: 'choose_template', 5: 'build_funnel',    6: 'complete'        }[s] || 'unknown';
-			if (g === 'improve-checkout') return { 4: 'choose_template', 5: 'generate_funnel', 6: 'complete'        }[s] || 'unknown';
-			if (g === 'sales')            return { 4: 'product_sync',    5: 'choose_template', 6: 'generate_funnel', 7: 'complete' }[s] || 'unknown';
-			return 'unknown';
-		}
 	}
 }
 </script>
@@ -328,12 +167,8 @@ export default {
 }
 
 @keyframes fadeIn {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
+	from { opacity: 0; }
+	to { opacity: 1; }
 }
 
 .wpfnl-exit-modal {
@@ -347,14 +182,8 @@ export default {
 }
 
 @keyframes slideUp {
-	from {
-		transform: translateY(20px);
-		opacity: 0;
-	}
-	to {
-		transform: translateY(0);
-		opacity: 1;
-	}
+	from { transform: translateY(20px); opacity: 0; }
+	to { transform: translateY(0); opacity: 1; }
 }
 
 .wpfnl-exit-modal-header {

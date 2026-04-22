@@ -1,16 +1,16 @@
 <template>
 	<div class="wpfnl-mm-setup-wizard-steps">
-        <div 
-            v-for="(step, index) in steps" 
+        <div
+            v-for="(step, index) in steps"
             :key="index"
             class="wpfnl-mm-setup-wizard-step"
             :class="{
-                'active': currentStep === index + 1,
-                'completed': currentStep > index + 1
+                'active': isActive(index),
+                'completed': isCompleted(index)
             }"
         >
             <div class="wpfnl-mm-setup-wizard-step-number">
-                <svg v-if="currentStep > index + 1" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg v-if="isCompleted(index)" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="8" cy="8" r="8" fill="#239654"/>
                     <path d="M11.3333 5.33334L6.66667 10L4.66667 8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -32,65 +32,30 @@ export default {
         selectedGoal: {
             type: String,
             default: ''
+        },
+        storeCheckoutPhase: {
+            type: String,
+            default: 'select'
         }
     },
     computed: {
         steps() {
-            // Before goal selection or default view - show 5 generic steps
-            if (!this.selectedGoal || this.currentStep <= 3) {
-                return [
-                    'Welcome',
-                    'Setup',
-                    'Choose Goal',
-                    'Choose Template',
-                    'Complete'
-                ];
-            }
-
-            // After goal selection - show dynamic steps based on goal
-            if (this.selectedGoal === 'order-value') {
-                return [
-                    'Welcome',
-                    'Setup',
-                    'Choose Goal',
-                    'Choose Template',
-                    'Build Funnel',
-                    'Complete'
-                ];
-            }
-
-            if (this.selectedGoal === 'improve-checkout') {
-                return [
-                    'Welcome',
-                    'Setup',
-                    'Choose Goal',
-                    'Choose Template',
-                    'Generate Funnel',
-                    'Complete'
-                ];
-            }
-
-            if (this.selectedGoal === 'sales') {
-                return [
-                    'Welcome',
-                    'Setup',
-                    'Choose Goal',
-                    'Product Sync',
-                    'Choose Template',
-                    'Generate Funnel',
-                    'Complete'
-                ];
-            }
-
-            // Fallback to default
-            return [
-                'Welcome',
-                'Setup',
-                'Choose Goal',
-                'Choose Template',
-                'Complete'
-            ];
+            return ['Welcome', 'Required Installation', 'Store Checkout'];
         }
     },
+    methods: {
+        isCompleted(index) {
+            // Standard: earlier steps are completed when currentStep has moved past them
+            if (this.currentStep > index + 1) return true;
+            // Special case: step 3 (index 2) is completed when StoreCheckout phase is 'complete'
+            if (index === 2 && this.currentStep === 3 && this.storeCheckoutPhase === 'complete') return true;
+            return false;
+        },
+        isActive(index) {
+            // Step 3 is no longer "active" once it's complete — it's "completed"
+            if (index === 2 && this.storeCheckoutPhase === 'complete') return false;
+            return this.currentStep === index + 1;
+        }
+    }
 }
 </script>

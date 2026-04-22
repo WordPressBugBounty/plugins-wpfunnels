@@ -74,7 +74,7 @@ class Telemetry {
                     ],
                 ],
             ] );
-        } catch ( \Exception ) {
+        } catch ( \Exception $e ) {
             return;
         }
 
@@ -110,7 +110,7 @@ class Telemetry {
                     ],
                 ],
             ] );
-        } catch ( \Exception ) {
+        } catch ( \Exception $e ) {
             // Failure-safe: trigger registration errors must not surface to callers.
         }
 
@@ -255,7 +255,7 @@ class Telemetry {
                 'funnel_type' => sanitize_text_field( (string) $funnel_type ),
                 '__timestamp' => $this->current_timestamp(),
             ] );
-        } catch ( \Exception ) {
+        } catch ( \Exception $e ) {
             // Failure-safe.
         }
     }
@@ -291,7 +291,7 @@ class Telemetry {
                 'days_since_created' => $days_created,
                 '__timestamp'        => $this->current_timestamp(),
             ] );
-        } catch ( \Exception ) {
+        } catch ( \Exception $e ) {
             // Failure-safe.
         }
     }
@@ -338,7 +338,7 @@ class Telemetry {
                 'time_on_step' => absint( $data['time_on_step'] ?? 0 ),
                 '__timestamp'  => $this->current_timestamp(),
             ] );
-        } catch ( \Exception ) {
+        } catch ( \Exception $e ) {
             // Failure-safe.
         }
 
@@ -409,7 +409,7 @@ class Telemetry {
 
             // Mark as fired so re-renders / redirects cannot double-fire.
             update_option( 'wpfunnels_onboarding_progress_tracked', '1', false );
-        } catch ( \Exception ) {
+        } catch ( \Exception $e ) {
             // Failure-safe.
         }
     }
@@ -499,7 +499,7 @@ class Telemetry {
         }
         try {
             return $this->client->get_review_prompt();
-        } catch ( \Throwable ) {
+        } catch ( \Throwable $e) {
             return null;
         }
     }
@@ -586,7 +586,7 @@ class Telemetry {
             if ( $this->client ) {
                 $this->client->track_kui( 'first_live_sale', $this->aha_payload( $order_id, $funnel_id ) );
             }
-        } catch ( \Exception ) {
+        } catch ( \Exception $e ) {
             // Failure-safe: telemetry errors must never block order processing.
         }
         $this->mark_aha_completed( $funnel_id, $order_id );

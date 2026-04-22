@@ -66,7 +66,7 @@ class SetupWizardController extends Wpfnl_REST_Controller {
                             'type'              => 'string',
                             'required'          => true,
                             'sanitize_callback' => 'sanitize_key',
-                            'enum'              => array( 'viewed', 'completed', 'abandoned' ),
+                            'enum'              => array( 'viewed', 'completed', 'abandoned', 'skipped' ),
                         ),
                         'step_name' => array(
                             'description'       => __( 'Step slug identifier.', 'wpfnl' ),
@@ -241,8 +241,9 @@ class SetupWizardController extends Wpfnl_REST_Controller {
      * Receive an onboarding step event from the setup wizard frontend.
      *
      * For viewed/completed events, dispatches track_onboarding_step().
-     * For abandoned events, dispatches the unified track_onboarding_progress()
-     * with outcome 'exited' — no separate abandoned event is fired.
+     * For abandoned events, dispatches track_onboarding_progress() with outcome 'exited'.
+     * For skipped events (user reached template picker but didn't import),
+     * dispatches track_onboarding_progress() with outcome 'skipped'.
      *
      * @param WP_REST_Request $request
      * @return \WP_REST_Response
@@ -261,12 +262,22 @@ class SetupWizardController extends Wpfnl_REST_Controller {
         if ( $telemetry ) {
             if ( 'abandoned' === $data['event_type'] ) {
                 $telemetry->track_onboarding_progress( [
-                    'outcome'        => 'exited',
-                    'last_step_name' => $data['step_name'],
-                    'last_step_index'=> $data['step_index'],
-                    'total_steps'    => $data['total_steps'],
-                    'goal'           => $data['goal'],
-                    'funnel_id'      => 0,
+                    'outcome'         => 'exited',
+                    'last_step_name'  => $data['step_name'],
+                    'last_step_index' => $data['step_index'],
+                    'total_steps'     => $data['total_steps'],
+                    'goal'            => $data['goal'],
+                    'funnel_id'       => 0,
+                ] );
+            } elseif ( 'skipped' === $data['event_type'] ) {
+                // User reached the template selection screen but exited without importing
+                $telemetry->track_onboarding_progress( [
+                    'outcome'         => 'skipped',
+                    'last_step_name'  => $data['step_name'],
+                    'last_step_index' => $data['step_index'],
+                    'total_steps'     => $data['total_steps'],
+                    'goal'            => $data['goal'],
+                    'funnel_id'       => 0,
                 ] );
             } else {
                 $telemetry->track_onboarding_step( $data );

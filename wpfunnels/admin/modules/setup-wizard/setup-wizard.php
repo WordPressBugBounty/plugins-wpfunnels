@@ -178,7 +178,6 @@ class SetupWizard
      */
     private function setup_wizard()
     {
-
         $steps = array(
             'type' => array(
                 'name'      => 'Funnel Type',

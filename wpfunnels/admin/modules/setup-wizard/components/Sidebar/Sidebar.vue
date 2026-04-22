@@ -1,8 +1,8 @@
 <template>
 	<div class="wpfnl-mm-setup-wizard-sidebar">
         <Branding />
-        <Steps :currentStep="currentStep" :selectedGoal="selectedGoal" />
-        <Help v-if="!isLastStep" @show-exit-modal="$emit('show-exit-modal')" />
+        <Steps :currentStep="currentStep" :selectedGoal="selectedGoal" :storeCheckoutPhase="storeCheckoutPhase" />
+        <Help v-if="showSkipOption" @show-exit-modal="$emit('show-exit-modal')" />
 	</div>
 </template>
 
@@ -26,11 +26,22 @@ export default {
         selectedGoal: {
             type: String,
             default: ''
+        },
+        storeCheckoutPhase: {
+            type: String,
+            default: 'select'
         }
     },
     computed: {
         isLastStep() {
             return this.currentStep === this.getMaxSteps();
+        },
+        showSkipOption() {
+            // Hide on step 2 (Required Installation) — no skipping plugin setup
+            if (this.currentStep === 2) return false;
+            // Hide on step 3 complete phase — setup is done, nothing to skip
+            if (this.currentStep === 3 && this.storeCheckoutPhase === 'complete') return false;
+            return true;
         }
     },
     methods: {
@@ -40,7 +51,7 @@ export default {
                 return 6; // Welcome, Setup, ChooseGoal, ChooseTemplate, BuildFunnel, Complete
             }
             if (this.selectedGoal === 'improve-checkout') {
-                return 6; // Welcome, Setup, ChooseGoal, ChooseTemplate, GenerateFunnel, Complete
+                return 3; // Welcome, Setup, StoreCheckout
             }
             if (this.selectedGoal === 'sales') {
                 return 7; // Welcome, Setup, ChooseGoal, ProductSync, ChooseTemplate, GenerateFunnel, Complete
