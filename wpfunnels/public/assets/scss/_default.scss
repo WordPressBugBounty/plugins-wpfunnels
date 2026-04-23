@@ -254,8 +254,13 @@ body.wpfnl-theme-style-removed {
 
 #wpfunnels_next_step_controller.elementor-button {
     display: inline-flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
+}
+#wpfunnels_next_step_controller.wpfnl-has-subtitle {
+    flex-direction: column;
+    row-gap: 3px;
 }
 
 .et_divi_builder #et_builder_outer_content .et_pb_button.btn-optin.disabled,

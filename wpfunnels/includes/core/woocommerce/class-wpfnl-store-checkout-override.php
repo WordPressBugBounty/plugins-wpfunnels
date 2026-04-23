@@ -38,7 +38,9 @@ class Wpfnl_Store_Checkout_Override {
 	 * @since 3.5.0
 	 */
 	public function __construct() {
-		add_action( 'wp', array( $this, 'override_wc_checkout' ), 0 );
+		// Priority 1: run after CartFlows (priority 0) so our post-swap wins,
+		// but before FunnelKit's page-detection (priority 5).
+		add_action( 'wp', array( $this, 'override_wc_checkout' ), 1 );
 	}
 
 	// =========================================================================
@@ -129,6 +131,13 @@ class Wpfnl_Store_Checkout_Override {
 			$GLOBALS['wp_the_query']->post = $checkout_post; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		}
 		$GLOBALS['post'] = $checkout_post; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+
+		// Prevent FunnelKit (WFACP) from redirecting to its own global checkout
+		// when WPFunnels has already claimed this request.
+		\add_filter( 'wfacp_do_not_check_for_global_checkout', '__return_true' );
+
+		// Prevent CartFlows from redirecting to its global checkout via template_redirect.
+		\add_filter( 'cartflows_allow_display_global_checkout', '__return_true' );
 	}
 
 	// =========================================================================

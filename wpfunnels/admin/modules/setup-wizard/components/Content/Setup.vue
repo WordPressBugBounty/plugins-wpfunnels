@@ -150,7 +150,7 @@ export default {
 			pluginStatuses: {},
 			isProcessing: false,
 			installStatusText: '',
-			mailMintSelected: true,
+			mailMintSelected: false,
 			builders: [
 				{ id: 'gutenberg', name: 'Gutenberg', image: window?.setup_wizard_obj?.gb_builder_img || '', isBuiltIn: true },
 				{ id: 'elementor', name: 'Elementor', image: window?.setup_wizard_obj?.elementor_img || '' },

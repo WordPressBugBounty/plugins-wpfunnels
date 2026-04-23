@@ -1,7 +1,7 @@
 <?php
 /**
  * Next step widget
- * 
+ *
  * @package WPFunnels\Widgets\Elementor
  */
 namespace WPFunnels\Widgets\Elementor;
@@ -160,8 +160,36 @@ class Step_Pointer extends Widget_Base
 		$response['checkout'] = __('Next Step', 'wpfnl');
 		$response['url-path'] = __('Go To URL Path', 'wpfnl');
 		$response['another-funnel'] = __('Another Funnel', 'wpfnl');
-		
+
 		return $response;
+	}
+
+	/**
+	 * Get user roles.
+	 *
+	 * Retrieve an array of WordPress user roles.
+	 *
+	 * @return array An array containing user roles.
+	 * @since  1.0.0
+	 * @access public
+	 */
+	public function get_user_roles()
+	{
+		$roles = array(
+			'none' => __('None', 'wpfnl'),
+		);
+		
+		if (!function_exists('get_editable_roles')) {
+			require_once ABSPATH . 'wp-admin/includes/user.php';
+		}
+		
+		$wp_roles = get_editable_roles();
+		
+		foreach ($wp_roles as $role_key => $role_info) {
+			$roles[$role_key] = $role_info['name'];
+		}
+		
+		return $roles;
 	}
 
 	/**
@@ -305,7 +333,7 @@ class Step_Pointer extends Widget_Base
 	 */
 	protected function register_controls()
 	{
-		
+
 		$this->next_step_button_controls();
 	}
 
@@ -319,7 +347,7 @@ class Step_Pointer extends Widget_Base
 	protected function _register_controls()
 	{
 		$this->next_step_button_controls();
-		
+
 	}
 
 	/**
@@ -340,7 +368,7 @@ class Step_Pointer extends Widget_Base
 		$general_data = get_option('_wpfunnels_general_settings');
 		$funnel_types = $general_data['funnel_type'];
 
-		
+
 		$this->add_control(
 			'button_type_selector',
 			[
@@ -520,6 +548,171 @@ class Step_Pointer extends Widget_Base
 			]
 		);
 
+		// Subtitle Settings
+		$this->add_control(
+			'enable_subtitle',
+			[
+				'label' => __('Enable Subtitle', 'wpfnl'),
+				'type' => Controls_Manager::SWITCHER,
+				'label_on' => __('Yes', 'wpfnl'),
+				'label_off' => __('No', 'wpfnl'),
+				'return_value' => 'yes',
+				'default' => 'no',
+				'separator' => 'before',
+			]
+		);
+
+		$this->add_control(
+			'subtitle_text',
+			[
+				'label' => __('Subtitle Text', 'wpfnl'),
+				'type' => Controls_Manager::TEXT,
+				'default' => __('Click to continue', 'wpfnl'),
+				'placeholder' => __('Enter subtitle text', 'wpfnl'),
+				'condition' => [
+					'enable_subtitle' => 'yes',
+				],
+			]
+		);
+
+		$this->end_controls_section();
+
+		// Display Conditions Section
+		$this->start_controls_section(
+			'section_display_conditions',
+			[
+				'label' => __('Display Conditions', 'wpfnl'),
+			]
+		);
+
+		$this->add_control(
+			'display_condition_type',
+			[
+				'label' => __('Display Condition', 'wpfnl'),
+				'type' => Controls_Manager::SELECT,
+				'default' => 'none',
+				'options' => [
+					'none' => __('None', 'wpfnl'),
+					'user_state' => __('User State', 'wpfnl'),
+					'user_role' => __('User Role', 'wpfnl'),
+					'browser' => __('Browser', 'wpfnl'),
+					'operating_system' => __('Operating System', 'wpfnl'),
+					'day' => __('Day', 'wpfnl'),
+				],
+			]
+		);
+
+		// User State Conditions
+		$this->add_control(
+			'hide_from_logged_in',
+			[
+				'label' => __('Hide From Logged In User', 'wpfnl'),
+				'type' => Controls_Manager::SWITCHER,
+				'label_on' => __('Yes', 'wpfnl'),
+				'label_off' => __('No', 'wpfnl'),
+				'return_value' => 'yes',
+				'default' => 'no',
+				'condition' => [
+					'display_condition_type' => 'user_state',
+				],
+			]
+		);
+
+		$this->add_control(
+			'hide_from_logged_out',
+			[
+				'label' => __('Hide From Logged Out User', 'wpfnl'),
+				'type' => Controls_Manager::SWITCHER,
+				'label_on' => __('Yes', 'wpfnl'),
+				'label_off' => __('No', 'wpfnl'),
+				'return_value' => 'yes',
+				'default' => 'no',
+				'condition' => [
+					'display_condition_type' => 'user_state',
+				],
+			]
+		);
+
+		// User Role Condition
+		$this->add_control(
+			'hide_for_user_role',
+			[
+				'label' => __('Hide For User Role', 'wpfnl'),
+				'type' => Controls_Manager::SELECT,
+				'default' => 'none',
+				'options' => $this->get_user_roles(),
+				'condition' => [
+					'display_condition_type' => 'user_role',
+				],
+			]
+		);
+
+		// Browser Condition
+		$this->add_control(
+			'hide_on_browser',
+			[
+				'label' => __('Hide On Browser', 'wpfnl'),
+				'type' => Controls_Manager::SELECT,
+				'default' => 'none',
+				'options' => [
+					'none' => __('None', 'wpfnl'),
+					'mozilla' => __('Mozilla Firefox', 'wpfnl'),
+					'chrome' => __('Google Chrome', 'wpfnl'),
+					'opera_mini' => __('Opera Mini', 'wpfnl'),
+					'safari' => __('Safari', 'wpfnl'),
+					'edge' => __('Microsoft Edge', 'wpfnl'),
+				],
+				'condition' => [
+					'display_condition_type' => 'browser',
+				],
+			]
+		);
+
+		// Operating System Condition
+		$this->add_control(
+			'hide_on_os',
+			[
+				'label' => __('Hide On Operating System', 'wpfnl'),
+				'type' => Controls_Manager::SELECT,
+				'default' => 'none',
+				'options' => [
+					'none' => __('None', 'wpfnl'),
+					'ios' => __('iOS', 'wpfnl'),
+					'android' => __('Android', 'wpfnl'),
+					'windows' => __('Windows', 'wpfnl'),
+					'macos' => __('MacOS', 'wpfnl'),
+					'linux' => __('Linux', 'wpfnl'),
+					'sunos' => __('SunOS', 'wpfnl'),
+					'openbsd' => __('OpenBSD', 'wpfnl'),
+				],
+				'condition' => [
+					'display_condition_type' => 'operating_system',
+				],
+			]
+		);
+
+		// Day Condition
+		$this->add_control(
+			'disable_on_days',
+			[
+				'label' => __('Select Days You Want To Disable', 'wpfnl'),
+				'type' => Controls_Manager::SELECT2,
+				'multiple' => true,
+				'options' => [
+					'monday' => __('Monday', 'wpfnl'),
+					'tuesday' => __('Tuesday', 'wpfnl'),
+					'wednesday' => __('Wednesday', 'wpfnl'),
+					'thursday' => __('Thursday', 'wpfnl'),
+					'friday' => __('Friday', 'wpfnl'),
+					'saturday' => __('Saturday', 'wpfnl'),
+					'sunday' => __('Sunday', 'wpfnl'),
+				],
+				'condition' => [
+					'display_condition_type' => 'day',
+				],
+			]
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -683,7 +876,47 @@ class Step_Pointer extends Widget_Base
 			]
 		);
 
-		
+
+		$this->end_controls_section();
+
+		// Subtitle Style Section
+		$this->start_controls_section(
+			'section_subtitle_style',
+			[
+				'label' => __('Subtitle', 'wpfnl'),
+				'tab' => Controls_Manager::TAB_STYLE,
+				'condition' => [
+					'enable_subtitle' => 'yes',
+				],
+			]
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			[
+				'name' => 'subtitle_typography',
+				'label' => __('Typography', 'wpfnl'),
+				'selector' => '{{WRAPPER}} .wpfnl-button-subtitle',
+			]
+		);
+
+		$this->add_responsive_control(
+			'subtitle_spacing',
+			[
+				'label' => __('Spacing', 'wpfnl'),
+				'type' => Controls_Manager::SLIDER,
+				'range' => [
+					'px' => [
+						'min' => 0,
+						'max' => 50,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .wpfnl-button-subtitle' => 'margin-top: {{SIZE}}{{UNIT}};',
+				],
+			]
+		);
+
 		$this->end_controls_section();
 	}
 
@@ -703,20 +936,31 @@ class Step_Pointer extends Widget_Base
 		$this->add_render_attribute('wrapper', 'class', 'elementor-button-wrapper');
 		$this->add_render_attribute('button', 'class', 'elementor-button');
 		$products = '';
+
+
+		// Get subtitle settings
+		$enable_subtitle = isset($settings['enable_subtitle']) ? $settings['enable_subtitle'] : 'no';
+		$subtitle_text = isset($settings['subtitle_text']) ? $settings['subtitle_text'] : '';
+
 		if (!empty($settings['size'])) {
 			$this->add_render_attribute('button', 'class', 'elementor-size-' . $settings['size']);
+		}
+
+		if (isset($enable_subtitle) && $enable_subtitle === 'yes' && !empty($enable_subtitle)) {
+			$this->add_render_attribute('button', 'class', 'wpfnl-has-subtitle');
 		}
 
 		if (isset($settings['hover_animation']) && $settings['hover_animation']) {
 			$this->add_render_attribute('button', 'class', 'elementor-animation-' . $settings['hover_animation']);
 		}
+
 		if (isset($settings['button_type_selector']) && $settings['button_type_selector'] !== 'lead') {
-			
+
 			// $products = implode(",", $settings['checkout_product_selector']);
 			$products_array = get_post_meta(get_the_ID(), 'checkout_product_selector', true);
 			if ($products_array) {
 				$products = implode(",", $products_array);
-			}	
+			}
 
 			if( 'url-path' === $settings['button_type_selector'] ){
 				$url = isset($settings['url_path_field']['url']) ? $settings['url_path_field']['url'] : '';
@@ -725,18 +969,136 @@ class Step_Pointer extends Widget_Base
 			}else{
 				$url = '';
 			}
+
+
+			// Prepare data attributes for client-side display conditions
+			$hide_on_browser = isset($settings['hide_on_browser']) ? esc_attr($settings['hide_on_browser']) : 'none';
+			$hide_on_os = isset($settings['hide_on_os']) ? esc_attr($settings['hide_on_os']) : 'none';
+
+			// Get display condition settings
+			$display_condition = isset($settings['display_condition_type']) ? $settings['display_condition_type'] : 'none';
 			
+			// Check display conditions and return early if button should be hidden
+			if ($display_condition === 'user_state') {
+				$hide_logged_in = isset($settings['hide_from_logged_in']) ? $settings['hide_from_logged_in'] : 'no';
+				$hide_logged_out = isset($settings['hide_from_logged_out']) ? $settings['hide_from_logged_out'] : 'no';
+				
+				// Hide from logged in users
+				if ($hide_logged_in === 'yes' && is_user_logged_in()) {
+					return;
+				}
+				
+				// Hide from logged out users
+				if ($hide_logged_out === 'yes' && !is_user_logged_in()) {
+					return;
+				}
+
+			} elseif ($display_condition === 'user_role') {
+				$hide_for_user_role = isset($settings['hide_for_user_role']) ? $settings['hide_for_user_role'] : 'none';
+				
+				if ($hide_for_user_role !== 'none' && is_user_logged_in()) {
+					$user = wp_get_current_user();
+					if (in_array($hide_for_user_role, $user->roles)) {
+						return;
+					}
+				}
+
+			} elseif ($display_condition === 'day') {
+				$disable_on_days = isset($settings['disable_on_days']) ? $settings['disable_on_days'] : array();
+				
+				if (!empty($disable_on_days) && is_array($disable_on_days)) {
+					$current_day = strtolower(date('l')); // e.g., 'monday'
+					if (in_array($current_day, $disable_on_days)) {
+						return;
+					}
+				}
+
+			} elseif ($display_condition === 'browser') {
+				$hide_on_browser = isset($settings['hide_on_browser']) ? $settings['hide_on_browser'] : 'none';
+				
+				if ($hide_on_browser !== 'none') {
+					$user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? strtolower($_SERVER['HTTP_USER_AGENT']) : '';
+					$current_browser = '';
+					
+					// Detect browser from user agent
+					if (strpos($user_agent, 'edg') !== false) {
+						$current_browser = 'edge';
+					} elseif (strpos($user_agent, 'opr') !== false || strpos($user_agent, 'opera') !== false) {
+						$current_browser = 'opera_mini';
+					} elseif (strpos($user_agent, 'chrome') !== false) {
+						$current_browser = 'chrome';
+					} elseif (strpos($user_agent, 'safari') !== false) {
+						$current_browser = 'safari';
+					} elseif (strpos($user_agent, 'firefox') !== false) {
+						$current_browser = 'mozilla';
+					}
+					
+					// Hide button if current browser matches
+					if ($current_browser === $hide_on_browser) {
+						return;
+					}
+				}
+			} elseif ($display_condition === 'operating_system') {
+				$hide_on_os = isset($settings['hide_on_os']) ? $settings['hide_on_os'] : 'none';
+				
+				if ($hide_on_os !== 'none') {
+					$user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? strtolower($_SERVER['HTTP_USER_AGENT']) : '';
+					$current_os = '';
+					
+					// Detect operating system from user agent
+					if (strpos($user_agent, 'windows') !== false || strpos($user_agent, 'win32') !== false || strpos($user_agent, 'win64') !== false) {
+						$current_os = 'windows';
+					} elseif (strpos($user_agent, 'macintosh') !== false || strpos($user_agent, 'mac os x') !== false) {
+						$current_os = 'macos';
+					} elseif (strpos($user_agent, 'linux') !== false && strpos($user_agent, 'android') === false) {
+						$current_os = 'linux';
+					} elseif (strpos($user_agent, 'android') !== false) {
+						$current_os = 'android';
+					} elseif (strpos($user_agent, 'iphone') !== false || strpos($user_agent, 'ipad') !== false || strpos($user_agent, 'ipod') !== false) {
+						$current_os = 'ios';
+					} elseif (strpos($user_agent, 'sunos') !== false) {
+						$current_os = 'sunos';
+					} elseif (strpos($user_agent, 'openbsd') !== false) {
+						$current_os = 'openbsd';
+					}
+					
+					// Hide button if current OS matches
+					if ($current_os === $hide_on_os) {
+						return;
+					}
+				}
+			}
+			// -----end display conditioning----
+
 			?>
 			<div <?php echo $this->get_render_attribute_string('wrapper'); ?>>
-				<a href="#"  data-button-type="<?php echo $settings['button_type_selector']; ?>"  data-url="<?php echo $url; ?>"  data-id="<?php echo get_the_ID(); ?>" data-products="<?php echo $products; ?>"
+				<a href="#"  
+				   data-button-type="<?php echo $settings['button_type_selector']; ?>"  
+				   data-url="<?php echo $url; ?>"  
+				   data-id="<?php echo get_the_ID(); ?>" 
+				   data-products="<?php echo $products; ?>"
 				   id="wpfunnels_next_step_controller"
-				   style="cursor: pointer;" <?php echo $this->get_render_attribute_string('button'); ?>>
-					<?php $this->render_text(); ?>
-					<span class="wpfnl-loader"></span>
+				   style="cursor: pointer;" 
+				   <?php echo $this->get_render_attribute_string('button'); ?> 
+				>
+
+					<?php if (isset($enable_subtitle) && $enable_subtitle === 'yes' && !empty($subtitle_text)) { ?>
+						<span class="text-inner-wrapper" style="display: flex; align-items: center; gap: 3px;">
+							<?php $this->render_text(); ?>
+							<span class="wpfnl-loader"></span>
+						</span>
+
+						<small class="wpfnl-button-subtitle">
+							<?php echo esc_html($subtitle_text); ?>
+						</small>
+					<?php } else { ?>
+						<?php $this->render_text(); ?>
+						<span class="wpfnl-loader"></span>
+					<?php } ?>
 				</a>
 			</div>
 			<span class="wpfnl-alert" id="wpfnl-next-button-loader"></span>
-			
+
 			<?php
 		} elseif (isset($settings['button_type_selector']) && $settings['button_type_selector'] == 'lead') {
 			if (!in_array('fluentform/fluentform.php', WPFNL_ACTIVE_PLUGINS)) {
@@ -793,7 +1155,7 @@ class Step_Pointer extends Widget_Base
 
 		$this->add_inline_editing_attributes('text', 'none');
 		?>
-		<span <?php echo $this->get_render_attribute_string('content-wrapper'); ?>>
+		<span <?php echo $this->get_render_attribute_string('content-wrapper'); ?> style="<?php echo $settings['next_step_button_icon_align'] === 'right' ? 'flex-direction: row-reverse' : '' ?>">
 
             <?php if (!empty($settings['icon']) || !empty($settings['next_step_button_icon']['value'])) : ?>
 				<span <?php echo $this->get_render_attribute_string('icon-align'); ?>>

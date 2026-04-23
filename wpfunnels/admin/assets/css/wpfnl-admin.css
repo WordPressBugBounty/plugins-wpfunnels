@@ -16686,6 +16686,9 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
 .wpfnl-drawing-window .drawflow .drawflow-node .node-body .orderbump-cta > span.clickable-tag:hover {
   opacity: 0.8;
 }
+.wpfnl-drawing-window .drawflow .drawflow-node .node-body .orderbump-cta > span.has-orderbump {
+  font-weight: 600;
+}
 .wpfnl-drawing-window .drawflow .drawflow-node .node-body .node-cta > span {
   border: 1px solid #EEF0F3;
   border-radius: 8px;
@@ -16704,6 +16707,8 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
 }
 .wpfnl-drawing-window .drawflow .drawflow-node .node-body .node-cta > span.has-product {
   color: #45b959;
+  font-weight: 600;
+  border-color: #45b959;
 }
 .wpfnl-drawing-window .drawflow .drawflow-node .node-body .node-cta > span.clickable-tag {
   cursor: pointer;
@@ -16711,7 +16716,12 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
 }
 .wpfnl-drawing-window .drawflow .drawflow-node .node-body .node-cta > span.clickable-tag:hover {
   opacity: 0.75;
+}
+.wpfnl-drawing-window .drawflow .drawflow-node .node-body .node-cta > span.clickable-tag.no-product:hover {
   border-color: #ee5f5a;
+}
+.wpfnl-drawing-window .drawflow .drawflow-node .node-body .node-cta > span.clickable-tag.has-product:hover {
+  border-color: #45b959;
 }
 .wpfnl-drawing-window .drawflow .drawflow-node .node-body .end-flag {
   position: absolute;

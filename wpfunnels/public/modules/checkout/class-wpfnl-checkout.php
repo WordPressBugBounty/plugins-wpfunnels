@@ -42,6 +42,9 @@ class Module extends Wpfnl_Frontend_Module
 		/* set checkout flag */
 		add_filter('woocommerce_is_checkout', [$this, 'checkout_flag'], 9999);
 
+		/* suppress WC "session expired" AJAX response when rendering checkout with empty cart for preview */
+		add_filter('woocommerce_checkout_update_order_review_expired', [$this, 'allow_empty_cart_order_review']);
+
 		if( !defined('WCML_VERSION') ){
 			add_action('woocommerce_checkout_update_order_meta', [$this, 'save_checkout_fields'], 10, 2);
 		}
@@ -51,6 +54,31 @@ class Module extends Wpfnl_Frontend_Module
 
 		/* init WooCommerce action */
 		add_action( 'wp', [$this, 'init_actions']);
+
+		/* Exclude Funnel Builder hooks when WPFunnels checkout is active */
+		add_action( 'wp', [$this, 'exclude_funnel_builder_hooks'], 1 );
+
+		/* Remove CartFlows global checkout override before it fires on 'wp' priority 0 */
+		add_action( 'template_redirect', [$this, 'exclude_funnel_builder_hooks'], 0 );
+
+		/* Exclude conflicting hooks during checkout AJAX (update_order_review) */
+		add_action( 'woocommerce_checkout_update_order_review', [$this, 'exclude_funnel_builder_hooks_on_ajax'], -1 );
+
+		/*
+		 * Prevent CartFlows from overriding the global checkout on WPFunnels step pages.
+		 * CartFlows calls should_show_global_checkout() inside override_global_checkout()
+		 * and global_checkout_template_redirect() — returning true from this filter
+		 * makes both methods bail out immediately, regardless of object reference issues.
+		 */
+		add_filter( 'cartflows_allow_display_global_checkout', [$this, 'prevent_cartflows_global_checkout_override'], 10, 2 );
+
+		/*
+		 * Prevent FunnelKit from redirecting to its own global checkout on WPFunnels
+		 * store checkout pages. fk_checkout_redirect_resolve fires on this filter and
+		 * WFACP_Common caches the result — intercept early at priority 5 (before FK's
+		 * priority 8 and 10) and return 0 to signal "no override" when on a WPFunnels page.
+		 */
+		add_filter( 'wfacp_global_checkout_page_id', [$this, 'prevent_funnelkit_global_checkout_override'], 5, 1 );
 
 		/* register checkout shortcode */
 		add_shortcode('wpfunnels_checkout', array($this, 'render_checkout_shortcode'));
@@ -222,6 +250,169 @@ class Module extends Wpfnl_Frontend_Module
 			$is_checkout = true;
 		}
 		return $is_checkout;
+	}
+
+
+	/**
+	 * Prevent WooCommerce from returning "session expired" on the update_order_review
+	 * AJAX when the cart is empty because we're rendering a Store Checkout preview.
+	 *
+	 * @param bool $expired
+	 * @return bool
+	 */
+	public function allow_empty_cart_order_review( $expired ) {
+		if ( WC()->session && WC()->session->get( 'wpfnl_checkout_preview_mode' ) ) {
+			return false;
+		}
+		return $expired;
+	}
+
+	/**
+	 * Prevent CartFlows from overriding the global checkout page when the current
+	 * page is a WPFunnels step. CartFlows checks this filter inside both
+	 * override_global_checkout() and global_checkout_template_redirect() — returning
+	 * true makes both bail out immediately without touching $GLOBALS['post'].
+	 *
+	 * @param bool $is_allow
+	 * @param int  $checkout_id  Current post ID passed by CartFlows.
+	 * @return bool
+	 * @since 3.10.6
+	 */
+	public function prevent_cartflows_global_checkout_override( $is_allow, $checkout_id ) {
+		if ( $is_allow ) {
+			return $is_allow;
+		}
+
+		// If the current post is a WPFunnels step, tell CartFlows to skip its override.
+		if ( $checkout_id && Wpfnl_functions::is_funnel_step_page() ) {
+			return true;
+		}
+
+		return $is_allow;
+	}
+
+	/**
+	 * Prevent FunnelKit from redirecting to its own global checkout on WPFunnels
+	 * store checkout pages.
+	 *
+	 * fk_checkout_redirect_resolve (priority 10) and maybe_override_global_checkout_id
+	 * (priority 8) both fire on wfacp_global_checkout_page_id after this callback.
+	 * WordPress passes each callback's return value to the next, so returning 0 here
+	 * is not enough — priority 8/10 will overwrite it with a real step ID.
+	 *
+	 * The fix: when on a WPFunnels step page, remove those downstream filters from
+	 * inside this callback (they haven't run yet at priority 5), then return 0.
+	 * WFACP_Common treats 0 as "no global checkout configured" → skips the redirect.
+	 *
+	 * @param int $checkout_page_id
+	 * @return int
+	 * @since 3.10.6
+	 */
+	public function prevent_funnelkit_global_checkout_override( $checkout_page_id ) {
+		if ( ! Wpfnl_functions::is_funnel_step_page() ) {
+			return $checkout_page_id;
+		}
+
+		// Remove FunnelKit's downstream filters before they run (we are at priority 5).
+		if ( class_exists( 'WFFN_Step_WC_Checkout' ) ) {
+			$wffn_checkout = \WFFN_Step_WC_Checkout::get_instance();
+			if ( $wffn_checkout ) {
+				remove_filter( 'wfacp_global_checkout_page_id', array( $wffn_checkout, 'maybe_override_global_checkout_id' ), 8 );
+				remove_filter( 'wfacp_global_checkout_page_id', array( $wffn_checkout, 'fk_checkout_redirect_resolve' ), 10 );
+			}
+		}
+
+		// Return 0 — WFACP_Common treats 0 as "no global checkout configured".
+		return 0;
+	}
+
+
+	/**
+	 * Remove conflicting hooks from Funnel Builder (WFACP/FunnelKit) and CartFlows
+	 * that interfere with WPFunnels checkout pages.
+	 *
+	 * Two entry points:
+	 *  1. 'template_redirect' (priority -1) — fires before 'wp', catches CartFlows
+	 *     global checkout override which runs at wp priority 0.
+	 *  2. 'wp' (priority 1) — catches remaining hooks that need $post to be set.
+	 *
+	 * @since 3.10.6
+	 */
+	public function exclude_funnel_builder_hooks() {
+		// Bail early if not a WPFunnels step page at all
+		if ( ! Wpfnl_functions::is_funnel_step_page() ) {
+			return;
+		}
+
+		$this->remove_conflicting_plugin_hooks();
+	}
+
+	/**
+	 * Exclude conflicting hooks during the woocommerce_checkout_update_order_review
+	 * AJAX call, where is_funnel_step_page() cannot rely on get_post_type().
+	 * Uses _wpfunnels_checkout_id in POST data to detect WPFunnels context.
+	 *
+	 * @since 3.10.6
+	 */
+	public function exclude_funnel_builder_hooks_on_ajax() {
+		$checkout_id = Wpfnl_functions::get_checkout_id_from_post( $_POST );
+		if ( ! $checkout_id ) {
+			return;
+		}
+		if ( ! Wpfnl_functions::check_if_this_is_step_type_by_id( $checkout_id, 'checkout' ) ) {
+			return;
+		}
+
+		$this->remove_conflicting_plugin_hooks();
+	}
+
+	/**
+	 * Core removal logic shared by both page-load and AJAX entry points.
+	 *
+	 * @since 3.10.6
+	 */
+	private function remove_conflicting_plugin_hooks() {
+		// --- FunnelKit (WFACP) ---
+		if ( class_exists( 'WFFN_Step_WC_Checkout' ) ) {
+			$wffn_checkout = \WFFN_Step_WC_Checkout::get_instance();
+			if ( $wffn_checkout ) {
+				// Prevents FunnelKit store checkout from overriding WPFunnels checkout page ID
+				remove_filter( 'wfacp_global_checkout_page_id', array( $wffn_checkout, 'maybe_override_global_checkout_id' ), 8 );
+				// Prevents FK cart-based checkout redirect from firing on WPFunnels pages
+				remove_filter( 'wfacp_global_checkout_page_id', array( $wffn_checkout, 'fk_checkout_redirect_resolve' ), 10 );
+				// Prevents FunnelKit from setting up its own funnel session on WPFunnels AJAX
+				remove_action( 'woocommerce_checkout_update_order_review', array( $wffn_checkout, 'setup_funnel_on_update_order' ), 99 );
+			}
+		}
+
+		// --- CartFlows: global checkout page override ---
+		if ( class_exists( 'Cartflows_Global_Checkout' ) ) {
+			$cartflows_global = \Cartflows_Global_Checkout::get_instance();
+			if ( $cartflows_global ) {
+				// Prevents CartFlows from replacing $GLOBALS['post'] with its own checkout
+				remove_action( 'wp', array( $cartflows_global, 'override_global_checkout' ), 0 );
+				remove_action( 'wp', array( $cartflows_global, 'maybe_override_order_pay_page' ), 0 );
+				// Prevents CartFlows from redirecting to its global checkout URL
+				remove_action( 'template_redirect', array( $cartflows_global, 'global_checkout_template_redirect' ), 1 );
+			}
+		}
+
+		// --- CartFlows: checkout markup hooks ---
+		if ( class_exists( 'Cartflows_Checkout_Markup' ) ) {
+			$cartflows_markup = \Cartflows_Checkout_Markup::get_instance();
+			if ( $cartflows_markup ) {
+				// Prevents CartFlows from hijacking the woocommerce_is_checkout flag
+				remove_filter( 'woocommerce_is_checkout', array( $cartflows_markup, 'woo_checkout_flag' ), 9999 );
+				// Prevents CartFlows from emptying and repopulating the cart with its own products
+				remove_action( 'wp', array( $cartflows_markup, 'preconfigured_cart_data' ), 1 );
+				// Prevents CartFlows from loading its scripts/hooks on WPFunnels pages
+				remove_action( 'wp', array( $cartflows_markup, 'shortcode_load_data' ), 999 );
+				// Prevents CartFlows from restoring a different checkout's cart during AJAX
+				remove_action( 'woocommerce_checkout_update_order_review', array( $cartflows_markup, 'restore_cart_data' ) );
+				// Prevents CartFlows from overwriting WPFunnels cart item prices
+				remove_action( 'woocommerce_before_calculate_totals', array( $cartflows_markup, 'custom_price_to_cart_item' ), 9999 );
+			}
+		}
 	}
 
 

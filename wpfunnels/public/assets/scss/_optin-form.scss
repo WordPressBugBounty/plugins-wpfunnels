@@ -29,7 +29,7 @@
         .input-wrapper {
             display: block;
             position: relative;
-            
+
             .field-icon {
                 position: absolute;
                 top: 50%;
@@ -216,22 +216,20 @@
     display: inline-block;
 }
 
-.et-db #et-boc .et-l .et_pb_button.wpfnl_next_step_button:after {
-    content: ""!important;
+.et-db #et-boc .et-l .et_pb_button.wpfnl_next_step_button.show-loader:after {
+    opacity: 1;
+	visibility: visible;
+	content: ""!important;
     border: 2px solid #8265c5;
     border-radius: 50%;
     border-top: 2px solid #fff;
     width: 13px;
     height: 13px;
     animation: spin 0.7s linear infinite;
-    display: none;
-    margin-left: 5px!important;
-    position: relative!important;
-    top: 1px;
-    opacity: 1!important;
-}
-.et-db #et-boc .et-l .et_pb_button.wpfnl_next_step_button.show-loader:after {
-    display: inline-block!important;
+	display: inline-block!important;
+    margin-left: 8px !important;
+    position: relative !important;
+    top: 3px;
 }
 
 
@@ -241,7 +239,7 @@
     .wpfnl-optin-form-wrapper.form-style1 {
         display: flex;
         flex-flow: row wrap;
-        
+
         .wpfnl-optin-form-group:nth-child(1) {
             width: 50%;
             padding-right: 10px;
@@ -270,7 +268,7 @@
 
         .btn-optin {
             background-color: #EE8134;
-            
+
             &:hover {
                 background-color: #d76515;
             }
@@ -296,18 +294,18 @@
             &.align-justify {
                 .btn-optin {
                     width: 100%;
-    
+
                     .elementor-button-text {
                         flex-grow: inherit;
                     }
                 }
             }
         }
-        
+
         .btn-optin {
             background-color: #EE8134;
             width: auto;
-            
+
             &:hover {
                 background-color: #d76515;
             }
@@ -323,7 +321,7 @@
             background-color: #00D057;
             border-color: #00D057;
         }
-        
+
         .wpfnl-optin-form-group.user-registration-checkbox label a,
         .wpfnl-optin-form-group.acceptance-checkbox label a {
             color: #EE8134;
@@ -332,7 +330,7 @@
         .btn-optin {
             background-color: #EE8134;
             width: 100%;
-            
+
             &:hover {
                 background-color: #d76515;
             }
@@ -397,8 +395,8 @@
     }
 
     // ------one column style---
-    .wpfnl-checkout .wpfnl-checkout-form-one-column .woocommerce #customer_details, 
-    .wpfnl-checkout.wpfnl-col-1 .woocommerce #customer_details, 
+    .wpfnl-checkout .wpfnl-checkout-form-one-column .woocommerce #customer_details,
+    .wpfnl-checkout.wpfnl-col-1 .woocommerce #customer_details,
     .woocommerce-page .wpfnl-checkout.wpfnl-col-1 #customer_details {
         width: 100%;
         margin: 0;

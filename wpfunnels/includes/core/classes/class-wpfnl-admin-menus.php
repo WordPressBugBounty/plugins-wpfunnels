@@ -25,6 +25,7 @@ class Wpfnl_Menus
         add_action('admin_init', [$this, 'disallow_all_step_view']);
         add_action('admin_footer', [$this, 'doc_link_with_new_page']);
         add_filter('wpfnl_dashboard_nav_lists', [$this, 'add_store_checkout_nav'], 15, 1);
+        add_action('admin_bar_menu', [$this, 'register_admin_bar_menu'], 100);
 
         if( isset($_GET['page']) && 'edit_funnel' === $_GET['page'] ) {
 			$funnel_id = isset($_GET['id']) ? absint($_GET['id']) : 0;
@@ -523,5 +524,81 @@ class Wpfnl_Menus
 		}
 
 		return $new_list;
+	}
+
+
+	/**
+	 * Register WPFunnels nodes in the WordPress admin bar.
+	 *
+	 * @param WP_Admin_Bar $wp_admin_bar
+	 * @since 3.10.9
+	 */
+	public function register_admin_bar_menu( $wp_admin_bar ) {
+		$role_permission = Wpfnl_functions::get_general_settings();
+		$capability      = Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission );
+
+		if ( ! current_user_can( $capability ) ) {
+			return;
+		}
+
+		$wp_admin_bar->add_node([
+			'id'    => 'wpfunnels',
+			'title' => __('WPFunnels', 'wpfnl'),
+			'href'  => admin_url('admin.php?page=' . WPFNL_MAIN_PAGE_SLUG),
+		]);
+
+		$subnodes = [
+			[
+				'id'    => 'wpfunnels-dashboard',
+				'title' => __('Dashboard', 'wpfnl'),
+				'href'  => admin_url('admin.php?page=' . WPFNL_MAIN_PAGE_SLUG),
+			],
+			[
+				'id'    => 'wpfunnels-funnels',
+				'title' => __('Funnels', 'wpfnl'),
+				'href'  => admin_url('admin.php?page=' . WPFNL_FUNNEL_PAGE_SLUG),
+			],
+			[
+				'id'    => 'wpfunnels-store-checkout',
+				'title' => __('Store Checkout', 'wpfnl'),
+				'href'  => admin_url('admin.php?page=' . WPFNL_STORE_CHECKOUT_SLUG),
+			],
+			[
+				'id'    => 'wpfunnels-automations',
+				'title' => __('Automations', 'wpfnl'),
+				'href'  => admin_url('admin.php?page=' . WPFNL_AUTOMATIONS_SLUG),
+			],
+		];
+
+		if ( ! function_exists( 'is_plugin_active' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$integrations_in_pro = defined('WPFNL_PRO_VERSION') && version_compare(WPFNL_PRO_VERSION, '2.9.0', '>=');
+		$legacy_addon_active = is_plugin_active('wpfunnels-pro-integrations/wpfunnels-pro-integrations.php');
+
+		if ( $integrations_in_pro || ! $legacy_addon_active ) {
+			$subnodes[] = [
+				'id'    => 'wpfunnels-integrations',
+				'title' => __('Integrations', 'wpfnl'),
+				'href'  => admin_url('admin.php?page=' . WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG),
+			];
+		}
+
+		$subnodes[] = [
+			'id'    => 'wpfunnels-templates',
+			'title' => __('Templates', 'wpfnl'),
+			'href'  => admin_url('admin.php?page=' . WPFNL_TEMPLATE_PAGE_SLUG),
+		];
+
+		$subnodes[] = [
+			'id'    => 'wpfunnels-settings',
+			'title' => __('Settings', 'wpfnl'),
+			'href'  => admin_url('admin.php?page=' . WPFNL_GLOBAL_SETTINGS_SLUG),
+		];
+
+		foreach ( $subnodes as $node ) {
+			$wp_admin_bar->add_node( array_merge( $node, ['parent' => 'wpfunnels'] ) );
+		}
 	}
 }

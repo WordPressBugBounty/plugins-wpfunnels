@@ -22,7 +22,6 @@ if (!defined('ABSPATH')) {
 } // Exit if accessed directly
 
 
-
 /**
  * Funnel sell accept button
  *

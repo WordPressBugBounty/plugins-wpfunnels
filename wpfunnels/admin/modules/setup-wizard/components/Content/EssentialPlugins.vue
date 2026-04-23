@@ -83,16 +83,16 @@ export default {
                 : 'Email Marketing and Automation.';
 
             this.plugins = [
-                {
-                    id: 'mail-mint',
-                    name: 'Mail Mint',
-                    description: mailMintDescription,
-                    image: window?.setup_wizard_obj?.mail_mint_logo || '',
-                    slug: 'mail-mint',
-                    basename: 'mail-mint/mail-mint.php',
-                    showForGoals: ['all'],
-                    selected: this.isPluginSelected('mail-mint')
-                },
+                // {
+                //     id: 'mail-mint',
+                //     name: 'Mail Mint',
+                //     description: mailMintDescription,
+                //     image: window?.setup_wizard_obj?.mail_mint_logo || '',
+                //     slug: 'mail-mint',
+                //     basename: 'mail-mint/mail-mint.php',
+                //     showForGoals: ['all'],
+                //     selected: this.isPluginSelected('mail-mint')
+                // },
                 {
                     id: 'woocommerce-payments',
                     name: 'WooCommerce Payments',

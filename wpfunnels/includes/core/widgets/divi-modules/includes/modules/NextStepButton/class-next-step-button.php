@@ -55,10 +55,14 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 			),
 			'advanced' => array(
 				'toggles' => array(
-					'alignment' => esc_html__( 'Alignment', 'wpfnl' ),
-					'text'      => array(
+					'alignment'        => esc_html__( 'Alignment', 'wpfnl' ),
+					'text'             => array(
 						'title'    => __( 'Alignment' ,'wpfnl'),
 						'priority' => 49,
+					),
+					'subtitle_style'   => array(
+						'title'    => __( 'Subtitle', 'wpfnl' ),
+						'priority' => 51,
 					),
 				),
 			),
@@ -67,7 +71,7 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 
 		$this->advanced_fields = array(
 			'text' =>array(
-				'use_text_orientation'  => true, // default
+				'use_text_orientation'  => true,
 				'css' => array(
 					'text_orientation' => '%%order_class%%',
 				)
@@ -80,7 +84,6 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 					'label'          => __( 'Button','wpfnl' ),
 					'css'            => array(
 						'main'         => $this->main_css_element.'.et_pb_button' ,
-//						'limited_main' => "{$this->main_css_element}.et_pb_button",
 					),
 					'box_shadow'     => false,
 					'text_shadow'     => false,
@@ -92,13 +95,27 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 					),
 				),
 			),
+			'fonts'           => array(
+				'subtitle' => array(
+					'label'       => __( 'Subtitle', 'wpfnl' ),
+					'css'         => array(
+						'main' => '%%order_class%% .wpfnl-button-subtitle',
+					),
+					'tab_slug'    => 'advanced',
+					'toggle_slug' => 'subtitle_style',
+					'show_if'     => array(
+						'enable_subtitle' => 'on',
+					),
+					'hide_text_align'   => true,
+					'hide_text_shadow'  => true,
+				),
+			),
 			'box_shadow'     => false,
 			'margin_padding' => false,
 			'text_shadow'     => array(
 				'default' => false,
 			),
 			'background'      => false,
-			'fonts'           => false,
 			'max_width'       => false,
 			'height'          => false,
 			'link_options'    => false,
@@ -195,6 +212,119 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 				'toggle_slug'     => 'button',
 				'default'         => 'Buy Now',
 			),
+
+			'enable_subtitle' => array(
+				'label'           => __( 'Enable Subtitle', 'wpfnl' ),
+				'type'            => 'yes_no_button',
+				'option_category' => 'basic_option',
+				'options'         => array(
+					'off' => __( 'No', 'wpfnl' ),
+					'on'  => __( 'Yes', 'wpfnl' ),
+				),
+				'default'         => 'off',
+				'toggle_slug'     => 'button',
+				'description'     => __( 'Enable to show a subtitle below the button text.', 'wpfnl' ),
+			),
+
+			'subtitle_text' => array(
+				'label'           => __( 'Subtitle Text', 'wpfnl' ),
+				'type'            => 'text',
+				'option_category' => 'basic_option',
+				'description'     => __( 'Enter the subtitle text to display below the button text.', 'wpfnl' ),
+				'toggle_slug'     => 'button',
+				'default'         => __( 'Click to continue', 'wpfnl' ),
+				'show_if'         => array(
+					'enable_subtitle' => 'on',
+				),
+			),
+
+			'subtitle_font_size' => array(
+				'label'           => __( 'Font Size (px)', 'wpfnl' ),
+				'type'            => 'range',
+				'option_category' => 'basic_option',
+				'tab_slug'        => 'advanced',
+				'toggle_slug'     => 'subtitle_style',
+				'default'         => '14',
+				'range_settings'  => array(
+					'min'  => 8,
+					'max'  => 60,
+					'step' => 1,
+				),
+				'mobile_options'  => true,
+				'show_if'         => array(
+					'enable_subtitle' => 'on',
+				),
+			),
+
+			'subtitle_line_height' => array(
+				'label'           => __( 'Line Height', 'wpfnl' ),
+				'type'            => 'range',
+				'option_category' => 'basic_option',
+				'tab_slug'        => 'advanced',
+				'toggle_slug'     => 'subtitle_style',
+				'default'         => '1.2',
+				'range_settings'  => array(
+					'min'  => 0.5,
+					'max'  => 5,
+					'step' => 0.1,
+				),
+				'show_if'         => array(
+					'enable_subtitle' => 'on',
+				),
+			),
+
+			'subtitle_letter_spacing' => array(
+				'label'           => __( 'Letter Spacing (px)', 'wpfnl' ),
+				'type'            => 'range',
+				'option_category' => 'basic_option',
+				'tab_slug'        => 'advanced',
+				'toggle_slug'     => 'subtitle_style',
+				'default'         => '0',
+				'range_settings'  => array(
+					'min'  => 0,
+					'max'  => 20,
+					'step' => 0.5,
+				),
+				'show_if'         => array(
+					'enable_subtitle' => 'on',
+				),
+			),
+
+			'subtitle_text_transform' => array(
+				'label'           => __( 'Text Transform', 'wpfnl' ),
+				'type'            => 'select',
+				'option_category' => 'basic_option',
+				'tab_slug'        => 'advanced',
+				'toggle_slug'     => 'subtitle_style',
+				'default'         => 'none',
+				'options'         => array(
+					'none'       => __( 'None', 'wpfnl' ),
+					'uppercase'  => __( 'Uppercase', 'wpfnl' ),
+					'lowercase'  => __( 'Lowercase', 'wpfnl' ),
+					'capitalize' => __( 'Capitalize', 'wpfnl' ),
+				),
+				'show_if'         => array(
+					'enable_subtitle' => 'on',
+				),
+			),
+
+			'subtitle_spacing_top' => array(
+				'label'           => __( 'Spacing Top (px)', 'wpfnl' ),
+				'type'            => 'range',
+				'option_category' => 'basic_option',
+				'tab_slug'        => 'advanced',
+				'toggle_slug'     => 'subtitle_style',
+				'default'         => '2',
+				'range_settings'  => array(
+					'min'  => 0,
+					'max'  => 50,
+					'step' => 1,
+				),
+				'show_if'         => array(
+					'enable_subtitle' => 'on',
+				),
+			),
+
 		);
 
 
@@ -277,6 +407,14 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 
 		$button_type = isset($this->props['button_type_selector']) ? $this->props['button_type_selector'] : '';
 
+		// Subtitle settings
+		$enable_subtitle         = isset( $this->props['enable_subtitle'] ) ? $this->props['enable_subtitle'] : 'off';
+		$subtitle_text           = isset( $this->props['subtitle_text'] ) ? esc_html( $this->props['subtitle_text'] ) : '';
+		$subtitle_font_size      = isset( $this->props['subtitle_font_size'] ) ? $this->props['subtitle_font_size'] : '14';
+		$subtitle_line_height    = isset( $this->props['subtitle_line_height'] ) ? $this->props['subtitle_line_height'] : '1.2';
+		$subtitle_letter_spacing = isset( $this->props['subtitle_letter_spacing'] ) ? $this->props['subtitle_letter_spacing'] : '0';
+		$subtitle_text_transform = isset( $this->props['subtitle_text_transform'] ) ? $this->props['subtitle_text_transform'] : 'none';
+		$subtitle_spacing_top    = isset( $this->props['subtitle_spacing_top'] ) ? $this->props['subtitle_spacing_top'] : '2';
 
 		// Render Button
 		$button = $this->render_button(
@@ -302,6 +440,13 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 				),
 				'data_url'			=> $url,
 				'data_button_type'	=> $button_type,
+				'enable_subtitle'        => $enable_subtitle,
+				'subtitle_text'          => $subtitle_text,
+				'subtitle_font_size'     => $subtitle_font_size,
+				'subtitle_line_height'   => $subtitle_line_height,
+				'subtitle_letter_spacing'=> $subtitle_letter_spacing,
+				'subtitle_text_transform'=> $subtitle_text_transform,
+				'subtitle_spacing_top'   => $subtitle_spacing_top,
 			)
 		);
 
@@ -349,6 +494,20 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 			self::set_style( $render_slug, $el_style );
 		}
 
+		// Subtitle typography — handled automatically by advanced_fields['fonts']['subtitle']
+		// Only apply spacing-top and text-transform via set_style (not covered by fonts field)
+		if ( 'on' === $enable_subtitle ) {
+			$subtitle_css = 'color: inherit;';
+			if ( $subtitle_spacing_top )   $subtitle_css .= "margin-top: {$subtitle_spacing_top}px;";
+			if ( $subtitle_text_transform && 'none' !== $subtitle_text_transform ) {
+				$subtitle_css .= "text-transform: {$subtitle_text_transform};";
+			}
+			self::set_style( $render_slug, array(
+				'selector'    => '%%order_class%% .wpfnl-button-subtitle',
+				'declaration' => $subtitle_css,
+			) );
+		}
+
 		return $output;
 	}
 
@@ -380,6 +539,8 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 			'multi_view_data'     => '',
 			'data_url'     		  => '',
 			'data_button_type'    => '',
+			'enable_subtitle'     => 'off',
+			'subtitle_text'       => '',
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -448,11 +609,24 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 
 
 
+		// Build inner content: button text + optional subtitle
+		$has_subtitle = 'on' === $args['enable_subtitle'] && '' !== $args['subtitle_text'];
+
+		if ( $has_subtitle ) {
+			$inner_content = sprintf(
+				'<span class="wpfnl-divi-btn-text-wrap" style="display:flex;flex-direction:column;align-items:center;"><span>%1$s</span><small class="wpfnl-button-subtitle">%2$s</small></span>',
+				et_core_esc_previously( $button_text ) . et_core_esc_previously( $args['multi_view_data'] ),
+				esc_html( $args['subtitle_text'] )
+			);
+		} else {
+			$inner_content = et_core_esc_previously( $button_text ) . et_core_esc_previously( $args['multi_view_data'] );
+		}
+
 		// Render button.
 		return sprintf(
-			'%7$s<a%9$s class="%5$s" href="%1$s"%3$s%4$s%6$s%10$s%11$s%12$s%13$s%14$s>%2$s</a>%8$s',
+			'%7$s<a%9$s class="%5$s" href="%1$s"%3$s%4$s%6$s%10$s%11$s %12$s %13$s>%2$s</a>%8$s',
 			esc_url( $args['button_url'] ),
-			et_core_esc_previously( $button_text ),
+			et_core_esc_previously( $inner_content ),
 			( 'on' === $args['url_new_window'] ? ' target="_blank"' : '' ),
 			et_core_esc_previously( $data_icon ),
 			esc_attr( implode( ' ', array_unique( $button_classname ) ) ), // #5
@@ -462,9 +636,8 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 			'' !== $args['button_id'] ? sprintf( ' id="%1$s"', esc_attr( $args['button_id'] ) ) : '',
 			et_core_esc_previously( $data_icon_tablet ), // #10
 			et_core_esc_previously( $data_icon_phone ),
-			et_core_esc_previously( $args['multi_view_data'] ),
-			$data_url,
-			$data_button_type
+			et_core_esc_previously( $data_url ),
+			et_core_esc_previously( $data_button_type )
 		);
 	}
 

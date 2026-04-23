@@ -2355,6 +2355,46 @@
 		});
 		// ----end modern multistep checkout toggle----
 
+        // ---- Next Step Button Viewport Animation ----
+        function wpfnlInitButtonAnimations() {
+            var $buttons = $('.wpfunnels-block-next-step-button.wpfnl-animation, .bricks-button.wpfnl-animation');
+            if (!$buttons.length) return;
+
+            if ('IntersectionObserver' in window) {
+                var observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            $(entry.target).addClass('wpfnl-animated');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.2 });
+
+                $buttons.each(function() {
+                    observer.observe(this);
+                });
+            } else {
+                // Fallback for older browsers
+                function wpfnlCheckButtonsInView() {
+                    $buttons.each(function() {
+                        if ($(this).hasClass('wpfnl-animated')) return;
+                        var top = $(this).offset().top;
+                        var bottom = top + $(this).outerHeight();
+                        var viewTop = $(window).scrollTop();
+                        var viewBottom = viewTop + $(window).height();
+                        if (bottom > viewTop && top < viewBottom) {
+                            $(this).addClass('wpfnl-animated');
+                        }
+                    });
+                }
+                $(window).on('scroll.wpfnlAnim resize.wpfnlAnim', wpfnlCheckButtonsInView);
+                wpfnlCheckButtonsInView();
+            }
+        }
+
+        wpfnlInitButtonAnimations();
+        // ---- End Next Step Button Viewport Animation ----
+
 
     })
 })(jQuery)
