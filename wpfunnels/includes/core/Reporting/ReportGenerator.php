@@ -36,16 +36,46 @@ class ReportGenerator {
 	 * @since 3.2.0
 	 */
 	public static function get_overview( $start_date, $end_date ) {
-		$total_orders 			= self::get_total_orders( $start_date, $end_date );
-		$total_customers 		= self::get_total_customers( $start_date, $end_date );
-		$total_sales 			= self::get_total_sales( $start_date, $end_date );
-		$total_ob_revenue 		= self::get_total_ob_sales( $start_date, $end_date );
+		$total_orders           = self::get_total_orders( $start_date, $end_date );
+		$total_customers        = self::get_total_customers( $start_date, $end_date );
+		$total_sales            = self::get_total_sales( $start_date, $end_date );
+		$total_ob_revenue       = self::get_total_ob_sales( $start_date, $end_date );
+		$wc_total               = self::get_wc_total_sales( $start_date, $end_date );
+		$wc_total_orders        = self::get_wc_total_orders( $start_date, $end_date );
+		// Non-funnel (native WooCommerce) revenue and order count
+		$store_revenue          = max( 0, $wc_total - (float) $total_sales );
+		$store_order_count      = max( 0, $wc_total_orders - (int) $total_orders );
+		$avg_order_value        = (int) $total_orders > 0 ? ( (float) $total_sales / (int) $total_orders ) : 0;
+		// Store baseline AOV = native WC revenue ÷ native WC orders (funnel orders excluded)
+		$store_aov              = $store_order_count > 0 ? ( $store_revenue / $store_order_count ) : 0;
+
+		$funnel_checkout_visits         = CheckoutTracker::get_funnel_checkout_visits( $start_date, $end_date );
+		$store_checkout_visits          = CheckoutTracker::get_store_checkout_visits( $start_date, $end_date );
+		// Cap at 100 — visits may be undercount if tracking started after orders were placed.
+		$checkout_conversion_rate       = $funnel_checkout_visits > 0
+			? min( 100, round( ( (int) $total_orders / $funnel_checkout_visits ) * 100, 1 ) )
+			: 0;
+		$store_checkout_conversion_rate = $store_checkout_visits > 0
+			? min( 100, round( ( $store_order_count / $store_checkout_visits ) * 100, 1 ) )
+			: 0;
 
 		$result = array(
-			'total_orders'			=> (int) $total_orders,
-			'total_customers'		=> (int) $total_customers,
-			'total_sales'			=> self::format_price( $total_sales ),
-			'total_ob_revenue'		=> self::format_price( $total_ob_revenue ),
+			'total_orders'                   => (int) $total_orders,
+			'total_customers'                => (int) $total_customers,
+			'total_sales'                    => self::format_price( $total_sales ),
+			'total_ob_revenue'               => self::format_price( $total_ob_revenue ),
+			'total_revenue'                  => self::format_price( $total_sales ),
+			'avg_order_value'                => self::format_price( $avg_order_value ),
+			'store_aov'                      => self::format_price( $store_aov ),
+			'store_total_orders'             => (int) $store_order_count,
+			'store_revenue'                  => self::format_price( $store_revenue ),
+			'conversion_rate'                => $checkout_conversion_rate, // backward compat alias
+			'checkout_conversion_rate'       => $checkout_conversion_rate,
+			'store_checkout_conversion_rate' => $store_checkout_conversion_rate,
+			'ob_acceptance_rate'             => self::get_ob_acceptance_rate( $start_date, $end_date ),
+			'upsell_acceptance_rate'         => self::get_upsell_acceptance_rate( $start_date, $end_date ),
+			'downsell_recovery_rate'         => self::get_downsell_recovery_rate( $start_date, $end_date ),
+			'checkout_completion_rate'       => $checkout_conversion_rate,
 		);
 
 		$response['status'] = true;
@@ -66,11 +96,15 @@ class ReportGenerator {
 			$total_checkout_sales 	= self::get_total_checkout_sales( $start_date, $end_date );
 			$total_ob_revenue 		= self::get_total_ob_sales( $start_date, $end_date );
 			$total_leads 		    = self::get_total_leads( $start_date, $end_date );
+			$wc_interval_total      = self::get_wc_total_sales( $start_date, $end_date );
+			$store_sales            = max( 0, $wc_interval_total - (float) $total_sales );
 			$response['sales']['interval'][]	= apply_filters( 'wpfunnels/stat-interval-data',  array(
 				'total_orders'			=> (int) $total_orders,
 				'total_customers'		=> (int) $total_customers,
 				'total_sales'			=> self::format_price( $total_checkout_sales ),
 				'total_ob_revenue'		=> self::format_price( $total_ob_revenue ),
+				'total_funnel_sales'	=> self::format_price( $total_sales ),
+				'store_sales'			=> self::format_price( $store_sales ),
 			), $start_date, $end_date );
 
 			$response['lead']['interval'][]	= apply_filters( 'wpfunnels/stat-interval-data-leads',  array(
@@ -94,38 +128,62 @@ class ReportGenerator {
 	 * @throws Exception If there is an issue with the database query.
 	 * @since 3.5.0
 	 */
-	public static function get_top_funnels() {
+	public static function get_top_funnels( $start_date = null, $end_date = null ) {
 		global $wpdb;
-		$table	= $wpdb->prefix. 'wpfnl_stats';
-		$sql = "SELECT funnel_id, SUM(
-					CASE
-						WHEN status = 'completed' THEN ( total_sales )
-						ELSE 0
-					END
-				) AS total_revenue
-					FROM $table
-					GROUP BY funnel_id
-					ORDER BY total_revenue DESC
-				LIMIT 3";
-		$top_funnels = $wpdb->get_results($sql);
+		$table = $wpdb->prefix . 'wpfnl_stats';
+
+		if ( ! $start_date ) {
+			$start_date = '2000-01-01 00:00:00';
+		}
+		if ( ! $end_date ) {
+			$end_date = current_time( 'Y-m-d H:i:s' );
+		}
+
+		$sql = $wpdb->prepare(
+			"SELECT funnel_id,
+				SUM(CASE WHEN status = 'completed' THEN total_sales ELSE 0 END) AS total_revenue,
+				COUNT(CASE WHEN status = 'completed' THEN 1 END) AS order_count
+			 FROM {$table}
+			 WHERE paid_date >= %s AND paid_date <= %s
+			 GROUP BY funnel_id
+			 ORDER BY total_revenue DESC
+			 LIMIT 3",
+			$start_date,
+			$end_date
+		);
+
+		$top_funnels = $wpdb->get_results( $sql );
+
+		// Store AOV baseline for lift calculation
+		$wc_total  = self::get_wc_total_sales( $start_date, $end_date );
+		$wc_orders = self::get_wc_total_orders( $start_date, $end_date );
+		$store_aov = $wc_orders > 0 ? $wc_total / $wc_orders : 0;
+
 		$funnel_data = array();
 		foreach ( $top_funnels as $top_funnel ) {
-			$funnel_id 		= $top_funnel->funnel_id;
-			if ( 'publish' !== get_post_status($funnel_id) ) {
+			$funnel_id = $top_funnel->funnel_id;
+			if ( 'publish' !== get_post_status( $funnel_id ) ) {
 				continue;
 			}
-			$revenue 		= $top_funnel->total_revenue;
-			$funnel_data[] 	= array(
-				'id'				=> $funnel_id,
-				'link'				=> admin_url("/admin.php?page=edit_funnel&id={$funnel_id}&step_id=0"),
-				'title'				=> get_the_title( $funnel_id ),
-				'views'				=> 0,
-				'conversion'		=> 0,
-				'revenue' 			=> self::format_price( $revenue ),
-				'conversion_rate'	=> 0,
+			$revenue  = (float) $top_funnel->total_revenue;
+			$orders   = (int) $top_funnel->order_count;
+			$aov      = $orders > 0 ? $revenue / $orders : 0;
+			$aov_lift = $store_aov > 0 ? round( ( ( $aov - $store_aov ) / $store_aov ) * 100, 1 ) : 0;
+
+			$funnel_data[] = array(
+				'id'              => $funnel_id,
+				'link'            => admin_url( "/admin.php?page=edit_funnel&id={$funnel_id}&step_id=0" ),
+				'title'           => get_the_title( $funnel_id ),
+				'views'           => 0,
+				'orders'          => $orders,
+				'conversion'      => 0,
+				'revenue'         => self::format_price( $revenue ),
+				'aov'             => self::format_price( $aov ),
+				'aov_lift'        => $aov_lift,
+				'conversion_rate' => 0,
 			);
 		}
-		return apply_filters( 'wpfunnels/top-performing-funnels-data', $funnel_data );
+		return apply_filters( 'wpfunnels/top-performing-funnels-data', $funnel_data, $start_date, $end_date );
 	}
 
 
@@ -335,6 +393,196 @@ class ReportGenerator {
 		}
 
 		return $intervals;
+	}
+
+
+	/**
+	 * Get WooCommerce total sales for all orders (not just funnel orders).
+	 * Supports both HPOS and legacy post-based order storage.
+	 *
+	 * @param string $start_date
+	 * @param string $end_date
+	 * @return float
+	 *
+	 * @since 3.9.6
+	 */
+	public static function get_wc_total_sales( $start_date, $end_date ) {
+		if ( ! class_exists( 'WooCommerce' ) ) {
+			return 0;
+		}
+		global $wpdb;
+
+		$hpos_enabled = get_option( 'woocommerce_custom_orders_table_enabled' ) === 'yes';
+
+		if ( $hpos_enabled ) {
+			$table       = $wpdb->prefix . 'wc_orders';
+			$start_utc   = get_gmt_from_date( $start_date );
+			$end_utc     = get_gmt_from_date( $end_date );
+			$total = $wpdb->get_var( $wpdb->prepare(
+				"SELECT COALESCE(SUM(total_amount), 0) FROM {$table}
+				 WHERE type = 'shop_order'
+				 AND status IN ('wc-completed', 'wc-processing')
+				 AND date_created_gmt >= %s AND date_created_gmt <= %s",
+				$start_utc,
+				$end_utc
+			) );
+		} else {
+			$total = $wpdb->get_var( $wpdb->prepare(
+				"SELECT COALESCE(SUM(pm.meta_value), 0)
+				 FROM {$wpdb->posts} p
+				 INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = '_order_total'
+				 WHERE p.post_type = 'shop_order'
+				 AND p.post_status IN ('wc-completed', 'wc-processing')
+				 AND p.post_date >= %s AND p.post_date <= %s",
+				$start_date,
+				$end_date
+			) );
+		}
+
+		return self::format_price( (float) $total );
+	}
+
+
+	/**
+	 * Get the count of all WooCommerce orders (not just funnel orders) for a date range.
+	 * Supports both HPOS and legacy post-based order storage.
+	 *
+	 * @param string $start_date
+	 * @param string $end_date
+	 * @return int
+	 *
+	 * @since 3.9.6
+	 */
+	public static function get_wc_total_orders( $start_date, $end_date ) {
+		if ( ! class_exists( 'WooCommerce' ) ) {
+			return 0;
+		}
+		global $wpdb;
+
+		$hpos_enabled = get_option( 'woocommerce_custom_orders_table_enabled' ) === 'yes';
+
+		if ( $hpos_enabled ) {
+			$table = $wpdb->prefix . 'wc_orders';
+			return (int) $wpdb->get_var( $wpdb->prepare(
+				"SELECT COUNT(id) FROM {$table}
+				 WHERE type = 'shop_order'
+				 AND status IN ('wc-completed', 'wc-processing')
+				 AND date_created_gmt >= %s AND date_created_gmt <= %s",
+				$start_date,
+				$end_date
+			) );
+		}
+
+		return (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(ID) FROM {$wpdb->posts}
+			 WHERE post_type = 'shop_order'
+			 AND post_status IN ('wc-completed', 'wc-processing')
+			 AND post_date >= %s AND post_date <= %s",
+			$start_date,
+			$end_date
+		) );
+	}
+
+
+	/**
+	 * Get order bump acceptance rate.
+	 * = orders with orderbump_sales > 0  /  total completed orders × 100
+	 *
+	 * @param string $start_date
+	 * @param string $end_date
+	 * @return float
+	 *
+	 * @since 3.9.6
+	 */
+	public static function get_ob_acceptance_rate( $start_date, $end_date ) {
+		global $wpdb;
+		$table = $wpdb->prefix . 'wpfnl_stats';
+
+		$total = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(id) FROM {$table}
+			 WHERE paid_date >= %s AND paid_date <= %s AND status = 'completed'",
+			$start_date, $end_date
+		) );
+
+		if ( ! $total ) {
+			return 0;
+		}
+
+		$with_ob = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(id) FROM {$table}
+			 WHERE paid_date >= %s AND paid_date <= %s AND status = 'completed' AND orderbump_sales > 0",
+			$start_date, $end_date
+		) );
+
+		return round( ( $with_ob / $total ) * 100, 1 );
+	}
+
+
+	/**
+	 * Get upsell acceptance rate.
+	 * = orders with upsell_sales > 0  /  total completed orders × 100
+	 *
+	 * @param string $start_date
+	 * @param string $end_date
+	 * @return float
+	 *
+	 * @since 3.9.6
+	 */
+	public static function get_upsell_acceptance_rate( $start_date, $end_date ) {
+		global $wpdb;
+		$table = $wpdb->prefix . 'wpfnl_stats';
+
+		$total = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(id) FROM {$table}
+			 WHERE paid_date >= %s AND paid_date <= %s AND status = 'completed'",
+			$start_date, $end_date
+		) );
+
+		if ( ! $total ) {
+			return 0;
+		}
+
+		$with_upsell = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(id) FROM {$table}
+			 WHERE paid_date >= %s AND paid_date <= %s AND status = 'completed' AND upsell_sales > 0",
+			$start_date, $end_date
+		) );
+
+		return round( ( $with_upsell / $total ) * 100, 1 );
+	}
+
+
+	/**
+	 * Get downsell recovery rate.
+	 * = orders with downsell_sales > 0  /  total completed orders × 100
+	 *
+	 * @param string $start_date
+	 * @param string $end_date
+	 * @return float
+	 *
+	 * @since 3.9.6
+	 */
+	public static function get_downsell_recovery_rate( $start_date, $end_date ) {
+		global $wpdb;
+		$table = $wpdb->prefix . 'wpfnl_stats';
+
+		$total = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(id) FROM {$table}
+			 WHERE paid_date >= %s AND paid_date <= %s AND status = 'completed'",
+			$start_date, $end_date
+		) );
+
+		if ( ! $total ) {
+			return 0;
+		}
+
+		$with_downsell = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(id) FROM {$table}
+			 WHERE paid_date >= %s AND paid_date <= %s AND status = 'completed' AND downsell_sales > 0",
+			$start_date, $end_date
+		) );
+
+		return round( ( $with_downsell / $total ) * 100, 1 );
 	}
 
 }

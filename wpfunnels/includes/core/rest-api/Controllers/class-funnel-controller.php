@@ -2029,6 +2029,7 @@ class FunnelController extends Wpfnl_REST_Controller
 		foreach ( $new_steps_order as $step ) {
 			if ( isset( $step['step_type'] ) && 'checkout' === $step['step_type'] ) {
 				$checkout_step_id = $step['id'];
+				delete_post_meta( absint( $step['id'] ), '_wpfnl_checkout_products' );
 				break;
 			}
 		}

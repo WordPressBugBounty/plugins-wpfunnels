@@ -134,7 +134,9 @@ class TemplateLayout {
             ];
         }
 
-        if (isset($step_info['isCondition']) && $step_info['isCondition']) {
+        // Conditional step settings are a Pro feature — skip for free installs.
+        $is_pro_active = apply_filters( 'wpfunnels/is_pro_license_activated', false );
+        if ( $is_pro_active && isset($step_info['isCondition']) && $step_info['isCondition']) {
             $this->funnel->update_meta($step_id, '_wpfnl_maybe_enable_condition', 'yes');
             $this->handle_conditions($step_info, $index);
         }
@@ -163,9 +165,12 @@ class TemplateLayout {
         ];
 
         if (isset($step_info['isCondition']) && $step_info['isCondition']) {
-            $outputs['output_2'] = [
-                'connections' => []
-            ];
+            $is_pro_active = apply_filters( 'wpfunnels/is_pro_license_activated', false );
+            if ( $is_pro_active ) {
+                $outputs['output_2'] = [
+                    'connections' => []
+                ];
+            }
         }
         $edit_post_link = base64_encode(get_edit_post_link($step_id));
 		$view_link = base64_encode(get_the_permalink($step_id));

@@ -6,6 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'cweagans\\Composer\\' => array($vendorDir . '/cweagans/composer-patches/src'),
     'Symfony\\Component\\Process\\' => array($vendorDir . '/symfony/process'),
     'Spatie\\TemporaryDirectory\\' => array($vendorDir . '/spatie/temporary-directory/src'),
     'Spatie\\Image\\' => array($vendorDir . '/spatie/image/src'),

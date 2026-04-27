@@ -132,6 +132,18 @@ class DashboardController extends Wpfnl_REST_Controller
 				),
 			)
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/sync-cache',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'sync_cache' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -170,7 +182,37 @@ class DashboardController extends Wpfnl_REST_Controller
 
 
 	/**
-	 * Get overview data of funnels
+	 * Build a cache key from a prefix and parameter array.
+	 *
+	 * @param string $prefix
+	 * @param array  $params
+	 * @return string
+	 *
+	 * @since 3.9.6
+	 */
+	protected function get_cache_key( $prefix, $params ) {
+		return 'wpfnl_dash_' . $prefix . '_' . md5( serialize( $params ) );
+	}
+
+
+	/**
+	 * Delete all dashboard transients from the database.
+	 * Called by the sync-cache endpoint or when cache must be invalidated.
+	 *
+	 * @since 3.9.6
+	 */
+	public static function delete_dashboard_cache() {
+		global $wpdb;
+		$wpdb->query(
+			"DELETE FROM {$wpdb->options}
+			 WHERE option_name LIKE '_transient_wpfnl_dash_%'
+			    OR option_name LIKE '_transient_timeout_wpfnl_dash_%'"
+		);
+	}
+
+
+	/**
+	 * Get overview data of funnels (with 24-hour server-side cache).
 	 *
 	 * @param \WP_REST_Request $request
 	 * @return \WP_Error|\WP_REST_Response
@@ -180,16 +222,25 @@ class DashboardController extends Wpfnl_REST_Controller
 	 */
 	public function get_overview(\WP_REST_Request $request)
 	{
-		$params = $request->get_params();
-		$start_date = isset($params['after']) ? $params['after'] : $this->default_after()->format('Y-m-d H:i:s');
-		$end_date = isset($params['before']) ? $params['before'] : $this->default_before()->format('Y-m-d H:i:s');
-		$response = ReportGenerator::get_overview($start_date, $end_date);
-		return rest_ensure_response($response);
+		$params     = $request->get_params();
+		$start_date = isset($params['after'])  ? $params['after']  : $this->default_after()->format('Y-m-d H:i:s');
+		$end_date   = isset($params['before']) ? $params['before'] : $this->default_before()->format('Y-m-d H:i:s');
+
+		$cache_key = $this->get_cache_key( 'ov', array( $start_date, $end_date ) );
+		$cached    = get_transient( $cache_key );
+		if ( false !== $cached ) {
+			return rest_ensure_response( $cached );
+		}
+
+		$response = ReportGenerator::get_overview( $start_date, $end_date );
+		set_transient( $cache_key, $response, DAY_IN_SECONDS );
+
+		return rest_ensure_response( $response );
 	}
 
 
 	/**
-	 * Get stats of the funnels with intervals period
+	 * Get stats of the funnels with intervals period (with 24-hour server-side cache).
 	 *
 	 * @param \WP_REST_Request $request
 	 * @return \WP_Error|\WP_REST_Response
@@ -199,12 +250,21 @@ class DashboardController extends Wpfnl_REST_Controller
 	 */
 	public function get_stats(\WP_REST_Request $request)
 	{
-		$params = $request->get_params();
-		$start_date = isset($params['after']) ? $params['after'] : $this->default_after()->format('Y-m-d H:i:s');
-		$end_date = isset($params['before']) ? $params['before'] : $this->default_before()->format('Y-m-d H:i:s');
-		$interval = isset($params['interval']) ? $params['interval'] : 'day';
-		$response = ReportGenerator::get_stats($start_date, $end_date, $interval);
-		return rest_ensure_response($response);
+		$params     = $request->get_params();
+		$start_date = isset($params['after'])    ? $params['after']    : $this->default_after()->format('Y-m-d H:i:s');
+		$end_date   = isset($params['before'])   ? $params['before']   : $this->default_before()->format('Y-m-d H:i:s');
+		$interval   = isset($params['interval']) ? $params['interval'] : 'day';
+
+		$cache_key = $this->get_cache_key( 'st', array( $start_date, $end_date, $interval ) );
+		$cached    = get_transient( $cache_key );
+		if ( false !== $cached ) {
+			return rest_ensure_response( $cached );
+		}
+
+		$response = ReportGenerator::get_stats( $start_date, $end_date, $interval );
+		set_transient( $cache_key, $response, DAY_IN_SECONDS );
+
+		return rest_ensure_response( $response );
 	}
 
 
@@ -218,9 +278,13 @@ class DashboardController extends Wpfnl_REST_Controller
 	 */
 	public function get_top_funnels(\WP_REST_Request $request)
 	{
+		$params     = $request->get_params();
+		$start_date = isset( $params['after'] )  ? $params['after']  : $this->default_after()->format( 'Y-m-d H:i:s' );
+		$end_date   = isset( $params['before'] ) ? $params['before'] : $this->default_before()->format( 'Y-m-d H:i:s' );
+
 		$response['status'] = true;
-		$response['data'] = ReportGenerator::get_top_funnels();
-		return rest_ensure_response($response);
+		$response['data']   = ReportGenerator::get_top_funnels( $start_date, $end_date );
+		return rest_ensure_response( $response );
 	}
 
 
@@ -446,6 +510,23 @@ class DashboardController extends Wpfnl_REST_Controller
 			'funnel_count' => (int) $funnel_count
 		) );
 	}
+
+	/**
+	 * Clear all dashboard transient caches so the next request fetches fresh data.
+	 *
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response
+	 *
+	 * @since 3.9.6
+	 */
+	public function sync_cache( \WP_REST_Request $request ) {
+		self::delete_dashboard_cache();
+		return rest_ensure_response( array(
+			'success' => true,
+			'message' => __( 'Dashboard cache cleared. Data will refresh on next load.', 'wpfnl' ),
+		) );
+	}
+
 
 	/**
 	 * Dismiss the onboarding checklist

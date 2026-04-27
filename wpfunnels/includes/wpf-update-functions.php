@@ -79,3 +79,30 @@ function wpf_create_350_optin_entries_table() {
 function wpf_update_350_db_version() {
 	update_option('wpfunnels_db_version', '3.2.0');
 }
+
+
+/**
+ * Create checkout visits table for native checkout conversion rate tracking.
+ *
+ * @since 3.11.0
+ */
+function wpf_create_3110_checkout_visits_table() {
+	global $wpdb;
+	$wpdb->hide_errors();
+	$charset_collate = $wpdb->get_charset_collate();
+	$table_name      = $wpdb->prefix . 'wpfnl_checkout_visits';
+
+	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+		id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+		type varchar(10) NOT NULL DEFAULT 'store',
+		funnel_id bigint(20) unsigned NOT NULL DEFAULT 0,
+		session_hash varchar(32) NOT NULL,
+		visit_date date NOT NULL,
+		date_created datetime NOT NULL,
+		PRIMARY KEY  (id),
+		UNIQUE KEY unique_visit (session_hash, type, funnel_id, visit_date)
+	) $charset_collate;";
+
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+	dbDelta( $sql );
+}

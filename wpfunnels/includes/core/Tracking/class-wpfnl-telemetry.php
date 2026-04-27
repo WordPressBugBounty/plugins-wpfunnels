@@ -521,19 +521,14 @@ class Telemetry {
     public function filter_deactivation_reasons( array $reasons ): array {
         return [
             [
-                'id'   => 'checkout-not-working',
-                'text' => __( 'Checkout / payment issues', 'wpfnl' ),
-                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3B86FF" stroke-width="2"/><path d="M12 7v5l3 3" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
-            ],
-            [
                 'id'   => 'funnel-builder-hard-to-use',
                 'text' => __( 'Funnel builder too complex', 'wpfnl' ),
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#3B86FF" stroke-width="2"/><path d="M9 9h6M9 12h4" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
             ],
             [
-                'id'   => 'missing-integration',
-                'text' => __( 'Missing integration I need', 'wpfnl' ),
-                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
+                'id'   => 'checkout-not-working',
+                'text' => __( 'Checkout not working', 'wpfnl' ),
+                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3B86FF" stroke-width="2"/><path d="M12 7v5l3 3" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
             ],
             [
                 'id'   => 'upsell-downsell-not-working',
@@ -541,14 +536,24 @@ class Telemetry {
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 17l4-4 4 4 4-8 4 4" stroke="#3B86FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
             ],
             [
-                'id'   => 'performance-conflict',
-                'text' => __( 'Slows site / plugin conflict', 'wpfnl' ),
+                'id'   => 'plugin-conflict',
+                'text' => __( 'Plugin conflict', 'wpfnl' ),
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#3B86FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            ],
+            [
+                'id'   => 'payment-not-working',
+                'text' => __( 'Payment not working', 'wpfnl' ),
+                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3B86FF" stroke-width="2"/><path d="M12 7v5l3 3" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
             ],
             [
                 'id'   => 'missing-feature',
                 'text' => __( 'Missing a feature I need', 'wpfnl' ),
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3B86FF" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
+            ],
+            [
+                'id'   => 'missing-integration',
+                'text' => __( 'Missing integration I need', 'wpfnl' ),
+                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
             ],
             [
                 'id'   => 'found-better-plugin',

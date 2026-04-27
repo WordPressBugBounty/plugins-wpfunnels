@@ -31,6 +31,9 @@ class Wpfnl_Activator
 			'wpf_create_350_stat_table',
 			'wpf_create_350_optin_entries_table'
 		),
+		'3.11.0' => array(
+			'wpf_create_3110_checkout_visits_table',
+		),
 	);
 
 
@@ -270,6 +273,22 @@ class Wpfnl_Activator
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
 
+
+		/**
+		 * Create checkout visits table for conversion rate tracking
+		 */
+		$table_name = $wpdb->prefix . 'wpfnl_checkout_visits';
+		$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			type varchar(10) NOT NULL DEFAULT 'store',
+			funnel_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			session_hash varchar(32) NOT NULL,
+			visit_date date NOT NULL,
+			date_created datetime NOT NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY unique_visit (session_hash, type, funnel_id, visit_date)
+		) $charset_collate;";
+		dbDelta( $sql );
 
 		/**
 		 * Create table for optin entries

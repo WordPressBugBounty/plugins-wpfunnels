@@ -385,6 +385,15 @@ class Module extends Wpfnl_Frontend_Module
 			}
 		}
 
+		// --- FunnelKit (WFSWT) ---
+		if ( class_exists( 'WFFN_Step_WC_Thankyou' ) ) {
+			$wffn_thankyou = \WFFN_Step_WC_Thankyou::get_instance();
+			if ( $wffn_thankyou ) {
+				// Prevents FunnelKit store checkout from overriding WPFunnels checkout page ID
+				remove_filter( 'wffn_wfty_filter_page_ids', array( $wffn_thankyou, 'maybe_filter_thankyou' ), 10 );
+			}
+		}
+
 		// --- CartFlows: global checkout page override ---
 		if ( class_exists( 'Cartflows_Global_Checkout' ) ) {
 			$cartflows_global = \Cartflows_Global_Checkout::get_instance();

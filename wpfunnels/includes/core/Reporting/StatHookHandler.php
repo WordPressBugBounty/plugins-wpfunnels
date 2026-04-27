@@ -5,6 +5,7 @@ namespace WPFunnels\Report;
 use Automattic\WooCommerce\Utilities\OrderUtil;
 use FKWCS\Gateway\Stripe\P24;
 use WPFunnels\Wpfnl_functions;
+use WPFunnels\Rest\Controllers\DashboardController;
 
 class StatHookHandler
 {
@@ -13,6 +14,8 @@ class StatHookHandler
 	{
 		add_action('wpfunnels/funnel_order_placed', array($this, 'update_stat_data_from_order'), 10, 3);
 		add_action('woocommerce_order_status_changed', array($this, 'change_order_status'), 10, 4);
+		add_action('template_redirect', array($this, 'track_funnel_checkout_visit'), 1);
+		add_action('wp_footer', array($this, 'track_native_checkout_visit'));
 
 		if (class_exists('\Automattic\WooCommerce\Utilities\OrderUtil') && OrderUtil::custom_orders_table_usage_is_enabled()) {
 			add_action('woocommerce_delete_order', array($this, 'delete_stat_data'));
@@ -136,6 +139,7 @@ class StatHookHandler
 					'order_id' => $order_id
 				)
 			);
+			DashboardController::delete_dashboard_cache();
 		} else {
 			$wpdb->update(
 				$table,
@@ -271,6 +275,41 @@ class StatHookHandler
 					)
 				);
 			}
+		}
+	}
+
+
+	/**
+	 * Track funnel checkout page visits.
+	 * Runs at template_redirect priority 1, before any WC redirect hooks.
+	 */
+	public function track_funnel_checkout_visit()
+	{
+		if ( is_admin() ) {
+			return;
+		}
+
+		if ( Wpfnl_functions::check_if_this_is_step_type( 'checkout' ) ) {
+			global $post;
+			$funnel_id = Wpfnl_functions::get_funnel_id_from_step( $post->ID );
+			CheckoutTracker::track_visit( 'funnel', $funnel_id );
+			CheckoutTracker::track_visit( 'store', 0 );
+		}
+	}
+
+	/**
+	 * Track native WooCommerce checkout page visits.
+	 * wp_footer fires only when a full page renders — WC's empty-cart redirect
+	 * calls exit() before this point, so no cart check is needed here.
+	 * Works for both classic shortcode and block-based checkout.
+	 */
+	public function track_native_checkout_visit()
+	{
+		if ( ! function_exists( 'is_checkout' ) ) {
+			return;
+		}
+		if ( is_checkout() && ! is_wc_endpoint_url( 'order-received' ) && ! is_wc_endpoint_url( 'order-pay' ) ) {
+			CheckoutTracker::track_visit( 'store', 0 );
 		}
 	}
 

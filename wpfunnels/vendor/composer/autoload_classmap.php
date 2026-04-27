@@ -492,6 +492,7 @@ return array(
     'WPFunnels\\Offer\\Wpfnl_Offer' => $baseDir . '/includes/core/offer/class-wpfnl-offer.php',
     'WPFunnels\\Optin\\Optin_Record' => $baseDir . '/includes/core/classes/class-wpfnl-optin-record.php',
     'WPFunnels\\PageTemplates\\Manager' => $baseDir . '/includes/core/page-templates/class-manager.php',
+    'WPFunnels\\Report\\CheckoutTracker' => $baseDir . '/includes/core/Reporting/CheckoutTracker.php',
     'WPFunnels\\Report\\OptinRecorder' => $baseDir . '/includes/core/Reporting/OptinRecorder.php',
     'WPFunnels\\Report\\ReportGenerator' => $baseDir . '/includes/core/Reporting/ReportGenerator.php',
     'WPFunnels\\Report\\Reporting' => $baseDir . '/includes/core/AdvancedReporting/Reporting.php',
@@ -589,4 +590,7 @@ return array(
     'Wpfnl_Step_Template' => $baseDir . '/public/classes/class-wpfnl-step-template.php',
     'Wpfnl_Type_Factory' => $baseDir . '/admin/modules/type/sales-funnel/class-wpfnl-type-factory.php',
     'Wpfnl_i18n' => $baseDir . '/includes/utils/class-wpfnl-i18n.php',
+    'cweagans\\Composer\\PatchEvent' => $vendorDir . '/cweagans/composer-patches/src/PatchEvent.php',
+    'cweagans\\Composer\\PatchEvents' => $vendorDir . '/cweagans/composer-patches/src/PatchEvents.php',
+    'cweagans\\Composer\\Patches' => $vendorDir . '/cweagans/composer-patches/src/Patches.php',
 );

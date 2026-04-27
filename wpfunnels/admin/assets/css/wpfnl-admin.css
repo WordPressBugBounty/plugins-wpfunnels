@@ -730,6 +730,7 @@ body.wpfunnels-body #wpcontent {
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
+  margin: 0;
 }
 .wpfnl-tooltip p:before {
   content: "";
@@ -4728,30 +4729,41 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   flex-wrap: wrap;
 }
 body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wpfnl-dashboard-contents-header .wpfnl-dashboard-tabs {
-  border-radius: 100px;
   background: #FFF;
-  box-shadow: 0px 1px 1px 0px rgba(182, 185, 191, 0.3);
-  padding: 6px;
-  width: 144px;
+  width: auto;
+  padding: 0;
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  border-radius: 6px;
+  border: none;
+  box-shadow: none;
 }
 body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wpfnl-dashboard-contents-header .wpfnl-dashboard-tabs .wpfnl-dashboard-tab {
+  flex: 1;
   color: #2D3149;
   font-size: 13px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: 12px;
+  font-weight: 500;
+  line-height: 1;
   border: none;
   background: none;
-  padding: 8px 17px;
+  padding: 9px 15px;
   cursor: pointer;
+  border: 1px solid #DCD9E8;
+  box-shadow: none;
+  transition: all 0.3s ease;
+}
+body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wpfnl-dashboard-contents-header .wpfnl-dashboard-tabs .wpfnl-dashboard-tab:first-child {
+  border-radius: 6px 0 0 6px;
+}
+body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wpfnl-dashboard-contents-header .wpfnl-dashboard-tabs .wpfnl-dashboard-tab:last-child {
+  border-radius: 0 6px 6px 0;
+  margin-left: -1px;
 }
 body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wpfnl-dashboard-contents-header .wpfnl-dashboard-tabs .wpfnl-dashboard-tab.active {
-  border-radius: 100px;
-  background: #F6F5FA;
-  box-shadow: 0px 1px 1px 0px rgba(182, 185, 191, 0.3);
+  color: #6E42D3;
+  border-color: #6E42D3;
+  box-shadow: none;
+  z-index: 1;
 }
 body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wpfnl-dashboard-contents-header .wpfnl-dashboard-right-header {
   display: flex;
@@ -4769,7 +4781,7 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   font-style: normal;
   font-weight: 400;
   line-height: 11px;
-  border-radius: 100px;
+  border-radius: 5px;
   border: 1px solid #E4E6EB;
   background: #FFF;
   padding: 7px 10px;
@@ -4779,9 +4791,9 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   width: max-content;
 }
 body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wpfnl-dashboard-contents-header .wpfnl-dashboard-right-header .wpfnl-dashboard-filter-wrapper .wpfnl-dahsboard-filter-btn {
-  border-radius: 100px;
   background: #FFF;
-  box-shadow: 0px 1px 1px 0px rgba(182, 185, 191, 0.3);
+  border-radius: 6px;
+  border: 1px solid #DCD9E8;
   border: none;
   outline: none;
   padding: 13px 14px;
@@ -4899,7 +4911,7 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   cursor: default;
 }
 body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wpfnl-dashboard-contents-header .wpfnl-dashboard-right-header .wpfnl-create-funnel-btn {
-  border-radius: 10px;
+  border-radius: 6px;
   background: #6E42D3;
   box-shadow: 0px 2px 4px 0px rgba(223, 223, 249, 0.25);
   padding: 11px 16px;
@@ -4915,6 +4927,45 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   text-decoration: none;
   cursor: pointer;
 }
+body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wpfnl-dashboard-contents-header .wpfnl-dashboard-right-header .wpfnl-sync-cache-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 14px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  background: #FFF;
+  color: #2D3149;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, opacity 0.15s;
+}
+body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wpfnl-dashboard-contents-header .wpfnl-dashboard-right-header .wpfnl-sync-cache-btn .wpfnl-sync-icon {
+  flex-shrink: 0;
+}
+body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wpfnl-dashboard-contents-header .wpfnl-dashboard-right-header .wpfnl-sync-cache-btn:hover:not(:disabled) {
+  color: #6E42D3;
+}
+body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wpfnl-dashboard-contents-header .wpfnl-dashboard-right-header .wpfnl-sync-cache-btn.is-syncing {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wpfnl-dashboard-contents-header .wpfnl-dashboard-right-header .wpfnl-sync-cache-btn.is-syncing .wpfnl-sync-icon {
+  animation: wpfnl-spin 0.75s linear infinite;
+}
+@keyframes wpfnl-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body {
   margin-top: 24px;
 }
@@ -4924,11 +4975,11 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   gap: 20px;
 }
 body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card {
-  border-radius: 10px;
-  background: #FFF;
-  box-shadow: 0px 1px 1px 0px rgba(182, 185, 191, 0.3);
-  padding: 24px 20px 20px 23px;
+  padding: 20px;
   position: relative;
+  border-radius: 6px;
+  border: 1px solid rgba(230, 227, 241, 0.9);
+  background: #FFF;
 }
 body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-loader {
   display: flex;
@@ -4937,137 +4988,333 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   margin: 40px auto;
   padding: 20px;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-card-header {
+body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-card-body {
+  margin-top: 18px;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-card-header .wpfnl-card-icon {
-  border: 1px solid #E4E6EB;
-  border-radius: 50%;
-  width: 42px;
-  height: 42px;
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-card-header .wpfnl-percentage {
-  border-radius: 100px;
+body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-card-label {
+  margin: 0;
+  color: #7A8B9A;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.3;
+}
+body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-percentage {
   padding: 4px 7px;
   display: flex;
   align-items: center;
   gap: 1px;
   justify-content: center;
   font-size: 12px;
-  font-style: normal;
   font-weight: 500;
   line-height: 1;
   margin: 0;
-  min-width: 40px;
+  min-width: 30px;
+  border-radius: 4px;
+  background: #F6F5FA;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-card-header .wpfnl-percentage.wpfnl-decrease {
+body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-percentage.wpfnl-decrease {
   background: rgba(236, 89, 86, 0.1);
-  color: #EC5956;
+  color: #DC2626;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-card-header .wpfnl-percentage.wpfnl-increase {
+body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-percentage.wpfnl-increase {
   background: rgba(18, 183, 106, 0.1);
-  color: #12B76A;
+  color: #16A34A;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-card-body {
-  margin-top: 18px;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-card-body .wpfnl-card-label {
+body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-card-value {
   margin: 0;
-  color: #667085;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 14px;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-card-body .wpfnl-card-value {
-  margin: 0;
-  margin-top: 10px;
-  color: #2D3149;
-  font-size: 26px;
-  font-style: normal;
+  color: #1D2327;
+  font-size: 28px;
   font-weight: 500;
-  line-height: 24px;
+  line-height: 1;
 }
 body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-revenue-comparison {
   margin-top: 24px;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels {
-  border-radius: 10px;
-  background: #FFF;
-  box-shadow: 0px 1px 1px 0px rgba(182, 185, 191, 0.3);
+
+.wpfnl-admin-dashboard .shimmer-line {
+  height: 11px;
+  margin-top: 11px;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
   margin-top: 24px;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance {
+  background: #FFF;
+  border-radius: 6px;
+  border: 1px solid rgba(230, 227, 241, 0.9);
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-section-title {
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-title {
   color: #2D3149;
-  font-size: 18px;
-  font-style: normal;
+  font-size: 16px;
   font-weight: 600;
-  line-height: 18px;
+  line-height: 1;
   margin: 0;
-  margin-bottom: 30px;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-col .table-text {
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-legend {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-legend .wpfnl-dbdp-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #7A8B9A;
+  font-size: 13px;
+  font-weight: 400;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-legend .wpfnl-dbdp-legend-item .wpfnl-dbdp-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-summary {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  background: #F6F5FA;
+  border-radius: 6px;
+  padding: 0 15px;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-summary .wpfnl-dbdp-summary-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 16px;
+  border-left: 1px solid #fff;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-summary .wpfnl-dbdp-summary-card:first-child {
+  border-left: 0;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-summary .wpfnl-dbdp-summary-card .wpfnl-dbdp-summary-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50px;
+  background: #FFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-summary .wpfnl-dbdp-summary-card .wpfnl-dbdp-summary-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-summary .wpfnl-dbdp-summary-card .wpfnl-dbdp-summary-info .wpfnl-dbdp-summary-label {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: #7A8B9A;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-summary .wpfnl-dbdp-summary-card .wpfnl-dbdp-summary-info .wpfnl-dbdp-summary-value {
+  color: #1D2327;
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-chart {
+  height: 220px;
   position: relative;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-col .table-text .pro-tag-icon {
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-chart canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution {
+  background: #FFF;
+  border-radius: 6px;
+  border: 1px solid rgba(230, 227, 241, 0.9);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-title {
+  color: #2D3149;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  margin: 0;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-donut-wrapper {
+  display: flex;
+  justify-content: center;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-donut-wrapper .wpfnl-fc-donut {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-donut-wrapper .wpfnl-fc-donut canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-donut-wrapper .wpfnl-fc-donut .wpfnl-fc-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  pointer-events: none;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-donut-wrapper .wpfnl-fc-donut .wpfnl-fc-donut-center .wpfnl-fc-total-value {
+  color: #1D2327;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-donut-wrapper .wpfnl-fc-donut .wpfnl-fc-donut-center .wpfnl-fc-total-label {
+  color: #7A8B9A;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-breakdown .wpfnl-fc-breakdown-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-breakdown .wpfnl-fc-breakdown-item .wpfnl-fc-breakdown-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-breakdown .wpfnl-fc-breakdown-item .wpfnl-fc-breakdown-top .wpfnl-fc-breakdown-value {
+  color: #1D2327;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-breakdown .wpfnl-fc-breakdown-item .wpfnl-fc-breakdown-top .wpfnl-fc-breakdown-pct {
+  color: #2D3149;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-breakdown .wpfnl-fc-breakdown-item .wpfnl-fc-breakdown-label {
+  color: #7A8B9A;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-breakdown .wpfnl-fc-breakdown-item .wpfnl-fc-breakdown-bar-track {
+  width: 100%;
+  height: 4px;
+  background: #EEF0F3;
+  border-radius: 100px;
+  overflow: hidden;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-funnel-contribution .wpfnl-fc-breakdown .wpfnl-fc-breakdown-item .wpfnl-fc-breakdown-bar-track .wpfnl-fc-breakdown-bar-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.4s ease;
+}
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels {
+  background: #FFF;
+  margin-top: 24px;
+  padding: 24px;
+  border-radius: 6px;
+  border: 1px solid rgba(230, 227, 241, 0.9);
+}
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-section-title {
+  color: #2D3149;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+  margin-bottom: 24px;
+}
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-col .table-text {
+  position: relative;
+}
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-col .table-text .pro-tag-icon {
   top: -3px;
   right: -28px;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper p {
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper p {
   margin: 0;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-header,
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-row {
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-header,
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-row {
   display: grid;
-  grid-template-columns: 2fr repeat(4, 1fr);
-  gap: 10px;
+  grid-template-columns: 2fr repeat(6, 1fr);
+  gap: 20px;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-header {
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-header {
   padding-bottom: 16px;
   border-bottom: 1px solid #EEF0F3;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-header p {
-  color: #9398A5;
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-header p {
+  color: #7A8B9A;
   font-size: 14px;
   font-style: normal;
   font-weight: 400;
   line-height: 1.2;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-row {
-  padding: 22px 0;
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-row {
+  padding: 17px 0;
   border-bottom: 1px solid #EEF0F3;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-row:last-child {
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-row:last-child {
   border-bottom: none;
   padding-bottom: 0;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-row p {
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-row p {
   color: #2D3149;
   font-size: 14px;
-  font-style: normal;
   font-weight: 400;
   line-height: 1.2;
   word-wrap: break-word;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-row p.revenue {
-  color: #6E42D3;
-}
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-row p a {
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-row p a {
   color: #2D3149;
   font-size: 14px;
-  font-style: normal;
   font-weight: 500;
   line-height: 1;
   text-decoration: none;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-empty-table-body {
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-row .aov-tag {
+  padding: 6px 7px;
+  border-radius: 4px;
+  background: #F6F5FA;
+  color: #16A34A;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  display: inline-block;
+}
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-table-row .aov-tag.is-deacrease {
+  color: #F04438;
+}
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-empty-table-body {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5075,18 +5322,224 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   text-align: center;
   padding: 35px;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-empty-table-body .wpfnl-loader {
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-empty-table-body .wpfnl-loader {
   display: block;
   padding: 40px;
   margin: 60px auto;
 }
-body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-empty-table-body p {
+.wpfnl-admin-dashboard .wpfnl-top-performing-funnels .wpfnl-dashboard-table-wrapper .wpfnl-empty-table-body p {
   color: #2D3149;
   font-size: 15px;
   font-style: normal;
   font-weight: 500;
   line-height: 0.93;
   margin-top: 17px;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card {
+  padding: 24px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(230, 227, 241, 0.9);
+  background: #FFF;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-header .wpfnl-csc-label {
+  color: #7A8B9A;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-header .wpfnl-csc-info-icon {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-header .wpfnl-csc-info-icon:hover {
+  opacity: 1;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-body {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-body .wpfnl-csc-main-value {
+  color: #1D2327;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-body .wpfnl-csc-baseline {
+  color: #1F2937;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-body .wpfnl-csc-baseline strong {
+  font-size: 18px;
+  font-weight: 400;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-footer {
+  margin-top: 10px;
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  position: relative;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-footer::before {
+  content: "";
+  position: absolute;
+  left: -24px;
+  top: 0;
+  background-color: #E6E3F1;
+  height: 1px;
+  width: calc(100% + 48px);
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-footer .wpfnl-csc-footer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-footer .wpfnl-csc-footer-top .wpfnl-csc-footer-label {
+  color: #7A8B9A;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-footer .wpfnl-csc-footer-top .wpfnl-csc-lift-value {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  border-radius: 4px;
+  background: #F6F5FA;
+  padding: 6px 6px;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-footer .wpfnl-csc-footer-top .wpfnl-csc-lift-value.is-increase {
+  color: #16A34A;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-footer .wpfnl-csc-footer-top .wpfnl-csc-lift-value.is-decrease {
+  color: #DC2626;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-footer .wpfnl-csc-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: #EEF0F3;
+  border-radius: 100px;
+  overflow: hidden;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-footer .wpfnl-csc-progress-bar .wpfnl-csc-progress-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: #6E42D3;
+  transition: width 0.4s ease;
+}
+.wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-footer .wpfnl-csc-progress-bar .wpfnl-csc-progress-fill.is-decrease {
+  background: #DC2626;
+}
+.wpfnl-admin-dashboard .wpfnl-funnel-health-metrics {
+  background: #FFF;
+  border-radius: 6px;
+  border: 1px solid rgba(230, 227, 241, 0.9);
+  padding: 24px;
+  margin-top: 24px;
+}
+.wpfnl-admin-dashboard .wpfnl-funnel-health-metrics .wpfnl-fhm-title {
+  color: #2D3149;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  margin: 0 0 17px;
+}
+.wpfnl-admin-dashboard .wpfnl-funnel-health-metrics .wpfnl-fhm-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px 48px;
+  border-radius: 4px;
+  border: 1px solid #EEF0F3;
+  padding: 24px;
+}
+.wpfnl-admin-dashboard .wpfnl-funnel-health-metrics .wpfnl-health-metric-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wpfnl-admin-dashboard .wpfnl-funnel-health-metrics .wpfnl-health-metric-bar .wpfnl-hmb-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.wpfnl-admin-dashboard .wpfnl-funnel-health-metrics .wpfnl-health-metric-bar .wpfnl-hmb-top .wpfnl-hmb-label {
+  color: #7A8B9A;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1;
+}
+.wpfnl-admin-dashboard .wpfnl-funnel-health-metrics .wpfnl-health-metric-bar .wpfnl-hmb-top .wpfnl-hmb-value {
+  color: #1D2327;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+}
+.wpfnl-admin-dashboard .wpfnl-funnel-health-metrics .wpfnl-health-metric-bar .wpfnl-hmb-track {
+  width: 100%;
+  height: 5px;
+  background: #EEF0F3;
+  border-radius: 100px;
+  overflow: hidden;
+}
+.wpfnl-admin-dashboard .wpfnl-funnel-health-metrics .wpfnl-health-metric-bar .wpfnl-hmb-track .wpfnl-hmb-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.4s ease;
+}
+.wpfnl-admin-dashboard .wpfnl-leads-analytics .wpfnl-leads-analytics-wrapper .wpfnl-dashboard-cards-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+.wpfnl-admin-dashboard .wpfnl-leads-analytics .wpfnl-leads-analytics-wrapper .wpfnl-lead-growth-chart {
+  background: #FFF;
+  border-radius: 6px;
+  border: 1px solid rgba(230, 227, 241, 0.9);
+  padding: 24px;
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.wpfnl-admin-dashboard .wpfnl-leads-analytics .wpfnl-leads-analytics-wrapper .wpfnl-lead-growth-chart .wpfnl-lgc-header .wpfnl-lgc-title {
+  color: #2D3149;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  margin: 0;
+}
+.wpfnl-admin-dashboard .wpfnl-leads-analytics .wpfnl-leads-analytics-wrapper .wpfnl-lead-growth-chart .wpfnl-lgc-chart {
+  height: 260px;
+  position: relative;
+}
+.wpfnl-admin-dashboard .wpfnl-leads-analytics .wpfnl-leads-analytics-wrapper .wpfnl-lead-growth-chart .wpfnl-lgc-chart canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+.wpfnl-admin-dashboard .wpfnl-leads-analytics .wpfnl-leads-analytics-wrapper .wpfnl-leads-top-funnels .wpfnl-leads-table-row {
+  grid-template-columns: 2fr repeat(5, 1fr);
 }
 
 @media only screen and (max-width: 1699px) {
@@ -5109,8 +5562,207 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   }
   body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container {
     grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .wpfnl-dashboard-body .wpfnl-dashboard-contents-wrapper .wfpnl-dashboard-contents-body .wpfnl-dashboard-cards-container .wpfnl-single-card .wpfnl-card-value {
+    font-size: 22px;
+  }
+  .wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-body .wpfnl-csc-main-value {
+    font-size: 22px;
+  }
+  .wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-body .wpfnl-csc-baseline {
+    font-size: 14px;
+  }
+  .wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-body .wpfnl-csc-baseline strong {
+    font-size: 15px;
+  }
+  .wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-summary {
+    padding: 0;
+  }
+  .wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-summary .wpfnl-dbdp-summary-card {
+    gap: 12px;
+    padding: 11px 12px;
+  }
+  .wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-summary .wpfnl-dbdp-summary-card .wpfnl-dbdp-summary-info .wpfnl-dbdp-summary-value {
+    font-size: 22px;
   }
 }
+@media only screen and (max-width: 1199px) {
+  .wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card {
+    padding: 20px 20px 20px;
+  }
+  .wpfnl-admin-dashboard .wpfnl-dashboard-compare-store .wpfnl-compare-store-card .wpfnl-csc-footer::before {
+    left: -20px;
+    width: calc(100% + 40px);
+  }
+  .wpfnl-admin-dashboard .wpfnl-dashboard-performance {
+    grid-template-columns: 1fr 280px;
+  }
+  .wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance {
+    padding: 20px;
+  }
+  .wpfnl-admin-dashboard .wpfnl-dashboard-performance .wpfnl-day-by-day-performance .wpfnl-dbdp-summary .wpfnl-dbdp-summary-card .wpfnl-dbdp-summary-info .wpfnl-dbdp-summary-value {
+    font-size: 18px;
+  }
+}
+.wpfnl-pro-section-wrapper.is-locked .wpfnl-pro-content {
+  opacity: 0.38;
+  pointer-events: none;
+  user-select: none;
+}
+
+.wpfnl-pro-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  margin-bottom: 14px;
+  background: #F3EFFF;
+  border: 1px solid #DDD5F9;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.wpfnl-pro-banner:hover {
+  background: #EBE4FF;
+}
+.wpfnl-pro-banner .wpfnl-pro-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #5a35b8;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+}
+.wpfnl-pro-banner .wpfnl-pro-banner-left svg {
+  flex-shrink: 0;
+  stroke: #6E42D3;
+}
+.wpfnl-pro-banner .wpfnl-pro-banner-btn {
+  flex-shrink: 0;
+  display: inline-block;
+  padding: 6px 16px;
+  background: #6E42D3;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 5px;
+  white-space: nowrap;
+  transition: background 0.18s;
+}
+.wpfnl-pro-banner:hover .wpfnl-pro-banner-btn {
+  background: #5a35b8;
+}
+
+.wpfnl-compare-store-card {
+  position: relative;
+}
+.wpfnl-compare-store-card .wpfnl-csc-header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.wpfnl-compare-store-card .wpfnl-csc-pro-badge {
+  display: flex;
+  align-items: center;
+}
+.wpfnl-compare-store-card .wpfnl-csc-pro-badge svg {
+  width: 17px;
+  height: 17px;
+}
+.wpfnl-compare-store-card .wpfnl-csc-body.is-blurred,
+.wpfnl-compare-store-card .wpfnl-csc-footer.is-blurred {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+}
+.wpfnl-compare-store-card .wpfnl-csc-pro-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 6px;
+  text-decoration: none;
+  z-index: 5;
+}
+.wpfnl-compare-store-card .wpfnl-csc-pro-overlay .wpfnl-csc-pro-overlay-text {
+  padding: 8px 18px;
+  background: #6E42D3;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.wpfnl-compare-store-card .wpfnl-csc-pro-overlay:hover .wpfnl-csc-pro-overlay-text {
+  background: #5a35b8;
+}
+
+.wpfnl-pro-banner--compact {
+  padding: 7px 10px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+.wpfnl-pro-banner--compact .wpfnl-pro-banner-left {
+  font-size: 12px;
+  gap: 5px;
+}
+.wpfnl-pro-banner--compact .wpfnl-pro-banner-btn {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+.wpfnl-single-card.is-pro-locked {
+  position: relative;
+}
+.wpfnl-single-card.is-pro-locked .wpfnl-card-header,
+.wpfnl-single-card.is-pro-locked .wpfnl-card-body {
+  opacity: 0.38;
+  pointer-events: none;
+  user-select: none;
+}
+
+.wpfnl-card-pro-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  z-index: 2;
+}
+.wpfnl-card-pro-badge svg {
+  width: 22px;
+  height: 22px;
+}
+
+.wpfnl-compare-store-card.is-pro-locked .wpfnl-csc-body,
+.wpfnl-compare-store-card.is-pro-locked .wpfnl-csc-footer {
+  opacity: 0.38;
+  pointer-events: none;
+  user-select: none;
+}
+
+.wpfnl-csc-header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wpfnl-csc-pro-badge {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+.wpfnl-csc-pro-badge svg {
+  width: 20px;
+  height: 20px;
+}
+
 .step-template-showcase-modal .steps-template__filter-wrapper .pro-free__filter, .template-library-modal .funnel-templates-header .pro-free__filter {
   border-radius: 50px;
   box-shadow: none;
@@ -32115,5 +32767,3 @@ body.rtl .wpfnl-automation-window .automation-darwer .drawer-header .connect-crm
   padding-left: 7px;
   padding-right: 0;
 }
-
-/*# sourceMappingURL=wpfnl-admin.css.map */

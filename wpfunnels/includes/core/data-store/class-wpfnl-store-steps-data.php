@@ -238,7 +238,15 @@ class Wpfnl_Steps_Store_Data extends Wpfnl_Abstract_Store_data implements Wpfnl_
                 }
               
                 if (  ($meta_key != 'order-bump-settings' && $meta_key != '_wpfnl_checkout_products' && $meta_key != 'order-bump' && '_wpfnl_ab_testing_start_settings' !== $meta_key && '_wpfnl_next_step_after_condition' !== $meta_key )) {
-                    if( !$isSingleStep || ( $isSingleStep && '_wpfnl_maybe_enable_condition' != $meta_key ) ){
+                    $single_step_condition_keys = array( '_wpfnl_maybe_enable_condition', '_wpfnl_step_conditions' );
+
+                    // Condition settings are a Pro feature — skip them for free installs.
+                    $is_pro_active = apply_filters( 'wpfunnels/is_pro_license_activated', false );
+                    if ( ! $is_pro_active && in_array( $meta_key, $single_step_condition_keys ) ) {
+                        continue;
+                    }
+
+                    if( !$isSingleStep || !in_array( $meta_key, $single_step_condition_keys ) ){
                         $this->update_meta($step_id, $meta_key, $raw_data);
                     }
 

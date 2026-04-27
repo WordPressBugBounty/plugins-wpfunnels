@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit6a4dbaa228ee162865a721c9d74c83a5
+class ComposerStaticInitde007fd82ff0d62b8a232c4af8da3c8d
 {
     public static $files = array (
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
@@ -15,6 +15,10 @@ class ComposerStaticInit6a4dbaa228ee162865a721c9d74c83a5
     );
 
     public static $prefixLengthsPsr4 = array (
+        'c' =>
+        array (
+            'cweagans\\Composer\\' => 18,
+        ),
         'S' =>
         array (
             'Symfony\\Component\\Process\\' => 26,
@@ -53,6 +57,10 @@ class ComposerStaticInit6a4dbaa228ee162865a721c9d74c83a5
     );
 
     public static $prefixDirsPsr4 = array (
+        'cweagans\\Composer\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/cweagans/composer-patches/src',
+        ),
         'Symfony\\Component\\Process\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/process',
@@ -611,6 +619,7 @@ class ComposerStaticInit6a4dbaa228ee162865a721c9d74c83a5
         'WPFunnels\\Offer\\Wpfnl_Offer' => __DIR__ . '/../..' . '/includes/core/offer/class-wpfnl-offer.php',
         'WPFunnels\\Optin\\Optin_Record' => __DIR__ . '/../..' . '/includes/core/classes/class-wpfnl-optin-record.php',
         'WPFunnels\\PageTemplates\\Manager' => __DIR__ . '/../..' . '/includes/core/page-templates/class-manager.php',
+        'WPFunnels\\Report\\CheckoutTracker' => __DIR__ . '/../..' . '/includes/core/Reporting/CheckoutTracker.php',
         'WPFunnels\\Report\\OptinRecorder' => __DIR__ . '/../..' . '/includes/core/Reporting/OptinRecorder.php',
         'WPFunnels\\Report\\ReportGenerator' => __DIR__ . '/../..' . '/includes/core/Reporting/ReportGenerator.php',
         'WPFunnels\\Report\\Reporting' => __DIR__ . '/../..' . '/includes/core/AdvancedReporting/Reporting.php',
@@ -708,14 +717,17 @@ class ComposerStaticInit6a4dbaa228ee162865a721c9d74c83a5
         'Wpfnl_Step_Template' => __DIR__ . '/../..' . '/public/classes/class-wpfnl-step-template.php',
         'Wpfnl_Type_Factory' => __DIR__ . '/../..' . '/admin/modules/type/sales-funnel/class-wpfnl-type-factory.php',
         'Wpfnl_i18n' => __DIR__ . '/../..' . '/includes/utils/class-wpfnl-i18n.php',
+        'cweagans\\Composer\\PatchEvent' => __DIR__ . '/..' . '/cweagans/composer-patches/src/PatchEvent.php',
+        'cweagans\\Composer\\PatchEvents' => __DIR__ . '/..' . '/cweagans/composer-patches/src/PatchEvents.php',
+        'cweagans\\Composer\\Patches' => __DIR__ . '/..' . '/cweagans/composer-patches/src/Patches.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit6a4dbaa228ee162865a721c9d74c83a5::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit6a4dbaa228ee162865a721c9d74c83a5::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit6a4dbaa228ee162865a721c9d74c83a5::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitde007fd82ff0d62b8a232c4af8da3c8d::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitde007fd82ff0d62b8a232c4af8da3c8d::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitde007fd82ff0d62b8a232c4af8da3c8d::$classMap;
 
         }, null, ClassLoader::class);
     }

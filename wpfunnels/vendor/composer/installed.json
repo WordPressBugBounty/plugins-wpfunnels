@@ -58,6 +58,57 @@
             "install-path": "../appsero/client"
         },
         {
+            "name": "cweagans/composer-patches",
+            "version": "1.7.3",
+            "version_normalized": "1.7.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cweagans/composer-patches.git",
+                "reference": "e190d4466fe2b103a55467dfa83fc2fecfcaf2db"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cweagans/composer-patches/zipball/e190d4466fe2b103a55467dfa83fc2fecfcaf2db",
+                "reference": "e190d4466fe2b103a55467dfa83fc2fecfcaf2db",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.0 || ^2.0",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "composer/composer": "~1.0 || ~2.0",
+                "phpunit/phpunit": "~4.6"
+            },
+            "time": "2022-12-20T22:53:13+00:00",
+            "type": "composer-plugin",
+            "extra": {
+                "class": "cweagans\\Composer\\Patches"
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "cweagans\\Composer\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Cameron Eagans",
+                    "email": "me@cweagans.net"
+                }
+            ],
+            "description": "Provides a way to patch Composer packages.",
+            "support": {
+                "issues": "https://github.com/cweagans/composer-patches/issues",
+                "source": "https://github.com/cweagans/composer-patches/tree/1.7.3"
+            },
+            "install-path": "../cweagans/composer-patches"
+        },
+        {
             "name": "deliciousbrains/wp-background-processing",
             "version": "1.4.0",
             "version_normalized": "1.4.0.0",
@@ -589,12 +640,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/CODEREXLTD/linno-telemetry.git",
-                "reference": "66b72eb17f930c16dd29027c1defce1997a5efdd"
+                "reference": "402ca8b485d9a2670951cc83c578b2121982dfca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CODEREXLTD/linno-telemetry/zipball/66b72eb17f930c16dd29027c1defce1997a5efdd",
-                "reference": "66b72eb17f930c16dd29027c1defce1997a5efdd",
+                "url": "https://api.github.com/repos/CODEREXLTD/linno-telemetry/zipball/402ca8b485d9a2670951cc83c578b2121982dfca",
+                "reference": "402ca8b485d9a2670951cc83c578b2121982dfca",
                 "shasum": ""
             },
             "require": {
@@ -605,7 +656,7 @@
                 "mockery/mockery": "^1.5",
                 "phpunit/phpunit": "^9.5"
             },
-            "time": "2026-04-21T16:24:22+00:00",
+            "time": "2026-04-27T06:22:55+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -719,6 +770,11 @@
                 "bin/posthog"
             ],
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "Fix deprecated ${var} string interpolation (PHP 8.2+)": "patches/posthog-posthog-php-deprecated-string-interpolation.patch"
+                }
+            },
             "installation-source": "dist",
             "autoload": {
                 "psr-4": {

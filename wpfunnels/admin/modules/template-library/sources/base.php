@@ -147,6 +147,10 @@ abstract class Wpfnl_Source_Base
             ],
             admin_url('admin.php')
         );
+
+        // Flush rewrite rules so newly created funnel/step permalinks resolve immediately.
+        flush_rewrite_rules();
+
         return [
             'success'       => true,
             'redirectLink'  => $redirect_link,

@@ -114,6 +114,9 @@ class Module extends Wpfnl_Admin_Module
 
         do_action('wpfunnels_after_funnel_created', $funnel_id, $funnel_type);
 
+        // Flush rewrite rules so newly created funnel/step permalinks resolve immediately.
+        flush_rewrite_rules();
+
         return [
             'success' => true,
             'funnelID' => $funnel_id,

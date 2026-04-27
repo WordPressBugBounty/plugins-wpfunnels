@@ -353,6 +353,13 @@ class Wpfnl_Import {
             $step->update_meta($step_id, '_funnel_id', $funnel_id);
             $step->update_meta($step_id, '_wp_page_template', $page_template);
             $exclude_meta = array('_wpfnl_ab_testing_start_settings', '_funnel_id');
+            if ( ! Wpfnl_functions::is_wpfnl_pro_activated() ) {
+                $exclude_meta = array_merge( $exclude_meta, array(
+                    '_wpfnl_maybe_enable_condition',
+                    '_wpfnl_step_conditions',
+                    '_wpfnl_next_step_after_condition',
+                ) );
+            }
             $sql_query_arr      = [];
             $is_enable_condition_meta_blank = false;
             $is_condition_exits = false;
