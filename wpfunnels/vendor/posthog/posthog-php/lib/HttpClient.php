@@ -94,6 +94,9 @@ class HttpClient
             $httpResponse = $this->executePost($ch);
             $responseCode = $httpResponse->getResponseCode();
 
+            //close connection
+            curl_close($ch);
+
             if (200 != $responseCode) {
                 // log error
                 $this->handleError($ch, $responseCode);

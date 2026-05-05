@@ -6340,6 +6340,33 @@ class Wpfnl_functions {
 		return $data;
 	}
 
+
+	/**
+	 * Calculate discount price
+	 *
+	 * @param $discount_type
+	 * @param $discount_value
+	 * @param $product_price
+	 *
+	 * @return string
+	 */
+	public static function calculate_discount_price_for_widget( $discount_type, $discount_value, $product_price ) {
+
+		$custom_price = $product_price;
+		if ( ! empty( $discount_type ) ) {
+			if ( 'discount-percentage' === $discount_type ) {
+				if ( $discount_value > 0 && $discount_value <= 100 ) {
+					$custom_price = (float) $product_price - ( (float) ( $product_price * $discount_value ) / 100 );
+				}
+			} elseif ( 'discount-price' === $discount_type ) {
+				if ( $discount_value > 0 ) {
+					$custom_price = $product_price - $discount_value;
+				}
+			}
+		}
+		return $custom_price;
+	}
+
 	/**
 	 * Helper method to return the item description, which is composed of item
 	 * meta flattened into a comma-separated string, if available. Otherwise the

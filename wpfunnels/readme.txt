@@ -5,7 +5,7 @@ Tags: woocommerce funnel builder, order bump, one click upsell, custom checkout,
 Requires at least: 6.1
 Tested up to:  6.9
 Requires PHP: 7.4
-Stable tag:  3.11.0
+Stable tag:  3.11.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,24 +49,51 @@ Add checkout offers to maximize revenue per transaction.
 
 [youtube https://youtu.be/GrzIRl5jfBE?si=g-48K1WrhE7ZcVTp]
 
-== Why WooCommerce Store Owners Choose WPFunnels ==
+== As A WooCommerce Store Owner, Here's Why You Need WPFunnels ==
 
-Most WooCommerce stores leave a significant amount of revenue on the table without even realizing it. In fact, many are facing low profit margins and high acquisition costs.
+Most WooCommerce stores are suffering from low profit margins and high acquisition costs. (Can you relate?)
 
-However, it's not because of a lack of traffic or low number of orders... Rather, it's because they never focus on a key revenue growth lever - the Average Order Value (AOV). (Can you relate?)
+And no, it's not due to a lack of traffic or low no. of orders. Rather, they are leaving a significant amount of revenue on the table without even realizing it.
+
+Why?
+
+It's because they never focus on a key revenue growth lever – the Average Order Value (AOV).
 
 You see, it is actually possible to earn 20-30% more from every buyer just by introducing relevant order bumps and upsell offers to your checkout flow.
 
-But the default WooCommerce checkout is rigid and limiting.
+And if you do the math, this extra earning can lead to higher profits.
 
-* It can be distracting or overwhelming for many, leading to cart abandonment.
-* It doesn't allow you to present any relevant offers that could meaningfully increase revenue per order.
+**Let's do the math with an example:**
 
-So, if you are using the default WooCommerce setup, chances are, you are missing out on that extra revenue as well!
+For a $50 order, let’s say your total cost is $35 (COGs + shipping + Acquisition Cost/CAC).
 
-WPFunnels was built to help you fix exactly that. It is a WooCommerce funnel builder that comes with a complete toolkit to help you take control of the checkout experience, from designing a custom WooCommerce checkout page to setting up one-click upsells and order bumps that convert.
+So you make $15 in profit.
 
-Whether you run a product store, a subscription service, or sell digital goods through WooCommerce, you will be able to make those defining changes that can significantly increase your store's average order value, meaning more revenue from the same buyers without additional costs.
+Now, imagine you used order bumps and upsells, and the buyer ended up spending $65 instead.
+
+<em>Here, COGs and shipping costs may vary depending on what products you offer.</em>
+
+But, the CAC... It will remain the same! You've already paid to acquire the customer, right?
+
+So, your overall costs may increase by $5-$10 (as per benchmark). That means your cost may grow to $45.
+
+Even so, you will have made $20 in profits (a 25% hike)!
+
+That’s why increasing AOV is one of the most powerful ways to improve profitability.
+
+**The default WooCommerce checkout is rigid and limiting**
+
+If you are using the default WooCommerce setup, chances are, you are missing out on that extra revenue!
+
+That's because the usual checkout process... 
+* can be distracting or overwhelming for many, leading to cart abandonment.
+* doesn't allow you to make any relevant offers that could meaningfully increase revenue per order.
+
+**That's Exactly What WPFunnels Will Help You Fix**
+
+WPFunnels was built to be the go-to WooCommerce funnel builder that comes with a complete toolkit to help you take control of the checkout experience, from designing a custom WooCommerce checkout page to setting up one-click upsells and order bumps that convert.
+
+Whether you run a product store, a subscription service, or sell digital goods through WooCommerce, you will be able to optimize your WooCommerce store to significantly increase your average order value, meaning more revenue from the same buyers without additional costs.
 
 No need to hire developers, use expensive SaaS tools, or stitch external tools for your WooCommerce store.
 
@@ -78,6 +105,8 @@ No need to hire developers, use expensive SaaS tools, or stitch external tools f
 4. Add order bumps and upsell offers to your checkout flow.
 5. Launch and watch your AOV grow.
 
+<em>**In the free plugin, you can add 1 order bump and 1 one-click upsell offer after checkout in each funnel.</em>
+
 The entire process is visual, no-code, and manageable from your WordPress dashboard, taking less than 10 minutes to set up.
 
 Watch how Darrel Wilson used WPFunnels to create sales funnels:
@@ -85,7 +114,7 @@ Watch how Darrel Wilson used WPFunnels to create sales funnels:
 
 == Curated Solutions To Turn Your WooCommerce Store Into A Revenue Engine ==
 
-Every feature in WPFunnels is built with the intention of helping you grow your revenue and reduce technical overwhelm.
+Every feature in WPFunnels is built to help you grow your revenue and reduce technical overwhelm.
 
 = 👉 Complete WooCommerce Funnel Builder =
 
@@ -93,20 +122,21 @@ With WPFunnels, you get to plan the whole checkout flow for your buyers on a vis
 
 You can even plan exclusive funnels for specific products, starting from the landing page to checkout to post-purchase offers.
 
+* Easily replace your store's default checkout with a proven layout.
 * Get well-designed templates to create funnels in minutes.
-* Easily replace your store's default checkout with a proven layout (coming soon)
+* Define conditional storewide checkout flows with custom offers.
 * Add order bumps and one-click upsells relevant to the checkout flow.
 * Create product funnels, lead funnels, and revenue-focused WooCommerce sales funnels without any coding.
 
 Every step of the funnel is connected, trackable, and fully customizable.
 
-You plan the entire buyer journey visually: add funnel steps, define conditional flows, and manage everything from one place. It's one of the most intuitive WooCommerce funnel builders available for WordPress.
+You plan the entire buyer journey visually: add funnel steps, define conditional flows, and manage everything from one place. It's one of the most intuitive WooCommerce funnel builders out there.
 
 **🌟 Conditional WooCommerce Funnels (Pro) 🌟**
 
-One of the most unique features you will get with WPFunnels Pro is the ability to make conditional offers based on the products in the buyer's cart.
+One unique feature you will get with WPFunnels Pro is the ability to make conditional offers based on the products in the buyer's cart.
 
-You can define curated funnels for specific conditions, such as product category, cart total, specific items, etc., and add dynamic upsell offers and relevant order bumps that feel more personalized.
+<em>Define curated funnels for specific conditions, such as product category, cart total, specific items, etc., and add dynamic upsell offers and relevant order bumps that feel more personalized.</em>
 
 When a customer meets the conditions, they automatically enter this custom funnel, leading to more offer acceptance and higher AOV.
 
@@ -120,25 +150,28 @@ It gives you more control, while it makes every buyer feel special.
 
 The default WooCommerce checkout page is functional, but it’s not entirely optimized the way you want it to be.
 
-WPFunnels lets you replace it with a fully custom WooCommerce checkout page, designed the way you want, with the layout and elements that reduce friction and encourage purchase completion.
+WPFunnels lets you create a fully customized storewide checkout flow to replace your default WooCommerce checkout.
+
+You can design the checkout page, use one of the proven checkout form layouts, and edit the checkout fields, so that your checkout process has lower friction and encourages higher purchase completion.
 
 You get full design control without touching a line of code:
 
 * Single-column and two-column checkout layouts
+* Modern simple checkout layouts like Shopify
 * Two-step and multi-step checkout options (Pro)
 * Distraction-free express checkout (Pro)
 * Built-in checkout field editor with drag-and-drop (Pro)
 * Custom typography and design styling
 
-This WooCommerce checkout builder is designed with conversion in mind, so every element of the page works toward getting customers to complete their purchase.
+In a sense, you can consider WPFunnels a WooCommerce checkout builder that’s built with conversion in mind so that every element of the page works toward getting customers to complete their purchase.
 
-> Learn More About <a href="https://getwpfunnels.com/custom-checkout-page/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-custom-funnel-checkout" target="_blank">WooCommerce Checkout Customization</a> With WPFunnels.
+> Learn More About <a href="https://getwpfunnels.com/new-wpfunnels-3-10-to-grow-woocommerce-revenue/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-custom-funnel-checkout" target="_blank">WooCommerce Checkout Customization</a> With WPFunnels.
 
 **🌟 Checkoutify — WooCommerce Checkout Customizer (Pro) 🌟**
 
 While you already get exclusive checkout optimization tools, WPFunnels Pro includes a unique add-on, Checkoutify. It is a modern WooCommerce checkout customizer that gives you deep control over your checkout form design and layout.
 
-If you want to go beyond the initial checkout customization options you get with WPFunnels, you may use Checkoutify for advanced control.
+If you want to go beyond the initial checkout customization options, you may use Checkoutify for advanced control.
 
 * Drag-and-drop field editor
 * Full design and layout customization
@@ -170,7 +203,7 @@ An order bump is a quick offer you make right on the checkout page, which custom
 
 If used correctly, it can noticeably increase your revenue per transaction without extra effort.
 
-With WPFunnels, you can add and fully customize order bumps for your custom WooCommerce checkout page or any product funnel.
+With WPFunnels, you can add and customize order bumps for your custom WooCommerce checkout page or any product funnel.
 
 * Place a single order bump (free) or multiple order bumps (Pro)
 * Choose anywhere on the checkout form.
@@ -283,7 +316,7 @@ We promise you the following:
 
 If you're a WooCommerce store owner looking to increase average order value, reduce checkout abandonment, and build a complete WooCommerce sales funnel without leaving your WordPress Dashboard, then start using WPFunnels today.
 
-<a href="http://getwpfunnels.com/wpf-free-repo-down/ target="_blank">Get Started For Free</a> | <a href="https://getwpfunnels.com/pricing/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-pricing-cta" target="_blank">Check Out WPFunnels Pro</a>
+<a href="http://getwpfunnels.com/wpf-free-repo-down/" target="_blank">Get Started For Free</a> | <a href="https://getwpfunnels.com/pricing/?utm_source=repo-cta&utm_medium=wp-repo&utm_campaign=wpf-pricing-cta" target="_blank">Check Out WPFunnels Pro</a>
 
 
 = 🤩 Join The WPFunnels Community On Facebook 🤩 =
@@ -513,6 +546,12 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.11.1 (2026-05-05) =
+* Fix: Resolved style issues on funnel checkout
+* Fix: Fixed undefined PHP variable issue 
+* Fix: Fixed Paypal payment issue on offer page
+* Fix: Fixed undefined method issue on offer page
 
 = 3.11.0 (2026-04-27) =
 * Enhancement: Improved dashboard data metrics

@@ -124,35 +124,21 @@ class Wpfnl_Gateway_Paypal_WooCommerce extends Wpfnl_Gateway {
             'intent'              => $args['ppcp_data']['intent'],
             'purchase_units'      => $this->generate_purchase_unit( $order, $offer_product, $args ),
             'application_context' => array(
-                'brand_name'   => isset($settings['brand_name']) ? $settings['brand_name'] : '',
-                'landing_page' => isset($settings['landing_page']) ? $settings['landing_page'] : 'LOGIN',
-                'user_action'  => 'CONTINUE',
-                "shipping_preference" => "GET_FROM_FILE",
-                'return_url'   => add_query_arg( $return_arg, get_the_permalink($step_id)),
-                'cancel_url'   => add_query_arg(array(
-                    'wpfnl-order'           => $order_id,
-                    'wpfnl-key'             => $order_key,
-                    'key'             => $order_key,
-                    'wpfnl-paypal-cancel'   => true,
-                ), get_the_permalink($step_id)),
-                
-            ),
-            'payment_method'      => array(
-                'payee_preferred' => 'UNRESTRICTED',
-                'payer_selected'  => 'PAYPAL',
-            ),
-            'payment_instruction' => array(
-                'disbursement_mode' => 'INSTANT',
-                'platform_fees'     => array(
+                'brand_name'          => isset( $settings['brand_name'] ) ? $settings['brand_name'] : '',
+                'landing_page'        => isset( $settings['landing_page'] ) ? $settings['landing_page'] : 'LOGIN',
+                'user_action'         => 'CONTINUE',
+                'shipping_preference' => 'GET_FROM_FILE',
+                'return_url'          => add_query_arg( $return_arg, get_the_permalink( $step_id ) ),
+                'cancel_url'          => add_query_arg(
                     array(
-                        'amount' => array(
-                            'currency_code' => $this->get_currency( $order ),
-                            'value'         => $offer_product['unit_price_tax'],
-                        ),
+                        'wpfnl-order'         => $order_id,
+                        'wpfnl-key'           => $order_key,
+                        'key'                 => $order_key,
+                        'wpfnl-paypal-cancel' => true,
                     ),
+                    get_the_permalink( $step_id )
                 ),
             ),
-
         );
 
         $arguments = array(
@@ -188,13 +174,7 @@ class Wpfnl_Gateway_Paypal_WooCommerce extends Wpfnl_Gateway {
                 ),
                 'body'    => wp_json_encode( $data ),
             );
-            $is_sandbox     = isset($settings['sandbox_on']) ? $settings['sandbox_on'] : false;
-            $payment_env    = $is_sandbox ? 'sandbox' : 'production';
-            $host           = 'https://api-m.'.$payment_env.'.';
-            if($payment_env === 'production') {
-                $host           = 'https://api-m.';
-            }
-            $url            = $host. 'paypal.com/v2/checkout/orders/';
+            $url = $this->get_api_host() . 'paypal.com/v2/checkout/orders/';
     
             $response       = wp_remote_get( $url, $arguments );
             if ( is_wp_error( $response ) ) {
@@ -236,13 +216,7 @@ class Wpfnl_Gateway_Paypal_WooCommerce extends Wpfnl_Gateway {
                 ),
                 'body'    => wp_json_encode( $data ),
             );
-            $is_sandbox     = isset($settings['sandbox_on']) ? $settings['sandbox_on'] : false;
-            $payment_env    = $is_sandbox ? 'sandbox' : 'production';
-            $host           = 'https://api-m.'.$payment_env.'.';
-            if($payment_env === 'production') {
-                $host           = 'https://api-m.';
-            }
-            $url            = $host. 'paypal.com/v2/checkout/orders/';
+            $url = $this->get_api_host() . 'paypal.com/v2/checkout/orders/';
     
             $response       = wp_remote_get( $url, $arguments );
             if ( is_wp_error( $response ) ) {
@@ -251,23 +225,26 @@ class Wpfnl_Gateway_Paypal_WooCommerce extends Wpfnl_Gateway {
                     'message'         => $response->get_error_message(),
                 );
                 return wp_send_json( $json_response );
-            }else{
-                $json           = json_decode( $response['body'] );
-                $json_response = array(
-                    'result'    => false,
-                    'message'   => __( 'PayPal order is not created', 'wpfnl-pro' ),
-                    'response'  => $response,
-                );
-                $order->update_meta_data( '_wpfunnels_paypal_'.$step_type.'_'.$step_id.'_order_id_'.$order_id, $json->id );
-                $order->save();
-                $json_response = array(
-                    'status'          => 'success',
-                    'message'         => __( 'Order created successfully', 'wpfnl-pro' ),
-                    'paypal_order_id' => $json->id,
-                    'redirect'        => $json->links[1]->href,
-                    'response'        => $json,
-                );
-            }    
+            } else {
+                $json = json_decode( $response['body'] );
+                if ( isset( $json->status ) && 'CREATED' === $json->status ) {
+                    $order->update_meta_data( '_wpfunnels_paypal_' . $step_type . '_' . $step_id . '_order_id_' . $order_id, $json->id );
+                    $order->save();
+                    $json_response = array(
+                        'status'          => 'success',
+                        'message'         => __( 'Order created successfully', 'wpfnl-pro' ),
+                        'paypal_order_id' => $json->id,
+                        'redirect'        => $json->links[1]->href,
+                        'response'        => $json,
+                    );
+                } else {
+                    $json_response = array(
+                        'status'   => false,
+                        'message'  => __( 'PayPal order is not created', 'wpfnl-pro' ),
+                        'response' => $json,
+                    );
+                }
+            }
         }
         return wp_send_json( $json_response );
     }
@@ -288,17 +265,10 @@ class Wpfnl_Gateway_Paypal_WooCommerce extends Wpfnl_Gateway {
         $token              = $this->get_token( $order );
         $step_type          = isset( $_POST['step_type'] ) ? sanitize_text_field( wp_unslash( $_POST['step_type'] ) ) : '';
         $paypal_order_id    = $order->get_meta('_wpfunnels_paypal_'.$step_type.'_'.$step_id.'_order_id_' . $order->get_id());
-        $settings = get_option( 'woocommerce-ppcp-settings', true );
-        $is_sandbox     = isset($settings['sandbox_on']) ? $settings['sandbox_on'] : false;
-        $payment_env    = $is_sandbox ? 'sandbox' : 'production';
-        $host           = 'https://api-m.'.$payment_env.'.';
-        if($payment_env === 'production') {
-            $host           = 'https://api-m.';
-        }
-
-        $url = $host. 'paypal.com/v2/checkout/orders/'.$paypal_order_id.'/capture';
-        if ( 'AUTHORIZE'  === $order->get_meta( '_ppcp_paypal_intent' ) ) {
-            $url            = $host. 'paypal.com/v2/checkout/orders/'.$paypal_order_id.'/authorize';
+        $host = $this->get_api_host();
+        $url  = $host . 'paypal.com/v2/checkout/orders/' . $paypal_order_id . '/capture';
+        if ( 'AUTHORIZE' === $order->get_meta( '_ppcp_paypal_intent' ) ) {
+            $url = $host . 'paypal.com/v2/checkout/orders/' . $paypal_order_id . '/authorize';
         }
 
         $args = array(
@@ -437,13 +407,16 @@ class Wpfnl_Gateway_Paypal_WooCommerce extends Wpfnl_Gateway {
      * @return array
      */
     public function get_ppcp_meta( $order ) {
-        $settings = get_option( 'woocommerce-ppcp-settings', true );
+        $new_settings   = get_option( 'woocommerce-ppcp-data-common', array() );
+        $old_settings   = get_option( 'woocommerce-ppcp-settings', array() );
+        $merchant_email = ! empty( $new_settings['merchant_email'] ) ? $new_settings['merchant_email'] : ( isset( $old_settings['merchant_email'] ) ? $old_settings['merchant_email'] : '' );
+        $merchant_id    = ! empty( $new_settings['merchant_id'] ) ? $new_settings['merchant_id'] : ( isset( $old_settings['merchant_id'] ) ? $old_settings['merchant_id'] : '' );
         return array(
             'environment'    => $order->get_meta( '_ppcp_paypal_payment_mode' ),
-            'intent'         => $order->get_meta( '_ppcp_paypal_intent' ),
-            'merchant_email' => isset($settings['merchant_email']) ?  $settings['merchant_email'] : '',
-            'merchant_id'    => isset($settings['merchant_id']) ?  $settings['merchant_id'] : '',
-            'invoice_prefix' => isset($settings['prefix']) ?  $settings['prefix'] : '',
+            'intent'         => $order->get_meta( '_ppcp_paypal_intent' ) ?: 'CAPTURE',
+            'merchant_email' => $merchant_email,
+            'merchant_id'    => $merchant_id,
+            'invoice_prefix' => isset( $old_settings['prefix'] ) ? $old_settings['prefix'] : '',
         );
     }
 
@@ -455,32 +428,27 @@ class Wpfnl_Gateway_Paypal_WooCommerce extends Wpfnl_Gateway {
      * @return string
      * @throws \WooCommerce\PayPalCommerce\WcGateway\Exception\NotFoundException
      */
-    public function get_token( $order,$is_new = false) {
+    public function get_token( $order, $is_new = false ) {
         $token = '';
-        if( !$is_new ){
-            $bearer = get_option( '_transient_ppcp-paypal-bearerppcp-bearer' );
-            if ( !empty( $bearer ) ) {
-                $bearer = json_decode( $bearer );
-                $token  = $bearer->access_token;
+        if ( ! $is_new ) {
+            $bearer_json = get_transient( 'ppcp-paypal-bearerppcp-bearer' );
+            if ( ! empty( $bearer_json ) ) {
+                $bearer = json_decode( $bearer_json );
+                if ( isset( $bearer->access_token ) ) {
+                    $token = $bearer->access_token;
+                }
             }
-        }else{
-            $token = '';
         }
-        
-        if ( empty( $token ) ) {
-            $settings = get_option( 'woocommerce-ppcp-settings', true );
-            $is_sandbox     = isset($settings['sandbox_on']) ? $settings['sandbox_on'] : false;
-            $payment_env    = $is_sandbox ? 'sandbox' : 'production';
-            $key            = isset($settings['client_id']) ? $settings['client_id'] : '';
-            $secret         = isset($settings['client_secret']) ? $settings['client_secret'] : '';
-            $host           = 'https://api-m.'.$payment_env.'.';
-            $host           = 'https://api-m.'.$payment_env.'.';
-            if($payment_env === 'production') {
-                $host           = 'https://api-m.';
-            }
 
-            $url            = $host. 'paypal.com/v1/oauth2/token?grant_type=client_credentials';
-            $args     = array(
+        if ( empty( $token ) ) {
+            $new_settings = get_option( 'woocommerce-ppcp-data-common', array() );
+            $old_settings = get_option( 'woocommerce-ppcp-settings', array() );
+
+            $key    = ! empty( $new_settings['client_id'] ) ? $new_settings['client_id'] : ( isset( $old_settings['client_id'] ) ? $old_settings['client_id'] : '' );
+            $secret = ! empty( $new_settings['client_secret'] ) ? $new_settings['client_secret'] : ( isset( $old_settings['client_secret'] ) ? $old_settings['client_secret'] : '' );
+
+            $url  = $this->get_api_host() . 'paypal.com/v1/oauth2/token?grant_type=client_credentials';
+            $args = array(
                 'method'  => 'POST',
                 'headers' => array(
                     // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
@@ -490,11 +458,31 @@ class Wpfnl_Gateway_Paypal_WooCommerce extends Wpfnl_Gateway {
             $response = wp_remote_get( $url, $args );
             if ( ! is_wp_error( $response ) ) {
                 $res_body = json_decode( $response['body'] );
-                $token    = $res_body->access_token;
+                $token    = isset( $res_body->access_token ) ? $res_body->access_token : '';
             }
         }
 
         return $token;
+    }
+
+
+    /**
+     * Return the PayPal API base host for the active environment.
+     * Checks the new PPCP settings format first, falls back to the legacy option.
+     *
+     * @return string
+     */
+    private function get_api_host() {
+        $new_settings = get_option( 'woocommerce-ppcp-data-common', array() );
+        $old_settings = get_option( 'woocommerce-ppcp-settings', array() );
+
+        if ( is_array( $new_settings ) && array_key_exists( 'use_sandbox', $new_settings ) ) {
+            $is_sandbox = (bool) $new_settings['use_sandbox'];
+        } else {
+            $is_sandbox = ! empty( $old_settings['sandbox_on'] );
+        }
+
+        return $is_sandbox ? 'https://api-m.sandbox.' : 'https://api-m.';
     }
 
 
@@ -507,32 +495,40 @@ class Wpfnl_Gateway_Paypal_WooCommerce extends Wpfnl_Gateway {
      * @return array
      */
     public function generate_purchase_unit( $order, $offer_product, $args ) {
-        $invoice_id  = $args['ppcp_data']['invoice_prefix'] . '-wpfnl-' . $args['order_id'] . '_' . $args['funnel_id'] . '_' . $args['step_id'];
-        $unit_value = round($offer_product['unit_price_tax']/$offer_product['qty'],2);
-        $value = round($unit_value * $offer_product['qty'],2);
-        return array(
-            array(
-                'reference_id'  => 'default',
-                'amount'        => array(
-                    'currency_code' => $this->get_currency($order),
-                    'value'         => strval($value),
-                    'breakdown'     => $this->get_item_breakdown( $order, $offer_product )
+        $invoice_id = $args['ppcp_data']['invoice_prefix'] . '-wpfnl-' . $args['order_id'] . '_' . $args['funnel_id'] . '_' . $args['step_id'];
+        $unit_value = round( $offer_product['unit_price_tax'] / $offer_product['qty'], 2 );
+        $value      = round( $unit_value * $offer_product['qty'], 2 );
+
+        $purchase_unit = array(
+            'reference_id' => 'default',
+            'amount'       => array(
+                'currency_code' => $this->get_currency( $order ),
+                'value'         => number_format( $value, 2, '.', '' ),
+                'breakdown'     => $this->get_item_breakdown( $order, $offer_product ),
+            ),
+            'description'  => $offer_product['desc'],
+            'items'        => array( $this->get_items( $order, $offer_product ) ),
+            'invoice_id'   => $invoice_id,
+            'custom_id'    => $invoice_id,
+            'shipping'     => array(
+                'name' => array(
+                    'full_name' => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(),
                 ),
-                'description'  => $offer_product['desc'],
-                'items'         => array( $this->get_items($order, $offer_product) ),
-                'payee'         => array(
-                    'email_address' => $args['ppcp_data']['merchant_email'],
-                    'merchant_id'   => $args['ppcp_data']['merchant_id'],
-                ),
-                'invoice_id'    => $invoice_id,
-                'custom_id'     => $invoice_id,
-                'shipping'      => array(
-                    'name' => array(
-                        'full_name' => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(),
-                    ),
-                ),
-            )
+            ),
         );
+
+        $payee = array();
+        if ( ! empty( $args['ppcp_data']['merchant_email'] ) ) {
+            $payee['email_address'] = $args['ppcp_data']['merchant_email'];
+        }
+        if ( ! empty( $args['ppcp_data']['merchant_id'] ) ) {
+            $payee['merchant_id'] = $args['ppcp_data']['merchant_id'];
+        }
+        if ( ! empty( $payee ) ) {
+            $purchase_unit['payee'] = $payee;
+        }
+
+        return array( $purchase_unit );
     }
 
 
@@ -544,11 +540,11 @@ class Wpfnl_Gateway_Paypal_WooCommerce extends Wpfnl_Gateway {
      * @return mixed
      */
     public function get_item_breakdown( $order, $offer_product ) {
-        $unit_value = round($offer_product['unit_price_tax']/$offer_product['qty'],2);
-        $value = round($unit_value * $offer_product['qty'],2);
+        $unit_value = round( $offer_product['unit_price_tax'] / $offer_product['qty'], 2 );
+        $value      = round( $unit_value * $offer_product['qty'], 2 );
         $breakdown['item_total'] = array(
-            'currency_code' => $this->get_currency($order),
-            'value'         => strval($value),
+            'currency_code' => $this->get_currency( $order ),
+            'value'         => number_format( $value, 2, '.', '' ),
         );
 //        if ( ! empty( $offer_product['shipping_fee'] ) ) {
 //            $breakdown['shipping'] = array(
@@ -567,18 +563,17 @@ class Wpfnl_Gateway_Paypal_WooCommerce extends Wpfnl_Gateway {
      * @param $offer_product
      * @return array
      */
-    public function get_items($order, $offer_product) {
-        
-        $value = round($offer_product['unit_price_tax']/$offer_product['qty'],2);
+    public function get_items( $order, $offer_product ) {
+        $value = round( $offer_product['unit_price_tax'] / $offer_product['qty'], 2 );
 
         return array(
             'name'        => $offer_product['name'],
             'unit_amount' => array(
-                'currency_code' => $this->get_currency($order),
-                'value'         => strval($value),
+                'currency_code' => $this->get_currency( $order ),
+                'value'         => number_format( $value, 2, '.', '' ),
             ),
-            'quantity'      => $offer_product['qty'],
-            'id'            => $offer_product['id'],
+            'quantity'    => strval( $offer_product['qty'] ),
+            'sku'         => strval( $offer_product['id'] ),
             'description' => wp_strip_all_tags( $offer_product['desc'] ),
         );
     }

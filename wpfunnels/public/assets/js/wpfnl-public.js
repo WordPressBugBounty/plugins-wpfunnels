@@ -2395,6 +2395,30 @@
         wpfnlInitButtonAnimations();
         // ---- End Next Step Button Viewport Animation ----
 
+		// -----svg checkbox icon append in checkout page-----
+		var checkboxIcon = '<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x=".5" y=".5" width="21" height="21" rx="4.5" fill="#fff" stroke="#dedede"></rect><path d="M8.87459 15.3313C8.53396 15.3315 8.20728 15.1961 7.96662 14.955L5.22153 12.2109C4.92616 11.9155 4.92616 11.4365 5.22153 11.141C5.517 10.8457 5.99595 10.8457 6.29142 11.141L8.87459 13.7242L15.7086 6.89023C16.004 6.59486 16.483 6.59486 16.7785 6.89023C17.0738 7.1857 17.0738 7.66465 16.7785 7.96012L9.78256 14.955C9.5419 15.1961 9.21523 15.3315 8.87459 15.3313Z" fill="#fff"></path></svg>';
+
+		function initLoginCheckboxIcon() {
+			$('.wpfnl-checkout .woocommerce-form-login.login .woocommerce-form-login__rememberme>span').prepend(checkboxIcon);
+		}
+
+		function initTermsCheckboxIcon() {
+			$('.woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox .woocommerce-terms-and-conditions-checkbox-text').prepend(checkboxIcon);
+			$('.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew>label').prepend(checkboxIcon);
+		}
+
+		$(document).ready(function () {
+			initLoginCheckboxIcon();
+			initTermsCheckboxIcon();
+		});
+
+		$(document.body).on('updated_checkout', function () {
+			initTermsCheckboxIcon();
+		});
+
+
+
+
 
     })
 })(jQuery)

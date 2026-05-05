@@ -875,7 +875,7 @@ body.wpfnl-theme-style-removed {
 }
 .wpfnl-checkout table.woocommerce-checkout-review-order-table .product-name .product-name-text {
   color: #1A241A;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.3;
   display: -webkit-box;
@@ -1129,39 +1129,26 @@ body.wpfnl-theme-style-removed {
   display: block !important;
   min-height: 14px;
 }
-.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > label:before {
-  content: "";
+.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > label svg {
   position: absolute;
-  top: 2px;
   left: 0;
-  width: 18px;
-  height: 18px;
-  border: 2px solid #72737e;
-  border-radius: 3px;
+  top: 0;
+}
+.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > label rect {
   transition: all 0.3s ease;
 }
-.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > label:after {
-  content: "";
-  position: absolute;
-  top: 4px;
-  left: 6px;
-  width: 7px;
-  height: 11px;
-  background: transparent;
-  border-radius: 2px;
+.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > label path {
   opacity: 0;
-  transform: rotate(45deg) skewX(15deg);
+  visibility: hidden;
   transition: all 0.3s ease;
-  border: 3px solid #fff;
-  border-left: none;
-  border-top: none;
 }
-.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > input[type=checkbox]:checked + label:before {
-  border-color: #6E42D3;
-  background-color: #6E42D3;
+.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > input[type=checkbox]:checked + label rect {
+  stroke: #6E42D3;
+  fill: #6E42D3;
 }
-.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > input[type=checkbox]:checked + label:after {
+.wpfnl-checkout .woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew > input[type=checkbox]:checked + label svg path {
   opacity: 1;
+  visibility: visible;
 }
 .wpfnl-checkout .woocommerce-checkout #payment ul.payment_methods {
   padding: 10px 20px 10px 20px;
@@ -1919,44 +1906,35 @@ body.wpfnl-theme-style-removed {
   line-height: 1.3;
   font-size: 16px;
   color: #363B4E;
-  padding-left: 26px;
+  padding-left: 30px;
   cursor: pointer;
   display: inline-block;
 }
-.woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox .woocommerce-terms-and-conditions-checkbox-text:before {
-  content: "";
+.woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox .woocommerce-terms-and-conditions-checkbox-text svg {
   position: absolute;
   left: 0;
-  top: 3px;
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  border: 2px solid #72737e;
-  background-color: transparent;
+  top: -1px;
+}
+@media (max-width: 575px) {
+  .woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox .woocommerce-terms-and-conditions-checkbox-text svg {
+    top: 2px;
+  }
+}
+.woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox .woocommerce-terms-and-conditions-checkbox-text rect {
   transition: all 0.3s ease;
 }
-.woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox .woocommerce-terms-and-conditions-checkbox-text:after {
-  content: "";
-  position: absolute;
-  top: 5px;
-  left: 6px;
-  width: 7px;
-  height: 11px;
-  background: transparent;
-  border-radius: 2px;
+.woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox .woocommerce-terms-and-conditions-checkbox-text path {
   opacity: 0;
-  transform: rotate(45deg) skewX(10deg);
+  visibility: hidden;
   transition: all 0.3s ease;
-  border: 3px solid #fff;
-  border-left: none;
-  border-top: none;
 }
-.woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox input[type=checkbox]:checked + .woocommerce-terms-and-conditions-checkbox-text::before {
-  background-color: #6E42D3;
-  border-color: #6E42D3;
+.woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox input[type=checkbox]:checked + .woocommerce-terms-and-conditions-checkbox-text svg rect {
+  fill: #6E42D3;
+  stroke: #6E42D3;
 }
-.woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox input[type=checkbox]:checked + .woocommerce-terms-and-conditions-checkbox-text::after {
+.woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox input[type=checkbox]:checked + .woocommerce-terms-and-conditions-checkbox-text svg path {
   opacity: 1;
+  visibility: visible;
 }
 
 .wpfnl-checkout .woocommerce-account-fields {
@@ -2064,42 +2042,25 @@ body.wpfnl-theme-style-removed {
   color: #363B4E;
   padding-left: 26px;
   cursor: pointer;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
-.wpfnl-checkout .woocommerce-form-login.login .woocommerce-form-login__rememberme > span:before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 3px;
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  border: 2px solid #72737e;
-  background-color: transparent;
+.wpfnl-checkout .woocommerce-form-login.login .woocommerce-form-login__rememberme > span rect {
   transition: all 0.3s ease;
 }
-.wpfnl-checkout .woocommerce-form-login.login .woocommerce-form-login__rememberme > span:after {
-  content: "";
-  position: absolute;
-  top: 5px;
-  left: 6px;
-  width: 7px;
-  height: 11px;
-  background: transparent;
-  border-radius: 2px;
+.wpfnl-checkout .woocommerce-form-login.login .woocommerce-form-login__rememberme > span path {
   opacity: 0;
-  transform: rotate(45deg) skewX(10deg);
+  visibility: hidden;
   transition: all 0.3s ease;
-  border: 3px solid #fff;
-  border-left: none;
-  border-top: none;
 }
-.wpfnl-checkout .woocommerce-form-login.login .woocommerce-form-login__rememberme input[type=checkbox]:checked + span::before {
-  background-color: #6E42D3;
-  border-color: #6E42D3;
+.wpfnl-checkout .woocommerce-form-login.login .woocommerce-form-login__rememberme input[type=checkbox]:checked + span svg rect {
+  fill: #6E42D3;
+  stroke: #6E42D3;
 }
-.wpfnl-checkout .woocommerce-form-login.login .woocommerce-form-login__rememberme input[type=checkbox]:checked + span::after {
+.wpfnl-checkout .woocommerce-form-login.login .woocommerce-form-login__rememberme input[type=checkbox]:checked + span svg path {
   opacity: 1;
+  visibility: visible;
 }
 
 .oxy-wpf-checkout {
@@ -2229,17 +2190,7 @@ body.rtl .wpfnl-express-checkout .wpfnl-express-checkout-wrapper .wpfnl-express-
 body.rtl.et_divi_builder #et_builder_outer_content .woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox .woocommerce-terms-and-conditions-checkbox-text,
 body.rtl .woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox .woocommerce-terms-and-conditions-checkbox-text {
   padding-left: 0;
-  padding-right: 26px;
-}
-body.rtl.et_divi_builder #et_builder_outer_content .woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox .woocommerce-terms-and-conditions-checkbox-text:before,
-body.rtl .woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox .woocommerce-terms-and-conditions-checkbox-text:before {
-  left: inherit;
-  right: 0;
-}
-body.rtl.et_divi_builder #et_builder_outer_content .woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox .woocommerce-terms-and-conditions-checkbox-text:after,
-body.rtl .woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox .woocommerce-terms-and-conditions-checkbox-text:after {
-  left: inherit;
-  right: 6px;
+  padding-right: 0;
 }
 
 .wpfnl-place-order-add-overlay {
@@ -2292,11 +2243,11 @@ body.rtl .woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-
   .wpfnl-checkout .woocommerce-additional-fields > h3,
   .wpfnl-checkout .woocommerce-shipping-fields > #ship-to-different-address,
   .wpfnl-checkout .wpfnl-checkout-variable-product .variable-product-title {
-    font-size: 14px;
+    font-size: 18px;
     padding: 10px 13px;
   }
   .wpfnl-checkout #ship-to-different-address label span {
-    font-size: 14px;
+    font-size: 18px;
   }
   .wpfnl-checkout #ship-to-different-address label span:before {
     top: -1px;
