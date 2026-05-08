@@ -2357,7 +2357,7 @@
 
         // ---- Next Step Button Viewport Animation ----
         function wpfnlInitButtonAnimations() {
-            var $buttons = $('.wpfunnels-block-next-step-button.wpfnl-animation, .bricks-button.wpfnl-animation');
+            var $buttons = $('.wpfnl-animation');
             if (!$buttons.length) return;
 
             if ('IntersectionObserver' in window) {

@@ -63,7 +63,19 @@
                 <?php echo $this->get_render_attribute_string('button'); ?>
                 id="wpfunnels_<?php echo isset($settings['offer_button_type']) ? $settings['offer_button_type'] : ''; ?>_<?php echo isset($settings['offer_type']) ?  $settings['offer_type'] : ''; ?>"
                 data-offertype="<?php echo isset($settings['offer_button_type']) ?  $settings['offer_button_type'] : ''; ?>" >
-                <?php $this->render_text(); ?>
+                <?php
+                $enable_subtitle = isset( $settings['enable_subtitle'] ) ? $settings['enable_subtitle'] : 'no';
+                $subtitle_text   = isset( $settings['subtitle_text'] ) ? $settings['subtitle_text'] : '';
+
+                if ( 'yes' === $enable_subtitle && ! empty( $subtitle_text ) ) {
+                    echo '<span class="text-inner-wrapper" style="display:flex;align-items:center;gap:3px;">';
+                        $this->render_text();
+                    echo '</span>';
+                    echo '<small class="wpfnl-button-subtitle">' . esc_html( $subtitle_text ) . '</small>';
+                } else {
+                    $this->render_text();
+                }
+                ?>
             </a>
 
         </div>

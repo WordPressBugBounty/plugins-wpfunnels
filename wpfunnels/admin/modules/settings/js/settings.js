@@ -66,6 +66,11 @@ jQuery(function ($) {
             $('#clear-template').trigger('click');
         });
 
+        $('#wpfunnels-canvas-mode').on('click', '.wpfnl-single-item', function() {
+            $('#wpfunnels-canvas-mode .wpfnl-single-item').removeClass('checked');
+            $(this).addClass('checked');
+        });
+
         if ($("input[name='wpfnl-utm-enable']").prop("checked")) {
             $("#wpfnl-utm").show()
         } else {
@@ -284,6 +289,7 @@ jQuery(function ($) {
             var payload = {
                 'funnel_type': $('#wpfunnels-funnel-type .wpfnl-single-item.checked').attr('data-value'),
                 'builder': $('#wpfunnels-page-builder .wpfnl-single-item.checked').attr('data-value'),
+                'funnel_builder_mode': $('#wpfunnels-canvas-mode .wpfnl-single-item.checked').attr('data-value') || 'horizontal',
                 'uninstall_cleanup': $('#wpfnl-data-cleanup').is(':checked') ? 'on' : 'off',
                 'paypal_reference': $('#wpfunnels-paypal-reference').is(':checked') ? 'on' : 'off',
                 'analytics_roles': userRole,

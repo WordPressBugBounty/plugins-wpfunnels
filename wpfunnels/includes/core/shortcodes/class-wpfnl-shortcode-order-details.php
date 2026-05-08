@@ -82,12 +82,14 @@ class Wpfnl_Shortcode_Order_details {
 	 */
 	public function get_content() {
 		$output = '';
-		$show_dummy_order_details = false;
 
-		// allow to show the order details markup on preview
-		if ( is_admin() ) {
-			$show_dummy_order_details = apply_filters( 'wpfunnels/show_dummy_order_details', true );
-		}
+		// Default: enable demo mode in admin and REST (Divi VB) contexts.
+		// Callers can override via the filter (e.g. Elementor forces false below).
+		$in_preview_context = is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST );
+		$show_dummy_order_details = (bool) apply_filters(
+			'wpfunnels/show_dummy_order_details',
+			$in_preview_context
+		);
 
 		if(Wpfnl_functions::is_elementor_active()) {
 			$elementor_preview_active = \Elementor\Plugin::$instance->preview->is_preview_mode();
@@ -107,14 +109,19 @@ class Wpfnl_Shortcode_Order_details {
 			$key_param 		= 'wpfnl-key';
 			$child_orders 	= null;
 			if ( !isset($_GET[$id_param]) && $show_dummy_order_details ) {
-				$args = array(
-					'limit'     => 1,
-					'order'     => 'DESC',
-					'post_type' => 'shop_order',
-					'status'    => array( 'completed', 'processing' ),
-				);
+				// Try completed/processing first, then fall back to any order.
+				$latest_order = wc_get_orders( array(
+					'limit'  => 1,
+					'order'  => 'DESC',
+					'status' => array( 'completed', 'processing' ),
+				) );
 
-				$latest_order = wc_get_orders( $args );
+				if ( empty( $latest_order ) ) {
+					$latest_order = wc_get_orders( array(
+						'limit' => 1,
+						'order' => 'DESC',
+					) );
+				}
 
 				$order_id = ( ! empty( $latest_order ) ) ? current( $latest_order )->get_id() : 0;
 				if ( $order_id > 0 ) {
@@ -133,7 +140,13 @@ class Wpfnl_Shortcode_Order_details {
 						$order = false;
 					}
 				} else {
-					return '<p class="woocommerce-notice">' . __( 'No completed orders found in your shop for demo.', 'wpfnl' ) . '</p>';
+					// No orders in the shop — show a static placeholder so the
+					// widget still renders something useful in the builder.
+					return '<div class="woocommerce wpfnl-order-details-placeholder">'
+						. '<p class="woocommerce-notice">'
+						. __( 'Order details will appear here after a customer completes checkout.', 'wpfnl' )
+						. '</p>'
+						. '</div>';
 				}
 			}
 			else {

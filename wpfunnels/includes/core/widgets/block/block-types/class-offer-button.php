@@ -92,6 +92,59 @@ class OfferButton extends AbstractBlock {
      */
     protected function render( $attributes, $content ) {
         $attributes = wp_parse_args( $attributes, $this->defaults );
+
+        // ---- Display Conditions ----
+        $display_condition = isset( $attributes['displayConditionType'] ) ? $attributes['displayConditionType'] : 'none';
+
+        if ( $display_condition === 'user_state' ) {
+            $hide_logged_in  = isset( $attributes['hideFromLoggedIn'] )  ? $attributes['hideFromLoggedIn']  : false;
+            $hide_logged_out = isset( $attributes['hideFromLoggedOut'] ) ? $attributes['hideFromLoggedOut'] : false;
+            if ( $hide_logged_in && is_user_logged_in() )   { return ''; }
+            if ( $hide_logged_out && ! is_user_logged_in() ) { return ''; }
+
+        } elseif ( $display_condition === 'user_role' ) {
+            $hide_for_user_role = isset( $attributes['hideForUserRole'] ) ? $attributes['hideForUserRole'] : 'none';
+            if ( $hide_for_user_role !== 'none' && is_user_logged_in() ) {
+                $user = wp_get_current_user();
+                if ( in_array( $hide_for_user_role, $user->roles ) ) { return ''; }
+            }
+
+        } elseif ( $display_condition === 'day' ) {
+            $disable_on_days = isset( $attributes['disableOnDays'] ) ? $attributes['disableOnDays'] : array();
+            if ( ! empty( $disable_on_days ) && is_array( $disable_on_days ) ) {
+                if ( in_array( strtolower( date( 'l' ) ), $disable_on_days ) ) { return ''; }
+            }
+
+        } elseif ( $display_condition === 'browser' ) {
+            $hide_on_browser = isset( $attributes['hideOnBrowser'] ) ? $attributes['hideOnBrowser'] : 'none';
+            if ( $hide_on_browser !== 'none' ) {
+                $ua = isset( $_SERVER['HTTP_USER_AGENT'] ) ? strtolower( $_SERVER['HTTP_USER_AGENT'] ) : '';
+                $cb = '';
+                if ( strpos( $ua, 'edg' ) !== false )                                         { $cb = 'edge'; }
+                elseif ( strpos( $ua, 'opr' ) !== false || strpos( $ua, 'opera' ) !== false ) { $cb = 'opera_mini'; }
+                elseif ( strpos( $ua, 'chrome' ) !== false )                                  { $cb = 'chrome'; }
+                elseif ( strpos( $ua, 'safari' ) !== false )                                  { $cb = 'safari'; }
+                elseif ( strpos( $ua, 'firefox' ) !== false )                                 { $cb = 'mozilla'; }
+                if ( $cb === $hide_on_browser ) { return ''; }
+            }
+
+        } elseif ( $display_condition === 'operating_system' ) {
+            $hide_on_os = isset( $attributes['hideOnOS'] ) ? $attributes['hideOnOS'] : 'none';
+            if ( $hide_on_os !== 'none' ) {
+                $ua = isset( $_SERVER['HTTP_USER_AGENT'] ) ? strtolower( $_SERVER['HTTP_USER_AGENT'] ) : '';
+                $co = '';
+                if ( strpos( $ua, 'windows' ) !== false || strpos( $ua, 'win32' ) !== false || strpos( $ua, 'win64' ) !== false ) { $co = 'windows'; }
+                elseif ( strpos( $ua, 'macintosh' ) !== false || strpos( $ua, 'mac os x' ) !== false )                           { $co = 'macos'; }
+                elseif ( strpos( $ua, 'linux' ) !== false && strpos( $ua, 'android' ) === false )                                { $co = 'linux'; }
+                elseif ( strpos( $ua, 'android' ) !== false )                                                                    { $co = 'android'; }
+                elseif ( strpos( $ua, 'iphone' ) !== false || strpos( $ua, 'ipad' ) !== false || strpos( $ua, 'ipod' ) !== false ) { $co = 'ios'; }
+                elseif ( strpos( $ua, 'sunos' ) !== false )                                                                      { $co = 'sunos'; }
+                elseif ( strpos( $ua, 'openbsd' ) !== false )                                                                    { $co = 'openbsd'; }
+                if ( $co === $hide_on_os ) { return ''; }
+            }
+        }
+        // ---- End Display Conditions ----
+
         $dynamic_css = $this->generate_assets($attributes);
 
         $response = Wpfnl_functions::get_product_data_for_widget( get_the_ID() );

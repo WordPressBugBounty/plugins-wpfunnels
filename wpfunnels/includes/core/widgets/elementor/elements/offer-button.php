@@ -153,6 +153,7 @@ class Offer_Button extends Widget_Base
         
         $this->register_dynamic_data_template_content();
         $this->register_offer_button_content();
+        $this->register_offer_button_display_conditions();
 
         //----style funtion----
         $this->register_dynamic_data_template_style();
@@ -171,6 +172,7 @@ class Offer_Button extends Widget_Base
     {
         //----content funtion----
         $this->register_offer_button_content();
+        $this->register_offer_button_display_conditions();
         $this->register_dynamic_data_template_content();
 
         //----style funtion----
@@ -768,7 +770,7 @@ class Offer_Button extends Widget_Base
                     ],
                 ],
                 'condition' => [
-                    'upsell_downsell_button_icon!' => '',
+                    'upsell_downsell_button_icon[value]!' => '',
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .elementor-button .elementor-align-icon-right' => 'margin-left: {{SIZE}}{{UNIT}};',
@@ -855,11 +857,191 @@ class Offer_Button extends Widget_Base
                 ]
             );
         }
+
+        // Subtitle Settings
+        $this->add_control(
+            'enable_subtitle',
+            [
+                'label'        => __( 'Enable Subtitle', 'wpfnl-pro' ),
+                'type'         => Controls_Manager::SWITCHER,
+                'label_on'     => __( 'Yes', 'wpfnl-pro' ),
+                'label_off'    => __( 'No', 'wpfnl-pro' ),
+                'return_value' => 'yes',
+                'default'      => 'no',
+                'separator'    => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'subtitle_text',
+            [
+                'label'       => __( 'Subtitle Text', 'wpfnl-pro' ),
+                'type'        => Controls_Manager::TEXT,
+                'default'     => __( 'Click to continue', 'wpfnl-pro' ),
+                'placeholder' => __( 'Enter subtitle text', 'wpfnl-pro' ),
+                'condition'   => [
+                    'enable_subtitle' => 'yes',
+                ],
+            ]
+        );
         
         $this->end_controls_section();
 
     }
 
+
+    /**
+     * Register Offer Button Display Conditions Control.
+     *
+     * @since x.x.x
+     * @access protected
+     */
+    protected function register_offer_button_display_conditions() {
+
+        $this->start_controls_section(
+            'section_display_conditions',
+            [
+                'label' => __( 'Display Conditions', 'wpfnl-pro' ),
+            ]
+        );
+
+        $this->add_control(
+            'display_condition_type',
+            [
+                'label'   => __( 'Display Condition', 'wpfnl-pro' ),
+                'type'    => Controls_Manager::SELECT,
+                'default' => 'none',
+                'options' => [
+                    'none'             => __( 'None', 'wpfnl-pro' ),
+                    'user_state'       => __( 'User State', 'wpfnl-pro' ),
+                    'user_role'        => __( 'User Role', 'wpfnl-pro' ),
+                    'browser'          => __( 'Browser', 'wpfnl-pro' ),
+                    'operating_system' => __( 'Operating System', 'wpfnl-pro' ),
+                    'day'              => __( 'Day', 'wpfnl-pro' ),
+                ],
+            ]
+        );
+
+        // User State
+        $this->add_control(
+            'hide_from_logged_in',
+            [
+                'label'        => __( 'Hide From Logged In User', 'wpfnl-pro' ),
+                'type'         => Controls_Manager::SWITCHER,
+                'label_on'     => __( 'Yes', 'wpfnl-pro' ),
+                'label_off'    => __( 'No', 'wpfnl-pro' ),
+                'return_value' => 'yes',
+                'default'      => 'no',
+                'condition'    => [ 'display_condition_type' => 'user_state' ],
+            ]
+        );
+
+        $this->add_control(
+            'hide_from_logged_out',
+            [
+                'label'        => __( 'Hide From Logged Out User', 'wpfnl-pro' ),
+                'type'         => Controls_Manager::SWITCHER,
+                'label_on'     => __( 'Yes', 'wpfnl-pro' ),
+                'label_off'    => __( 'No', 'wpfnl-pro' ),
+                'return_value' => 'yes',
+                'default'      => 'no',
+                'condition'    => [ 'display_condition_type' => 'user_state' ],
+            ]
+        );
+
+        // User Role
+        $this->add_control(
+            'hide_for_user_role',
+            [
+                'label'     => __( 'Hide For User Role', 'wpfnl-pro' ),
+                'type'      => Controls_Manager::SELECT,
+                'default'   => 'none',
+                'options'   => $this->get_user_roles_for_offer(),
+                'condition' => [ 'display_condition_type' => 'user_role' ],
+            ]
+        );
+
+        // Browser
+        $this->add_control(
+            'hide_on_browser',
+            [
+                'label'     => __( 'Hide On Browser', 'wpfnl-pro' ),
+                'type'      => Controls_Manager::SELECT,
+                'default'   => 'none',
+                'options'   => [
+                    'none'       => __( 'None', 'wpfnl-pro' ),
+                    'mozilla'    => __( 'Mozilla Firefox', 'wpfnl-pro' ),
+                    'chrome'     => __( 'Google Chrome', 'wpfnl-pro' ),
+                    'opera_mini' => __( 'Opera Mini', 'wpfnl-pro' ),
+                    'safari'     => __( 'Safari', 'wpfnl-pro' ),
+                    'edge'       => __( 'Microsoft Edge', 'wpfnl-pro' ),
+                ],
+                'condition' => [ 'display_condition_type' => 'browser' ],
+            ]
+        );
+
+        // Operating System
+        $this->add_control(
+            'hide_on_os',
+            [
+                'label'     => __( 'Hide On Operating System', 'wpfnl-pro' ),
+                'type'      => Controls_Manager::SELECT,
+                'default'   => 'none',
+                'options'   => [
+                    'none'    => __( 'None', 'wpfnl-pro' ),
+                    'ios'     => __( 'iOS', 'wpfnl-pro' ),
+                    'android' => __( 'Android', 'wpfnl-pro' ),
+                    'windows' => __( 'Windows', 'wpfnl-pro' ),
+                    'macos'   => __( 'MacOS', 'wpfnl-pro' ),
+                    'linux'   => __( 'Linux', 'wpfnl-pro' ),
+                    'sunos'   => __( 'SunOS', 'wpfnl-pro' ),
+                    'openbsd' => __( 'OpenBSD', 'wpfnl-pro' ),
+                ],
+                'condition' => [ 'display_condition_type' => 'operating_system' ],
+            ]
+        );
+
+        // Day
+        $this->add_control(
+            'disable_on_days',
+            [
+                'label'     => __( 'Select Days You Want To Disable', 'wpfnl-pro' ),
+                'type'      => Controls_Manager::SELECT2,
+                'multiple'  => true,
+                'options'   => [
+                    'monday'    => __( 'Monday', 'wpfnl-pro' ),
+                    'tuesday'   => __( 'Tuesday', 'wpfnl-pro' ),
+                    'wednesday' => __( 'Wednesday', 'wpfnl-pro' ),
+                    'thursday'  => __( 'Thursday', 'wpfnl-pro' ),
+                    'friday'    => __( 'Friday', 'wpfnl-pro' ),
+                    'saturday'  => __( 'Saturday', 'wpfnl-pro' ),
+                    'sunday'    => __( 'Sunday', 'wpfnl-pro' ),
+                ],
+                'condition' => [ 'display_condition_type' => 'day' ],
+            ]
+        );
+
+        $this->end_controls_section();
+    }
+
+    /**
+     * Get WordPress user roles for display condition.
+     *
+     * @return array
+     */
+    protected function get_user_roles_for_offer() {
+        $roles = [ 'none' => __( 'None', 'wpfnl-pro' ) ];
+
+        if ( ! function_exists( 'get_editable_roles' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/user.php';
+        }
+
+        foreach ( get_editable_roles() as $role_key => $role_info ) {
+            $roles[ $role_key ] = $role_info['name'];
+        }
+
+        return $roles;
+    }
 
     /**
      * Register Offer Button Style Control.
@@ -1023,6 +1205,43 @@ class Offer_Button extends Widget_Base
 
         $this->end_controls_section();
 
+        // Subtitle Style Section
+        $this->start_controls_section(
+            'section_subtitle_style',
+            [
+                'label'     => __( 'Subtitle', 'wpfnl-pro' ),
+                'tab'       => Controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'enable_subtitle' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name'     => 'subtitle_typography',
+                'label'    => __( 'Typography', 'wpfnl-pro' ),
+                'selector' => '{{WRAPPER}} .wpfnl-button-subtitle',
+            ]
+        );
+
+        $this->add_responsive_control(
+            'subtitle_spacing',
+            [
+                'label'     => __( 'Spacing', 'wpfnl-pro' ),
+                'type'      => Controls_Manager::SLIDER,
+                'range'     => [
+                    'px' => [ 'min' => 0, 'max' => 50 ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .wpfnl-button-subtitle' => 'margin-top: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+
     }
 
 
@@ -1140,6 +1359,13 @@ class Offer_Button extends Widget_Base
             $this->add_render_attribute('button', 'class', 'elementor-size-' . $settings['size']);
         }
 
+        // Add subtitle class if enabled
+        $enable_subtitle = isset( $settings['enable_subtitle'] ) ? $settings['enable_subtitle'] : 'no';
+        $subtitle_text   = isset( $settings['subtitle_text'] ) ? $settings['subtitle_text'] : '';
+        if ( 'yes' === $enable_subtitle && ! empty( $subtitle_text ) && 'accept' === $settings['offer_type'] ) {
+            $this->add_render_attribute('button', 'class', 'wpfnl-has-subtitle');
+        }
+
         if ( isset($settings['hover_animation']) && $settings['hover_animation']) {
             $this->add_render_attribute('button', 'class', 'elementor-animation-' . $settings['hover_animation']);
         }
@@ -1148,6 +1374,94 @@ class Offer_Button extends Widget_Base
         $get_product_type    = isset($response['get_product_type']) && $response['get_product_type'] ? $response['get_product_type'] : '';
         $is_gbf              = isset($response['is_gbf']) && $response['is_gbf'] ? $response['is_gbf'] : '';
         $builder = 'elementor';
+
+        // ---- Display Conditions ----
+        $display_condition = isset( $settings['display_condition_type'] ) ? $settings['display_condition_type'] : 'none';
+
+        if ( $display_condition === 'user_state' ) {
+            $hide_logged_in  = isset( $settings['hide_from_logged_in'] )  ? $settings['hide_from_logged_in']  : 'no';
+            $hide_logged_out = isset( $settings['hide_from_logged_out'] ) ? $settings['hide_from_logged_out'] : 'no';
+
+            if ( $hide_logged_in === 'yes' && is_user_logged_in() ) {
+                return;
+            }
+            if ( $hide_logged_out === 'yes' && ! is_user_logged_in() ) {
+                return;
+            }
+
+        } elseif ( $display_condition === 'user_role' ) {
+            $hide_for_user_role = isset( $settings['hide_for_user_role'] ) ? $settings['hide_for_user_role'] : 'none';
+
+            if ( $hide_for_user_role !== 'none' && is_user_logged_in() ) {
+                $user = wp_get_current_user();
+                if ( in_array( $hide_for_user_role, $user->roles ) ) {
+                    return;
+                }
+            }
+
+        } elseif ( $display_condition === 'day' ) {
+            $disable_on_days = isset( $settings['disable_on_days'] ) ? $settings['disable_on_days'] : array();
+
+            if ( ! empty( $disable_on_days ) && is_array( $disable_on_days ) ) {
+                $current_day = strtolower( date( 'l' ) );
+                if ( in_array( $current_day, $disable_on_days ) ) {
+                    return;
+                }
+            }
+
+        } elseif ( $display_condition === 'browser' ) {
+            $hide_on_browser = isset( $settings['hide_on_browser'] ) ? $settings['hide_on_browser'] : 'none';
+
+            if ( $hide_on_browser !== 'none' ) {
+                $user_agent      = isset( $_SERVER['HTTP_USER_AGENT'] ) ? strtolower( $_SERVER['HTTP_USER_AGENT'] ) : '';
+                $current_browser = '';
+
+                if ( strpos( $user_agent, 'edg' ) !== false ) {
+                    $current_browser = 'edge';
+                } elseif ( strpos( $user_agent, 'opr' ) !== false || strpos( $user_agent, 'opera' ) !== false ) {
+                    $current_browser = 'opera_mini';
+                } elseif ( strpos( $user_agent, 'chrome' ) !== false ) {
+                    $current_browser = 'chrome';
+                } elseif ( strpos( $user_agent, 'safari' ) !== false ) {
+                    $current_browser = 'safari';
+                } elseif ( strpos( $user_agent, 'firefox' ) !== false ) {
+                    $current_browser = 'mozilla';
+                }
+
+                if ( $current_browser === $hide_on_browser ) {
+                    return;
+                }
+            }
+
+        } elseif ( $display_condition === 'operating_system' ) {
+            $hide_on_os = isset( $settings['hide_on_os'] ) ? $settings['hide_on_os'] : 'none';
+
+            if ( $hide_on_os !== 'none' ) {
+                $user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? strtolower( $_SERVER['HTTP_USER_AGENT'] ) : '';
+                $current_os = '';
+
+                if ( strpos( $user_agent, 'windows' ) !== false || strpos( $user_agent, 'win32' ) !== false || strpos( $user_agent, 'win64' ) !== false ) {
+                    $current_os = 'windows';
+                } elseif ( strpos( $user_agent, 'macintosh' ) !== false || strpos( $user_agent, 'mac os x' ) !== false ) {
+                    $current_os = 'macos';
+                } elseif ( strpos( $user_agent, 'linux' ) !== false && strpos( $user_agent, 'android' ) === false ) {
+                    $current_os = 'linux';
+                } elseif ( strpos( $user_agent, 'android' ) !== false ) {
+                    $current_os = 'android';
+                } elseif ( strpos( $user_agent, 'iphone' ) !== false || strpos( $user_agent, 'ipad' ) !== false || strpos( $user_agent, 'ipod' ) !== false ) {
+                    $current_os = 'ios';
+                } elseif ( strpos( $user_agent, 'sunos' ) !== false ) {
+                    $current_os = 'sunos';
+                } elseif ( strpos( $user_agent, 'openbsd' ) !== false ) {
+                    $current_os = 'openbsd';
+                }
+
+                if ( $current_os === $hide_on_os ) {
+                    return;
+                }
+            }
+        }
+        // ---- End Display Conditions ----
        
         if( 'yes' == $is_gbf && $settings['show_product_data'] == 'yes' && $settings['offer_type'] == 'accept' ){ 
             require WPFNL_DIR . 'public/modules/dynamic-offer-templates/styles/offer-' . $settings['dynamic_data_template_layout'] . '.php';
@@ -1173,7 +1487,6 @@ class Offer_Button extends Widget_Base
         $is_new = empty($settings['icon']) && Icons_Manager::is_migration_allowed();
 
         if (!$is_new && empty($settings['upsell_downsell_button_icon_align'])) {
-
             $settings['upsell_downsell_button_icon_align'] = $this->get_settings('upsell_downsell_button_icon_align');
         }
 
@@ -1192,14 +1505,11 @@ class Offer_Button extends Widget_Base
             ],
         ]);
 
-
         $this->add_render_attribute('content-wrapper', 'class', 'elementor-button-content-wrapper');
-        $this->add_render_attribute('icon-align', 'class', 'elementor-button-icon');
-
         $this->add_render_attribute('text', 'class', 'elementor-button-text');
         $this->add_inline_editing_attributes('text', 'none');
         ?>
-        <span <?php echo $this->get_render_attribute_string('content-wrapper'); ?>>
+        <span <?php echo $this->get_render_attribute_string('content-wrapper'); ?> style="<?php echo $settings['upsell_downsell_button_icon_align'] === 'right' ? 'flex-direction: row-reverse' : '' ?>">
             <?php if (!empty($settings['icon']) || !empty($settings['upsell_downsell_button_icon']['value'])) : ?>
                 <span <?php echo $this->get_render_attribute_string('icon-align'); ?>>
                     <?php if ($is_new || $migrated) :

@@ -204,6 +204,7 @@ class Module extends Wpfnl_Admin_Module
     public function update_general_settings($payload)
     {
         do_action('wpfunnels/before_settings_saved', $payload);
+        $existing_settings = Wpfnl_functions::get_general_settings();
         $general_settings  = [
             'funnel_type'               => sanitize_text_field($payload['funnel_type']),
             'builder'                   => sanitize_text_field($payload['builder']),
@@ -217,7 +218,12 @@ class Module extends Wpfnl_Admin_Module
             'enable_log_status'         => isset($payload['enable_log_status']) ? sanitize_text_field($payload['enable_log_status']) : 'off',
             'enable_skip_cart'          => isset($payload['enable_skip_cart']) ? $payload['enable_skip_cart'] : 'no',
             'skip_cart_for'             => isset($payload['skip_cart_for']) ? $payload['skip_cart_for'] : 'whole',
+            'funnel_builder_mode'       => isset($payload['funnel_builder_mode']) ? sanitize_text_field($payload['funnel_builder_mode']) : $existing_settings['funnel_builder_mode'],
         ];
+
+        if ( isset( $payload['funnel_builder_mode'] ) && 'vertical' === $payload['funnel_builder_mode'] ) {
+            do_action( 'wpfunnels_vertical_mode_used' );
+        }
 
         $permalink_settings = [
             'structure'   => isset($payload['permalink_settings']) ? sanitize_text_field($payload['permalink_settings']) : 'default',

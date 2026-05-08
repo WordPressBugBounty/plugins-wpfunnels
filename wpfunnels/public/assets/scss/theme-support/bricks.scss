@@ -1,6 +1,19 @@
 .theme-bricks {
     .wpfunnels_offer_button {
         display: inline-flex;
+        gap: 8px;
+        align-items: center;
+
+        .icon-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        &.wpfnl-has-subtitle {
+            flex-direction: column;
+            gap: 0;
+        }
     }
 
     .wpfnl-checkout .woocommerce #customer_details,

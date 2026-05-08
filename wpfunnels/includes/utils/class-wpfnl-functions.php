@@ -1249,18 +1249,19 @@ class Wpfnl_functions {
 		$default_settings = apply_filters(
 			'wpfunnels_general_settings',
 			array(
-				'builder'             => 'gutenberg',
-				'paypal_reference'    => 'off',
-				'order_bump'          => 'off',
-				'ab_testing'          => 'off',
-				'allow_funnels'       => array( 'administrator' => 'true' ),
-				'funnel_type'         => 'sales',
-				'create_child_order'  => 'off',
-				'disable_theme_style' => 'off',
-				'enable_log_status'   => 'off',
-				'enable_skip_cart'    => 'off',
-				'skip_cart_for'       => 'whole',
-				'uninstall_cleanup'   => 'off',
+				'builder'              => 'gutenberg',
+				'paypal_reference'     => 'off',
+				'order_bump'           => 'off',
+				'ab_testing'           => 'off',
+				'allow_funnels'        => array( 'administrator' => 'true' ),
+				'funnel_type'          => 'sales',
+				'create_child_order'   => 'off',
+				'disable_theme_style'  => 'off',
+				'enable_log_status'    => 'off',
+				'enable_skip_cart'     => 'off',
+				'skip_cart_for'        => 'whole',
+				'uninstall_cleanup'    => 'off',
+				'funnel_builder_mode'  => 'horizontal',
 			)
 		);
 		$saved_settings   = self::get_admin_settings( '_wpfunnels_general_settings', $default_settings );
@@ -1657,6 +1658,44 @@ class Wpfnl_functions {
 	 */
 	public static function is_wpfnl_pro_activated() {
 		return apply_filters( 'wpfunnels/is_wpfnl_pro_active', false ) || apply_filters( 'is_wpfnl_pro_active', false );
+	}
+
+
+	/**
+	 * Check if Divi 5 is active.
+	 *
+	 * This function checks if Divi 5 is enabled using multiple detection methods
+	 * to ensure compatibility regardless of when the check is performed.
+	 *
+	 * @return bool
+	 * @since 2.9.1
+	 */
+	public static function is_divi5_active(): bool {
+		// Primary: Check if the Divi 5 function exists and call it
+		if ( function_exists( 'et_builder_d5_enabled' ) ) {
+			return et_builder_d5_enabled();
+		}
+		
+		// Fallback 1: Check if Divi 5 classes/interfaces exist
+		if ( interface_exists( 'ET\Builder\Framework\DependencyManagement\Interfaces\DependencyInterface' ) ) {
+			return true;
+		}
+		
+		// Fallback 2: Check if Divi theme is active and ET_BUILDER_VERSION is 5.x
+		if ( get_template() === 'Divi' && defined( 'ET_BUILDER_VERSION' ) ) {
+			return version_compare( ET_BUILDER_VERSION, '5.0', '>=' );
+		}
+		
+		// Fallback 3: Check theme version from style.css
+		if ( get_template() === 'Divi' ) {
+			$theme = wp_get_theme( 'Divi' );
+			if ( $theme->exists() ) {
+				$version = $theme->get( 'Version' );
+				return version_compare( $version, '5.0', '>=' );
+			}
+		}
+		
+		return false;
 	}
 
 

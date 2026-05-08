@@ -27,7 +27,7 @@ class OfferButton extends \ET_Builder_Module {
 	 * Module properties initialization
 	 */
 	public function init() {
-		$this->name = esc_html__( 'Offer Button', 'wpfnl' );
+		$this->name      = esc_html__( 'Offer Button', 'wpfnl' );
 		$this->icon_path = plugin_dir_path( __FILE__ ) . 'icon.svg';
 	}
 
@@ -112,51 +112,64 @@ class OfferButton extends \ET_Builder_Module {
 	 * @return string Module's rendered output
 	 */
 	public function render( $attrs, $content, $render_slug ) {
-		$offer_action = $this->props['offer_action'];
-		$button_text = $this->props['button_text'];
-		$show_price = $this->props['show_product_price'];
-		$button_align = $this->props['button_alignment'];
+		$offer_action      = isset( $this->props['offer_action'] )    ? $this->props['offer_action']    : 'accept';
+		$button_text       = isset( $this->props['button_text'] )     ? $this->props['button_text']     : esc_html__( 'Yes, Add to My Order!', 'wpfnl' );
+		$show_price        = isset( $this->props['show_product_price'] ) ? $this->props['show_product_price'] : 'off';
+		$button_align      = isset( $this->props['button_alignment'] ) ? $this->props['button_alignment'] : 'left';
+		$offer_button_type = isset( $this->props['offer_type'] )      ? $this->props['offer_type']      : 'upsell';
 
-		// Get offer button type from settings or URL
-		$offer_button_type = isset( $this->props['offer_type'] ) ? $this->props['offer_type'] : 'upsell';
-		
-		// Get product data
-		$response = \WPFunnels\Wpfnl_functions::get_product_data_for_widget( get_the_ID() );
-		$offer_product = isset($response['offer_product']) && $response['offer_product'] ? $response['offer_product'] : '';
-		$get_product_type = isset($response['get_product_type']) && $response['get_product_type'] ? $response['get_product_type'] : '';
+		// Always return a safe placeholder in the Visual Builder / editor context.
+		// Divi renders modules via AJAX and get_the_ID() may not return a valid
+		// funnel step, causing fatal errors in get_product_data_for_widget().
+		if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+			return '<div class="wpfnl-divi-placeholder" style="padding:14px 18px;background:#f6f5fa;border:1px dashed #b0a8d0;border-radius:6px;text-align:center;font-family:sans-serif;">'
+				. '<strong style="display:block;margin-bottom:4px;color:#2d3149;">' . esc_html__( 'Offer Button', 'wpfnl' ) . '</strong>'
+				. '<span style="color:#7a8b9a;font-size:13px;">' . esc_html( $button_text ) . '</span>'
+				. '</div>';
+		}
+
+		// Frontend render — safe to call product data functions here.
+		try {
+			$response         = \WPFunnels\Wpfnl_functions::get_product_data_for_widget( get_the_ID() );
+			$offer_product    = isset( $response['offer_product'] )    && $response['offer_product']    ? $response['offer_product']    : '';
+			$get_product_type = isset( $response['get_product_type'] ) && $response['get_product_type'] ? $response['get_product_type'] : '';
+		} catch ( \Throwable $e ) {
+			$offer_product    = '';
+			$get_product_type = '';
+		}
 
 		ob_start();
 		?>
 		<div class="wp-block-wpfnl-offer-btn-<?php echo esc_attr( $button_align ); ?>">
 			<div class="wpfnl-offerbtn-wrapper" id="wpfnl-offerbtn-wrapper">
 				<?php
-				if( ('variable' === $get_product_type || 'variable-subscription' === $get_product_type) && 'accept' === $offer_action ) {
+				if ( ( 'variable' === $get_product_type || 'variable-subscription' === $get_product_type ) && 'accept' === $offer_action ) {
 					echo '<div class="has-variation-product">';
 					echo '<div class="wpfnl-product-variation">';
-					if( 'on' === $show_price ){
+					if ( 'on' === $show_price ) {
 						echo '<span class="offer-btn-loader"></span>';
 					}
 					$post_id = get_the_ID();
-					echo do_shortcode( '[wpf_variable_offer post_id="'.$post_id.'"]' );
+					echo do_shortcode( '[wpf_variable_offer post_id="' . $post_id . '"]' );
 					echo '</div>';
 				}
 				?>
-				
+
 				<div class="wpfnl-offerbtn-and-price-wrapper">
-					<?php if ( $show_price === 'on' && $offer_action === 'accept' ) : ?>
+					<?php if ( 'on' === $show_price && 'accept' === $offer_action ) : ?>
 						<span class="wpfnl-offer-product-price" id="wpfnl-offer-product-price">
 							<?php
-							if( ( 'variable' !== $get_product_type && 'variable-subscription' !== $get_product_type ) && 'accept' === $offer_action ){
-								$step_id = get_the_ID();
+							if ( 'variable' !== $get_product_type && 'variable-subscription' !== $get_product_type && 'accept' === $offer_action ) {
+								$step_id   = get_the_ID();
 								$step_type = get_post_meta( $step_id, '_step_type', true );
-								$products = get_post_meta( $step_id, '_wpfnl_' . $step_type . '_products', true );
-								
+								$products  = get_post_meta( $step_id, '_wpfnl_' . $step_type . '_products', true );
+
 								if ( ! empty( $products ) && is_array( $products ) ) {
 									$product_id = isset( $products[0]['id'] ) ? $products[0]['id'] : 0;
 									if ( $product_id ) {
 										$product = wc_get_product( $product_id );
 										if ( $product ) {
-											echo $product->get_price_html();
+											echo $product->get_price_html(); // phpcs:ignore
 										}
 									}
 								}
@@ -164,7 +177,7 @@ class OfferButton extends \ET_Builder_Module {
 							?>
 						</span>
 					<?php endif; ?>
-					
+
 					<a href="#"
 						class="wpfunnels-divi-module wpfunnels_offer_button"
 						id="wpfunnels_<?php echo esc_attr( $offer_button_type ); ?>_<?php echo esc_attr( $offer_action ); ?>"
@@ -172,23 +185,20 @@ class OfferButton extends \ET_Builder_Module {
 						<?php echo esc_html( $button_text ); ?>
 					</a>
 				</div>
-				
-				<?php 
-				if( ( 'variable' === $get_product_type || 'variable-subscription' === $get_product_type ) && 'accept' === $offer_action ) {
-					echo '</div>';
+
+				<?php
+				if ( ( 'variable' === $get_product_type || 'variable-subscription' === $get_product_type ) && 'accept' === $offer_action ) {
+					echo '</div>'; // end .has-variation-product
 				}
 				?>
 			</div>
 		</div>
 		<?php
-		
-		// Fire after offer button hook
-		if ( $offer_action !== 'reject' && \WPFunnels\Wpfnl_functions::is_wc_active() ) {
+
+		if ( 'accept' === $offer_action && \WPFunnels\Wpfnl_functions::is_wc_active() ) {
 			do_action( 'wpfunnels/after_offer_button' );
 		}
 
 		return ob_get_clean();
 	}
 }
-
-new OfferButton();

@@ -1018,17 +1018,17 @@
         },
         {
             "name": "spatie/browsershot",
-            "version": "v3.x-dev",
-            "version_normalized": "3.9999999.9999999.9999999-dev",
+            "version": "3.61.0",
+            "version_normalized": "3.61.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/browsershot.git",
-                "reference": "360da4f4968bff07d4b914689c0f0ffd907d4bb9"
+                "reference": "14d75679390b8b84a71b3a17dc5905928deeb887"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/browsershot/zipball/360da4f4968bff07d4b914689c0f0ffd907d4bb9",
-                "reference": "360da4f4968bff07d4b914689c0f0ffd907d4bb9",
+                "url": "https://api.github.com/repos/spatie/browsershot/zipball/14d75679390b8b84a71b3a17dc5905928deeb887",
+                "reference": "14d75679390b8b84a71b3a17dc5905928deeb887",
                 "shasum": ""
             },
             "require": {
@@ -1042,7 +1042,7 @@
                 "pestphp/pest": "^1.20",
                 "spatie/phpunit-snapshot-assertions": "^4.2.3"
             },
-            "time": "2023-12-29T12:51:22+00:00",
+            "time": "2023-12-21T10:00:28+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1075,7 +1075,7 @@
                 "webpage"
             ],
             "support": {
-                "source": "https://github.com/spatie/browsershot/tree/main"
+                "source": "https://github.com/spatie/browsershot/tree/3.61.0"
             },
             "funding": [
                 {

@@ -211,53 +211,53 @@ body.rtl {
 
 /* ---order-overview on/off */
 .wpfnl-elementor-display-order-overview-off .woocommerce-thankyou-order-details {
-	display: none;
+	display: none !important;
 }
 .wpfnl-elementor-display-order-overview-on .woocommerce-thankyou-order-details {
-	display: flex;
+	display: flex !important;
 }
 
 
 /* ---order-details on/off */
 .wpfnl-elementor-display-order-details-off .woocommerce-order-details {
-	display: none;
+	display: none !important;
 }
 .wpfnl-elementor-display-order-details-on .woocommerce-order-details {
-	display: block;
+	display: block !important;
 }
 
 
 /* ---billing address on/off */
 .wpfnl-elementor-display-billing-address-off .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-columns--addresses .woocommerce-column.col-1 {
-	display: none;
+	display: none !important;
 }
 .wpfnl-elementor-display-billing-address-off .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-columns--addresses .woocommerce-column.col-2 {
-	padding-left: 0;
+	padding-left: 0 !important;
 }
 .wpfnl-elementor-display-billing-address-on .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-columns--addresses .woocommerce-column.col-1 {
-	display: block;
+	display: block !important;
 }
 .wpfnl-elementor-display-billing-address-on .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-columns--addresses .woocommerce-column.col-2 {
-	padding-left: 10px;
+	padding-left: 10px !important;
 }
 
 
 /* ---shipping address on/off */
 .wpfnl-elementor-display-shipping-address-off .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-columns--addresses .woocommerce-column.col-2 {
-	display: none;
+	display: none !important;
 }
 .wpfnl-elementor-display-shipping-address-off .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-columns--addresses .woocommerce-column.col-1 {
-	padding-right: 0;
+	padding-right: 0 !important;
 }
 .wpfnl-elementor-display-shipping-address-on .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-columns--addresses .woocommerce-column.col-2 {
-	display: block;
+	display: block !important;
 }
 .wpfnl-elementor-display-shipping-address-on .wpfnl-thankyou-wrapper .woocommerce-customer-details .woocommerce-columns--addresses .woocommerce-column.col-1 {
-	padding-right: 10px;
+	padding-right: 10px !important;
 }
 
 .wpfnl-elementor-display-shipping-address-off.wpfnl-elementor-display-billing-address-off .woocommerce-customer-details {
-	display: none;
+	display: none !important;
 }
 
 

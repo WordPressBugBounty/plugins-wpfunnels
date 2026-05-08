@@ -122,6 +122,23 @@ class CheckoutForm extends AbstractDynamicBlock {
         'placeOrderIconStyle'  => 'lock1',
         'placeOrderEnablePrice'=> false,
         'placeOrderBelowText'  => '',
+
+        // Display Conditions
+        'displayConditionType' => 'none',
+        'hideFromLoggedIn'     => false,
+        'hideFromLoggedOut'    => false,
+        'hideForUserRole'      => 'none',
+        'hideOnBrowser'        => 'none',
+        'hideOnOS'             => 'none',
+        'disableOnDays'        => array(),
+
+        // Responsive Display
+        'hideOnDesktop'        => false,
+        'hideOnTablet'         => false,
+        'hideOnMobile'         => false,
+
+        // Animation
+        'animation'            => '',
     );
 
 
@@ -250,6 +267,108 @@ class CheckoutForm extends AbstractDynamicBlock {
         update_post_meta( $checkout_id, '_wpfnl_floating_label', $floating_label );
         $attributes = wp_parse_args( $attributes, $this->defaults );
 
+        // Check display conditions
+        $display_condition_type = isset( $attributes['displayConditionType'] ) ? $attributes['displayConditionType'] : 'none';
+        
+        if ( 'user_state' === $display_condition_type ) {
+            $hide_from_logged_in = isset( $attributes['hideFromLoggedIn'] ) ? $attributes['hideFromLoggedIn'] : false;
+            $hide_from_logged_out = isset( $attributes['hideFromLoggedOut'] ) ? $attributes['hideFromLoggedOut'] : false;
+            
+            if ( $hide_from_logged_in && is_user_logged_in() ) {
+                return '';
+            }
+            if ( $hide_from_logged_out && ! is_user_logged_in() ) {
+                return '';
+            }
+        } elseif ( 'user_role' === $display_condition_type ) {
+            $hide_for_user_role = isset( $attributes['hideForUserRole'] ) ? $attributes['hideForUserRole'] : 'none';
+            if ( 'none' !== $hide_for_user_role && is_user_logged_in() ) {
+                $user = wp_get_current_user();
+                if ( in_array( $hide_for_user_role, (array) $user->roles ) ) {
+                    return '';
+                }
+            }
+        } elseif ( 'browser' === $display_condition_type ) {
+            $hide_on_browser = isset( $attributes['hideOnBrowser'] ) ? $attributes['hideOnBrowser'] : 'none';
+            if ( 'none' !== $hide_on_browser ) {
+                $user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
+                $browser_match = false;
+                
+                if ( 'mozilla' === $hide_on_browser && stripos( $user_agent, 'Firefox' ) !== false ) {
+                    $browser_match = true;
+                } elseif ( 'chrome' === $hide_on_browser && stripos( $user_agent, 'Chrome' ) !== false && stripos( $user_agent, 'Edg' ) === false ) {
+                    $browser_match = true;
+                } elseif ( 'opera_mini' === $hide_on_browser && stripos( $user_agent, 'Opera Mini' ) !== false ) {
+                    $browser_match = true;
+                } elseif ( 'safari' === $hide_on_browser && stripos( $user_agent, 'Safari' ) !== false && stripos( $user_agent, 'Chrome' ) === false ) {
+                    $browser_match = true;
+                } elseif ( 'edge' === $hide_on_browser && stripos( $user_agent, 'Edg' ) !== false ) {
+                    $browser_match = true;
+                }
+                
+                if ( $browser_match ) {
+                    return '';
+                }
+            }
+        } elseif ( 'operating_system' === $display_condition_type ) {
+            $hide_on_os = isset( $attributes['hideOnOS'] ) ? $attributes['hideOnOS'] : 'none';
+            if ( 'none' !== $hide_on_os ) {
+                $user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
+                $os_match = false;
+                
+                if ( 'ios' === $hide_on_os && ( stripos( $user_agent, 'iPhone' ) !== false || stripos( $user_agent, 'iPad' ) !== false ) ) {
+                    $os_match = true;
+                } elseif ( 'android' === $hide_on_os && stripos( $user_agent, 'Android' ) !== false ) {
+                    $os_match = true;
+                } elseif ( 'windows' === $hide_on_os && stripos( $user_agent, 'Windows' ) !== false ) {
+                    $os_match = true;
+                } elseif ( 'macos' === $hide_on_os && stripos( $user_agent, 'Macintosh' ) !== false ) {
+                    $os_match = true;
+                } elseif ( 'linux' === $hide_on_os && stripos( $user_agent, 'Linux' ) !== false && stripos( $user_agent, 'Android' ) === false ) {
+                    $os_match = true;
+                } elseif ( 'sunos' === $hide_on_os && stripos( $user_agent, 'SunOS' ) !== false ) {
+                    $os_match = true;
+                } elseif ( 'openbsd' === $hide_on_os && stripos( $user_agent, 'OpenBSD' ) !== false ) {
+                    $os_match = true;
+                }
+                
+                if ( $os_match ) {
+                    return '';
+                }
+            }
+        } elseif ( 'day' === $display_condition_type ) {
+            $disable_on_days = isset( $attributes['disableOnDays'] ) ? $attributes['disableOnDays'] : array();
+            if ( ! empty( $disable_on_days ) && is_array( $disable_on_days ) ) {
+                $current_day = strtolower( date( 'l' ) );
+                if ( in_array( $current_day, $disable_on_days ) ) {
+                    return '';
+                }
+            }
+        }
+
+        // Build responsive classes
+        $responsive_classes = array();
+        if ( isset( $attributes['hideOnDesktop'] ) && $attributes['hideOnDesktop'] ) {
+            $responsive_classes[] = 'wpfnl-hide-desktop';
+        }
+        if ( isset( $attributes['hideOnTablet'] ) && $attributes['hideOnTablet'] ) {
+            $responsive_classes[] = 'wpfnl-hide-tablet';
+        }
+        if ( isset( $attributes['hideOnMobile'] ) && $attributes['hideOnMobile'] ) {
+            $responsive_classes[] = 'wpfnl-hide-mobile';
+        }
+
+        // Build animation classes
+        $animation_classes = array();
+        if ( isset( $attributes['animation'] ) && ! empty( $attributes['animation'] ) ) {
+            $animation_classes[] = 'wpfnl-animation';
+            $animation_classes[] = '' . esc_attr( $attributes['animation'] );
+        }
+
+        // Combine all additional classes
+        $additional_classes = array_merge( $responsive_classes, $animation_classes );
+        $additional_classes_str = ! empty( $additional_classes ) ? ' ' . implode( ' ', $additional_classes ) : '';
+
         $dynamic_css = $this->generate_assets( $attributes );
         do_action( 'wpfunnels/gutenberg_checkout_dynamic_filters', $attributes );
         do_action( 'wpfunnels/before_checkout_form', $checkout_id );
@@ -276,7 +395,7 @@ class CheckoutForm extends AbstractDynamicBlock {
             add_action( 'woocommerce_review_order_after_submit', $below_btn_filter );
         }
 
-        $output  = sprintf( '<div class="%1s" style="%2s">', esc_attr( $this->get_classes( $attributes ) ), esc_attr( $this->get_styles( $attributes ) ) );
+        $output  = sprintf( '<div class="%1s%2s" style="%3s">', esc_attr( $this->get_classes( $attributes ) ), $additional_classes_str, esc_attr( $this->get_styles( $attributes ) ) );
         $output .= '<div class="wpfnl-block-checkout-form__wrapper wp-block-wpfunnels-checkout">';
         $output .= do_shortcode('[wpfunnels_checkout]');
         $output .= '</div>';

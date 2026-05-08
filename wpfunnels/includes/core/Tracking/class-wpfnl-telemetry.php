@@ -108,6 +108,10 @@ class Telemetry {
                         'hook'     => 'wpfunnels_upsell_configured',
                         'callback' => [ $this, 'feature_usage_payload' ],
                     ],
+                    'vertical_canvas_mode' => [
+                        'hook'     => 'wpfunnels_vertical_mode_used',
+                        'callback' => [ $this, 'feature_usage_payload' ],
+                    ],
                 ],
             ] );
         } catch ( \Exception $e ) {
@@ -551,6 +555,11 @@ class Telemetry {
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3B86FF" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
             ],
             [
+                'id'   => 'template-not-good-enough',
+                'text' => __( 'Templates are not good enough', 'wpfnl' ),
+                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#3B86FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            ],
+            [
                 'id'   => 'missing-integration',
                 'text' => __( 'Missing integration I need', 'wpfnl' ),
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
@@ -559,6 +568,11 @@ class Telemetry {
                 'id'   => 'found-better-plugin',
                 'text' => __( 'Switching to another plugin', 'wpfnl' ),
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#3B86FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            ],
+            [
+                'id'   => 'lacking-reporting',
+                'text' => __( 'Lack of reporting', 'wpfnl' ),
+                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3B86FF" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
             ],
             [
                 'id'   => 'temporary',

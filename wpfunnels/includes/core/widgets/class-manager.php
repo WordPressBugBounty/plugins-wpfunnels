@@ -54,7 +54,11 @@ class Wpfnl_Widgets_Manager extends Base_Manager
 		if ('oxygen' === $selected_builder && $oxygen_capability){
 			array_push($builder,'oxygen');
 		}elseif ('divi-builder' === $selected_builder ){
-			array_push($builder,'diviModules');
+			if ( Wpfnl_functions::is_divi5_active() ) {
+				array_push($builder,'diviModulesV5');
+			} else {
+				array_push($builder,'diviModules');
+			}
 		}elseif ('elementor' === $selected_builder ){
 			array_push($builder,'elementor');
 		}elseif ( 'bricks' === $selected_builder && 'bricks' === wp_get_theme()->template ){

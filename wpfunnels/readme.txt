@@ -5,7 +5,7 @@ Tags: woocommerce funnel builder, order bump, one click upsell, custom checkout,
 Requires at least: 6.1
 Tested up to:  6.9
 Requires PHP: 7.4
-Stable tag:  3.11.1
+Stable tag:  3.12.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -546,6 +546,11 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.12.0 (2026-05-08) =
+* New: Added Vertical Funnel Flow mode to the funnel canvas
+* New: Added compatibility with Divi 5
+* Enhancement: Added new options to WPFunnels widgets
 
 = 3.11.1 (2026-05-05) =
 * Fix: Resolved style issues on funnel checkout

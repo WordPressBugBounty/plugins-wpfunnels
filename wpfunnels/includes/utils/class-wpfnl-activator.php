@@ -147,6 +147,8 @@ class Wpfnl_Activator
 	 * @since 1.0.0
 	 */
 	public static function activate(){
+		$is_new_install = self::is_new_install(); // capture before update_wpfunnles_version() sets the flag
+
 		set_transient( 'wpfunnels_just_activated', true, 60 );
 		self::set_wpfunnels_activation_transients();
 
@@ -156,6 +158,10 @@ class Wpfnl_Activator
 		self::update_wpfunnles_version();
 		self::update_wpfunnels_db_version();
 		self::update_installed_time();
+
+		if ( $is_new_install ) {
+			self::seed_default_builder_mode();
+		}
 
 		// add funnel type meta
 		Wpfnl_functions::add_type_meta();
@@ -196,6 +202,22 @@ class Wpfnl_Activator
 	public static function is_new_install()
 	{
 		return is_null(get_site_option('wpfunnels_version', null));
+	}
+
+	/**
+	 * Seed funnel_builder_mode to 'vertical' for brand-new installs.
+	 * Existing users keep their stored value; horizontal remains the fallback default.
+	 *
+	 * @since 3.11.0
+	 */
+	private static function seed_default_builder_mode()
+	{
+		$general_settings = get_option( '_wpfunnels_general_settings', array() );
+		error_log( 'General settings on activation: ' . print_r( $general_settings, true ) );
+		if ( ! isset( $general_settings['funnel_builder_mode'] ) ) {
+			$general_settings['funnel_builder_mode'] = 'vertical';
+			update_option( '_wpfunnels_general_settings', $general_settings );
+		}
 	}
 
 	/**

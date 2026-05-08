@@ -11,6 +11,7 @@ use WPFunnels\Batch\Divi\Wpfnl_Divi_Source;
 use WPFunnels\Batch\Gutenberg\Wpfnl_Gutenberg_Batch;
 use WPFunnels\Batch\Gutenberg\Wpfnl_Gutenberg_Source;
 use WPFunnels\Batch\Wpfnl_Divi_Batch;
+use WPFunnels\Batch\Wpfnl_Divi5_Batch;
 use WPFunnels\Batch\Wpfnl_Elementor_Batch;
 use WPFunnels\Batch\Wpfnl_Bricks_Batch;
 use WPFunnels\Traits\SingletonTrait;
@@ -108,7 +109,9 @@ class Wpfnl_Batch {
 		}
 
 		if ( 'divi-builder' === $page_builder ) {
-			$this->divi_batch = new Wpfnl_Divi_Batch();
+			$this->divi_batch = Wpfnl_functions::is_divi5_active()
+				? new Wpfnl_Divi5_Batch()
+				: new Wpfnl_Divi_Batch();
 		}
 
 		if ( 'bricks' === $page_builder ) {

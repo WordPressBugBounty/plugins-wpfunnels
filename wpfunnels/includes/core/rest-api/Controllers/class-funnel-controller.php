@@ -801,8 +801,9 @@ class FunnelController extends Wpfnl_REST_Controller
 
 		$response['success'] = true;
 		$step_order_data = self::get_steps_order_data($_steps_order);
-		$response['steps_order'] = $step_order_data['steps_order'];
-		$response['is_ob'] = $step_order_data['is_ob'];
+		$response['steps_order'] = isset( $step_order_data['steps_order'] ) ? $step_order_data['steps_order'] : [];
+		$response['is_ob']       = isset( $step_order_data['is_ob'] ) ? $step_order_data['is_ob'] : false;
+		$response['ob_steps']    = isset( $step_order_data['ob_steps'] ) ? $step_order_data['ob_steps'] : [];
 
 		$init_position = [
 			'pos_x' => 383,
@@ -821,7 +822,8 @@ class FunnelController extends Wpfnl_REST_Controller
 				'title' => $title,
 				'link' => $view_link,
 				'reset_funnel' => get_post_meta($funnel_id, '_wpfnl_is_reset', true),
-				'is_ob' => isset ($response['is_ob']) ? $response['is_ob'] : false
+				'is_ob' => isset ($response['is_ob']) ? $response['is_ob'] : false,
+				'ob_steps' => isset ($response['ob_steps']) ? $response['ob_steps'] : []
 			];
 
 			if (empty($funnel_data['drawflow']['Home']['data'])) {
@@ -1046,6 +1048,7 @@ class FunnelController extends Wpfnl_REST_Controller
 	private static function get_steps_order_data($steps_order)
 	{
 		$is_order_bump = false;
+		$ob_steps      = [];
 		$formatted_steps_order = [];
 		foreach ($steps_order as $step) {
 			$step_id = isset($step['id']) ? $step['id'] : null;
@@ -1058,7 +1061,11 @@ class FunnelController extends Wpfnl_REST_Controller
 			$should_assign_product = in_array($_step_type, ['checkout', 'upsell', 'downsell']) && !get_post_meta($step_id, '_wpfnl_' . $_step_type . '_products', true);
 
 			if ('checkout' === $_step_type) {
-				$is_order_bump = self::is_order_bump($step_id);
+				$step_has_ob = self::is_order_bump($step_id);
+				if ($step_has_ob) {
+					$is_order_bump = true;
+					$ob_steps[]    = (int) $step_id;
+				}
 			}
 
 			$_temp_step['should_assign_product'] = $should_assign_product;
@@ -1075,7 +1082,8 @@ class FunnelController extends Wpfnl_REST_Controller
 
 		return [
 			'steps_order' => $formatted_steps_order,
-			'is_ob' => $is_order_bump
+			'is_ob'       => $is_order_bump,
+			'ob_steps'    => $ob_steps,
 		];
 	}
 

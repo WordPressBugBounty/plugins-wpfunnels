@@ -5,6 +5,14 @@
     text-decoration: none;
 }
 
+.wpfnl-button-subtitle {
+	display: block;
+	text-align: center;
+	margin-top: 10px;
+	font-size: 14px;
+	line-height: 1.2;
+}
+
 // ---bricks next step button subtitle style----
 .wpfnl-has-subtitle {
     .bricks-button {
@@ -35,15 +43,16 @@
 
 // Button Entrance Animations
 // Base: hidden until wpfnl-animated is added by JS (viewport trigger)
-.bricks-button.wpfnl-animation {
+.wpfnl-animation {
 	opacity: 0;
 	transition: none;
 }
-.bricks-editor-active .bricks-button {
+.bricks-editor-active,
+.bricks-editor-active .wpfnl-animation {
 	opacity: 1;
 }
 
-.bricks-button.wpfnl-animation.wpfnl-animated {
+.wpfnl-animation.wpfnl-animated {
 	opacity: 1;
 	animation-duration: 0.8s;
 	animation-fill-mode: both;
@@ -131,7 +140,7 @@
 }
 
 // Map animation keys to keyframes
-.bricks-button.wpfnl-animation.wpfnl-animated {
+.wpfnl-animation.wpfnl-animated {
 	&.fadeIn      { animation-name: wpfnl-fadeIn; }
 	&.fadeInUp    { animation-name: wpfnl-fadeInUp; }
 	&.fadeInDown  { animation-name: wpfnl-fadeInDown; }
@@ -154,19 +163,19 @@
 // Responsive Display - Bricks Next Step Button
 // Matches the same breakpoints used in Gutenberg block (style.scss)
 @media (min-width: 1200px) {
-	.wpfnl-next-step-button.wpfnl-hide-desktop {
+	.wpfnl-hide-desktop {
 		display: none !important;
 	}
 }
 
 @media (min-width: 768px) and (max-width: 1199px) {
-	.wpfnl-next-step-button.wpfnl-hide-tablet {
+	.wpfnl-hide-tablet {
 		display: none !important;
 	}
 }
 
 @media (max-width: 767px) {
-	.wpfnl-next-step-button.wpfnl-hide-mobile {
+	.wpfnl-hide-mobile {
 		display: none !important;
 	}
 }
