@@ -750,6 +750,37 @@ class FunnelController extends Wpfnl_REST_Controller
 	 *
 	 * @since 2.7.17
 	 */
+
+	/**
+	 * Restore node_identifier precision from the html field.
+	 *
+	 * PHP json_encode truncates floats, so node_identifier stored as a number loses digits.
+	 * The html field is a string (e.g. "addstep311.7949003047232") and preserves full precision.
+	 * This method extracts node_identifier from html so the API response always matches what JS stored.
+	 *
+	 * @param array $funnel_data
+	 * @return array
+	 */
+	private function fix_node_identifier_precision($funnel_data)
+	{
+		if (!isset($funnel_data['drawflow']['Home']['data']) || !is_array($funnel_data['drawflow']['Home']['data'])) {
+			return $funnel_data;
+		}
+		foreach ($funnel_data['drawflow']['Home']['data'] as &$node) {
+			if (!isset($node['html'], $node['data']['node_identifier'])) {
+				continue;
+			}
+			$html = $node['html'];
+			if (strpos($html, 'addstep') === 0) {
+				$node['data']['node_identifier'] = substr($html, 7);
+			} elseif (strpos($html, 'conditional') === 0) {
+				$node['data']['node_identifier'] = substr($html, 11);
+			}
+		}
+		unset($node);
+		return $funnel_data;
+	}
+
 	private function prepare_funnel_data_response($funnel_id)
 	{
 		$response = [
@@ -811,6 +842,7 @@ class FunnelController extends Wpfnl_REST_Controller
 		];
 
 		$funnel_data = Wpfnl_functions::remove_disconnected_addstep_node($funnel_data, $funnel_id);
+		$funnel_data = $this->fix_node_identifier_precision($funnel_data);
 
 		if ($funnel_data) {
 			$response = [
@@ -1331,6 +1363,19 @@ class FunnelController extends Wpfnl_REST_Controller
 					if ($step) {
 						$node_data = $step['data'];
 						if (isset($node_data["step_name"])) unset($node_data["step_name"]);
+
+						// Preserve node_identifier at full precision by extracting it from the html
+						// field (a string) rather than using the float value decoded by json_decode,
+						// which PHP truncates before we can read it.
+						if (isset($step['html'], $node_data['node_identifier'])) {
+							$html = $step['html'];
+							if (strpos($html, 'addstep') === 0) {
+								$node_data['node_identifier'] = substr($html, 7);
+							} elseif (strpos($html, 'conditional') === 0) {
+								$node_data['node_identifier'] = substr($html, 11);
+							}
+						}
+
 						$step['data'] = $node_data;
 						$_steps[$key] = $step;
 

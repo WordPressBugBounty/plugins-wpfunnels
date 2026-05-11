@@ -8604,11 +8604,12 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   cursor: pointer;
   transition: background 0.15s ease, box-shadow 0.15s ease;
   white-space: nowrap;
+  position: relative;
 }
 .vf-mode-btn:first-child {
   border-bottom: 1px solid #eaecf0;
 }
-.vf-mode-btn span {
+.vf-mode-btn span:not(.action-tooltip) {
   font-size: 12px;
   font-weight: 500;
   color: #7a8b9a;
@@ -8620,10 +8621,46 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   height: 16px;
   flex-shrink: 0;
 }
-.vf-mode-btn:hover:not(.vf-mode-btn--active) span {
+.vf-mode-btn .action-tooltip {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 12px);
+  transform: translateY(-50%);
+  border-radius: 8px;
+  background: #10052E;
+  box-shadow: 0 2px 15px 0 rgba(22, 28, 32, 0.08);
+  color: #E8E8E9;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  padding: 8px 12px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease, right 0.2s ease;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+}
+.vf-mode-btn .action-tooltip:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  background: #10052E;
+  transform: translateY(-50%) rotate(45deg);
+  border-radius: 2px;
+}
+.vf-mode-btn:hover .action-tooltip {
+  opacity: 1;
+  visibility: visible;
+  right: calc(100% + 8px);
+}
+.vf-mode-btn:hover:not(.vf-mode-btn--active) span:not(.action-tooltip) {
   color: #344054;
 }
-.vf-mode-btn--active span {
+.vf-mode-btn--active span:not(.action-tooltip) {
   color: #6e42d3;
 }
 
@@ -8677,6 +8714,51 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   cursor: pointer;
   position: relative;
 }
+.funnel-window .wpfnl-canvas-zoom-control .zoom-level .action-tooltip,
+.funnel-window .wpfnl-canvas-zoom-control .full-screen .action-tooltip,
+.funnel-window .wpfnl-canvas-zoom-control .zoom-out .action-tooltip,
+.funnel-window .wpfnl-canvas-zoom-control .zoom-in .action-tooltip {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 12px);
+  transform: translateY(-50%);
+  border-radius: 8px;
+  background: #10052E;
+  box-shadow: 0 2px 15px 0 rgba(22, 28, 32, 0.08);
+  color: #E8E8E9;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  padding: 8px 12px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease, right 0.2s ease;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+}
+.funnel-window .wpfnl-canvas-zoom-control .zoom-level .action-tooltip:after,
+.funnel-window .wpfnl-canvas-zoom-control .full-screen .action-tooltip:after,
+.funnel-window .wpfnl-canvas-zoom-control .zoom-out .action-tooltip:after,
+.funnel-window .wpfnl-canvas-zoom-control .zoom-in .action-tooltip:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  background: #10052E;
+  transform: translateY(-50%) rotate(45deg);
+  border-radius: 2px;
+}
+.funnel-window .wpfnl-canvas-zoom-control .zoom-level:hover .action-tooltip,
+.funnel-window .wpfnl-canvas-zoom-control .full-screen:hover .action-tooltip,
+.funnel-window .wpfnl-canvas-zoom-control .zoom-out:hover .action-tooltip,
+.funnel-window .wpfnl-canvas-zoom-control .zoom-in:hover .action-tooltip {
+  opacity: 1;
+  visibility: visible;
+  right: calc(100% + 8px);
+}
 .funnel-window .wpfnl-canvas-zoom-control .zoom-in {
   border-bottom: none;
 }
@@ -8689,6 +8771,70 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
 }
 .funnel-window .wpfnl-canvas-zoom-control[data-tour=yes] {
   z-index: 4;
+}
+
+.wpfnl-drawflow-window.is-expand-mode {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #f6f5fa;
+}
+.wpfnl-drawflow-window.is-expand-mode .drawflow-window-header {
+  display: none;
+}
+.wpfnl-drawflow-window.is-expand-mode .funnel-window {
+  height: 100vh;
+}
+.wpfnl-drawflow-window.is-expand-mode .wpfnl-drawing-wrapper {
+  height: 100vh;
+}
+.wpfnl-drawflow-window.is-expand-mode .wpfnl-drawing-window {
+  height: 100vh;
+}
+.wpfnl-drawflow-window.is-expand-mode .wpfnl-vertical-flow-view {
+  height: 100vh;
+}
+.wpfnl-drawflow-window.is-expand-mode .expand-mode-exit-btn {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #ffffff;
+  border: 1px solid #eaecf0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: #7a8b9a;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.wpfnl-drawflow-window.is-expand-mode .expand-mode-exit-btn svg {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+}
+.wpfnl-drawflow-window.is-expand-mode .expand-mode-exit-btn svg path {
+  stroke: #7a8b9a;
+}
+.wpfnl-drawflow-window.is-expand-mode .expand-mode-exit-btn:hover {
+  background: #f6f5fa;
+  color: #344054;
+}
+.wpfnl-drawflow-window.is-expand-mode .expand-mode-exit-btn:hover svg path {
+  stroke: #344054;
+}
+
+body.wpfnl-builder-expand {
+  overflow: hidden;
+}
+body.wpfnl-builder-expand #wpadminbar,
+body.wpfnl-builder-expand #adminmenuwrap,
+body.wpfnl-builder-expand #adminmenuback {
+  display: none !important;
 }
 
 .wpfnl-box {
@@ -9245,10 +9391,6 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
     margin-right: 0;
   }
 }
-.step-settings__single-tab-content,
-.checkout-product-setting-tab__content-wrapper {
-  /* Conditional Funnel dummy/upgrade preview */
-}
 .step-settings__single-tab-content .product-mode-selection,
 .checkout-product-setting-tab__content-wrapper .product-mode-selection {
   border-radius: 10px;
@@ -9373,6 +9515,10 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   color: #6b7280;
   line-height: 1.5;
   margin: 0;
+}
+.step-settings__single-tab-content,
+.checkout-product-setting-tab__content-wrapper {
+  /* Conditional Funnel dummy/upgrade preview */
 }
 .step-settings__single-tab-content .conditional-funnel-preview,
 .checkout-product-setting-tab__content-wrapper .conditional-funnel-preview {
@@ -10830,10 +10976,6 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   box-shadow: 0px 5px 20px rgba(148, 135, 180, 0.15);
   border-radius: 10px;
   margin-bottom: 15px;
-  /* Upgrade overlay - full screen backdrop */
-  /* Upgrade modal card */
-  /* Locked auto-match label styling */
-  /*-----Rule Groups Styles-----*/
 }
 .checkout-order-bump-setting-tab__content-wrapper:last-child {
   margin-bottom: 0;
@@ -11640,6 +11782,9 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
 .checkout-order-bump-setting-tab__content-wrapper .ob-settings-category.conditional-rules .ob-settings-wrapper .enable-conditional .wpfnl-tooltip p {
   color: #ffffff;
 }
+.checkout-order-bump-setting-tab__content-wrapper {
+  /* Upgrade overlay - full screen backdrop */
+}
 .checkout-order-bump-setting-tab__content-wrapper .ob-upgrade-overlay {
   position: fixed;
   inset: 0;
@@ -11649,6 +11794,9 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   align-items: center;
   justify-content: center;
   padding: 20px;
+}
+.checkout-order-bump-setting-tab__content-wrapper {
+  /* Upgrade modal card */
 }
 .checkout-order-bump-setting-tab__content-wrapper .ob-upgrade-modal {
   position: relative;
@@ -11706,8 +11854,14 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   text-decoration: none;
   color: #fff !important;
 }
+.checkout-order-bump-setting-tab__content-wrapper {
+  /* Locked auto-match label styling */
+}
 .checkout-order-bump-setting-tab__content-wrapper .ob-automatch-locked {
   opacity: 0.6;
+}
+.checkout-order-bump-setting-tab__content-wrapper {
+  /*-----Rule Groups Styles-----*/
 }
 .checkout-order-bump-setting-tab__content-wrapper .rule-groups-container {
   width: 100%;
@@ -12039,7 +12193,7 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   .checkout-order-bump-setting-tab__content-wrapper .order-bump-template-preview-area {
     width: 45%;
   }
-  .checkout-order-bump-setting-tab__content-wrapper .wpfnl-field-wrapper::not(".no-title-checkbox") {
+  .checkout-order-bump-setting-tab__content-wrapper .wpfnl-field-wrapper::not('.no-title-checkbox') {
     margin-bottom: 18px;
     display: block;
   }
@@ -14108,6 +14262,7 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   font-weight: 400;
   letter-spacing: -0.16px;
   line-height: normal;
+  white-space: nowrap;
 }
 .wpfunnels-setup .wpfnl-mm-setup-wizard .wpfnl-mm-setup-wizard-sidebar .wpfnl-mm-setup-wizard-exit {
   margin-top: auto;
@@ -16496,7 +16651,6 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   justify-content: center;
   height: 508px;
   position: relative;
-  /* HTML: <div class="loader"></div> */
 }
 .wpfunnels-setup .wpfnl-mm-setup-wizard .wpfnl-generate-funnel-container .wpfnl-generate-funnel-canvas {
   width: 100%;
@@ -16542,6 +16696,9 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
 .wpfunnels-setup .wpfnl-mm-setup-wizard .wpfnl-generate-funnel-container.generating .generate-funnel-overlay {
   justify-content: center;
   backdrop-filter: blur(5px);
+}
+.wpfunnels-setup .wpfnl-mm-setup-wizard .wpfnl-generate-funnel-container {
+  /* HTML: <div class="loader"></div> */
 }
 .wpfunnels-setup .wpfnl-mm-setup-wizard .wpfnl-generate-funnel-container .generate-loader {
   width: 50px;
@@ -17839,23 +17996,17 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   width: 100%;
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding: 40px 40px 60px;
   background: #f6f5fa;
+  cursor: grab;
 }
-.wpfnl-vertical-flow-view::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
-}
-.wpfnl-vertical-flow-view::-webkit-scrollbar-track {
-  background: #f2f5f8;
-}
-.wpfnl-vertical-flow-view::-webkit-scrollbar-thumb {
-  background-color: #CBCBCB;
-  border-radius: 20px;
+.wpfnl-vertical-flow-view.vf--panning {
+  cursor: grabbing;
+  user-select: none;
 }
 .wpfnl-vertical-flow-view .vf-flow-container {
   display: flex;
@@ -17882,6 +18033,23 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   opacity: 1;
   visibility: visible;
   transform: translateX(0);
+}
+.wpfnl-vertical-flow-view .vf-step-card--gbf-disabled {
+  cursor: not-allowed;
+}
+.wpfnl-vertical-flow-view .vf-step-card--gbf-disabled::before {
+  content: url(../images/disabled.svg);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  background: rgba(249, 249, 249, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .wpfnl-vertical-flow-view .vf-step-card--landing {
   border-top-color: #2b74ff;
@@ -18012,7 +18180,9 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   white-space: nowrap;
 }
 .wpfnl-vertical-flow-view .vf-hover-btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   width: 100%;
   padding: 7px 14px;
   background: transparent;
@@ -18025,6 +18195,11 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   font-weight: 500;
   text-align: left;
   transition: background 0.12s ease, color 0.12s ease;
+}
+.wpfnl-vertical-flow-view .vf-hover-btn svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
 }
 .wpfnl-vertical-flow-view .vf-hover-btn span {
   font-size: 13px !important;
@@ -21728,6 +21903,27 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
     display: block;
   }
 }
+.gbf-dynamic-funnel-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #f0f4ff;
+  border: 1px solid #c7d7fd;
+  border-radius: 6px;
+  margin-top: 12px;
+}
+.gbf-dynamic-funnel-notice svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.gbf-dynamic-funnel-notice p {
+  margin: 0;
+  font-size: 13px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
 .gbf-upgrade-overlay {
   position: relative;
   margin-top: 8px;
@@ -31558,11 +31754,11 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   .wpfnl-free-vs-pro-comparison-wrapper .table-content-wrapper {
     padding: 0 20px;
   }
-  .wpfnl-free-vs-pro-comparison-wrapper .table-content-wrapper .comparison-table thead th {
-    padding: 16px 5px;
-  }
   .wpfnl-free-vs-pro-comparison-wrapper .table-content-wrapper .comparison-table thead th.regular, .wpfnl-free-vs-pro-comparison-wrapper .table-content-wrapper .comparison-table thead th.popular {
     width: 145px;
+  }
+  .wpfnl-free-vs-pro-comparison-wrapper .table-content-wrapper .comparison-table thead th {
+    padding: 16px 5px;
   }
   .wpfnl-free-vs-pro-comparison-wrapper .table-content-wrapper .comparison-table thead th:first-child, .wpfnl-free-vs-pro-comparison-wrapper .table-content-wrapper .comparison-table thead th:last-child {
     padding: 16px 10px 16px 5px;
@@ -32424,7 +32620,6 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
 }
 #wpfnl-toaster-wrapper {
   display: none;
-  /* -------Warn notification alert toast------------ */
 }
 #wpfnl-toaster-wrapper.quick-toastify-successful-notification .quick-toastify-alert-toast {
   position: fixed;
@@ -32469,6 +32664,9 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
 }
 #wpfnl-toaster-wrapper.quick-toastify-successful-notification .quick-toastify-successful-notification.quick-toastify-hide {
   display: none;
+}
+#wpfnl-toaster-wrapper {
+  /* -------Warn notification alert toast------------ */
 }
 #wpfnl-toaster-wrapper.quick-toastify-warn-notification .quick-toastify-alert-toast {
   position: fixed;

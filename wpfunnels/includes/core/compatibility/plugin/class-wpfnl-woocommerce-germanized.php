@@ -2,22 +2,34 @@
 /**
  * WooCommerce Germanized Compatibility
  *
- * When Germanized is active it removes standard WooCommerce order notification
- * hooks (customer_processing_order, new_order) before the order status changes,
- * then sends its own confirmation via the woocommerce_payment_successful_result
- * filter.  That filter never fires for WPFunnels upsell/downsell AJAX requests,
- * so the confirmation email is silently dropped.
+ * Handles two integration points between WPFunnels and Germanized:
  *
- * This class hooks into wpfunnels/offer_accepted – which fires after a child
- * order has been created and payment_complete() called – and explicitly
- * triggers Germanized's own confirm_order() so the customer and admin
- * receive their order confirmation.
+ * 1. Checkout submit button – Germanized hides the default WC submit button via
+ *    woocommerce_order_button_html filter and renders its own block at the end
+ *    of woocommerce_checkout_order_review.  On WPFunnels funnel checkout pages
+ *    this means the button lands outside WPFunnels' payment section.  We tell
+ *    Germanized to disable its checkout adjustments by defining the
+ *    WC_GZD_DISABLE_CHECKOUT_ADJUSTMENTS constant before Germanized's own
+ *    mechanism reads it (woocommerce_before_checkout_form priority -999).
+ *    Germanized then:
+ *      - stops hiding / relocating the WC order button,
+ *      - moves legal checkboxes to woocommerce_review_order_before_payment
+ *        so they still render inside WPFunnels' payment section, and
+ *      - outputs a wc_gzd_checkout_disabled hidden field so AJAX order-review
+ *        requests also carry the disabled flag.
+ *
+ * 2. Offer order confirmation – Germanized removes the standard WC order-
+ *    notification hooks and sends its own confirmation via the
+ *    woocommerce_payment_successful_result filter, which never fires for
+ *    WPFunnels' AJAX offer acceptance.  We hook into wpfunnels/offer_accepted
+ *    and call Germanized's confirm_order() directly for child/separate orders.
  *
  * @package WPFunnels\Compatibility\Plugin
  */
 namespace WPFunnels\Compatibility\Plugin;
 
 use WPFunnels\Traits\SingletonTrait;
+use WPFunnels\Wpfnl_functions;
 
 class WooCommerceGermanized extends PluginCompatibility {
 	use SingletonTrait;
@@ -28,7 +40,39 @@ class WooCommerceGermanized extends PluginCompatibility {
 	 * @return void
 	 */
 	public function init() {
+		// Disable Germanized's checkout adjustments on WPFunnels funnel checkout
+		// pages. Priority -1000 fires before Germanized's priority -999 handler
+		// (wc_gzd_maybe_disable_checkout_adjustments), so the constant is already
+		// set when Germanized reads it and removes its button/submit hooks.
+		add_action( 'woocommerce_before_checkout_form', array( $this, 'maybe_disable_checkout_adjustments' ), -1000 );
+
+		// Trigger Germanized's order confirmation for upsell/downsell child orders.
 		add_action( 'wpfunnels/offer_accepted', array( $this, 'send_offer_order_confirmation' ), 10, 2 );
+	}
+
+	/**
+	 * Define WC_GZD_DISABLE_CHECKOUT_ADJUSTMENTS on WPFunnels funnel checkout pages.
+	 *
+	 * Germanized's wc_gzd_maybe_disable_checkout_adjustments() reads this
+	 * constant at woocommerce_before_checkout_form priority -999.  When true it:
+	 *   - removes the hooks that temporarily hide woocommerce_order_button_html,
+	 *   - removes woocommerce_gzd_template_order_submit from
+	 *     woocommerce_checkout_order_review (prevents a duplicate button),
+	 *   - moves legal checkboxes to woocommerce_review_order_before_payment so
+	 *     they still display inside WPFunnels' payment.php template, and
+	 *   - outputs a hidden wc_gzd_checkout_disabled field so AJAX order-review
+	 *     fragments also receive the disabled flag.
+	 *
+	 * @return void
+	 */
+	public function maybe_disable_checkout_adjustments() {
+		if ( ! Wpfnl_functions::check_if_this_is_step_type( 'checkout' ) ) {
+			return;
+		}
+
+		if ( ! defined( 'WC_GZD_DISABLE_CHECKOUT_ADJUSTMENTS' ) ) {
+			define( 'WC_GZD_DISABLE_CHECKOUT_ADJUSTMENTS', true );
+		}
 	}
 
 	/**
@@ -43,12 +87,11 @@ class WooCommerceGermanized extends PluginCompatibility {
 	 * meta) because the main-order path does not call payment_complete() again
 	 * and therefore is unaffected by Germanized's hook removal.
 	 *
-	 * @param \WC_Order $order        The order object (child order when using
-	 *                                separate-order mode, main order otherwise).
-	 * @param array     $offer_product Offer product data.
+	 * @param \WC_Order $order          Child order created for the upsell/downsell.
+	 * @param array     $_offer_product Offer product data (unused; required by hook signature).
 	 * @return void
 	 */
-	public function send_offer_order_confirmation( $order, $offer_product ) {
+	public function send_offer_order_confirmation( $order, $_offer_product ) {
 		if ( ! $this->maybe_activate() ) {
 			return;
 		}
@@ -67,7 +110,7 @@ class WooCommerceGermanized extends PluginCompatibility {
 			return;
 		}
 
-		$gzd = WC_germanized();
+		$gzd = \WC_germanized();
 		if ( ! isset( $gzd->emails ) || ! is_object( $gzd->emails ) ) {
 			return;
 		}
@@ -76,7 +119,7 @@ class WooCommerceGermanized extends PluginCompatibility {
 			return;
 		}
 
-		if ( wc_gzd_send_instant_order_confirmation( $order ) ) {
+		if ( \wc_gzd_send_instant_order_confirmation( $order ) ) {
 			$gzd->emails->confirm_order( $order );
 		}
 	}

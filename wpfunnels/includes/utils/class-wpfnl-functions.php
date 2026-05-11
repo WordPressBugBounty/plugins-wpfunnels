@@ -4728,7 +4728,8 @@ class Wpfnl_functions {
 			'yes'                                         => __( 'Yes', 'wpfnl' ),
 			'are_you_sure_delete_product'                 => __( 'Are you sure you want to delete this product?', 'wpfnl' ),
 			'thankyou'                                    => __( 'Thank you', 'wpfnl' ),
-			'add_condition'                               => __( 'Add Condition', 'wpfnl' ),
+			'add_condition'                               => __( 'Set Entry Rules', 'wpfnl' ),
+			'conditional_drawer_header'                   => __( 'Conditions', 'wpfnl' ),
 			'add_featured_image'                          => __( 'Add Featured Image', 'wpfnl' ),
 			'title'                                       => __( 'Title', 'wpfnl' ),
 			'url_slug'                                    => __( 'URL Slug', 'wpfnl' ),
@@ -5955,7 +5956,7 @@ class Wpfnl_functions {
 							if ( $function_exist ) {
 								$id = '';
 								if ( is_admin() ) {
-									$dynamic_product = Wpfnl_Pro_GB_Functions::get_random_product_in_shop_for_widget( 1 );
+									$dynamic_product = Wpfnl_Pro_GBF_Functions::get_random_product_in_shop_for_widget( 1 );
 									if ( isset( $dynamic_product[0]->ID ) ) {
 										$id = $dynamic_product[0]->ID;
 									}
@@ -5981,7 +5982,7 @@ class Wpfnl_functions {
 							if ( $function_exist ) {
 								$id = '';
 								if ( is_admin() ) {
-									$dynamic_product = Wpfnl_Pro_GB_Functions::get_random_product_in_category_within_price_for_offer_for_widget( 1 );
+									$dynamic_product = Wpfnl_Pro_GBF_Functions::get_random_product_in_category_within_price_for_offer_for_widget( 1 );
 									if ( isset( $dynamic_product[0]->ID ) ) {
 										$id = $dynamic_product[0]->ID;
 									}
@@ -6004,7 +6005,7 @@ class Wpfnl_functions {
 							$category       = isset( $offer_mappings['category'] ) ? $offer_mappings['category'] : null;
 							$function_exist = is_callable( array( $instance, 'get_highest_sold_product_in_category_for_offer' ) );
 							if ( $function_exist ) {
-								$highestSoldInsideCategory = Wpfnl_Pro_GB_Functions::get_highest_sold_product_in_category_for_offer( 1, $category );
+								$highestSoldInsideCategory = Wpfnl_Pro_GBF_Functions::get_highest_sold_product_in_category_for_offer( 1, $category );
 								if ( is_array( $highestSoldInsideCategory ) && isset( $highestSoldInsideCategory['posts'][0]->ID ) ) {
 									$id               = $highestSoldInsideCategory['posts'][0]->ID;
 									$offer_product    = wc_get_product( $id );
@@ -6018,7 +6019,7 @@ class Wpfnl_functions {
 							$tag            = isset( $offer_mappings['tag'] ) ? $offer_mappings['tag'] : null;
 							$function_exist = is_callable( array( $instance, 'get_highest_sold_product_in_tag_for_offer' ) );
 							if ( $function_exist ) {
-								$highestSoldInsideTag = Wpfnl_Pro_GB_Functions::get_highest_sold_product_in_tag_for_offer( $tag, 1 );
+								$highestSoldInsideTag = Wpfnl_Pro_GBF_Functions::get_highest_sold_product_in_tag_for_offer( $tag, 1 );
 								if ( is_array( $highestSoldInsideTag ) && isset( $highestSoldInsideTag['posts'][0]->ID ) ) {
 									$id               = $highestSoldInsideTag['posts'][0]->ID;
 									$offer_product    = wc_get_product( $id );
@@ -6029,7 +6030,7 @@ class Wpfnl_functions {
 					} elseif ( 'highestSold' == $rules_type ) {
 						$function_exist = is_callable( array( $instance, 'get_highest_sold_product_for_offer' ) );
 						if ( $function_exist ) {
-							$highestSold = Wpfnl_Pro_GB_Functions::get_highest_sold_product_for_offer( 1 );
+							$highestSold = Wpfnl_Pro_GBF_Functions::get_highest_sold_product_for_offer( 1 );
 							if ( is_array( $highestSold ) && isset( $highestSold['posts'][0]->ID ) ) {
 								$id               = $highestSold['posts'][0]->ID;
 								$offer_product    = wc_get_product( $id );
@@ -6041,7 +6042,7 @@ class Wpfnl_functions {
 						if ( $function_exist ) {
 							$id = '';
 							if ( is_admin() ) {
-								$dynamic_product = Wpfnl_Pro_GB_Functions::get_random_product_in_tag_for_offer_for_widget( 1 );
+								$dynamic_product = Wpfnl_Pro_GBF_Functions::get_random_product_in_tag_for_offer_for_widget( 1 );
 								if ( isset( $dynamic_product[0]->ID ) ) {
 									$id = $dynamic_product[0]->ID;
 								}
@@ -6061,7 +6062,7 @@ class Wpfnl_functions {
 						if ( $function_exist ) {
 							$id = '';
 							if ( is_admin() ) {
-								$dynamic_product = Wpfnl_Pro_GB_Functions::get_random_product_in_tag_within_price_for_offer_for_widget( 1 );
+								$dynamic_product = Wpfnl_Pro_GBF_Functions::get_random_product_in_tag_within_price_for_offer_for_widget( 1 );
 
 								if ( isset( $dynamic_product[0]->ID ) ) {
 									$id = $dynamic_product[0]->ID;
@@ -6080,7 +6081,7 @@ class Wpfnl_functions {
 					} elseif ( 'randomInShop' == $rules_type ) {
 						$id = '';
 						if ( is_admin() ) {
-							$dynamic_product = Wpfnl_Pro_GB_Functions::get_random_product_in_shop_for_widget( 1 );
+							$dynamic_product = Wpfnl_Pro_GBF_Functions::get_random_product_in_shop_for_widget( 1 );
 							if ( isset( $dynamic_product[0]->ID ) ) {
 								$id = $dynamic_product[0]->ID;
 							}

@@ -213,7 +213,6 @@ class Wpfnl_Activator
 	private static function seed_default_builder_mode()
 	{
 		$general_settings = get_option( '_wpfunnels_general_settings', array() );
-		error_log( 'General settings on activation: ' . print_r( $general_settings, true ) );
 		if ( ! isset( $general_settings['funnel_builder_mode'] ) ) {
 			$general_settings['funnel_builder_mode'] = 'vertical';
 			update_option( '_wpfunnels_general_settings', $general_settings );

@@ -1229,7 +1229,9 @@ class Wpfnl_Admin
 	{
 		$gbf_steps = [];
 		if ($funnel_id) {
-			$is_gbf = get_post_meta($funnel_id, 'is_global_funnel', true);
+			$funnel_type = get_post_meta($funnel_id, '_wpfnl_funnel_type', true);
+			$is_gbf      = get_post_meta($funnel_id, 'is_global_funnel', true);
+
 			if ('yes' === $is_gbf) {
 				$steps = Wpfnl_functions::get_steps($funnel_id);
 				if (is_array($steps)) {
@@ -1242,11 +1244,23 @@ class Wpfnl_Admin
 								}
 							}
 							elseif ('upsell' === $step['step_type'] || 'downsell' === $step['step_type']) {
-
 								$conditions = get_post_meta($step['id'], 'global_funnel_' . $step['step_type'] . '_rules', true);
 								if (is_array($conditions)) {
 									array_push($gbf_steps, $step['id']);
 								}
+							}
+						}
+					}
+				}
+			} elseif ('store_checkout' === $funnel_type) {
+				$steps = Wpfnl_functions::get_steps($funnel_id);
+				if (is_array($steps)) {
+					foreach ($steps as $step) {
+						if (isset($step['id'], $step['step_type']) && 'checkout' === $step['step_type']) {
+							$raw       = get_post_meta($step['id'], '_wpfnl_store_checkout_condition', true);
+							$condition = is_string($raw) ? json_decode($raw, true) : $raw;
+							if (is_array($condition) && isset($condition['condition_type']) && 'rules' === $condition['condition_type']) {
+								array_push($gbf_steps, $step['id']);
 							}
 						}
 					}
