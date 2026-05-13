@@ -26,6 +26,72 @@ class ElementorPro extends PluginCompatibility{
 	 */
 	public function init() {
 		add_action( 'elementor_pro/forms/new_record', array( $this, 'after_submit_elementor_form'), 10,2 );
+		// Priority 0: fires before initialize_cart_data (priority 10) so the hooks are gone before add_to_cart.
+		add_action( 'wp', [ $this, 'remove_elementor_wc_hooks_on_funnel_checkout' ], 0 );
+		// Priority -2: fires before Elementor Pro's hook (priority 10) during update_order_review AJAX.
+		add_action( 'woocommerce_checkout_update_order_review', [ $this, 'remove_elementor_wc_hooks_on_funnel_checkout_ajax' ], -2 );
+	}
+
+
+	/**
+	 * Get Elementor Pro's WooCommerce module instance.
+	 *
+	 * @return object|null
+	 */
+	private function get_elementor_wc_module() {
+		if ( ! class_exists( '\ElementorPro\Plugin' ) ) {
+			return null;
+		}
+		return \ElementorPro\Plugin::instance()->modules_manager->get_modules( 'woocommerce' );
+	}
+
+
+	/**
+	 * Remove Elementor Pro's WooCommerce hooks on WPFunnels checkout page load.
+	 *
+	 * Elementor Pro's load_widget_before_wc_ajax() calls create_element_instance() which returns
+	 * null in non-AJAX contexts, causing a fatal TypeError. Remove both hooks it registers so
+	 * neither woocommerce_before_calculate_totals nor woocommerce_checkout_update_order_review
+	 * trigger it during WPFunnels cart initialization.
+	 *
+	 * @since 3.11.1
+	 */
+	public function remove_elementor_wc_hooks_on_funnel_checkout() {
+		if ( ! Wpfnl_functions::check_if_this_is_step_type( 'checkout' ) ) {
+			return;
+		}
+
+		$wc_module = $this->get_elementor_wc_module();
+		if ( ! $wc_module ) {
+			return;
+		}
+
+		remove_action( 'woocommerce_before_calculate_totals', [ $wc_module, 'load_widget_before_wc_ajax' ] );
+		remove_action( 'woocommerce_checkout_update_order_review', [ $wc_module, 'load_widget_before_wc_ajax' ] );
+	}
+
+
+	/**
+	 * Remove Elementor Pro's woocommerce_checkout_update_order_review hook during WPFunnels AJAX.
+	 *
+	 * Runs at priority -2 on woocommerce_checkout_update_order_review so it fires before
+	 * Elementor Pro's hook (priority 10) during the WC update_order_review AJAX request.
+	 *
+	 * @since 3.11.1
+	 */
+	public function remove_elementor_wc_hooks_on_funnel_checkout_ajax() {
+		$page_data = Wpfnl_functions::is_funnel_checkout_page();
+		if ( empty( $page_data['status'] ) ) {
+			return;
+		}
+
+		$wc_module = $this->get_elementor_wc_module();
+		if ( ! $wc_module ) {
+			return;
+		}
+
+		remove_action( 'woocommerce_checkout_update_order_review', [ $wc_module, 'load_widget_before_wc_ajax' ] );
+		remove_action( 'woocommerce_before_calculate_totals', [ $wc_module, 'load_widget_before_wc_ajax' ] );
 	}
 
 

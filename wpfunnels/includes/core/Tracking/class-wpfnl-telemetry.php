@@ -139,6 +139,18 @@ class Telemetry {
 
         // Replace generic SDK deactivation reasons with WPFunnels-specific ones.
         add_filter( 'wpfunnels_telemetry_deactivation_reasons', [ $this, 'filter_deactivation_reasons' ] );
+
+        // Swap the SDK's shared deactivation modal for WPFunnels' own isolated implementation.
+        // The SDK's modal uses generic CSS class names (wd-dr-*, wd-de-*) that conflict with
+        // mail-mint and wpvr when all plugins are active. WPFunnels' modal uses wpfnl-dr-/wpfnl-de-
+        // prefixed classes and one-click behavior, keeping it fully independent.
+        //
+        // We cannot call $this->client->get_deactivation() because another plugin (mail-mint,
+        // wpvr) may load its own Client.php first — only one class definition wins in PHP.
+        // Instead we scan $wp_filter at priority 0 and identify WPFunnels' Deactivation
+        // instance by the plugin_action_links hook it registers for WPFNL_FILE.
+        add_action( 'admin_footer', [ $this, 'remove_sdk_deactivation_modal' ], 0 );
+        add_action( 'admin_footer', [ $this, 'render_deactivation_modal' ] );
     }
 
     // -------------------------------------------------------------------------
@@ -513,17 +525,247 @@ class Telemetry {
     // -------------------------------------------------------------------------
 
     /**
+     * Find and remove the SDK's admin_footer deactivation modal for WPFunnels.
+     *
+     * Runs at priority 0 so it fires before the SDK's default priority-10 callback.
+     * We cannot use get_deactivation() on Client because another plugin may have
+     * loaded its own Client.php first (PHP only keeps the first class definition).
+     * Instead we identify WPFunnels' Deactivation instance by the plugin_action_links
+     * hook it uniquely registers for WPFNL_FILE, then remove its admin_footer callback.
+     */
+    public function remove_sdk_deactivation_modal() {
+        global $wp_filter;
+
+        if ( ! isset( $wp_filter['admin_footer'] ) ) {
+            return;
+        }
+
+        $links_hook = 'plugin_action_links_' . plugin_basename( WPFNL_FILE );
+
+        foreach ( $wp_filter['admin_footer']->callbacks as $priority => $callbacks ) {
+            foreach ( $callbacks as $cb ) {
+                $fn = $cb['function'];
+                if ( ! is_array( $fn ) || ! ( $fn[0] instanceof \LinnoSDK\Telemetry\Deactivation ) ) {
+                    continue;
+                }
+                if ( has_filter( $links_hook, [ $fn[0], 'filter_plugin_action_links' ] ) ) {
+                    remove_action( 'admin_footer', [ $fn[0], 'add_deactivation_feedback_modal' ], $priority );
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * Render WPFunnels' own deactivation modal on the plugins.php page.
+     *
+     * This replaces the SDK's generic modal (unhooked via remove_sdk_deactivation_modal()) so
+     * WPFunnels uses isolated wpfnl-dr-/wpfnl-de- CSS class names and one-click
+     * UX without conflicting with mail-mint or wpvr modals on the same page.
+     * The SDK's plugin_action_links filter and AJAX handler remain active.
+     */
+    public function render_deactivation_modal() {
+        global $pagenow;
+        if ( 'plugins.php' !== $pagenow ) {
+            return;
+        }
+
+        $nonce   = wp_create_nonce( 'wpfunnels-deactivation-nonce' );
+        $reasons = apply_filters( 'wpfunnels_telemetry_deactivation_reasons', [] );
+
+        if ( empty( $reasons ) ) {
+            return;
+        }
+        ?>
+        <style type="text/css">
+            .wpfnl-dr-modal {
+                position: fixed;
+                z-index: 99999;
+                top: 0; right: 0; bottom: 0; left: 0;
+                background: rgba(0,0,0,0.5);
+                display: none;
+                box-sizing: border-box;
+                overflow: scroll;
+            }
+            .wpfnl-dr-modal * { box-sizing: border-box; }
+            .wpfnl-dr-modal.modal-active { display: block; }
+            .wpfnl-dr-modal-wrap {
+                max-width: 780px;
+                width: 100%;
+                position: relative;
+                margin: 8% auto;
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            }
+            .wpfnl-dr-modal-header {
+                border-bottom: 1px solid #E8E8E8;
+                padding: 24px 24px 16px 24px;
+            }
+            .wpfnl-dr-modal-header h3 {
+                line-height: 1.5;
+                margin: 0 0 4px 0;
+                color: #1a1a2e;
+                font-size: 16px;
+                font-weight: 600;
+            }
+            .wpfnl-dr-modal-subheading { margin: 0; color: #718096; font-size: 13px; }
+            .wpfnl-dr-modal-body { padding: 20px 24px 8px 24px; }
+            .wpfnl-dr-modal-footer {
+                border-top: 1px solid #E8E8E8;
+                padding: 16px 24px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+            }
+            ul.wpfnl-de-reasons {
+                display: flex;
+                flex-wrap: wrap;
+                margin: 0 -6px 12px -6px;
+                padding: 0;
+                list-style: none;
+            }
+            ul.wpfnl-de-reasons li { padding: 0 6px; margin: 0 0 12px 0; width: 25%; }
+            .wpfnl-de-reason-btn {
+                width: 100%;
+                border: 1.5px solid #E8E8E8;
+                border-radius: 6px;
+                background: #fff;
+                cursor: pointer;
+                text-align: center;
+                padding: 14px 8px 12px 8px;
+                transition: border-color 0.15s, background 0.15s, transform 0.1s;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                height: 100%;
+            }
+            .wpfnl-de-reason-btn:hover {
+                border-color: #7B68EE;
+                background: #f5f3ff;
+                transform: translateY(-1px);
+            }
+            .wpfnl-de-reason-btn:active { transform: translateY(0); }
+            .wpfnl-de-reason-btn:disabled { cursor: default; opacity: 0.6; }
+            .wpfnl-de-reason-text { color: #4A5568; font-size: 12px; line-height: 1.4; }
+            .wpfnl-de-reason-icon { display: flex; align-items: center; justify-content: center; }
+            ul.wpfnl-de-reasons li.wpfnl-de-reason-selected .wpfnl-de-reason-btn {
+                background: #7B68EE;
+                border-color: #7B68EE;
+            }
+            ul.wpfnl-de-reasons li.wpfnl-de-reason-selected .wpfnl-de-reason-icon svg,
+            ul.wpfnl-de-reasons li.wpfnl-de-reason-selected .wpfnl-de-reason-icon svg g { fill: #fff; }
+            ul.wpfnl-de-reasons li.wpfnl-de-reason-selected .wpfnl-de-reason-text { color: #fff; }
+            .wpfnl-dr-btn-cancel,
+            .wpfnl-dr-btn-cancel:hover {
+                border: 1px solid #EBEBEB;
+                border-radius: 4px;
+                font-size: 13px;
+                line-height: 1.5;
+                color: #718096;
+                padding: 6px 14px;
+                cursor: pointer;
+                background-color: transparent;
+                text-decoration: none;
+            }
+        </style>
+
+        <div class="wpfnl-dr-modal" id="wpfunnels-dr-modal">
+            <div class="wpfnl-dr-modal-wrap">
+                <div class="wpfnl-dr-modal-header">
+                    <h3><?php esc_html_e( "Quick question before you go — what's the main reason?", 'wpfnl' ); ?></h3>
+                    <p class="wpfnl-dr-modal-subheading"><?php esc_html_e( 'One click is all it takes. Your feedback helps us improve.', 'wpfnl' ); ?></p>
+                </div>
+                <div class="wpfnl-dr-modal-body">
+                    <ul class="wpfnl-de-reasons">
+                        <?php foreach ( $reasons as $reason ) : ?>
+                            <li data-reason-id="<?php echo esc_attr( $reason['id'] ); ?>">
+                                <button type="button" class="wpfnl-de-reason-btn">
+                                    <div class="wpfnl-de-reason-icon"><?php echo $reason['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+                                    <div class="wpfnl-de-reason-text"><?php echo esc_html( $reason['text'] ); ?></div>
+                                </button>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+                <div class="wpfnl-dr-modal-footer">
+                    <button type="button" class="wpfnl-dr-btn-cancel"><?php esc_html_e( 'Cancel', 'wpfnl' ); ?></button>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            (function($) {
+                $(function() {
+                    var modal          = $('#wpfunnels-dr-modal');
+                    var deactivateLink = '';
+                    var submitting     = false;
+
+                    $('#the-list').on('click', 'a.wpfunnels-deactivation-link', function(e) {
+                        e.preventDefault();
+                        deactivateLink = $(this).attr('href');
+                        submitting     = false;
+                        modal.find('.wpfnl-de-reason-btn').prop('disabled', false);
+                        modal.find('li').removeClass('wpfnl-de-reason-selected');
+                        modal.addClass('modal-active');
+                    });
+
+                    modal.on('click', 'button.wpfnl-dr-btn-cancel', function(e) {
+                        e.preventDefault();
+                        modal.removeClass('modal-active');
+                    });
+
+                    modal.on('click', '.wpfnl-de-reason-btn', function() {
+                        if (submitting || !deactivateLink) return;
+                        submitting = true;
+
+                        var reasonId = $(this).closest('li').data('reason-id');
+                        $(this).closest('li').addClass('wpfnl-de-reason-selected');
+                        modal.find('.wpfnl-de-reason-btn').prop('disabled', true);
+
+                        $.ajax({
+                            url:  ajaxurl,
+                            type: 'POST',
+                            data: {
+                                nonce:       '<?php echo esc_js( $nonce ); ?>',
+                                action:      'wpfunnels_submit_deactivation_reason',
+                                reason_id:   reasonId,
+                                reason_info: ''
+                            },
+                            complete: function() {
+                                window.location.href = deactivateLink;
+                            }
+                        });
+                    });
+                });
+            }(jQuery));
+        </script>
+        <?php
+    }
+
+    /**
      * Replace the generic SDK deactivation reasons with WPFunnels-specific ones.
      *
-     * Hooked on wpfunnels_telemetry_deactivation_reasons (fired by the SDK's
-     * Deactivation class). Each reason requires only 'id', 'text', and 'icon'.
-     * One-click on a card immediately submits and deactivates — no textarea needed.
+     * Hooked on wpfunnels_telemetry_deactivation_reasons. Called by render_deactivation_modal()
+     * via apply_filters to populate WPFunnels' own modal.
      *
      * @param array $reasons Default reasons from the SDK.
      * @return array
      */
     public function filter_deactivation_reasons( array $reasons ): array {
         return [
+            
+            [
+                'id'   => 'plugin-conflict',
+                'text' => __( 'Plugin conflict', 'wpfnl' ),
+                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#3B86FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            ],
+            [
+                'id'   => 'payment-not-working',
+                'text' => __( 'Payment not working', 'wpfnl' ),
+                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3B86FF" stroke-width="2"/><path d="M12 7v5l3 3" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
+            ],
             [
                 'id'   => 'funnel-builder-hard-to-use',
                 'text' => __( 'Funnel builder too complex', 'wpfnl' ),
@@ -540,16 +782,6 @@ class Telemetry {
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 17l4-4 4 4 4-8 4 4" stroke="#3B86FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
             ],
             [
-                'id'   => 'plugin-conflict',
-                'text' => __( 'Plugin conflict', 'wpfnl' ),
-                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#3B86FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-            ],
-            [
-                'id'   => 'payment-not-working',
-                'text' => __( 'Payment not working', 'wpfnl' ),
-                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3B86FF" stroke-width="2"/><path d="M12 7v5l3 3" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
-            ],
-            [
                 'id'   => 'missing-feature',
                 'text' => __( 'Missing a feature I need', 'wpfnl' ),
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3B86FF" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
@@ -560,19 +792,14 @@ class Telemetry {
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#3B86FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
             ],
             [
-                'id'   => 'missing-integration',
-                'text' => __( 'Missing integration I need', 'wpfnl' ),
-                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
+                'id'   => 'lacking-payment-gateway',
+                'text' => __( 'Lack of payment gateway options', 'wpfnl' ),
+                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3B86FF" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
             ],
             [
                 'id'   => 'found-better-plugin',
                 'text' => __( 'Switching to another plugin', 'wpfnl' ),
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#3B86FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-            ],
-            [
-                'id'   => 'lacking-reporting',
-                'text' => __( 'Lack of reporting', 'wpfnl' ),
-                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3B86FF" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="#3B86FF" stroke-width="2" stroke-linecap="round"/></svg>',
             ],
             [
                 'id'   => 'temporary',
