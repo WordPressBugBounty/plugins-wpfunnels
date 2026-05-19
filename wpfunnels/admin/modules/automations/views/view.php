@@ -322,14 +322,32 @@ if ( ! Wpfnl_functions::is_mail_mint_pro_license_active() || ! Wpfnl_functions::
                     ?>
                     <div class="funnel-list__wrapper">
                         <div class="funnel__single-list list-header">
-                            <!-- <div class="funnel-list__bulk-action">
-                                <div class="funnel-list__bulk-select select-all-funnels" >
+                            <div class="bulk-action-wrapper" style="display:none;">
+                                <p>
+                                    <span class="selected-funnel-count">0 <?php echo __('Automation', 'wpfnl'); ?></span>
+                                    <?php echo __('Selected', 'wpfnl'); ?>
+                                </p>
+                                <button class="btn-default bulk-delete-toggler">
+                                    <?php echo __('Bulk Actions', 'wpfnl'); ?>
+                                    <svg width="8" height="6" fill="none" viewBox="0 0 8 6" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" stroke="#fff" stroke-width=".2" d="M4 5.28a.559.559 0 01-.396-.164l-3.44-3.44A.56.56 0 11.956.884L4 3.928 7.044.884a.56.56 0 01.792.792l-3.44 3.44A.559.559 0 014 5.28z"/></svg>
+                                    <ul class="wpfnl-dropdown">
+                                        <li>
+                                            <a href="#" class="delete wpfnl-automation-bulk-delete">
+                                                <?php require WPFNL_DIR . '/admin/partials/icons/delete-icon.php'; ?>
+                                                <?php echo __('Delete', 'wpfnl'); ?>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </button>
+                            </div>
+                            <div class="funnel-list__bulk-action">
+                                <div class="funnel-list__bulk-select select-all-funnels">
                                     <span class="wpfnl-checkbox no-title">
-                                        <input type="checkbox" name="funnel-list__bulk-select" id="funnel-list__bulk-select">
-                                        <label for="funnel-list__bulk-select"></label>
+                                        <input type="checkbox" name="automation-list__bulk-select" id="automation-list__bulk-select">
+                                        <label for="automation-list__bulk-select"></label>
                                     </span>
                                 </div>
-                            </div> -->
+                            </div>
                             <div class="list-cell wpfnl-name"><?php echo __('Automation Name', 'wpfnl'); ?></div>
                             <div class="list-cell wpfnl-customers"><?php echo __('Customers', 'wpfnl'); ?></div>
                             <div class="list-cell wpfnl-status"><?php echo __('Status', 'wpfnl'); ?></div>
@@ -339,12 +357,12 @@ if ( ! Wpfnl_functions::is_mail_mint_pro_license_active() || ! Wpfnl_functions::
                         foreach ($automations as $automation) :
                         ?>
                         <div class="funnel__single-list list-body">
-                            <!-- <div class="funnel-list__bulk-action">
+                            <div class="funnel-list__bulk-action">
                                 <span class="wpfnl-checkbox no-title">
-                                    <input type="checkbox" name="funnel-list-select" id="funnel-list<?php echo $automation['id']; ?>-select" data-id="<?php echo $automation['id']; ?>">
-                                    <label for="funnel-list<?php echo $automation['id']; ?>-select"></label>
+                                    <input type="checkbox" name="automation-list-select" id="automation-list-<?php echo esc_attr( $automation['id'] ); ?>-select" data-id="<?php echo esc_attr( $automation['id'] ); ?>">
+                                    <label for="automation-list-<?php echo esc_attr( $automation['id'] ); ?>-select"></label>
                                 </span>
-                            </div> -->
+                            </div>
                             <div class="list-cell wpfnl-name">
                                 <span class="builder-logo">
                                     <?php require WPFNL_DIR . '/admin/partials/icons/automation-list-icon.php'; ?>
@@ -643,11 +661,89 @@ if ( ! Wpfnl_functions::is_mail_mint_pro_license_active() || ! Wpfnl_functions::
                         xhr.setRequestHeader('X-WP-Nonce', wpfnlAutomationVars.restNonce);
                     },
                     success: function() {
-                        $(row).remove();
+                        location.reload();
                     },
                     error: function() {
                         row.style.opacity = '1';
                         alert('Failed to delete automation. Please try again.');
+                    }
+                });
+            });
+        });
+
+        // Bulk action: counter + show/hide wrapper (mirrors funnel listing pattern)
+        function automationSelectedCounter() {
+            var total = $('input[name=automation-list-select]:checked').length;
+            if (total > 0) {
+                var label = total > 1 ? total + ' Automations' : total + ' Automation';
+                $('.funnel__single-list.list-header .bulk-action-wrapper .selected-funnel-count').text(label);
+                $('.funnel__single-list.list-header .bulk-action-wrapper').css('display', 'flex');
+            } else {
+                $('.funnel__single-list.list-header .bulk-action-wrapper').css('display', 'none');
+            }
+        }
+
+        // Per-row checkbox change
+        $('.funnel__single-list.list-body input[name=automation-list-select]').on('change', function() {
+            $('#automation-list__bulk-select').prop('checked', false);
+            automationSelectedCounter();
+        });
+
+        // Select-all checkbox change
+        $('#automation-list__bulk-select').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('input[name=automation-list-select]').prop('checked', true);
+                automationSelectedCounter();
+            } else {
+                $('.funnel__single-list.list-header .bulk-action-wrapper').css('display', 'none');
+                $('input[name=automation-list-select]').prop('checked', false);
+            }
+        });
+
+        // Bulk delete (from dropdown)
+        $(document).on('click', '.wpfnl-automation-bulk-delete', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $('.bulk-delete-toggler').removeClass('show-dropdown');
+
+            var checked = $('input[name=automation-list-select]:checked');
+            if (checked.length === 0) return;
+
+            if ( ! confirm('Are you sure you want to delete ' + checked.length + ' automation(s)? This action cannot be undone.') ) {
+                return;
+            }
+
+            var ids = [];
+            checked.each(function() { ids.push($(this).data('id')); });
+
+            var remaining = ids.length;
+            var failed = 0;
+
+            $.each(ids, function(i, automationId) {
+                var row = $('input[name=automation-list-select][data-id="' + automationId + '"]').closest('.funnel__single-list');
+                row.css('opacity', '0.5');
+
+                $.ajax({
+                    url: wpfnlAutomationVars.restUrl + 'wpfunnels/v1/automation-canvas/' + automationId,
+                    type: 'DELETE',
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-WP-Nonce', wpfnlAutomationVars.restNonce);
+                    },
+                    success: function() {
+                        row.remove();
+                    },
+                    error: function() {
+                        row.css('opacity', '1');
+                        failed++;
+                    },
+                    complete: function() {
+                        remaining--;
+                        if (remaining === 0) {
+                            if (failed > 0) {
+                                alert(failed + ' automation(s) could not be deleted. Please try again.');
+                            }
+                            location.reload();
+                        }
                     }
                 });
             });

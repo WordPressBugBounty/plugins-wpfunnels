@@ -39,6 +39,13 @@ class Wpfnl_Stripe_payment_process {
         // so we must inject directly into the PI request instead.
         add_filter( 'wc_stripe_generate_create_intent_request', array( $this, 'force_save_pm_for_funnel_order' ), 10, 2 );
 
+        // Stripe Checkout Sessions (WC Stripe 10.x hosted payment page) do not fire
+        // wc_stripe_generate_create_intent_request, so setup_future_usage is never set
+        // and the resulting PM becomes permanently single-use. Disabling the feature on
+        // funnel checkout pages forces WC Stripe to use the standard UPE inline flow
+        // where our force_save_pm_for_funnel_order hook can run.
+        add_filter( 'wc_stripe_is_checkout_sessions_available', array( $this, 'disable_checkout_sessions_for_funnels' ) );
+
     }
 
 
@@ -223,12 +230,29 @@ class Wpfnl_Stripe_payment_process {
      * @param WC_Order $order   The WooCommerce order.
      * @return array
      */
-    public function force_save_pm_for_funnel_order( $request, $order ) {
-        // Only apply when there is a Stripe customer to attach the PM to.
-        if ( empty( $request['customer'] ) ) {
-            return $request;
+    /**
+     * Disable Stripe Checkout Sessions (WC Stripe 10.x hosted payment page) for funnel
+     * checkout steps. The sessions flow bypasses wc_stripe_generate_create_intent_request,
+     * so setup_future_usage is never injected and guest PMs become permanently single-use.
+     * Returning false here forces the standard UPE inline flow where our hook can run.
+     *
+     * @param bool $available
+     * @return bool
+     */
+    public function disable_checkout_sessions_for_funnels( $available ) {
+        if ( ! $available ) {
+            return $available;
         }
+        $checkout_id = Wpfnl_functions::get_checkout_id_from_post_data();
+        $checkout_id = $checkout_id ?: get_the_ID();
+        $funnel_id   = Wpfnl_functions::get_funnel_id_from_step( $checkout_id );
+        if ( $funnel_id && Wpfnl_functions::is_offer_exists_in_funnel( $funnel_id ) ) {
+            return false;
+        }
+        return $available;
+    }
 
+    public function force_save_pm_for_funnel_order( $request, $order ) {
         // Only apply to payment creation requests (must have either a payment_method or confirmation_token).
         $has_pm    = ! empty( $request['payment_method'] );
         $has_ct    = ! empty( $request['confirmation_token'] );
@@ -360,7 +384,7 @@ class Wpfnl_Stripe_payment_process {
      * @throws \WC_Stripe_Exception
      */
     public function check_stripe_sca() {
-        $security = filter_input( INPUT_POST, 'security', FILTER_SANITIZE_STRING );
+        $security = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : '';
         if ( ! wp_verify_nonce( $security, 'wpfnl_stripe_sca_check_nonce' ) ) {
             return;
         }
@@ -429,19 +453,29 @@ class Wpfnl_Stripe_payment_process {
                 $_3ds_array = [ 'optional', 'not_supported' ];
 
                 // check if 3ds is active or not
-                if ( isset($is_3ds) && !in_array( $is_3ds,$_3ds_array ) ) {
+                // is_string guard: $is_3ds is false when source is empty/missing — without it,
+                // !in_array(false, $_3ds_array) = true and create_intent fires with no payment method.
+                if ( is_string( $is_3ds ) && ! empty( $order_source->source ) && ! in_array( $is_3ds, $_3ds_array ) ) {
 
                     $intent = $this->create_intent( $order, $order_source, $offer_product );
-
+                    
                     // Confirm the intent after locking the order to make sure webhooks will not interfere.
                     if ( empty( $intent->error ) ) {
                         $intent = $this->confirm_stripe_intent( $intent, $order, $order_source );
+                        
+                    }
+
+                    if ( ! empty( $intent->error ) ) {
+                        wp_send_json( array(
+                            'result'  => 'fail',
+                            'message' => isset( $intent->error->message ) ? $intent->error->message : __( 'Stripe payment failed.', 'wpfnl' ),
+                        ) );
+                        return;
                     }
 
                     // Use get_latest_charge_from_intent() to support both old charges->data
                     // and new latest_charge (required since Stripe API 2022-11-15).
                     $response = $gateway->get_latest_charge_from_intent( $intent );
-
                     if ( ! empty( $response->balance_transaction ) ) {
                         $order->update_meta_data( '_stripe_balance_transaction_' . $step_id, $response->balance_transaction );
                         if ( isset( $offer_settings['offer_orders'] ) && 'main-order' === $offer_settings['offer_orders'] ) {
@@ -449,12 +483,11 @@ class Wpfnl_Stripe_payment_process {
                             $this->store_offer_transaction( $order, $response, $offer_product );
                         }
                     }
-
                     if ( $order ) {
                         $order->update_meta_data( '_stripe_intent_id_' . $step_id, $intent->id );
                         $order->save();
                     }
-
+                    
                     wp_send_json( array(
                         'result'        => 'success',
                         'redirect'      => $gateway->get_return_url( $order ),
@@ -464,10 +497,7 @@ class Wpfnl_Stripe_payment_process {
                 }
             }
 
-            wp_send_json(array(
-                'result' => 'fail',
-                'message' => 'No 3ds payment',
-            ));
+            wp_send_json( array( 'result' => 'success' ) );
         }
     }
 
@@ -497,7 +527,8 @@ class Wpfnl_Stripe_payment_process {
 			$level3_data,
 			$order
 		);
-
+        
+       
 		if ( ! empty( $confirmed_intent->error ) ) {
 			return $confirmed_intent;
 		}
@@ -597,7 +628,7 @@ class Wpfnl_Stripe_payment_process {
         // The request for a charge contains metadata for the intent.
         $full_request = $this->generate_payment_request($order, $order_source, $product);
         $request = [
-          
+
             'amount' => \WC_Stripe_Helper::get_stripe_amount($product['price']),
             'currency' => strtolower($order->get_currency()),
             'description' => $full_request['description'],
@@ -607,7 +638,6 @@ class Wpfnl_Stripe_payment_process {
             'payment_method_types' => [
                 'card',
             ],
-            'customer'             => $order_source->customer,
         ];
 
         $request = \WC_Stripe_Helper::add_payment_method_to_request_array( $order_source->source, $request );
@@ -624,28 +654,27 @@ class Wpfnl_Stripe_payment_process {
         // Confirm immediately (on-session: the customer is present on the offer page).
         // Force capture_method=automatic so the confirmed intent settles immediately.
         if ( 0 === strpos( $order_source->source, 'pm_' ) ) {
-            // Use string 'true' not PHP bool: wp_safe_remote_post encodes via http_build_query
-            // which converts PHP true -> '1', but Stripe expects the string 'true'.
             $request['confirm']        = 'true';
             $request['capture_method'] = 'automatic';
 
-            if ( ! empty( $order_source->customer ) && ! empty( $order_source->source ) ) {
-                $pm_object = \WC_Stripe_API::get_payment_method( $order_source->source );
-                if ( ! empty( $pm_object->error ) ) {
-                    return $pm_object;
-                }
+            $pm_object = \WC_Stripe_API::get_payment_method( $order_source->source );
+            if ( ! empty( $pm_object->error ) ) {
+                return $pm_object;
+            }
 
+            // Always resolve the actual PM type so Stripe doesn't reject with
+            // payment_intent_incompatible_payment_method (e.g. 'link' vs 'card').
+            if ( ! empty( $pm_object->type ) ) {
+                $request['payment_method_types'] = [ $pm_object->type ];
+            }
+
+            if ( ! empty( $order_source->customer ) ) {
                 if ( empty( $pm_object->customer ) ) {
                     // PM is not yet attached — attach it now before creating the offer intent.
                     $attach_result = \WC_Stripe_API::attach_payment_method_to_customer( $order_source->customer, $order_source->source );
                     if ( ! empty( $attach_result->error ) ) {
                         return $attach_result;
                     }
-                }
-
-                // Use the actual PM type so Stripe doesn't reject for type mismatch (e.g. 'link' vs 'card').
-                if ( ! empty( $pm_object->type ) ) {
-                    $request['payment_method_types'] = [ $pm_object->type ];
                 }
 
                 // PM is attached (either already was or we just attached it): charge off-session.
@@ -722,6 +751,78 @@ class Wpfnl_Stripe_payment_process {
     }
 
     /**
+     * Fetch the PaymentMethod ID from the checkout PaymentIntent when _stripe_source_id
+     * was not saved (e.g. guest orders blocked by WC Stripe's is_user_logged_in() guard).
+     *
+     * @param \WC_Order $order
+     * @return string  pm_xxx or empty string
+     */
+    private function recover_pm_from_intent( \WC_Order $order ) {
+        $intent_id = $order->get_meta( '_stripe_intent_id' );
+
+        // Stripe Checkout flow (hosted page) stores a session ID instead of a direct PI ID.
+        // Retrieve the session to get the underlying PaymentIntent.
+        if ( ! $intent_id || 0 !== strpos( $intent_id, 'pi_' ) ) {
+            $session_id = $order->get_meta( '_stripe_checkout_session_id' );
+            if ( $session_id && 0 === strpos( $session_id, 'cs_' ) ) {
+                $session = WC_Stripe_API::retrieve( 'checkout/sessions/' . $session_id );
+                if ( ! empty( $session->payment_intent ) && is_string( $session->payment_intent ) ) {
+                    $intent_id = $session->payment_intent;
+                }
+            }
+        }
+
+        if ( ! $intent_id || 0 !== strpos( $intent_id, 'pi_' ) ) {
+            return '';
+        }
+
+        $intent = WC_Stripe_API::retrieve( 'payment_intents/' . $intent_id );
+        if ( empty( $intent->payment_method ) || ! is_string( $intent->payment_method ) ) {
+            return '';
+        }
+
+        return $intent->payment_method;
+    }
+
+    /**
+     * Ensure a pm_xxx PaymentMethod is attached to a Stripe Customer so it can be reused
+     * off-session for upsell charges. Creates a customer from order billing info if none exists.
+     * Called unconditionally before create_intent() — handles retries where _stripe_source_id
+     * was already saved but no customer was created yet.
+     *
+     * @param \WC_Order $order
+     */
+    private function ensure_pm_customer( \WC_Order $order ) {
+        $pm_id = $order->get_meta( '_stripe_source_id' );
+        if ( ! $pm_id || 0 !== strpos( $pm_id, 'pm_' ) ) {
+            return;
+        }
+
+        $customer_id = $order->get_meta( '_stripe_customer_id' );
+        if ( ! $customer_id ) {
+            $customer = WC_Stripe_API::request(
+                [
+                    'email'    => $order->get_billing_email(),
+                    'name'     => trim( $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() ),
+                    'metadata' => [ 'wc_order_id' => $order->get_id() ],
+                ],
+                'customers'
+            );
+            if ( ! empty( $customer->id ) ) {
+                $customer_id = $customer->id;
+                $order->update_meta_data( '_stripe_customer_id', $customer_id );
+            }
+        }
+
+        if ( $customer_id ) {
+            $pm_obj = WC_Stripe_API::retrieve( 'payment_methods/' . $pm_id );
+            if ( empty( $pm_obj->customer ) ) {
+                WC_Stripe_API::attach_payment_method_to_customer( $customer_id, $pm_id );
+            }
+        }
+    }
+
+    /**
      * process the offer payment
      *
      * @param $order
@@ -735,11 +836,24 @@ class Wpfnl_Stripe_payment_process {
             'message' => ''
         );
         if ( ! $this->has_token( $order ) ) {
-            return $result;
+            $pm_id = $this->recover_pm_from_intent( $order );
+            if ( $pm_id ) {
+                $order->update_meta_data( '_stripe_source_id', $pm_id );
+            } else {
+                return $result;
+            }
         }
-        $gateway = $this->get_wc_gateway();
+        // Always ensure a Customer exists and the PM is attached before charging off-session.
+        // Required even on retries where _stripe_source_id is already set but no customer exists.
+        $this->ensure_pm_customer( $order );
+        $order->save();
+        global $woocommerce;
+        $gateways   = $woocommerce->payment_gateways->payment_gateways();
+        $gateway    = $gateways['stripe'];
         $order_source = $gateway->prepare_order_source( $order );
         
+        
+
         // Express Checkout Element (Apple Pay / Google Pay) stores a PaymentMethod (pm_xxx).
         // These must be charged using Payment Intents, not the legacy Charges API.
         if ( 0 === strpos( $order_source->source, 'pm_' ) ) {
@@ -856,11 +970,19 @@ class Wpfnl_Stripe_payment_process {
         $fee = !empty($response->balance_transaction->fee) ? \WC_Stripe_Helper::format_balance_fee($response->balance_transaction, 'fee') : 0;
         $net = !empty($response->balance_transaction->net) ? \WC_Stripe_Helper::format_balance_fee($response->balance_transaction, 'net') : 0;
 
-        $fee = $fee + \WC_Stripe_Helper::get_stripe_fee($order);
-        $net = $net + \WC_Stripe_Helper::get_stripe_net($order);
-
-        \WC_Stripe_Helper::update_stripe_fee($order, $fee);
-        \WC_Stripe_Helper::update_stripe_net($order, $net);
+        // WC Stripe 10.x moved fee/net helpers from WC_Stripe_Helper to WC_Stripe_Order_Helper.
+        if ( class_exists( 'WC_Stripe_Order_Helper' ) ) {
+            $order_helper = \WC_Stripe_Order_Helper::get_instance();
+            $fee          = (float) $fee + (float) $order_helper->get_stripe_fee( $order );
+            $net          = (float) $net + (float) $order_helper->get_stripe_net( $order );
+            $order_helper->update_stripe_fee( $order, $fee );
+            $order_helper->update_stripe_net( $order, $net );
+        } else {
+            $fee = (float) $fee + (float) \WC_Stripe_Helper::get_stripe_fee( $order );
+            $net = (float) $net + (float) \WC_Stripe_Helper::get_stripe_net( $order );
+            \WC_Stripe_Helper::update_stripe_fee( $order, $fee );
+            \WC_Stripe_Helper::update_stripe_net( $order, $net );
+        }
     }
 
 
@@ -883,16 +1005,23 @@ class Wpfnl_Stripe_payment_process {
 				$fee_refund = ! empty( $balance_transaction->fee ) ? WC_Stripe_Helper::format_balance_fee( $balance_transaction, 'fee' ) : 0;
 				$net_refund = ! empty( $balance_transaction->net ) ? WC_Stripe_Helper::format_balance_fee( $balance_transaction, 'net' ) : 0;
 
-				// Current data fee & net.
-				$fee_current = WC_Stripe_Helper::get_stripe_fee( $order );
-				$net_current = WC_Stripe_Helper::get_stripe_net( $order );
-
-				// Calculation.
-				$fee = (float) $fee_current + (float) $fee_refund;
-				$net = (float) $net_current + (float) $net_refund;
-              
-				WC_Stripe_Helper::update_stripe_fee( $order, $fee );
-				WC_Stripe_Helper::update_stripe_net( $order, $net );
+				// WC Stripe 10.x moved fee/net helpers from WC_Stripe_Helper to WC_Stripe_Order_Helper.
+				if ( class_exists( 'WC_Stripe_Order_Helper' ) ) {
+					$order_helper = WC_Stripe_Order_Helper::get_instance();
+					$fee_current  = $order_helper->get_stripe_fee( $order );
+					$net_current  = $order_helper->get_stripe_net( $order );
+					$fee          = (float) $fee_current + (float) $fee_refund;
+					$net          = (float) $net_current + (float) $net_refund;
+					$order_helper->update_stripe_fee( $order, $fee );
+					$order_helper->update_stripe_net( $order, $net );
+				} else {
+					$fee_current = WC_Stripe_Helper::get_stripe_fee( $order );
+					$net_current = WC_Stripe_Helper::get_stripe_net( $order );
+					$fee         = (float) $fee_current + (float) $fee_refund;
+					$net         = (float) $net_current + (float) $net_refund;
+					WC_Stripe_Helper::update_stripe_fee( $order, $fee );
+					WC_Stripe_Helper::update_stripe_net( $order, $net );
+				}
 
 				$currency = ! empty( $balance_transaction->currency ) ? strtoupper( $balance_transaction->currency ) : null;
 				WC_Stripe_Helper::update_stripe_currency( $order, $currency );

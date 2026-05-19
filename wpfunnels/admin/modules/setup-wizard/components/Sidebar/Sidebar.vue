@@ -39,8 +39,8 @@ export default {
         showSkipOption() {
             // Hide on step 2 (Required Installation) — no skipping plugin setup
             if (this.currentStep === 2) return false;
-            // Hide on step 3 complete phase — setup is done, nothing to skip
-            if (this.currentStep === 3 && this.storeCheckoutPhase === 'complete') return false;
+            // Hide once step 3 is done (completed or skipped)
+            if (this.currentStep === 3 && ['complete', 'skipped'].includes(this.storeCheckoutPhase)) return false;
             return true;
         }
     },

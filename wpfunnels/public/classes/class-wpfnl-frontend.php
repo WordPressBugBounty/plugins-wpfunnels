@@ -13,7 +13,7 @@ class Wpfnl_Frontend
 {
     public function __construct()
     {
-        add_filter('woocommerce_get_checkout_order_received_url', [ $this, 'redirect_to_next_step' ], 10, 2);
+        add_filter('woocommerce_get_checkout_order_received_url', [ $this, 'redirect_to_next_step' ], 1000, 2);
     }
 
 

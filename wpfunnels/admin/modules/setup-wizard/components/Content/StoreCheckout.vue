@@ -50,12 +50,15 @@
 				</div>
 			</div>
 
-			<div class="wpfnl-mm-choose-goal-buttons wpfnl-mm-buttons-container">
+			<div class="wpfnl-mm-choose-goal-buttons wpfnl-mm-buttons-container wpfnl-sc-footer-actions">
 				<button class="wpfnl-mm-btn wpfnl-mm-btn-secondary" @click="goBack">
 					<svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<path d="M16 6H1M1 6L6 1M1 6L6 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 					</svg>
 					Back
+				</button>
+				<button class="wpfnl-mm-btn wpfnl-mm-btn-skip" @click="skipCheckout">
+					Skip
 				</button>
 			</div>
 
@@ -107,14 +110,19 @@
 
 				<h2 class="wpfnl-celebration-title">Setup Complete! 🎉</h2>
 				<p class="wpfnl-celebration-subtitle">
-					Your store checkout is ready. Start converting visitors into customers.
+					<template v-if="skipped">
+						Your setup is complete. You can configure Store Checkout anytime from the WPFunnels settings.
+					</template>
+					<template v-else>
+						Your store checkout is ready. Start converting visitors into customers.
+					</template>
 				</p>
 
 				<div class="wpfnl-celebration-actions">
 					<button class="wpfnl-mm-btn wpfnl-mm-btn-secondary" @click="goToDashboard">
 						Go to Dashboard
 					</button>
-					<button class="wpfnl-mm-btn wpfnl-mm-btn-primary" @click="goToEditor">
+					<button v-if="!skipped" class="wpfnl-mm-btn wpfnl-mm-btn-primary" @click="goToEditor">
 						Go to Editor
 						<svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 							<path d="M1 6H16M16 6L11 1M16 6L11 11" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -152,6 +160,7 @@ export default {
 	data() {
 		return {
 			phase: 'select',
+			skipped: false,
 			loading: true,
 			templates: [],
 			selectedTemplateId: null,
@@ -431,6 +440,28 @@ export default {
 			window.location.href = wizardObj.dashboard_url || `${wizardObj.admin_url}admin.php?page=wpfunnels`;
 		},
 
+		skipCheckout() {
+			this.skipped = true;
+			this.phase = 'complete';
+			this.$emit('store-checkout-phase', 'skipped');
+			this.$nextTick(() => this.launchConfetti());
+			this.maybeCreateContact();
+			this.handleSkipTracking();
+		},
+
+		handleSkipTracking() {
+			const wizardObj = window.setup_wizard_obj || {};
+			const restApiUrl = wizardObj.rest_api_url || '';
+			if (!restApiUrl) return;
+
+			const normalizedUrl = restApiUrl.endsWith('/') ? restApiUrl : `${restApiUrl}/`;
+			apiFetch({
+				url: `${normalizedUrl}wpfunnels/v1/setup-wizard/complete-step`,
+				method: 'POST',
+				data: { action: 'skipped', goal: 'improve-checkout', total_steps: 3 },
+			}).catch(() => {});
+		},
+
 		goBack() {
 			this.$emit('prev-step');
 		},
@@ -505,7 +536,7 @@ export default {
 	align-items: center;
 	justify-content: center;
 	width: 100%;
-	min-height: 100%;
+	align-self: stretch;
 	position: relative;
 }
 
@@ -607,6 +638,30 @@ export default {
 
 .wpfnl-celebration-actions .wpfnl-mm-btn-primary:hover {
 	background: #5c36b3;
+}
+
+/* Footer actions row (Back + Skip) */
+.wpfnl-sc-footer-actions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.wpfnl-mm-btn-skip {
+	background: transparent;
+	border: none;
+	color: #9CA3AF;
+	font-size: 14px;
+	font-weight: 500;
+	font-family: 'DM Sans', sans-serif;
+	cursor: pointer;
+	padding: 8px 16px;
+	border-radius: 8px;
+	transition: color 0.2s ease;
+}
+
+.wpfnl-mm-btn-skip:hover {
+	color: #6E42D3;
 }
 
 /* Generating phase styles */

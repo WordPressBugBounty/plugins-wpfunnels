@@ -45,14 +45,12 @@ export default {
     },
     methods: {
         isCompleted(index) {
-            // Standard: earlier steps are completed when currentStep has moved past them
             if (this.currentStep > index + 1) return true;
-            // Special case: step 3 (index 2) is completed when StoreCheckout phase is 'complete'
+            // Only mark step 3 complete when the template was actually imported
             if (index === 2 && this.currentStep === 3 && this.storeCheckoutPhase === 'complete') return true;
             return false;
         },
         isActive(index) {
-            // Step 3 is no longer "active" once it's complete — it's "completed"
             if (index === 2 && this.storeCheckoutPhase === 'complete') return false;
             return this.currentStep === index + 1;
         }

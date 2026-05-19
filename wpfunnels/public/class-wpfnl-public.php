@@ -73,7 +73,7 @@ class Wpfnl_Public
 		/**
 		 * Modify the checkout order received url to next step
 		 */
-		add_filter('woocommerce_get_checkout_order_received_url', [$this, 'redirect_to_funnel_thankyou_page'], 10, 2);
+		add_filter('woocommerce_get_checkout_order_received_url', [$this, 'redirect_to_funnel_thankyou_page'], 1000, 2);
 
 		/*
 		 * This hook will be triggered once the elementor data is saved.

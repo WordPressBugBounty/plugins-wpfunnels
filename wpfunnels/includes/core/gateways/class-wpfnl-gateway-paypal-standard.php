@@ -187,46 +187,42 @@ class Wpfnl_Gateway_Paypal extends Wpfnl_Gateway {
      */
     public function modify_paypal_args( $args, $order ) {
 
-        $checkout_id    =  Wpfnl_functions::get_checkout_id_from_post_data();
-        $funnel_id      =  Wpfnl_functions::get_funnel_id_from_post_data();
+        $checkout_id = Wpfnl_functions::get_checkout_id_from_post_data();
+        // Fall back to order meta if POST data is unavailable.
+        if ( ! $checkout_id ) {
+            $checkout_id = (int) $order->get_meta( '_wpfunnels_checkout_id' );
+        }
+
+        $funnel_id = Wpfnl_functions::get_funnel_id_from_post_data();
+        if ( ! $funnel_id ) {
+            $funnel_id = (int) $order->get_meta( '_wpfunnels_funnel_id' );
+        }
 
         if ( ! $checkout_id ) {
             return $args;
         }
 
-        if (false === $this->should_tokenize($funnel_id)) {
+        if ( false === $this->should_tokenize( $funnel_id ) ) {
             return $args;
         }
 
-        if (false === $this->has_api_credentials_set()) {
+        $next_step_obj  = Wpfnl_functions::get_next_step( $funnel_id, $checkout_id );
+        $is_offer_next  = $next_step_obj && in_array( $next_step_obj['step_type'], array( 'upsell', 'downsell' ), true );
+
+        if ( ! $is_offer_next ) {
             return $args;
         }
 
         /**
-         * Check if gateway is enabled and we have reference transactions turned off.
+         * Reference transaction flow: when enabled with API credentials,
+         * hijack the checkout to use PayPal Express so a billing agreement
+         * (token) is saved for one-click offer charges.
          */
-        if (true === $this->is_enabled() && false === $this->is_reference_transaction_enabled()) {
-
-            $is_upsell = false;
-            $next_step_obj = Wpfnl_functions::get_next_step($funnel_id, $checkout_id);
-
-            if ($next_step_obj && ($next_step_obj['step_type'] === 'upsell' || $next_step_obj['step_type'] === 'downsell')) {
-                if ($this->has_api_credentials_set()) {
-                    $is_upsell = true;
-                }
-            }
-
-            if ($is_upsell) {
-                $args['return'] = $this->get_wc_gateway()->get_return_url( $order );
-            }
-        }
-        else {
-
+        if ( true === $this->is_enabled() && true === $this->is_reference_transaction_enabled() && true === $this->has_api_credentials_set() ) {
             try {
-                // Initiate express checkout request.
                 $response = $this->init_express_checkout(
                     array(
-                        'currency' => $args['currency_code'],
+                        'currency'   => $args['currency_code'],
                         'return_url' => $this->get_callback_url(
                             array(
                                 'action'    => 'wpfunnels_paypal_create_billing_agreement',
@@ -244,25 +240,38 @@ class Wpfnl_Gateway_Paypal extends Wpfnl_Gateway {
                             )
                         ),
                         'notify_url' => $args['notify_url'],
-                        'custom' => $args['custom'],
-                        'order' => $order,
-                        'step_id' => $checkout_id,
+                        'custom'     => $args['custom'],
+                        'order'      => $order,
+                        'step_id'    => $checkout_id,
                     )
                 );
 
-                if (!isset($response['TOKEN']) || '' === $response['TOKEN']) {
+                if ( ! isset( $response['TOKEN'] ) || '' === $response['TOKEN'] ) {
                     return $args;
                 }
 
                 return array(
-                    'cmd' => '_express-checkout',
+                    'cmd'   => '_express-checkout',
                     'token' => $response['TOKEN'],
                 );
             }
-            catch (\Exception $e) {
+            catch ( \Exception $e ) {
                 return $args;
             }
         }
+
+        /**
+         * Standard PayPal flow (no reference transactions): redirect the
+         * customer to the offer page after payment so the funnel continues.
+         * The offer page will show a fallback checkout form for accepting the offer.
+         */
+        $args['return'] = add_query_arg(
+            array(
+                'wpfnl-order' => $order->get_id(),
+                'wpfnl-key'   => $order->get_order_key(),
+            ),
+            get_permalink( $next_step_obj['step_id'] )
+        );
 
         return $args;
 

@@ -627,11 +627,11 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
             if($order) {
                 $gateways = array( 'paypal','ppec_paypal' );
                 $payment_method = $order->get_payment_method();
-                // for now we ignore the paypal reference transactions. In future there will be a settings
-                // for paypal reference transaction. User can define if they want to use paypal reference transaction
-                // or not.
-                if ( ( in_array( $payment_method, $gateways ) ) && !$is_reference_transaction ) {
-                    $skip_offer = 'yes';
+                // PayPal Standard can't do one-click upsells (no reference transactions),
+                // so treat the offer page like an unsupported gateway: show a fallback
+                // checkout form so the customer can still accept the offer.
+                if ( in_array( $payment_method, $gateways, true ) && ! $is_reference_transaction ) {
+                    $maybe_unsupported_payment = true;
                 }
             }
             $currency_symbol = get_woocommerce_currency_symbol();
@@ -771,7 +771,7 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
      */
     public function process_upsell_accepted_action() {
 
-        $nonce = filter_input( INPUT_POST, 'security', FILTER_SANITIZE_STRING );
+        $nonce = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : '';
 
         if ( $nonce && ! wp_verify_nonce( $nonce, 'wpfnl_upsell_accepted_nonce' ) ) {
             return array(
@@ -848,7 +848,7 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
      */
     public function process_downsell_accepted_action() {
 
-        $nonce = filter_input( INPUT_POST, 'security', FILTER_SANITIZE_STRING );
+        $nonce = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : '';
         if ( $nonce && ! wp_verify_nonce( $nonce, 'wpfnl_downsell_accepted_nonce' ) ) {
             return array(
                 'status'    => 'success',
@@ -926,7 +926,7 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
      * @since 1.0.0
      */
     public function process_upsell_rejected_action() {
-        $nonce = filter_input( INPUT_POST, 'security', FILTER_SANITIZE_STRING );
+        $nonce = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'wpfnl_upsell_rejected_nonce' ) ) {
             return array(
                 'status'    => 'success',
@@ -994,7 +994,7 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
      * @since 1.0.0
      */
     public function process_downsell_rejected_action() {
-        $nonce = filter_input( INPUT_POST, 'security', FILTER_SANITIZE_STRING );
+        $nonce = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'wpfnl_downsell_rejected_nonce' ) ) {
             return array(
                 'status'    => 'success',
@@ -1123,7 +1123,7 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
 
         if ($skip_payment) {
             $_stripe_intent_id = get_post_meta($order->get_id(), '_stripe_intent_id_' . $step_id, true);
-            $intent_id = filter_input(INPUT_POST, 'stripe_intent_id', FILTER_SANITIZE_STRING);
+            $intent_id = isset( $_POST['stripe_intent_id'] ) ? sanitize_text_field( wp_unslash( $_POST['stripe_intent_id'] ) ) : '';
             $skip_payment = ($intent_id === $_stripe_intent_id) ? true : false;
         }
 
