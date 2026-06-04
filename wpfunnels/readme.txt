@@ -3,9 +3,9 @@ Contributors: coderexltd, getwpfunnels, coderexco
 Donate link: https://getwpfunnels.com/
 Tags: woocommerce funnel builder, order bump, one click upsell, custom checkout, sales funnel builder, lead generation, sales funnels
 Requires at least: 6.1
-Tested up to:  6.9
+Tested up to:  7.0
 Requires PHP: 7.4
-Stable tag: 3.12.5
+Stable tag: 3.12.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -546,6 +546,10 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.12.6 (2026-06-04) =
+* BugFix: Resolved Mail Mint automation creation issue from WPFunnels
+* BugFix: Resolved place order issue with Gutenberg on funnel checkout pages
 
 = 3.12.5 (2026-05-19) =
 * Enhancement: Added the option to skip store checkout during setup

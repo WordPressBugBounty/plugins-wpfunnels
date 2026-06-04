@@ -185,7 +185,9 @@ class CheckoutForm extends AbstractDynamicBlock {
             return;
         }
         $place_order_filter = $this->get_place_order_button_filter( $settings );
-        add_filter( 'woocommerce_order_button_html', $place_order_filter );
+        // Use a very high priority so this customization wins over the legacy
+        // Pro "custom order text" filter (woocommerce_order_button_html @ 10).
+        add_filter( 'woocommerce_order_button_html', $place_order_filter, PHP_INT_MAX );
 
         $below_text = isset( $settings['placeOrderBelowText'] ) ? $settings['placeOrderBelowText'] : '';
         if ( ! empty( $below_text ) ) {
@@ -384,7 +386,9 @@ class CheckoutForm extends AbstractDynamicBlock {
         ) );
 
         $place_order_filter = $this->get_place_order_button_filter( $attributes );
-        add_filter( 'woocommerce_order_button_html', $place_order_filter );
+        // Use a very high priority so this customization wins over the legacy
+        // Pro "custom order text" filter (woocommerce_order_button_html @ 10).
+        add_filter( 'woocommerce_order_button_html', $place_order_filter, PHP_INT_MAX );
 
         $below_text = isset( $attributes['placeOrderBelowText'] ) ? $attributes['placeOrderBelowText'] : '';
         $below_btn_filter = null;
@@ -401,7 +405,7 @@ class CheckoutForm extends AbstractDynamicBlock {
         $output .= '</div>';
         $output .= '</div>';
 
-        remove_filter( 'woocommerce_order_button_html', $place_order_filter );
+        remove_filter( 'woocommerce_order_button_html', $place_order_filter, PHP_INT_MAX );
         if ( null !== $below_btn_filter ) {
             remove_action( 'woocommerce_review_order_after_submit', $below_btn_filter );
         }
@@ -838,7 +842,9 @@ class CheckoutForm extends AbstractDynamicBlock {
 		do_action( 'wpfunnels/before_gb_checkout_form_ajax', $checkout_id, $_POST );
 
 		$place_order_filter = $this->get_place_order_button_filter( $attributes );
-		add_filter( 'woocommerce_order_button_html', $place_order_filter );
+		// Use a very high priority so this customization wins over the legacy
+		// Pro "custom order text" filter (woocommerce_order_button_html @ 10).
+		add_filter( 'woocommerce_order_button_html', $place_order_filter, PHP_INT_MAX );
 
 		$below_text = isset( $attributes['placeOrderBelowText'] ) ? $attributes['placeOrderBelowText'] : '';
 		$below_btn_filter = null;
@@ -857,7 +863,7 @@ class CheckoutForm extends AbstractDynamicBlock {
 		$output 		.= '</div>';
 		$output 		.= "<style>$dynamic_css</style>";
 
-		remove_filter( 'woocommerce_order_button_html', $place_order_filter );
+		remove_filter( 'woocommerce_order_button_html', $place_order_filter, PHP_INT_MAX );
 		if ( null !== $below_btn_filter ) {
 			remove_action( 'woocommerce_review_order_after_submit', $below_btn_filter );
 		}

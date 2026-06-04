@@ -205,8 +205,7 @@ class Wpfnl_Activator
 	}
 
 	/**
-	 * Seed funnel_builder_mode to 'vertical' for brand-new installs.
-	 * Existing users keep their stored value; horizontal remains the fallback default.
+	 * Seed funnel_builder_mode to 'horizontal' for brand-new installs.
 	 *
 	 * @since 3.11.0
 	 */
@@ -214,7 +213,7 @@ class Wpfnl_Activator
 	{
 		$general_settings = get_option( '_wpfunnels_general_settings', array() );
 		if ( ! isset( $general_settings['funnel_builder_mode'] ) ) {
-			$general_settings['funnel_builder_mode'] = 'vertical';
+			$general_settings['funnel_builder_mode'] = 'horizontal';
 			update_option( '_wpfunnels_general_settings', $general_settings );
 		}
 	}
