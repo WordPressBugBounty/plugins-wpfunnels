@@ -83,6 +83,18 @@ if ( ! defined( 'WPFNL_DIVI5_MODULES_LOADED' ) ) {
 		20
 	);
 
+	// ── D4 → D5 frontend shortcode compatibility ─────────────────────────────
+	// Imported templates built with Divi 4 still store `[wpfnl_*]` shortcodes.
+	// Register frontend handlers so they render under Divi 5 instead of printing
+	// the raw shortcode as plain text. Hooked on `wp` so step context is ready.
+	require_once __DIR__ . '/../compat/D4ShortcodeCompat.php';
+	add_action(
+		'wp',
+		static function () {
+			\WPFunnels\Widgets\DiviModules\D5\Compat\D4ShortcodeCompat::register();
+		}
+	);
+
 	// ── D4 → D5 shortcode conversion map ────────────────────────────────────
 	add_filter(
 		'divi.moduleLibrary.conversion.moduleConversionOutline',

@@ -5,7 +5,7 @@ Tags: woocommerce funnel builder, order bump, one click upsell, custom checkout,
 Requires at least: 6.1
 Tested up to:  7.0
 Requires PHP: 7.4
-Stable tag: 3.12.6
+Stable tag: 3.12.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -546,6 +546,11 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.12.7 (2026-06-18) =
+* Enhancement: Automatically convert Divi 4 widgets to Divi 5 during funnel template import
+* Compatibility: Resolved funnel checkout issues with the WooCommerce Germanized plugin
+* Compatibility: Improved compatibility with Fox Currency Switcher
 
 = 3.12.6 (2026-06-04) =
 * BugFix: Resolved Mail Mint automation creation issue from WPFunnels

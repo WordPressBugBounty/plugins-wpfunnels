@@ -204,8 +204,40 @@ class CheckoutForm extends AbstractDynamicBlock {
      * @param array $attributes Block attributes.
      * @return \Closure
      */
+    /**
+     * Resolve the checkout step id for Place Order customization, covering both
+     * the initial page render and WooCommerce AJAX order-review updates.
+     *
+     * @return int
+     */
+    protected function get_place_order_checkout_id() {
+        $checkout_id = intval( \WPFunnels\Wpfnl_functions::get_checkout_id_from_post_data() );
+        if ( ! $checkout_id ) {
+            $checkout_id = intval( \WPFunnels\Wpfnl_functions::get_checkout_id_from_post( $_POST ) );
+        }
+        if ( ! $checkout_id && \WPFunnels\Wpfnl_functions::is_funnel_step_page() ) {
+            $checkout_id = intval( get_the_ID() );
+        }
+        return $checkout_id;
+    }
+
+
     protected function get_place_order_button_filter( $attributes ) {
         $btn_text     = isset( $attributes['placeOrderBtnText'] ) && '' !== $attributes['placeOrderBtnText'] ? $attributes['placeOrderBtnText'] : 'Place Order';
+
+        // When the block's own button text is left at the default, honour the
+        // "Place Order" text set in the checkout drawer Edit Field tab
+        // (stored by Pro as _wpfunnels_edit_field_additional_settings).
+        if ( 'Place Order' === $btn_text ) {
+            $checkout_id = $this->get_place_order_checkout_id();
+            if ( $checkout_id ) {
+                $additional_settings = get_post_meta( $checkout_id, '_wpfunnels_edit_field_additional_settings', true );
+                if ( is_array( $additional_settings ) && ! empty( $additional_settings['custom_order_text'] ) ) {
+                    $btn_text = $additional_settings['custom_order_text'];
+                }
+            }
+        }
+
         $sub_text     = isset( $attributes['placeOrderSubText'] ) ? $attributes['placeOrderSubText'] : '';
         $enable_icon  = isset( $attributes['placeOrderEnableIcon'] ) ? (bool) $attributes['placeOrderEnableIcon'] : false;
         $icon_style   = isset( $attributes['placeOrderIconStyle'] ) ? $attributes['placeOrderIconStyle'] : 'lock1';

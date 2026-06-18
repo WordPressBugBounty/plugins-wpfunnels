@@ -542,6 +542,7 @@ return array(
     'WPFunnels\\Widgets\\DiviModules\\D5\\Checkout\\CheckoutTrait\\ModuleStylesTrait' => $baseDir . '/includes/core/widgets/divi-modules/divi-5/modules/Checkout/CheckoutTrait/ModuleStylesTrait.php',
     'WPFunnels\\Widgets\\DiviModules\\D5\\Checkout\\CheckoutTrait\\RenderCallbackTrait' => $baseDir . '/includes/core/widgets/divi-modules/divi-5/modules/Checkout/CheckoutTrait/RenderCallbackTrait.php',
     'WPFunnels\\Widgets\\DiviModules\\D5\\Checkout\\CheckoutTrait\\RestApiTrait' => $baseDir . '/includes/core/widgets/divi-modules/divi-5/modules/Checkout/CheckoutTrait/RestApiTrait.php',
+    'WPFunnels\\Widgets\\DiviModules\\D5\\Compat\\D4ShortcodeCompat' => $baseDir . '/includes/core/widgets/divi-modules/divi-5/compat/D4ShortcodeCompat.php',
     'WPFunnels\\Widgets\\DiviModules\\D5\\ModuleRegistry' => $baseDir . '/includes/core/widgets/divi-modules/divi-5/modules/ModuleRegistry.php',
     'WPFunnels\\Widgets\\DiviModules\\D5\\NextStepButton\\NextStepButton' => $baseDir . '/includes/core/widgets/divi-modules/divi-5/modules/NextStepButton/NextStepButton.php',
     'WPFunnels\\Widgets\\DiviModules\\D5\\NextStepButton\\NextStepButtonTrait\\ModuleClassnamesTrait' => $baseDir . '/includes/core/widgets/divi-modules/divi-5/modules/NextStepButton/NextStepButtonTrait/ModuleClassnamesTrait.php',

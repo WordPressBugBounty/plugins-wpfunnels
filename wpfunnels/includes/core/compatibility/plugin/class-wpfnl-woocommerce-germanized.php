@@ -46,8 +46,43 @@ class WooCommerceGermanized extends PluginCompatibility {
 		// set when Germanized reads it and removes its button/submit hooks.
 		add_action( 'woocommerce_before_checkout_form', array( $this, 'maybe_disable_checkout_adjustments' ), -1000 );
 
+		// Re-add the standard order-review/payment hooks that Germanized's ET Builder
+		// (Divi) compatibility strips when checkout adjustments are disabled. Priority 20
+		// runs after Germanized's own priority-10 handler so it can undo the removal.
+		add_action( 'woocommerce_gzd_disabled_checkout_adjustments', array( $this, 'restore_order_review_hooks' ), 20 );
+
 		// Trigger Germanized's order confirmation for upsell/downsell child orders.
 		add_action( 'wpfunnels/offer_accepted', array( $this, 'send_offer_order_confirmation' ), 10, 2 );
+	}
+
+	/**
+	 * Restore the default WooCommerce order-review hooks on WPFunnels checkout steps.
+	 *
+	 * When the Divi theme is active, Germanized's ET Builder compatibility
+	 * (WC_GZD_Compatibility_ET_Builder) listens on woocommerce_gzd_disabled_checkout_adjustments
+	 * and removes woocommerce_order_review (priority 10) and woocommerce_checkout_payment
+	 * (priority 20) from woocommerce_checkout_order_review.  It assumes Divi's own native
+	 * checkout modules (et_pb_wc_checkout_order_details / _payment_info) will re-add them.
+	 *
+	 * WPFunnels' Divi checkout module instead renders the full [woocommerce_checkout]
+	 * shortcode, which relies on those standard hooks, so they are never re-added and the
+	 * order review section renders empty.  We re-attach them here for WPFunnels checkout
+	 * steps only, leaving genuine Divi WooCommerce checkouts untouched.
+	 *
+	 * @return void
+	 */
+	public function restore_order_review_hooks() {
+		if ( ! Wpfnl_functions::check_if_this_is_step_type( 'checkout' ) ) {
+			return;
+		}
+
+		if ( ! has_action( 'woocommerce_checkout_order_review', 'woocommerce_order_review' ) ) {
+			add_action( 'woocommerce_checkout_order_review', 'woocommerce_order_review', 10 );
+		}
+
+		if ( ! has_action( 'woocommerce_checkout_order_review', 'woocommerce_checkout_payment' ) ) {
+			add_action( 'woocommerce_checkout_order_review', 'woocommerce_checkout_payment', 20 );
+		}
 	}
 
 	/**

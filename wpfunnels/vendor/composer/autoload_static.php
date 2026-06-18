@@ -669,6 +669,7 @@ class ComposerStaticInitde007fd82ff0d62b8a232c4af8da3c8d
         'WPFunnels\\Widgets\\DiviModules\\D5\\Checkout\\CheckoutTrait\\ModuleStylesTrait' => __DIR__ . '/../..' . '/includes/core/widgets/divi-modules/divi-5/modules/Checkout/CheckoutTrait/ModuleStylesTrait.php',
         'WPFunnels\\Widgets\\DiviModules\\D5\\Checkout\\CheckoutTrait\\RenderCallbackTrait' => __DIR__ . '/../..' . '/includes/core/widgets/divi-modules/divi-5/modules/Checkout/CheckoutTrait/RenderCallbackTrait.php',
         'WPFunnels\\Widgets\\DiviModules\\D5\\Checkout\\CheckoutTrait\\RestApiTrait' => __DIR__ . '/../..' . '/includes/core/widgets/divi-modules/divi-5/modules/Checkout/CheckoutTrait/RestApiTrait.php',
+        'WPFunnels\\Widgets\\DiviModules\\D5\\Compat\\D4ShortcodeCompat' => __DIR__ . '/../..' . '/includes/core/widgets/divi-modules/divi-5/compat/D4ShortcodeCompat.php',
         'WPFunnels\\Widgets\\DiviModules\\D5\\ModuleRegistry' => __DIR__ . '/../..' . '/includes/core/widgets/divi-modules/divi-5/modules/ModuleRegistry.php',
         'WPFunnels\\Widgets\\DiviModules\\D5\\NextStepButton\\NextStepButton' => __DIR__ . '/../..' . '/includes/core/widgets/divi-modules/divi-5/modules/NextStepButton/NextStepButton.php',
         'WPFunnels\\Widgets\\DiviModules\\D5\\NextStepButton\\NextStepButtonTrait\\ModuleClassnamesTrait' => __DIR__ . '/../..' . '/includes/core/widgets/divi-modules/divi-5/modules/NextStepButton/NextStepButtonTrait/ModuleClassnamesTrait.php',

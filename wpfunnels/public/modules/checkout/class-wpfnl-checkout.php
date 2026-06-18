@@ -1085,8 +1085,28 @@ class Module extends Wpfnl_Frontend_Module
 		if ( wp_doing_ajax() && !WC()->session->__isset('reload_checkout')) {
 			foreach ($cart->cart_contents as $key => $value) {
 				if (isset($value['custom_price'])) {
-					$custom_price = floatval($value['custom_price']);
-					$value['data']->set_price($custom_price);
+					/**
+					 * Filter the custom price applied to a funnel cart item during the
+					 * update_order_review AJAX refresh.
+					 *
+					 * This callback overrides the cart item price at a very late priority
+					 * (9999), i.e. after multi-currency switchers have already converted it.
+					 * Compatibility layers can hook here to adjust the value, or return
+					 * `false`/`null` to skip the override entirely and keep the converted price.
+					 *
+					 * @param float $custom_price The stored custom price for the cart item.
+					 * @param array $value        The cart item.
+					 * @param object $cart        The cart object.
+					 *
+					 * @since 3.12.7
+					 */
+					$custom_price = apply_filters( 'wpfunnels/checkout_ajax_custom_price', floatval($value['custom_price']), $value, $cart );
+
+					if ( false === $custom_price || null === $custom_price ) {
+						continue;
+					}
+
+					$value['data']->set_price(floatval($custom_price));
 				}
 			}
 		}
