@@ -8585,6 +8585,114 @@ body.rtl .wpfnl-order-bump__template-style14 .template-preview-wrapper .product-
     padding: 0;
   }
 }
+.wp-theme-woodmart .wpfnl-checkout .woocommerce form.woocommerce-checkout,
+.wp-theme-woodmart .wpfnl-checkout .woocommerce form.checkout {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  gap: 0;
+  column-gap: 0;
+  row-gap: 0;
+}
+.wp-theme-woodmart .wpfnl-checkout .woocommerce form.woocommerce-checkout > .col2-set,
+.wp-theme-woodmart .wpfnl-checkout .woocommerce form.woocommerce-checkout > #customer_details,
+.wp-theme-woodmart .wpfnl-checkout .woocommerce form.woocommerce-checkout > .customer-details,
+.wp-theme-woodmart .wpfnl-checkout .woocommerce form.woocommerce-checkout > .woocommerce-checkout-review-order,
+.wp-theme-woodmart .wpfnl-checkout .woocommerce form.woocommerce-checkout > .checkout-order-review,
+.wp-theme-woodmart .wpfnl-checkout .woocommerce form.woocommerce-checkout > #order_review {
+  order: unset;
+}
+.wp-theme-woodmart .wpfnl-checkout .woocommerce .col2-set,
+.wp-theme-woodmart .wpfnl-checkout .col2-set#customer_details,
+.wp-theme-woodmart .wpfnl-checkout #customer_details,
+.wp-theme-woodmart .wpfnl-checkout .customer-details {
+  width: 50%;
+  max-width: 50%;
+  flex: 0 0 50%;
+  float: none;
+  padding-right: 10px;
+  margin-right: 0;
+  display: block;
+  gap: 0;
+}
+.wp-theme-woodmart .wpfnl-checkout .woocommerce .woocommerce-checkout-review-order,
+.wp-theme-woodmart .wpfnl-checkout .checkout-order-review,
+.wp-theme-woodmart .wpfnl-checkout #order_review {
+  width: 50%;
+  max-width: 50%;
+  flex: 0 0 50%;
+  float: none;
+  padding-left: 10px;
+  margin-top: 0;
+}
+.wp-theme-woodmart .wpfnl-checkout .checkout-order-review #order_review {
+  width: 100%;
+  max-width: 100%;
+  flex: 0 0 100%;
+  padding-left: 0;
+}
+.wp-theme-woodmart .wpfnl-checkout .col2-set .col-1,
+.wp-theme-woodmart .wpfnl-checkout .col2-set .col-2 {
+  flex: 0 0 100%;
+  max-width: 100%;
+  width: 100%;
+  float: none;
+  padding: 0;
+}
+.wp-theme-woodmart .wpfnl-checkout .woocommerce-checkout-review-order-table {
+  display: table;
+}
+.wp-theme-woodmart .wpfnl-checkout .woocommerce-checkout-review-order-table tr {
+  display: table-row;
+  border-bottom: none;
+}
+.wp-theme-woodmart .wpfnl-checkout .woocommerce-checkout-review-order-table thead th {
+  flex-basis: auto;
+}
+.wp-theme-woodmart .wpfnl-checkout .woocommerce-checkout-review-order-table tfoot td {
+  flex-grow: 0;
+}
+.wp-theme-woodmart .wpfnl-checkout .woocommerce-checkout-review-order-table th,
+.wp-theme-woodmart .wpfnl-checkout .woocommerce-checkout-review-order-table td {
+  display: table-cell;
+  border: none;
+}
+.wp-theme-woodmart .wpfnl-checkout .wd-table-wrapper {
+  padding: 0;
+  margin-bottom: 0;
+  background-color: transparent;
+  box-shadow: none;
+  overflow-x: inherit;
+}
+.wp-theme-woodmart .wpfnl-checkout.wpfnl-col-1 .woocommerce .col2-set,
+.wp-theme-woodmart .wpfnl-checkout.wpfnl-col-1 .col2-set#customer_details,
+.wp-theme-woodmart .wpfnl-checkout.wpfnl-col-1 #customer_details,
+.wp-theme-woodmart .wpfnl-checkout.wpfnl-col-1 .customer-details,
+.wp-theme-woodmart .wpfnl-checkout.wpfnl-col-1 .woocommerce .woocommerce-checkout-review-order,
+.wp-theme-woodmart .wpfnl-checkout.wpfnl-col-1 .checkout-order-review,
+.wp-theme-woodmart .wpfnl-checkout.wpfnl-col-1 #order_review {
+  width: 100%;
+  max-width: 100%;
+  flex: 0 0 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+@media only screen and (max-width: 991px) {
+  .wp-theme-woodmart .wpfnl-checkout .woocommerce .col2-set,
+  .wp-theme-woodmart .wpfnl-checkout .col2-set#customer_details,
+  .wp-theme-woodmart .wpfnl-checkout #customer_details,
+  .wp-theme-woodmart .wpfnl-checkout .customer-details,
+  .wp-theme-woodmart .wpfnl-checkout .woocommerce .woocommerce-checkout-review-order,
+  .wp-theme-woodmart .wpfnl-checkout .checkout-order-review,
+  .wp-theme-woodmart .wpfnl-checkout #order_review {
+    width: 100%;
+    max-width: 100%;
+    flex: 0 0 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
 .dynamic-offer-template-default {
   display: flex;
   flex-flow: row wrap;
@@ -8958,3 +9066,5 @@ body.rtl .wpfnl-order-bump__template-style14 .template-preview-wrapper .product-
     font-size: 17px;
   }
 }
+
+/*# sourceMappingURL=wpfnl-public.css.map */

@@ -700,20 +700,41 @@ class Module extends Wpfnl_Admin_Module
      */
     public static function wpfnl_show_log( $payload ) {
         if( isset($payload['logKey']) ){
-            $key = $payload['logKey'];
-            $upload_dir = wp_upload_dir( null, false );
-            $log_url = $upload_dir['basedir'].'/wpfunnels/wpfunnels-logs/';
-            $file_url = $log_url  . $key;
+            // Reduce to a bare filename — strips any directory traversal (../),
+            // separators, and stream-wrapper prefixes (phar://, php://, etc.).
+            $key = basename( wp_unslash( $payload['logKey'] ) );
 
-            ob_start();
-            include_once $file_url;
-            $out = ob_get_clean();
-            ob_end_clean();
+            $upload_dir = wp_upload_dir( null, false );
+            $log_url    = trailingslashit( $upload_dir['basedir'] ) . 'wpfunnels/wpfunnels-logs/';
+            $file_url   = $log_url . $key;
+
+            // Whitelist: key must be a .log filename that actually resolves inside
+            // the logs directory. realpath() comparison defeats any residual traversal.
+            $real_dir  = realpath( $log_url );
+            $real_file = file_exists( $file_url ) ? realpath( $file_url ) : false;
+
+            $is_valid = $key
+                && '.log' === strtolower( substr( $key, -4 ) )
+                && $real_dir
+                && $real_file
+                && 0 === strpos( $real_file, trailingslashit( $real_dir ) );
+
+            if ( $is_valid ) {
+                // Never include/execute the log file — read it as data and escape it.
+                $out = file_get_contents( $file_url );
+                $out = '<pre>' . esc_html( $out ) . '</pre>';
+
+                return array(
+                    'success'  => true,
+                    'content'  => $out,
+                    'file_url' => $file_url,
+                );
+            }
 
             return array(
-                'success' => true,
-                'content' => $out,
-                'file_url' => $log_url. $key
+                'success'  => false,
+                'content'  => '',
+                'file_url' => '',
             );
         }
 

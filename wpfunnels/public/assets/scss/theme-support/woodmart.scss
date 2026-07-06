@@ -1,0 +1,172 @@
+//======================================================================
+//  Woodmart theme compatibility
+//
+//  Woodmart ships generic WooCommerce checkout CSS that leaks into the
+//  WPFunnels checkout markup and breaks the 2 column layout:
+//    - woo-mod-grid.css      : `.col2-set { display:flex; gap:30px }`
+//                              `.col2-set :is(.col-1,.col-2){ flex:1 0 0 }`
+//                              (forces billing/shipping side-by-side)
+//    - woo-page-checkout.css : `.woocommerce-checkout-review-order-table
+//                               { display:flex }`, `tr{display:flex}`,
+//                               `th{flex-basis:50%}` (breaks order table)
+//
+//  Everything below is scoped under `.wp-theme-woodmart` (a body class
+//  added by WordPress core only when Woodmart is the active/parent theme)
+//  AND `.wpfnl-checkout`, so it cannot affect other themes or any
+//  non-funnel page.
+//======================================================================
+
+.wp-theme-woodmart {
+
+    //-------- outer 2 column layout: [customer details | order review] --------
+    .wpfnl-checkout {
+
+        .woocommerce form.woocommerce-checkout,
+        .woocommerce form.checkout {
+            display: flex;
+            flex-flow: row wrap;
+            align-items: flex-start;
+
+            // Woodmart puts `gap:30px` on the form; combined with two 50%
+            // columns that overflows 100% and wraps the order review onto
+            // its own row (columns collapse). WPFunnels spaces columns with
+            // padding instead, so the gap must be reset to 0.
+            gap: 0;
+            column-gap: 0;
+            row-gap: 0;
+        }
+
+        // Woodmart's `form > * { flex:1 1 100% }` also lands on WPFunnels'
+        // columns (they aren't `.customer-details`/`.checkout-order-review`),
+        // forcing flex-basis:100%. Neutralise it for the two real columns.
+        .woocommerce form.woocommerce-checkout > .col2-set,
+        .woocommerce form.woocommerce-checkout > #customer_details,
+        .woocommerce form.woocommerce-checkout > .customer-details,
+        .woocommerce form.woocommerce-checkout > .woocommerce-checkout-review-order,
+        .woocommerce form.woocommerce-checkout > .checkout-order-review,
+        .woocommerce form.woocommerce-checkout > #order_review {
+            order: unset;
+        }
+
+        // Left column — covers both WPFunnels markup (`.col2-set`) and
+        // Woodmart's own form-checkout markup (`.customer-details`).
+        .woocommerce .col2-set,
+        .col2-set#customer_details,
+        #customer_details,
+        .customer-details {
+            width: 50%;
+            max-width: 50%;
+            flex: 0 0 50%;
+            float: none;
+            padding-right: 10px;
+            margin-right: 0;
+
+            // Woodmart makes .col2-set a flex row (gap:30px) which places
+            // billing and shipping side-by-side. WPFunnels stacks them.
+            display: block;
+            gap: 0;
+        }
+
+        // Right column — WPFunnels (`.woocommerce-checkout-review-order`)
+        // and Woodmart (`.checkout-order-review` wrapper around #order_review).
+        .woocommerce .woocommerce-checkout-review-order,
+        .checkout-order-review,
+        #order_review {
+            width: 50%;
+            max-width: 50%;
+            flex: 0 0 50%;
+            float: none;
+            padding-left: 10px;
+            margin-top: 0;
+        }
+
+        // When Woodmart wraps #order_review in .checkout-order-review, the
+        // inner #order_review should fill its parent (avoid a nested 50%).
+        .checkout-order-review #order_review {
+            width: 100%;
+            max-width: 100%;
+            flex: 0 0 100%;
+            padding-left: 0;
+        }
+
+        // Billing / shipping columns stack vertically (WPFunnels default).
+        .col2-set .col-1,
+        .col2-set .col-2 {
+            flex: 0 0 100%;
+            max-width: 100%;
+            width: 100%;
+            float: none;
+            padding: 0;
+        }
+
+        //-------- undo Woodmart's flex-ified order review table --------
+        .woocommerce-checkout-review-order-table {
+            display: table;
+
+            tr {
+                display: table-row;
+                border-bottom: none;
+            }
+
+            thead th {
+                flex-basis: auto;
+            }
+
+            tfoot td {
+                flex-grow: 0;
+            }
+
+            th,
+            td {
+                display: table-cell;
+                border: none;
+            }
+        }
+
+        // Woodmart wraps the order table in `.wd-table-wrapper`; strip its
+        // card styling so it sits flush inside the WPFunnels review column.
+        .wd-table-wrapper {
+            padding: 0;
+            margin-bottom: 0;
+            background-color: transparent;
+            box-shadow: none;
+            overflow-x: inherit;
+        }
+    }
+
+    //-------- 1 column layout (wpfnl-col-1) --------
+    .wpfnl-checkout.wpfnl-col-1 {
+        .woocommerce .col2-set,
+        .col2-set#customer_details,
+        #customer_details,
+        .customer-details,
+        .woocommerce .woocommerce-checkout-review-order,
+        .checkout-order-review,
+        #order_review {
+            width: 100%;
+            max-width: 100%;
+            flex: 0 0 100%;
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+
+    //-------- responsive: collapse to single column on tablet/mobile --------
+    @media only screen and (max-width: 991px) {
+        .wpfnl-checkout {
+            .woocommerce .col2-set,
+            .col2-set#customer_details,
+            #customer_details,
+            .customer-details,
+            .woocommerce .woocommerce-checkout-review-order,
+            .checkout-order-review,
+            #order_review {
+                width: 100%;
+                max-width: 100%;
+                flex: 0 0 100%;
+                padding-left: 0;
+                padding-right: 0;
+            }
+        }
+    }
+}

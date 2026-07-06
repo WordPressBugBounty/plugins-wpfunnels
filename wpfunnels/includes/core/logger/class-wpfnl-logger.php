@@ -80,6 +80,29 @@ class Wpfnl_Logger {
 	 */
 	public function create_log_folder() {
 		wp_mkdir_p( $this->log_location_dir );
+		$this->protect_log_folder();
+	}
+
+
+	/**
+	 * Harden the log directory: deny direct web access and prevent directory listing.
+	 *
+	 * @since 3.12.8
+	 */
+	protected function protect_log_folder() {
+		if ( ! is_dir( $this->log_location_dir ) || ! is_writable( $this->log_location_dir ) ) {
+			return;
+		}
+
+		$htaccess = trailingslashit( $this->log_location_dir ) . '.htaccess';
+		if ( ! file_exists( $htaccess ) ) {
+			file_put_contents( $htaccess, "Order deny,allow\nDeny from all\n" );
+		}
+
+		$index = trailingslashit( $this->log_location_dir ) . 'index.php';
+		if ( ! file_exists( $index ) ) {
+			file_put_contents( $index, "<?php\n// Silence is golden.\n" );
+		}
 	}
 
 
@@ -155,10 +178,28 @@ class Wpfnl_Logger {
 				return;
 			}
 
+			// Neutralise any PHP open tags in attacker-controlled content so the
+			// log file can never be executed if it is ever included by PHP.
+			$header_content = self::sanitize_log_content( $header_content );
+			$content        = is_scalar( $content ) ? self::sanitize_log_content( (string) $content ) : '';
+
 			file_put_contents ($file_name, $header_content, FILE_APPEND );
 			file_put_contents ($file_name, $content, FILE_APPEND );
 
 		}
+	}
+
+
+	/**
+	 * Strip PHP open tags from log content to prevent code execution.
+	 *
+	 * @param String $content
+	 *
+	 * @return String
+	 * @since 3.12.8
+	 */
+	protected static function sanitize_log_content( $content ) {
+		return str_ireplace( array( '<?php', '<?=', '<?' ), '', $content );
 	}
 
 

@@ -54,7 +54,7 @@ class SpecialOccasionBanner
         $this->start_date   = strtotime($start_date);
         $this->end_date     = strtotime($end_date);
 
-        if ('yes' === get_option('_is_show_ugcify_banner', 'yes')) {
+        if ('yes' === get_option('_is_show_us_banner', 'yes')) {
             // Hook into the admin_notices action to display the banner
             add_action('admin_notices', [$this, 'display_banner']);
             add_action('admin_head', array($this, 'add_styles'));
@@ -68,7 +68,7 @@ class SpecialOccasionBanner
      */
     public function wpf_get_promotion_banner_countdown()
     {
-        $end_date = strtotime('2026-01-07 23:59:59');
+        $end_date = strtotime('2026-07-07 23:59:59');
         $now      = current_time('timestamp');
         $diff     = $end_date - $now;
 
@@ -94,7 +94,7 @@ class SpecialOccasionBanner
         }
 
         if ($current_date_time < $this->start_date || $current_date_time > $this->end_date) {
-            //return;
+            return;
         }
 
         // Calculate the time remaining in seconds
@@ -105,25 +105,44 @@ class SpecialOccasionBanner
         <div class="gwpf-promotional-notice <?php echo esc_attr($this->occasion); ?>-banner notice">
             <div class="gwpf-tb__notification">
                 <div class="banner-overflow">
-                    <section class="gwpf-promotional-banner" aria-labelledby="UGCify-offer">
+                    <section class="gwpf-promotional-banner" aria-labelledby="US independence day offer">
                         <div class="gwpf-container">
                             <div class="promotional-banner">
                                 <div class="banner-content">
 									<div class="banner-logo-area">
-										<span class="new-tool-text"><?php echo __('New Tool Coming:', 'wpfunnels'); ?></span>
-										<svg xmlns="http://www.w3.org/2000/svg" width="23" height="20" viewBox="0 0 23 20" fill="none"><path d="M1.06618 12.1359C8.90142 22.3152 17.4084 17.0302 21.0104 12.1256C21.0976 12.0069 21.286 12.1052 21.2364 12.2439C17.5346 22.5755 4.52336 22.5942 0.84551 12.2448C0.797424 12.1095 0.97859 12.0221 1.06618 12.1359Z" fill="#201cfe"/><path d="M3.38441 14.7801C7.55671 19.3578 14.4767 19.3577 18.6683 14.7962L19.2305 18.0621C19.4048 19.0746 18.6283 20 17.6009 20H4.4095C3.37407 20 2.59495 19.0608 2.78274 18.0425L3.38441 14.7801ZM18.4936 13.7809C14.7261 17.1915 8.66183 18.7568 3.58106 13.7132L5.28946 4.4507H16.8876L18.4936 13.7809ZM11.4455 8.30703C11.1791 7.76715 10.7417 7.76715 10.4726 8.30703L9.97917 9.30214C9.91189 9.44065 9.73246 9.57354 9.58387 9.59899L8.68947 9.74872C8.11753 9.84484 7.98578 10.2633 8.39511 10.676L9.09037 11.377C9.20812 11.4957 9.27268 11.7247 9.23624 11.8887L9.0371 12.7566C8.88013 13.4406 9.24466 13.7091 9.84463 13.3502L10.6829 12.8498C10.8371 12.7594 11.0866 12.7593 11.238 12.8498L12.0763 13.3502C12.679 13.7091 13.0407 13.4435 12.8837 12.7566L12.6847 11.8887C12.6482 11.7247 12.7127 11.4957 12.8304 11.377L13.5258 10.676C13.9379 10.2633 13.8032 9.84483 13.2313 9.74872L12.337 9.59899C12.1856 9.57355 12.0062 9.44065 11.9389 9.30214L11.4455 8.30703Z" fill="#201cfe"/><path d="M2.13955 12.1528C1.65099 12.0253 0.571895 12.1146 0.164049 13.491C-0.473269 12.5989 0.864968 10.942 2.13955 12.1528Z" fill="#201cfe"/><path d="M21.652 13.492C21.5932 12.9905 21.118 12.0176 19.6874 12.1378C20.287 11.2198 22.3169 11.8646 21.652 13.492Z" fill="#201cfe"/><path d="M14.02 3.50497C14.02 2.57539 13.6977 1.68389 13.1241 1.02658C12.5504 0.369272 11.7724 7.01809e-08 10.9611 0C10.1499 -7.01809e-08 9.37184 0.369272 8.7982 1.02658C8.22455 1.68389 7.90228 2.57539 7.90228 3.50496H8.7852C8.7852 2.84371 9.01445 2.20953 9.42252 1.74195C9.83058 1.27437 10.384 1.01169 10.9611 1.01169C11.5382 1.01169 12.0917 1.27437 12.4997 1.74195C12.9078 2.20953 13.1371 2.84371 13.1371 3.50497H14.02Z" fill="#201cfe"/></svg>
-										<span class="tool-name">UGCify</span>
+										<span class="us-flag">
+											<img src="<?php echo WPFNL_DIR_URL . 'admin/assets/images/us-flag.webp'; ?>" alt="us-flag" width="117" height="70">
+										</span>
+										<span class="discount-text">
+											<small><?php echo __('Happy 4th Of July!', 'wpfunnels'); ?></small>
+											<?php echo __('Get 30% Off', 'wpfunnels'); ?>
+										</span>
 									</div>
 
-                                    <div class="banner-text">
-										<?php echo __('Build trust and increase conversions with UGC for WooCommerce!', 'wpfunnels'); ?>
+                                    <div class="countdown-timer" id="wpf-promo-countdown">
+                                        <div class="countdown-item">
+                                            <span id="wpf-promo-days"><?php echo esc_html(str_pad($countdown['days'], 2, '0', STR_PAD_LEFT)); ?></span>
+                                            <small><?php echo __('DAY', 'wpfunnels'); ?></small>
+                                        </div>
+                                        <div class="countdown-item">
+                                            <span id="wpf-promo-hours"><?php echo esc_html(str_pad($countdown['hours'], 2, '0', STR_PAD_LEFT)); ?></span>
+                                            <small><?php echo __('HR', 'wpfunnels'); ?></small>
+                                        </div>
+                                        <div class="countdown-item">
+                                            <span id="wpf-promo-mins"><?php echo esc_html(str_pad($countdown['mins'], 2, '0', STR_PAD_LEFT)); ?></span>
+                                            <small><?php echo __('MIN', 'wpfunnels'); ?></small>
+                                        </div>
+                                        <div class="countdown-item">
+                                            <span id="wpf-promo-secs"><?php echo esc_html(str_pad($countdown['secs'], 2, '0', STR_PAD_LEFT)); ?></span>
+                                            <small><?php echo __('SEC', 'wpfunnels'); ?></small>
+                                        </div>
                                     </div>
 
-                                    <a href="<?php echo esc_url($this->btn_link); ?>" class="cta-button" role="button" aria-label="get special discount " target="_blank">
+                                    <a href="<?php echo esc_url($this->btn_link); ?>" class="cta-button" role="button" aria-label="claim your deal" target="_blank">
                                         <?php
-                                            echo __('Request Early Access', 'wpfunnels');
+                                            echo __('Claim Your Deal', 'wpfunnels');
                                         ?>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="8" height="9" viewBox="0 0 8 9" fill="none"><path d="M8 0.703124V8.29686C8 8.48334 7.93415 8.66218 7.81694 8.79405C7.69973 8.92591 7.54076 8.99999 7.375 8.99999C7.20924 8.99999 7.05027 8.92591 6.93306 8.79405C6.81585 8.66218 6.75 8.48334 6.75 8.29686V2.40061L1.06695 8.79406C0.949738 8.92592 0.790765 9 0.625004 9C0.459243 9 0.30027 8.92592 0.183059 8.79406C0.0658485 8.6622 0 8.48335 0 8.29687C0 8.11039 0.0658485 7.93155 0.183059 7.79968L5.86613 1.40625H0.625012C0.459252 1.40625 0.300281 1.33217 0.183071 1.20031C0.0658608 1.06845 1.28672e-05 0.889604 1.28672e-05 0.703124C1.28672e-05 0.516644 0.0658608 0.337802 0.183071 0.20594C0.300281 0.0740789 0.459252 0 0.625012 0L7.375 0C7.54076 0 7.69973 0.0740789 7.81694 0.20594C7.93415 0.337802 8 0.516644 8 0.703124Z" fill="#201cfe"/></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="8" height="9" viewBox="0 0 8 9" fill="none"><path d="M8 0.703124V8.29686C8 8.48334 7.93415 8.66218 7.81694 8.79405C7.69973 8.92591 7.54076 8.99999 7.375 8.99999C7.20924 8.99999 7.05027 8.92591 6.93306 8.79405C6.81585 8.66218 6.75 8.48334 6.75 8.29686V2.40061L1.06695 8.79406C0.949738 8.92592 0.790765 9 0.625004 9C0.459243 9 0.30027 8.92592 0.183059 8.79406C0.0658485 8.6622 0 8.48335 0 8.29687C0 8.11039 0.0658485 7.93155 0.183059 7.79968L5.86613 1.40625H0.625012C0.459252 1.40625 0.300281 1.33217 0.183071 1.20031C0.0658608 1.06845 1.28672e-05 0.889604 1.28672e-05 0.703124C1.28672e-05 0.516644 0.0658608 0.337802 0.183071 0.20594C0.300281 0.0740789 0.459252 0 0.625012 0L7.375 0C7.54076 0 7.69973 0.0740789 7.81694 0.20594C7.93415 0.337802 8 0.516644 8 0.703124Z" fill="#fff"/></svg>
                                     </a>
                                 </div>
                             </div>
@@ -132,48 +151,67 @@ class SpecialOccasionBanner
                 </div>
 
                 <button class="close-promotional-banner" type="button" aria-label="close banner">
-                    <svg width="12" height="13" fill="none" viewBox="0 0 12 13" xmlns="http://www.w3.org/2000/svg"><path stroke="#7A8B9A" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 1.97L1 11.96m0-9.99l10 9.99"/></svg>
+                    <svg width="12" height="13" fill="none" viewBox="0 0 12 13" xmlns="http://www.w3.org/2000/svg"><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 1.97L1 11.96m0-9.99l10 9.99"/></svg>
                 </button>
             </div>
         </div>
         <!-- .gwpf-tb-notification end -->
 
         <script>
-            function updateCountdown() {
-                var endDate = new Date("2026-01-07 23:59:59").getTime();
-                var now = new Date().getTime();
-                var timeLeft = endDate - now;
+            (function() {
+                var countdownInterval;
 
-                var days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                var hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                var minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                var seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-                var daysElement = document.getElementById('wpf-halloween-days');
-                var hoursElement = document.getElementById('wpf-halloween-hours');
-                var minsElement = document.getElementById('wpf-halloween-mins');
-                var secsElement = document.getElementById('wpf-halloween-secs');
-
-                if (daysElement) {
-                    daysElement.innerHTML = days;
+                function pad(num) {
+                    return String(num).padStart(2, '0');
                 }
 
-                if (hoursElement) {
-                    hoursElement.innerHTML = hours;
+                function updateCountdown() {
+                    var endDate = new Date("2026-07-07 23:59:59").getTime();
+                    var now = new Date().getTime();
+                    var timeLeft = endDate - now;
+
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownInterval);
+
+                        var banner = document.querySelector('.gwpf-promotional-notice');
+                        if (banner) {
+                            banner.style.display = 'none';
+                        }
+
+                        return;
+                    }
+
+                    var days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    var minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                    var daysElement = document.getElementById('wpf-promo-days');
+                    var hoursElement = document.getElementById('wpf-promo-hours');
+                    var minsElement = document.getElementById('wpf-promo-mins');
+                    var secsElement = document.getElementById('wpf-promo-secs');
+
+                    if (daysElement) {
+                        daysElement.innerHTML = pad(days);
+                    }
+
+                    if (hoursElement) {
+                        hoursElement.innerHTML = pad(hours);
+                    }
+
+                    if (minsElement) {
+                        minsElement.innerHTML = pad(minutes);
+                    }
+                    if (secsElement) {
+                        secsElement.innerHTML = pad(seconds);
+                    }
                 }
 
-                if (minsElement) {
-                    minsElement.innerHTML = minutes;
-                }
-                if (secsElement) {
-                    secsElement.innerHTML = seconds;
-                }
-            }
-
-            document.addEventListener('DOMContentLoaded', function() {
-                updateCountdown();
-                setInterval(updateCountdown, 1000); // Update every minute
-            });
+                document.addEventListener('DOMContentLoaded', function() {
+                    updateCountdown();
+                    countdownInterval = setInterval(updateCountdown, 1000);
+                });
+            })();
         </script>
     <?php
     }
@@ -226,19 +264,19 @@ class SpecialOccasionBanner
             .gwpf-promotional-banner {
                 position: relative;
                 z-index: 1111;
-                padding: 6px 0;
-				border-radius: 10px;
-				background: #FFF;
+                padding: 0;
+                /* padding: 6px 0; */
+				background: #7D4CEF;
 				box-shadow: 0 1px 1px 0 rgba(32, 28, 254, 0.10);
             }
             .gwpf-promotional-banner .promotional-banner {
-                color: white;
-                padding: 3px 20px 0;
                 /* padding: 12px 20px; */
-                text-align: center;
-                font-size: 14px;
-                line-height: 1.4;
-                position: relative;
+				padding-top: 1px;
+				text-align: center;
+				font-size: 14px;
+				line-height: 1.4;
+				position: relative;
+				height: 70px;
             }
             .gwpf-promotional-banner .banner-content {
                 max-width: 1200px;
@@ -247,28 +285,43 @@ class SpecialOccasionBanner
                 align-items: center;
                 justify-content: center;
                 flex-wrap: wrap;
-                gap: 30px;
+                gap: 70px;
                 row-gap: 8px;
                 position: relative;
             }
 			.gwpf-promotional-banner .banner-logo-area {
 				display: flex;
 				align-items: center;
-				gap: 5px;
+				gap: 17px;
 			}
-			.gwpf-promotional-banner .new-tool-text {
-				color: #666;
-				font-size: 12px;
+
+			.gwpf-promotional-banner .banner-logo-area img {
+				display: block;
+				position: relative;
+				top: -1px;
+			}
+
+			.gwpf-promotional-banner .discount-text {
+				color: #FFF;
+				font-family: 'Inter', sans-serif;
+				font-size: 24px;
+				font-weight: 700;
+				line-height: 1.2;
+				letter-spacing: -0.084px;
+				display: flex;
+				flex-flow: column;
+				align-items: flex-start;
+				gap: 7px;
+
+			}
+
+			.gwpf-promotional-banner .discount-text small {
+				color: #FFF;
+				font-family: 'Inter', sans-serif;
+				font-size: 16px;
 				font-weight: 500;
 				line-height: 1;
-				display: block;
-			}
-			.gwpf-promotional-banner .tool-name {
-				color: #090939;
-				font-size: 14px;
-				font-weight: 600;
-				line-height: 1;
-				display: block;
+				letter-spacing: -0.32px;
 			}
             .gwpf-promotional-banner .banner-text {
                 display: flex;
@@ -291,31 +344,67 @@ class SpecialOccasionBanner
                 color: #ee8134;
                 font-weight: 700;
             }
-            .gwpf-promotional-banner .halloween-bird-left {
-                position: absolute;
-                left: -47px;
-                bottom: -7px;
+
+            .gwpf-promotional-banner .countdown-timer {
+                display: flex;
+                align-items: center;
+                gap: 2px;
             }
-            .gwpf-promotional-banner .halloween-bird-right {
-                position: absolute;
-                right: -50px;
-                top: -5px;
+            .gwpf-promotional-banner .countdown-item {
+                display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 4px;
+				min-width: 50px;
+				height: 50px;
+				padding: 4px 6px;
+				color: #fff;
+				line-height: 1.2;
+				border: 1px solid #8555f5;
+				background: rgba(54, 30, 107, 0.40);
+
+            }
+
+			.gwpf-promotional-banner .countdown-item:first-child {
+				border-radius: 4px 0 0 4px;
+			}
+
+			.gwpf-promotional-banner .countdown-item:last-child {
+				border-radius: 0 4px 4px 0;
+			}
+
+            .gwpf-promotional-banner .countdown-item span {
+                font-size: 20px;
+				font-weight: 600;
+				line-height: 1;
+				font-family: 'Inter', sans-serif;
+            }
+            .gwpf-promotional-banner .countdown-item small {
+                text-transform: uppercase;
+				color: rgba(255, 255, 255, 0.80);
+				text-align: center;
+				font-family: Inter;
+				font-size: 12px;
+				font-weight: 400;
+				line-height: 1;
+				letter-spacing: 0.24px;
             }
             .gwpf-promotional-banner .cta-button {
-                color: #201CFE;
+                color: #fff;
 				font-size: 15px;
 				font-style: normal;
-				font-weight: 500;
+				font-weight: 600;
 				line-height: 1;
-				text-decoration: underline;
-				text-decoration-thickness: 1px;
-                text-underline-offset: 5px;
-                display: inline-flex;
-                align-items: center;
-                gap: 5px;
-                transition: all 0.2s ease;
-                background: #fff;
-                padding: 9px 14px;
+				text-decoration: none;
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+				transition: all 0.2s ease;
+				background: #F7941D;
+				border-radius: 6px;
+				padding: 12px 15px;
+				font-family: 'Inter', sans-serif;
             }
             .gwpf-promotional-banner .cta-button svg {
                 transition: transform 0.3s ease;
@@ -335,6 +424,7 @@ class SpecialOccasionBanner
 
 			.gwpf-promotional-banner .cta-button:hover {
                 text-decoration: none;
+				color: #fff;
             }
             .gwpf-promotional-banner .cta-button:hover svg {
                 transform: translateX(3px);
@@ -346,7 +436,7 @@ class SpecialOccasionBanner
 				top: 50%;
 				right: 10px;
 				transform: translateY(-50%);
-                background: #fff;
+                background: transparent;
                 border: none;
                 padding: 0;
                 border-radius:0;
@@ -367,12 +457,8 @@ class SpecialOccasionBanner
 
             @media only screen and (max-width: 1199px) {
 				.gwpf-promotional-banner .banner-content {
-					gap: 20px;
+					gap: 40px;
 					row-gap: 8px;
-				}
-
-				.gwpf-promotional-banner .cta-button {
-					padding-top: 0;
 				}
 			}
 

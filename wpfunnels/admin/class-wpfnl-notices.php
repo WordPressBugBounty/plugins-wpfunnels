@@ -559,7 +559,7 @@ class Notice {
      * @since  2.6.1
      */
     public function wpfnl_delete_promotional_banner( $payload ){
-        update_option('_is_show_ugcify_banner', 'no' );
+        update_option('_is_show_us_banner', 'no' );
         return [
             'success' => true,
         ];

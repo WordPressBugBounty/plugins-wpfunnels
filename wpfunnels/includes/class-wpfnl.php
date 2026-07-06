@@ -430,7 +430,7 @@ class Wpfnl
         $this->widget_manager           = Widget_Manager::getInstance()->init();
         $this->page_templates           = new PageTemplates\Manager();
         $this->admin_notice             = new Notice();
-        $this->admin_banner             = new SpecialOccasionBanner('ugcity', '2026-03-16 00:00:01', '2026-03-24 23:59:59', 'https://rextheme.com/ugc-for-woocommerce-ugcify/?utm_source=plugin&utm_medium=dashboard-banner-wpf&utm_campaign=ugcify-early-access');
+        $this->admin_banner             = new SpecialOccasionBanner('4thjuly', '2026-07-02 00:00:01', '2026-07-07 23:59:59', 'https://getwpfunnels.com/pricing/?utm_source=plugin&utm_medium=dashboard-banner-wpf&utm_campaign=4THJULY2026');
         $this->setup_reminder_banner    = new SetupReminderBanner();
         $this->order_bump_actions       = new Wpfnl_Order_Bump_Action();
         $this->testimonial_actions      = new Wpfnl_Testimonial_Action();
