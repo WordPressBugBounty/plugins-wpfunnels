@@ -507,60 +507,93 @@ class Module extends Wpfnl_Frontend_Module
 	 */
 	public function save_checkout_fields( $order_id, $posted )
 	{
-		// Instantiate the CheckoutModuleHelper
-		$helper = CheckoutHelper::getInstance();
-
-		if (isset($_POST['_wpfunnels_checkout_id'])) {
-			$helper->update_checkout_id_post_meta($order_id, sanitize_text_field( $_POST['_wpfunnels_checkout_id'] ) );
-			if (isset($_POST['_wpfunnels_funnel_id'])) {
-				$funnel_id = $helper->update_order_meta_for_funnel($order_id, sanitize_text_field($_POST['_wpfunnels_funnel_id']));
-			}
-			if (isset($_POST['_wpfunnels_order_unique_identifier'])) {
-				$helper->update_unique_identifier_post_meta($order_id, sanitize_text_field($_POST['_wpfunnels_order_unique_identifier']));
-			}
-			$order_bump_products = get_post_meta( $_POST['_wpfunnels_checkout_id'], 'order-bump-settings' , true );
-			$helper->update_order_bump_product( $order_bump_products, $order_id );
+		if ( ! isset( $_POST['_wpfunnels_checkout_id'] ) || ! Wpfnl_functions::is_wc_active() ) {
+			return;
 		}
 
-		if (isset($funnel_id)) {
-			$order     = Wpfnl_functions::is_wc_active() ? wc_get_order($order_id) : null;
+		$checkout_id = sanitize_text_field( wp_unslash( $_POST['_wpfunnels_checkout_id'] ) );
+		$funnel_id   = isset( $_POST['_wpfunnels_funnel_id'] ) ? sanitize_text_field( wp_unslash( $_POST['_wpfunnels_funnel_id'] ) ) : '';
 
-			$funnel_id = $helper->update_order_meta_for_funnel($order_id, sanitize_text_field( $_POST['_wpfunnels_funnel_id']) );
+		// Load order once for all meta operations.
+		$order = wc_get_order( $order_id );
+		if ( ! $order || is_wp_error( $order ) ) {
+			return;
+		}
 
-			if( $funnel_id ){
-				$discount_instance = new WpfnlDiscount();
+		$order->update_meta_data( '_wpfunnels_checkout_id', wc_clean( $checkout_id ) );
 
-				if( !$discount_instance->maybe_time_bound_discount( $_POST['_wpfunnels_checkout_id'] ) || ($discount_instance->maybe_time_bound_discount( $_POST['_wpfunnels_checkout_id'] ) && $discount_instance->maybe_validate_discount_time( $_POST['_wpfunnels_checkout_id'] )) ){
-					$discount          = $discount_instance->get_discount_settings( $_POST['_wpfunnels_checkout_id'] );
-					$main_products     = $helper->get_main_products( $_POST['_wpfunnels_checkout_id'], $funnel_id );
+		if ( $funnel_id ) {
+			$order->update_meta_data( '_wpfunnels_funnel_id', $funnel_id );
+			$order->update_meta_data( '_wpfunnels_order', 'yes' );
+		}
 
-					$variable_product_check  = $helper->variable_product_check( $order->get_items(), $main_products, false );
-					$main_products           = isset( $variable_product_check['main_products'] ) ? $variable_product_check['main_products'] : $main_products;
+		if ( isset( $_POST['_wpfunnels_order_unique_identifier'] ) ) {
+			$order->update_meta_data( '_wpfunnels_order_unique_identifier', wc_clean( sanitize_text_field( wp_unslash( $_POST['_wpfunnels_order_unique_identifier'] ) ) ) );
+		}
 
-					$is_main_product_in_cart = isset( $variable_product_check['is_main_product_in_cart'] ) ? $variable_product_check['is_main_product_in_cart'] : false;
-					$is_regular = isset( $discount['discountOptions'], $discount['discountapplyto']) && 'original' !== $discount['discountOptions'] && 'sale' !== $discount['discountapplyto'];
-
-					$total                   = $helper->get_custom_subtotal($is_regular);
-					$response = $helper->apply_discount_and_update_total( $order, $total, $discount, $is_main_product_in_cart);
+		// Process order bump products using the already-loaded order object.
+		$order_bump_products = get_post_meta( $checkout_id, 'order-bump-settings', true );
+		if ( is_array( $order_bump_products ) ) {
+			$ob_products = [];
+			foreach ( $order_bump_products as $key => $orderBumpProduct ) {
+				if ( ! isset( $_POST[ '_wpfunnels_order_bump_product_' . $key ] ) ) {
+					continue;
+				}
+				$ob_product_id = wc_clean( sanitize_text_field( wp_unslash( $_POST[ '_wpfunnels_order_bump_product_' . $key ] ) ) );
+				$order->update_meta_data( '_wpfunnels_order_bump_product', $ob_product_id );
+				foreach ( $order->get_items() as $order_item_id => $order_item ) {
+					$product_id = ! empty( $order_item['variation_id'] ) ? $order_item['variation_id'] : $order_item['product_id'];
+					if ( $ob_product_id == $product_id ) {
+						$ob_products[] = $ob_product_id;
+						wc_add_order_item_meta( $order_item_id, '_wpfunnels_order_bump', 'yes' );
+					}
 				}
 			}
-    		$user_id = $order->get_user_id();
-			$orders[sanitize_text_field($_POST['_wpfunnels_checkout_id'])] = $order_id;
-			WC()->session->set('wpfnl_orders_'.$user_id.'_'.$funnel_id, $orders);
+			if ( ! empty( $ob_products ) ) {
+				$order->update_meta_data( '_wpfunnels_order_bump_products', $ob_products );
+			}
+		}
+
+		// Single save for all meta accumulated above.
+		$order->save();
+
+		if ( $funnel_id ) {
+			$helper            = CheckoutHelper::getInstance();
+			$discount_instance = new WpfnlDiscount();
+			$is_time_bound     = $discount_instance->maybe_time_bound_discount( $checkout_id );
+
+			if ( ! $is_time_bound || $discount_instance->maybe_validate_discount_time( $checkout_id ) ) {
+				$discount      = $discount_instance->get_discount_settings( $checkout_id );
+				$main_products = $helper->get_main_products( $checkout_id, $funnel_id );
+
+				$variable_product_check  = $helper->variable_product_check( $order->get_items(), $main_products, false );
+				$main_products           = isset( $variable_product_check['main_products'] ) ? $variable_product_check['main_products'] : $main_products;
+				$is_main_product_in_cart = isset( $variable_product_check['is_main_product_in_cart'] ) ? $variable_product_check['is_main_product_in_cart'] : false;
+				$is_regular              = isset( $discount['discountOptions'], $discount['discountapplyto'] )
+					&& 'original' !== $discount['discountOptions']
+					&& 'sale' !== $discount['discountapplyto'];
+
+				$total = $helper->get_custom_subtotal( $is_regular );
+				$helper->apply_discount_and_update_total( $order, $total, $discount, $is_main_product_in_cart );
+			}
+
+			$user_id                          = $order->get_user_id();
+			$orders[ $checkout_id ]           = $order_id;
+			WC()->session->set( 'wpfnl_orders_' . $user_id . '_' . $funnel_id, $orders );
 
 			$session_handler = new WC_Session_Handler();
-			WC()->session->set('wpfnl_order_owner', $session_handler->generate_customer_id());
+			WC()->session->set( 'wpfnl_order_owner', $session_handler->generate_customer_id() );
 
 			/**
 			 * Fires after a funnel order is placed.
 			 *
 			 * @since 1.0.0
 			 *
-			 * @param int    $order_id               The ID of the order.
-			 * @param string $funnel_id              The ID of the funnel.
-			 * @param string $_POST['_wpfunnels_checkout_id']  The checkout ID associated with the order.
+			 * @param int    $order_id    The ID of the order.
+			 * @param string $funnel_id   The ID of the funnel.
+			 * @param string $checkout_id The checkout step ID associated with the order.
 			 */
-			do_action( 'wpfunnels/funnel_order_placed', $order_id, $funnel_id, $_POST['_wpfunnels_checkout_id'] );
+			do_action( 'wpfunnels/funnel_order_placed', $order_id, $funnel_id, $checkout_id );
 		}
 	}
 

@@ -198,6 +198,9 @@ class SettingsController extends Wpfnl_REST_Controller {
         if ( empty( $group_id ) ) {
             return new WP_Error( 'rest_setting_setting_group_invalid', __( 'Invalid setting group.', 'wpfnl' ), array( 'status' => 404 ) );
         }
+        if ( ! $this->is_allowed_settings_group( $group_id ) ) {
+            return new WP_Error( 'rest_setting_setting_group_invalid', __( 'Invalid setting group.', 'wpfnl' ), array( 'status' => 403 ) );
+        }
         $settings = Wpfnl_functions::get_admin_settings( $group_id );
         if ( empty( $settings ) ) {
             return new WP_Error( 'rest_setting_setting_group_invalid', __( 'Invalid setting group.', 'wpfnl' ), array( 'status' => 404 ) );
@@ -409,6 +412,47 @@ class SettingsController extends Wpfnl_REST_Controller {
 
 
     /**
+     * Validate a settings group_id against WPFunnels-owned option keys.
+     *
+     * The `group_id` path parameter is passed straight into get_option()/update_option(),
+     * so it MUST be restricted to plugin-owned option names. Without this guard a request
+     * could target arbitrary WordPress options (e.g. `wp_user_roles`) and escalate privileges.
+     *
+     * @param string $group_id Option key supplied via the route.
+     *
+     * @return bool True when the key is a WPFunnels-owned option, false otherwise.
+     * @since  3.12.9
+     */
+    protected function is_allowed_settings_group( $group_id ) {
+        if ( ! is_string( $group_id ) || '' === $group_id ) {
+            return false;
+        }
+
+        $allowed = array(
+            '_wpfunnels_general_settings',
+            '_wpfunnels_permalink_settings',
+            '_wpfunnels_optin_settings',
+            '_wpfunnels_advanced_settings',
+            '_wpfunnels_integrations',
+            '_wpfunnels_notification_settings',
+            '_wpfunnels_lms_settings',
+            '_wpfunnels_recaptcha_setting',
+            '_wpfunnels_google_map_api_key',
+            '_wpfunnels_user_roles',
+        );
+
+        if ( in_array( $group_id, $allowed, true ) ) {
+            return true;
+        }
+
+        // Defense in depth: only allow plugin-prefixed option keys so add-ons that
+        // register their own `_wpfunnels_*` settings groups keep working, while any
+        // WordPress core / third-party option name is rejected.
+        return 0 === strpos( $group_id, '_wpfunnels_' );
+    }
+
+
+    /**
      * Update a single setting in a group.
      *
      * @param WP_REST_Request $request Request data.
@@ -418,6 +462,9 @@ class SettingsController extends Wpfnl_REST_Controller {
      */
     public function update_settings( $request ) {
         if( isset( $request['settings_id'], $request['group_id'] )){
+            if ( ! $this->is_allowed_settings_group( $request['group_id'] ) ) {
+                return new WP_Error( 'rest_setting_group_invalid', __( 'Invalid setting group.', 'wpfnl' ), array( 'status' => 403 ) );
+            }
             if( $request['settings_id'] === 'permalink') {
                 $default = Wpfnl_functions::get_permalink_settings();
                 $settings = Wpfnl_functions::get_admin_settings( '_wpfunnels_permalink_settings', $default);

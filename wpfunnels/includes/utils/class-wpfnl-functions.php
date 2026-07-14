@@ -1196,7 +1196,11 @@ class Wpfnl_functions {
 	 * @since 2.0.5
 	 */
 	public static function get_funnel_data( $funnel_id ) {
-		return get_post_meta( $funnel_id, '_funnel_data', true );
+		static $cache = [];
+		if ( ! array_key_exists( $funnel_id, $cache ) ) {
+			$cache[ $funnel_id ] = get_post_meta( $funnel_id, '_funnel_data', true );
+		}
+		return $cache[ $funnel_id ];
 	}
 
 

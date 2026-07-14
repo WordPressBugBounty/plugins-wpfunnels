@@ -1,11 +1,11 @@
 === WPFunnels – Funnel Builder for WooCommerce with Checkout & One Click Upsell ===
 Contributors: coderexltd, getwpfunnels, coderexco
 Donate link: https://getwpfunnels.com/
-Tags: woocommerce funnel builder, order bump, one click upsell, custom checkout, sales funnel builder, lead generation, sales funnels
+Tags: funnel builder, woocommerce checkout, order bump, woocommerce funnel builder,one click upsell, lead generation, sales funnels
 Requires at least: 6.1
 Tested up to:  7.0
 Requires PHP: 7.4
-Stable tag: 3.12.8
+Stable tag: 3.12.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,9 +14,6 @@ WPFunnels is a powerful funnel builder for WooCommerce that helps store owners c
 == Description ==
 
 If you're looking for a WooCommerce funnel builder to increase average order value and boost conversions, WPFunnels gives you full control over your checkout flow. Design custom WooCommerce checkout pages, customize thank you pages, and add revenue-boosting offers without touching code.
-
-
-
 
 
 With WPFunnels, you can:
@@ -546,6 +543,9 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.12.9 (2026-07-14) =
+* Security: Fixed a privilege escalation vulnerability in the settings REST endpoint
 
 = 3.12.8 (2026-07-06) =
 * Compatibility: Resolved design conflicts with the Woodmart theme on funnel checkout pages

@@ -60,38 +60,55 @@ class CheckoutHelper extends Module
      * @since 2.7.9
      */
     public function variable_product_check( $order_items, $main_products, $is_main_product_in_cart ) {
-        if ( is_array($order_items) && is_array($main_products) ){
-            foreach( $order_items as $order_item ){
-                $default_product_id = isset( $order_item['product_id'] ) ? $order_item['product_id'] : 0;
-                $product_id         = !empty( $order_item['variation_id'] ) ? $order_item['variation_id'] : $default_product_id;
-                if( !empty($main_products) && is_array($main_products) ){
-                    $key = array_search($product_id, array_column($main_products, 'id'));
-                    foreach( $main_products as $key=>$main_product ){
-                        if( isset($main_product['id']) ){
-                            $product_obj = wc_get_product( $product_id );
-                            if( $product_obj ){
-                                $_product_id = 'variation' === $product_obj->get_type() ? $product_obj->get_parent_id() : $product_obj->get_id();
-                                $main_product_obj = wc_get_product( $main_product['id'] );
-                                $main_product_id = 'variation' === $main_product_obj->get_type() ? $main_product_obj->get_parent_id() : $main_product_obj->get_id();
-                                if( (int)$main_product_id === $_product_id){
-                                    $is_main_product_in_cart = true;
-                                    $main_products[$key]['id'] = $product_id;
-                                    break;
-                                }
-                            }
-                        }
+        if ( ! is_array( $order_items ) || ! is_array( $main_products ) || empty( $main_products ) ) {
+            return [
+                'main_products'           => $main_products,
+                'is_main_product_in_cart' => $is_main_product_in_cart,
+            ];
+        }
 
-                    }
+        // Build a canonical-ID map for order items once (O(n)) instead of inside the inner loop.
+        $order_item_canonical = [];
+        foreach ( $order_items as $order_item ) {
+            $pid = ! empty( $order_item['variation_id'] ) ? $order_item['variation_id'] : ( isset( $order_item['product_id'] ) ? $order_item['product_id'] : 0 );
+            if ( $pid && ! isset( $order_item_canonical[ $pid ] ) ) {
+                $obj = wc_get_product( $pid );
+                $order_item_canonical[ $pid ] = $obj ? ( 'variation' === $obj->get_type() ? $obj->get_parent_id() : $obj->get_id() ) : $pid;
+            }
+        }
+
+        // Build a canonical-ID map for main products once (O(m)).
+        $main_canonical = [];
+        foreach ( $main_products as $key => $main_product ) {
+            if ( ! isset( $main_product['id'] ) ) {
+                continue;
+            }
+            $mid = $main_product['id'];
+            if ( ! isset( $main_canonical[ $mid ] ) ) {
+                $obj = wc_get_product( $mid );
+                $main_canonical[ $mid ] = $obj ? ( 'variation' === $obj->get_type() ? $obj->get_parent_id() : $obj->get_id() ) : $mid;
+            }
+        }
+
+        // Match using pre-built maps (O(n*m) comparisons but zero extra DB calls).
+        foreach ( $order_item_canonical as $pid => $canonical_pid ) {
+            foreach ( $main_products as $key => $main_product ) {
+                if ( ! isset( $main_product['id'] ) ) {
+                    continue;
                 }
-                if( $is_main_product_in_cart ){
-                    break;
+                $main_canonical_id = $main_canonical[ $main_product['id'] ] ?? $main_product['id'];
+                if ( (int) $main_canonical_id === (int) $canonical_pid ) {
+                    $is_main_product_in_cart   = true;
+                    $main_products[ $key ]['id'] = $pid;
+                    break 2;
                 }
             }
         }
-        return array(
+
+        return [
             'main_products'           => $main_products,
-            'is_main_product_in_cart' => $is_main_product_in_cart
-        );
+            'is_main_product_in_cart' => $is_main_product_in_cart,
+        ];
     }
 
     /**
