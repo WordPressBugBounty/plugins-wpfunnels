@@ -76,7 +76,7 @@ class OrderToStatTableMigration extends AbstractMigrations {
 	 */
 	private function get_sql() {
 		global $wpdb;
-		if ( class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil' ) && OrderUtil::custom_orders_table_usage_is_enabled() ) {
+		if ( class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil' ) && function_exists( 'wc_get_container' ) && OrderUtil::custom_orders_table_usage_is_enabled() ) {
 			return "
 				SELECT o.id as id
 				FROM {$wpdb->prefix}wc_orders o

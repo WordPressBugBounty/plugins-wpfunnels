@@ -51,12 +51,34 @@ class Module extends Wpfnl_Admin_Module
             $automation_version = isset($automation_asset['version']) ? $automation_asset['version'] : $automation_version;
         }
 
+        // The automation-canvas bundle ships its own copy of lodash (pulled in by
+        // easy-email's `import { ... } from "lodash"`). Lodash's UMD wrapper self-registers
+        // as the global `_`, clobbering WP core's Underscore.js that media-views.js relies
+        // on for `_.each(list, iteratee, context)` context-binding — breaking the media
+        // modal ("this.activateMode is not a function") once this script has run.
+        // Force load-order against 'underscore' and snapshot/restore the real global
+        // around it rather than reworking the bundled easy-email/lodash import graph.
+        $automation_dependencies[] = 'underscore';
+        $automation_dependencies   = array_unique($automation_dependencies);
+
+        wp_add_inline_script(
+            'underscore',
+            'window.__wpfnlCoreUnderscore = window.__wpfnlCoreUnderscore || window._;',
+            'after'
+        );
+
         wp_enqueue_script(
             'wpfnl-automation-canvas',
             WPFNL_URL . 'admin/assets/dist/js/automation-canvas.min.js',
             $automation_dependencies,
             $automation_version,
             true
+        );
+
+        wp_add_inline_script(
+            'wpfnl-automation-canvas',
+            'if (window.__wpfnlCoreUnderscore) { window._ = window.__wpfnlCoreUnderscore; }',
+            'after'
         );
 
         // Enqueue automation-canvas styles
@@ -73,6 +95,15 @@ class Module extends Wpfnl_Admin_Module
                 );
             }
         }
+
+        // The automation editor's own full-screen overlay (.wpfnl-automation-modal, see
+        // admin/src/automation-canvas/AutomationModal.scss) sits at z-index: 999999,
+        // higher than WP core's default .media-modal z-index — pushing the media
+        // library modal behind the editor chrome. Force it back on top.
+        wp_add_inline_style(
+            'media-views',
+            '.media-modal { z-index: 9999999999 !important; } .media-modal-backdrop { z-index: 999999998 !important; }'
+        );
 
         // Localize script with data
         wp_localize_script(

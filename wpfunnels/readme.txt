@@ -5,7 +5,7 @@ Tags: funnel builder, woocommerce checkout, order bump, woocommerce funnel build
 Requires at least: 6.1
 Tested up to:  7.0
 Requires PHP: 7.4
-Stable tag: 3.12.9
+Stable tag: 3.12.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -543,6 +543,10 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.12.10 (2026-07-21) =
+* BugFix: Fixed a fatal error caused by WooCommerce order utilities not being fully loaded
+* BugFix: Fixed the media library modal not opening on top of the automation email builder
 
 = 3.12.9 (2026-07-14) =
 * Security: Fixed a privilege escalation vulnerability in the settings REST endpoint

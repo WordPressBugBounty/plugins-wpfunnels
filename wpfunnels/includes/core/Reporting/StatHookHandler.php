@@ -17,7 +17,7 @@ class StatHookHandler
 		add_action('template_redirect', array($this, 'track_funnel_checkout_visit'), 1);
 		add_action('wp_footer', array($this, 'track_native_checkout_visit'));
 
-		if (class_exists('\Automattic\WooCommerce\Utilities\OrderUtil') && OrderUtil::custom_orders_table_usage_is_enabled()) {
+		if (class_exists('\Automattic\WooCommerce\Utilities\OrderUtil') && function_exists('wc_get_container') && OrderUtil::custom_orders_table_usage_is_enabled()) {
 			add_action('woocommerce_delete_order', array($this, 'delete_stat_data'));
 		} else {
 			add_action('delete_post', array($this, 'delete_stat_data'));
