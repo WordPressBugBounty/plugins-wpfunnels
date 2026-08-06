@@ -1,15 +1,15 @@
 === WPFunnels – Funnel Builder for WooCommerce with Checkout & One Click Upsell ===
 Contributors: coderexltd, getwpfunnels, coderexco
 Donate link: https://getwpfunnels.com/
-Tags: funnel builder, woocommerce checkout, order bump, woocommerce funnel builder,one click upsell, lead generation, sales funnels
+Tags: funnel builder, woocommerce checkout, order bump, woocommerce funnel builder, one click upsell
 Requires at least: 6.1
 Tested up to:  7.0
 Requires PHP: 7.4
-Stable tag: 3.12.10
+Stable tag: 3.12.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-WPFunnels is a powerful funnel builder for WooCommerce that helps store owners create high-converting WooCommerce checkout pages, sales funnels, one-click upsells, and order bumps --- all inside WordPress.
+WooCommerce funnel builder to create custom checkout pages, sales funnels, one-click upsells, and order bumps - all inside WordPress.
 
 == Description ==
 
@@ -52,27 +52,15 @@ Most WooCommerce stores are suffering from low profit margins and high acquisiti
 
 And no, it's not due to a lack of traffic or low no. of orders. Rather, they are leaving a significant amount of revenue on the table without even realizing it.
 
-Why?
-
-It's because they never focus on a key revenue growth lever – the Average Order Value (AOV).
+Why? It's because they never focus on a key revenue growth lever – the Average Order Value (AOV).
 
 You see, it is actually possible to earn 20-30% more from every buyer just by introducing relevant order bumps and upsell offers to your checkout flow.
 
-And if you do the math, this extra earning can lead to higher profits.
+**Let's do the math:**
 
-**Let's do the math with an example:**
+For a $50 order with a total cost of $35 (COGs + shipping + Acquisition Cost/CAC), you make $15 in profit.
 
-For a $50 order, let’s say your total cost is $35 (COGs + shipping + Acquisition Cost/CAC).
-
-So you make $15 in profit.
-
-Now, imagine you used order bumps and upsells, and the buyer ended up spending $65 instead.
-
-<em>Here, COGs and shipping costs may vary depending on what products you offer.</em>
-
-But, the CAC... It will remain the same! You've already paid to acquire the customer, right?
-
-So, your overall costs may increase by $5-$10 (as per benchmark). That means your cost may grow to $45.
+Now, imagine order bumps and upsells pushed that order to $65. Your costs may grow to $45, since only COGs and shipping go up — the CAC stays the same, because you've already paid to acquire the customer.
 
 Even so, you will have made $20 in profits (a 25% hike)!
 
@@ -90,9 +78,7 @@ That's because the usual checkout process...
 
 WPFunnels was built to be the go-to WooCommerce funnel builder that comes with a complete toolkit to help you take control of the checkout experience, from designing a custom WooCommerce checkout page to setting up one-click upsells and order bumps that convert.
 
-Whether you run a product store, a subscription service, or sell digital goods through WooCommerce, you will be able to optimize your WooCommerce store to significantly increase your average order value, meaning more revenue from the same buyers without additional costs.
-
-No need to hire developers, use expensive SaaS tools, or stitch external tools for your WooCommerce store.
+Whether you run a product store, a subscription service, or sell digital goods, you can significantly increase your average order value — more revenue from the same buyers, without additional costs, developers, or expensive SaaS tools.
 
 = Getting Started Is Simple =
 
@@ -543,6 +529,15 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 11. All Your Funnels In One Place
 
 == Changelog ==
+
+= 3.12.11 (2026-08-06) =
+* Fix: Product and post categories now load correctly in the automation email builder panels
+* Fix: Switching the Product block filter to "Products by category" no longer crashes the editor
+* Fix: WooCommerce expired sale prices no longer appear as the original price at checkout
+* Fix: Sale price resolution is now schedule-aware across simple products, variations, and add-to-cart paths
+* Fix: Unsaved changes prompt no longer appears after a successful automation canvas save
+* Fix: Funnel import validation messages now display correctly in the import modal
+* Fix: Import errors from server-side validation are no longer silently swallowed
 
 = 3.12.10 (2026-07-21) =
 * BugFix: Fixed a fatal error caused by WooCommerce order utilities not being fully loaded

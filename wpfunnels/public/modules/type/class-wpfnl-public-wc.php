@@ -504,8 +504,9 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 					$price_type = $this->get_product_price_type( $funnel_id, $checkout_id );
 
 					if( $price_type == 'original' ||  $price_type == 'sale' ){
+						$variation_object = wc_get_product( $variation_id );
 						$cart_item_data = [
-							'custom_price' 	=> get_post_meta($variation_id, '_price', true) ? get_post_meta($variation_id, '_price', true) : get_post_meta($variation_id, '_regular_price', true)
+							'custom_price' 	=> $variation_object->is_on_sale() ? $variation_object->get_sale_price() : $variation_object->get_regular_price()
 						];
 					}else{
 						$cart_item_data = [

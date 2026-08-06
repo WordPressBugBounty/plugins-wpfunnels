@@ -174,8 +174,60 @@ class Module extends Wpfnl_Admin_Module
                 'post_types'                     => array(),
                 'contact_general_fields'         => array(),
                 'contact_custom_fields'          => array(),
+                'editor_data_source'             => $this->get_editor_data_source(),
             )
         );
+    }
+
+    /**
+     * Provide the product/post category options the email builder's custom
+     * block panels (e.g. ProductBlock) read from MRM_Vars.editor_data_source.
+     * Without this key present, `options={undefined}` is passed to a Select
+     * field, which throws "Cannot read properties of undefined (reading 'map')"
+     * the moment that panel renders.
+     *
+     * @return array
+     * @since 3.12.10
+     */
+    private function get_editor_data_source()
+    {
+        return array(
+            'product_categories' => $this->get_formatted_categories( 'product_cat' ),
+            'post_categories'    => $this->get_formatted_categories( 'category' ),
+            'placeholder_image'  => '',
+        );
+    }
+
+    /**
+     * Fetch terms for a taxonomy formatted as {value, label} pairs.
+     *
+     * @param string $taxonomy Taxonomy name.
+     * @return array
+     * @since 3.12.10
+     */
+    private function get_formatted_categories( $taxonomy )
+    {
+        if ( ! taxonomy_exists( $taxonomy ) ) {
+            return array();
+        }
+
+        $terms = get_categories(
+            array(
+                'taxonomy'   => $taxonomy,
+                'orderby'    => 'name',
+                'hide_empty' => false,
+            )
+        );
+
+        $formatted = array();
+        foreach ( $terms as $term ) {
+            $formatted[] = array(
+                'value' => $term->term_id,
+                'label' => $term->name,
+            );
+        }
+
+        return $formatted;
     }
 
     public function get_view()

@@ -879,6 +879,45 @@
         }
 
         /**
+         * Show a validation/error message inside the import funnel modal.
+         *
+         * The message element carries a default text, so it is always set
+         * explicitly here to avoid leaking a previous message.
+         *
+         * @param message
+         * @since 2.6.3
+         */
+        FunnelHandler.prototype.ShowImportWarning = function (message) {
+            $('#wpfnl-export-import-warning')
+                .text(message || 'Please select a valid file.')
+                .css('display', 'inline-block')
+            $('#wpfnl-import-funnel .wpfnl-loader').css('display', 'none')
+        }
+
+        /**
+         * Pull the error message out of an ajax response.
+         *
+         * wp_send_json_error() responses arrive either as a parsed body
+         * (HTTP 200) or on the jqXHR when a status code was passed.
+         *
+         * @param response
+         * @since 2.6.3
+         */
+        FunnelHandler.prototype.GetImportErrorMessage = function (response) {
+            const body = response && response.responseJSON ? response.responseJSON : response
+
+            if (body && body.data && body.data.message) {
+                return body.data.message
+            }
+
+            if (body && typeof body.data === 'string') {
+                return body.data
+            }
+
+            return ''
+        }
+
+        /**
          *
          * Ajax handler for import funnels
          * funnel action
@@ -888,6 +927,8 @@
          */
         FunnelHandler.prototype.ImportFunnels = function (event) {
             event.preventDefault()
+            // `this` is the submitted form here, so reach the helpers via the prototype.
+            const handler = FunnelHandler.prototype
             $('#wpfnl-import-funnel .wpfnl-loader').css('display', 'inline-block')
             $('#wpfnl-export-import-warning').css('display', 'none')
             let formData = new FormData(this)
@@ -909,26 +950,25 @@
                         processData: false,
                         data: formData,
                         success: function (response) {
-                            window.location.reload();
+                            // wp_send_json_error() without a status code still returns HTTP 200.
+                            if (response && false === response.success) {
+                                handler.ShowImportWarning(handler.GetImportErrorMessage(response))
+                                return
+                            }
                             $('#wpfnl-import-funnel .wpfnl-loader').css('display', 'none')
                             $('.import-funnel-modal').removeClass('show-modal')
+                            window.location.reload()
                         },
-                    }).done(function (request, status, XHR) {
-                        if (status.success) {
-                            // window.location.reload();
-                        }
-                        $('#wpfnl-import-funnel .wpfnl-loader').css('display', 'none')
-                        $('.import-funnel-modal').removeClass('show-modal')
+                        error: function (jqXHR) {
+                            // Validation failures are sent with a 4xx status code.
+                            handler.ShowImportWarning(handler.GetImportErrorMessage(jqXHR))
+                        },
                     })
                 } else {
-                    $('#wpfnl-export-import-warning').css('display', 'inline-block')
-                    $('#wpfnl-export-import-warning').css('color', '#d63638 !important')
-                    $('#wpfnl-import-funnel .wpfnl-loader').css('display', 'none')
+                    handler.ShowImportWarning('Please select a valid file.')
                 }
             } else {
-                $('#wpfnl-export-import-warning').css('display', 'inline-block')
-                $('#wpfnl-export-import-warning').css('color', '#d63638 !important')
-                $('#wpfnl-import-funnel .wpfnl-loader').css('display', 'none')
+                handler.ShowImportWarning('Please select a valid file.')
             }
         }
 
@@ -956,8 +996,7 @@
                     $('.import-funnel-modal .import-label > p').text(fileName)
                 } else {
                     $('.import-funnel-modal .import-label').removeClass('file-added')
-                    $('#wpfnl-export-import-warning').css('display', 'inline-block')
-                    $('#wpfnl-export-import-warning').css('color', '#d63638 !important')
+                    FunnelHandler.prototype.ShowImportWarning('Please select a valid file.')
 
                     $('.import-funnel-modal .import-label > h4').html(
                         'Drag & Drop or <span class="primary-color">Choose file</span> to upload.',
@@ -968,8 +1007,7 @@
                 }
             } else {
                 $('.import-funnel-modal .import-label').removeClass('file-added')
-                $('#wpfnl-export-import-warning').css('display', 'inline-block')
-                $('#wpfnl-export-import-warning').css('color', '#d63638 !important')
+                FunnelHandler.prototype.ShowImportWarning('Please select a valid file.')
 
                 $('.import-funnel-modal .import-label > h4').html(
                     'Drag & Drop or <span class="primary-color">Choose file</span> to upload.',

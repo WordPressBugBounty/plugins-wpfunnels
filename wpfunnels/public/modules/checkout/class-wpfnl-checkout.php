@@ -746,7 +746,7 @@ class Module extends Wpfnl_Frontend_Module
 							$is_bundle_exist = false;
 							if( $price_type == 'original' ||  $price_type == 'sale' ){
 								$custom_data = [
-									'custom_price' 	=> $product_object->get_sale_price() ? $product_object->get_sale_price() : get_post_meta($product_id, '_price', true),
+									'custom_price' 	=> $product_object->is_on_sale() ? $product_object->get_sale_price() : $product_object->get_regular_price(),
 									'product_type'  => $product_type
 								];
 							}else{
@@ -943,7 +943,8 @@ class Module extends Wpfnl_Frontend_Module
             return;
         }
 
-        $parent_id = wc_get_product( $variation_id )->get_parent_id();
+        $variation_object = wc_get_product( $variation_id );
+        $parent_id = $variation_object->get_parent_id();
         if( !$parent_product ) {
             $parent_product = wc_get_product( $parent_id );
         }
@@ -955,7 +956,7 @@ class Module extends Wpfnl_Frontend_Module
 		$custom_data = [];
 		if( $price_type == 'original' ||  $price_type == 'sale' ){
 			$custom_data = [
-				'custom_price' 	=> get_post_meta($variation_id, '_price', true) ? get_post_meta($variation_id, '_price', true) : get_post_meta($variation_id, '_regular_price', true),
+				'custom_price' 	=> $variation_object->is_on_sale() ? $variation_object->get_sale_price() : $variation_object->get_regular_price(),
 				'product_type'  => $product_type
 			];
 		}else{
