@@ -26,6 +26,13 @@ use WPFunnels\Wpfnl_functions;
 class Wpfnl_Activator
 {
 
+	/**
+	 * Flags that the one-time canvas layout pin has already run.
+	 *
+	 * @since 3.12.13
+	 */
+	const BUILDER_MODE_PINNED_OPTION = 'wpfunnels_builder_mode_pinned';
+
 	private static $db_updates = array(
 		'3.5.0' => array(
 			'wpf_create_350_stat_table',
@@ -33,6 +40,9 @@ class Wpfnl_Activator
 		),
 		'3.11.0' => array(
 			'wpf_create_3110_checkout_visits_table',
+		),
+		'3.12.12' => array(
+			'wpf_add_31212_stats_funnel_status_index',
 		),
 	);
 
@@ -43,6 +53,7 @@ class Wpfnl_Activator
 	 * @return void
 	 */
 	public static function init() {
+		add_action( 'init', array( __CLASS__, 'maybe_pin_legacy_builder_mode' ), 1 );
 		add_action( 'init', array( __CLASS__, 'update' ), 20 );
 		add_action('wpfunnels_run_update_callback', array( __CLASS__, 'run_update_callback' ) );
 	}
@@ -205,7 +216,11 @@ class Wpfnl_Activator
 	}
 
 	/**
-	 * Seed funnel_builder_mode to 'horizontal' for brand-new installs.
+	 * Seed funnel_builder_mode for brand-new installs.
+	 *
+	 * Writes the current default explicitly so the value in the database always
+	 * reflects a decision, and marks the legacy pin as handled — a fresh install
+	 * has no old default to preserve.
 	 *
 	 * @since 3.11.0
 	 */
@@ -213,9 +228,45 @@ class Wpfnl_Activator
 	{
 		$general_settings = get_option( '_wpfunnels_general_settings', array() );
 		if ( ! isset( $general_settings['funnel_builder_mode'] ) ) {
+			$general_settings['funnel_builder_mode'] = Wpfnl_functions::DEFAULT_FUNNEL_BUILDER_MODE;
+			update_option( '_wpfunnels_general_settings', $general_settings );
+		}
+
+		update_option( self::BUILDER_MODE_PINNED_OPTION, 'yes' );
+	}
+
+
+	/**
+	 * Keep pre-existing sites on the horizontal canvas.
+	 *
+	 * The default canvas layout became vertical in 3.12.13. A site that has been
+	 * running without a stored funnel_builder_mode has been on the old horizontal
+	 * default all along, so flipping the fallback would silently rearrange every
+	 * canvas its users know. This writes horizontal in explicitly, once, leaving
+	 * the new default to apply only to installs created after the change. Users
+	 * opt in to vertical from Settings or the canvas view switcher.
+	 *
+	 * Runs synchronously on `init` rather than through the Action Scheduler db
+	 * updates, because a queued job could land after the user has already opened
+	 * the builder and seen the wrong layout.
+	 *
+	 * @since 3.12.13
+	 */
+	public static function maybe_pin_legacy_builder_mode()
+	{
+		if ( 'yes' === get_option( self::BUILDER_MODE_PINNED_OPTION ) ) {
+			return;
+		}
+
+		$general_settings = get_option( '_wpfunnels_general_settings', array() );
+		$general_settings = is_array( $general_settings ) ? $general_settings : array();
+
+		if ( ! isset( $general_settings['funnel_builder_mode'] ) ) {
 			$general_settings['funnel_builder_mode'] = 'horizontal';
 			update_option( '_wpfunnels_general_settings', $general_settings );
 		}
+
+		update_option( self::BUILDER_MODE_PINNED_OPTION, 'yes' );
 	}
 
 	/**

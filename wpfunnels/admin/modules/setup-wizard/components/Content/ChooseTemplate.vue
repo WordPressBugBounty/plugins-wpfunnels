@@ -1,81 +1,70 @@
 <template>
-	<div class="wpfnl-mm-choose-template">
-		<!-- Header -->
-		<div class="wpfnl-mm-setup-header">
-			<h2 class="wpfnl-mm-setup-title">{{ headerContent.title }}</h2>
-			<p class="wpfnl-mm-setup-subtitle">
-				{{ headerContent.subtitle }}
-			</p>
-		</div>
+	<div class="wpfnl-wz-center wpfnl-wz-templates">
+		<h1 class="wpfnl-wz-h1">Setup your new store checkout</h1>
+		<p class="wpfnl-wz-sub">After setup you can change the text and color or even choose an entirely new store checkout design.</p>
 
-		<!-- Templates Grid -->
-		<div class="wpfnl-mm-templates-grid" v-if="!loading">
-			<div
-				v-for="template in templates"
-				:key="template.ID"
-				class="wpfnl-mm-template-card"
-				:class="{ 'active': selectedTemplateId === template.ID }"
-				@click="selectTemplate(template)"
-			>
-				<div class="wpfnl-mm-template-card-preview">
-					<img :src="getCardImage(template)" :alt="template.title" v-if="getCardImage(template)">
-					<div class="wpfnl-mm-template-card-overlay">
-						<button class="wpfnl-mm-btn-preview" @click.stop="showPreview(template)">Preview</button>
-					</div>
-					<div class="wpfnl-mm-template-card-checkmark" v-if="selectedTemplateId === template.ID">
-						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z" fill="#fff"/><path d="M17.3327 8L9.99935 15.3333L6.66602 12" stroke="#6e42d3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-					</div>
-				</div>
-				<div class="wpfnl-mm-template-card-divider"></div>
-				<div class="wpfnl-mm-template-card-body">
-					<h3 class="wpfnl-mm-template-card-title">{{ template.title }}</h3>
-					<span class="wpfnl-mm-template-card-steps" v-if="template.steps">{{ getDisplayStepCount(template) }} Steps</span>
-				</div>
+		<p v-if="errorMessage" class="wpfnl-wz-error" role="alert">{{ errorMessage }}</p>
+
+		<!-- Loading skeletons -->
+		<div v-if="loading" class="wpfnl-wz-template-grid" aria-busy="true">
+			<div v-for="n in 3" :key="n" class="wpfnl-wz-template-card is-skeleton">
+				<div class="wpfnl-wz-template-thumb"></div>
+				<div class="wpfnl-wz-skeleton-line"></div>
+				<div class="wpfnl-wz-skeleton-line is-short"></div>
 			</div>
 		</div>
 
-        <div v-else class="wpfnl-mm-templates-grid wpfnl-mm-templates-skeleton">
-            <div
-                v-for="n in 6"
-                :key="n"
-                class="wpfnl-mm-template-card wpfnl-mm-template-card--skeleton"
-            >
-                <div class="wpfnl-mm-template-card-preview wpfnl-mm-skeleton-block"></div>
-                <div class="wpfnl-mm-template-card-divider"></div>
-                <div class="wpfnl-mm-template-card-body">
-                    <div class="wpfnl-mm-skeleton-block wpfnl-mm-skeleton-title"></div>
-                    <div class="wpfnl-mm-skeleton-block wpfnl-mm-skeleton-steps"></div>
-                </div>
-            </div>
-        </div>
+		<p v-else-if="! templates.length" class="wpfnl-wz-empty">
+			No templates are available for this builder yet. You can skip ahead and
+			build your funnel from scratch in the editor.
+		</p>
 
-		<!-- Buttons -->
-		<div class="wpfnl-mm-choose-goal-buttons wpfnl-mm-buttons-container">
-			<button class="wpfnl-mm-btn wpfnl-mm-btn-secondary" @click="goBack">
-				<svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path d="M16 6H1M1 6L6 1M1 6L6 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-				</svg>
-				Back
-			</button>
-			<div class="wpfnl-mm-btn-group">
-				<button
-					class="wpfnl-mm-btn wpfnl-mm-btn-primary"
-					@click="handleContinue"
-                    :disabled="!selectedTemplateId"
-				>
-					Continue
-					<svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path d="M1 6H16M16 6L11 1M16 6L11 11" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-					</svg>
-				</button>
+		<div
+			v-else
+			class="wpfnl-wz-template-grid"
+			:class="{ 'is-busy': isGenerating }"
+			:aria-busy="isGenerating"
+			role="radiogroup"
+			aria-label="Funnel template"
+		>
+			<div
+				v-for="tpl in templates"
+				:key="tpl.ID || tpl.id"
+				class="wpfnl-wz-template-card"
+				:class="{
+					'is-active': selectedTemplateId === ( tpl.ID || tpl.id ),
+					'is-suggested': isSuggested( tpl ),
+				}"
+				role="radio"
+				:aria-checked="selectedTemplateId === ( tpl.ID || tpl.id )"
+				tabindex="0"
+				@click="selectTemplate( tpl )"
+				@keydown.enter.prevent="selectTemplate( tpl )"
+				@keydown.space.prevent="selectTemplate( tpl )"
+			>
+				<div class="wpfnl-wz-template-thumb">
+					<img :src="cardImage( tpl )" :alt="tpl.title" loading="lazy" />
+					<span v-if="isSuggested( tpl )" class="wpfnl-wz-template-badge">
+						<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+							<path d="M5 1L6.18 3.4L8.8 3.78L6.9 5.64L7.36 8.25L5 6.99L2.64 8.25L3.1 5.64L1.2 3.78L3.82 3.4L5 1Z" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linejoin="round" />
+						</svg>
+						Suggested
+					</span>
+					<button type="button" class="wpfnl-wz-template-preview" @click.stop="showPreview( tpl )">
+						Preview
+					</button>
+				</div>
+
+				<h2 class="wpfnl-wz-template-title">{{ tpl.title }}</h2>
+				<p class="wpfnl-wz-template-meta">{{ stepCount( tpl ) }} steps</p>
 			</div>
 		</div>
 
 		<PreviewTemplate
-			v-if="showPreviewModal"
+			v-if="showPreviewModal && previewTemplate"
 			:template="previewTemplate"
-			:isStoreCheckout="isStoreCheckout"
-			:isSalesFunnel="isSalesFunnel"
+			:isStoreCheckout="true"
+			:isSalesFunnel="false"
 			@close="closePreview"
 			@import="importFromPreview"
 		/>
@@ -83,261 +72,311 @@
 </template>
 
 <script>
-import apiFetch from '@wordpress/api-fetch'
-import { addQueryArgs } from '@wordpress/url'
-import PreviewTemplate from './PreviewTemplate.vue'
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
+import PreviewTemplate from './PreviewTemplate.vue';
+import { generateFunnel } from '../../js/funnel-generator';
+
+/**
+ * The checkout templates the wizard offers, in the order they appear.
+ *
+ * Matched as lowercase substrings of the template title, since the API returns
+ * titles rather than stable slugs. Anything not listed here is hidden — the
+ * wizard deliberately shows a short, curated set rather than the full library.
+ */
+const OFFERED_TEMPLATES = [
+	'instant checkout',
+	'express checkout',
+	'store checkout',
+];
 
 export default {
 	name: 'ChooseTemplate',
-    components: {
-        PreviewTemplate
-    },
+	components: {
+		PreviewTemplate,
+	},
 	props: {
 		builder: {
 			type: String,
-			required: true
-		},
-		goal: {
-			type: String,
-			default: 'sales'
+			default: 'gutenberg',
 		},
 		prefetchedTemplates: {
-			type: Object,
-			default: () => ({})
-		}
+			type: Array,
+			default: () => [],
+		},
 	},
+	emits: [ 'nav', 'next-step' ],
 	data() {
 		return {
 			loading: true,
 			templates: [],
 			selectedTemplateId: null,
-            selectedTemplate: null,
+			selectedTemplate: null,
 			showPreviewModal: false,
 			previewTemplate: null,
-			previewTab: 'listing'
-		}
+			phase: 'select',
+			errorMessage: '',
+		};
 	},
 	computed: {
-		isStoreCheckout() {
-			return this.goal === 'improve-checkout'
+		isGenerating() {
+			return 'generating' === this.phase;
 		},
-		isSalesFunnel() {
-			return this.goal === 'sales'
+	},
+	watch: {
+		selectedTemplateId() {
+			this.publishNav();
 		},
-		headerContent() {
-			const headers = {
-				'order-value': {
-					title: 'Boost Your Order Value',
-					subtitle: 'Pick a template with upsells and cross-sells to increase your average order value.'
-				},
-				'improve-checkout': {
-					title: 'Optimize Your Checkout Experience',
-					subtitle: 'Choose a streamlined checkout template to reduce cart abandonment.'
-				},
-				'sales': {
-					title: 'Start With a High-Converting Template',
-					subtitle: 'Pick a ready-made funnel and customize it to match your store.'
-				}
-			};
-			return headers[this.goal] || headers['sales'];
-		}
+		templates( list ) {
+			// Default to the first (suggested) template so the step opens ready
+			// to proceed instead of with a disabled button.
+			if ( ! this.selectedTemplateId && list?.length ) {
+				this.selectTemplate( list[ 0 ] );
+			}
+		},
+		prefetchedTemplates( value ) {
+			// The prefetch may land after this step mounted.
+			if ( ! this.loading ) {
+				return;
+			}
+			if ( value?.length ) {
+				this.templates = this.filterTemplates( value );
+				this.loading = false;
+				this.publishNav();
+			}
+		},
 	},
 	mounted() {
-		const cached = this.prefetchedTemplates[this.goal];
-		if (cached && cached.length > 0) {
-			this.templates = this.filterTemplates(cached);
+		if ( this.prefetchedTemplates?.length ) {
+			this.templates = this.filterTemplates( this.prefetchedTemplates );
 			this.loading = false;
 		} else {
 			this.fetchTemplates();
 		}
-	},
-	watch: {
-		// Handle race condition: component mounted before prefetch completed.
-		prefetchedTemplates(val) {
-			if (!this.loading) return;
-			const cached = val[this.goal];
-			if (cached && cached.length > 0) {
-				this.templates = this.filterTemplates(cached);
-				this.loading = false;
-			}
-		},
+		this.publishNav();
 	},
 	methods: {
-		fetchTemplates() {
-			this.loading = true;
-
-            // Map builder ID if necessary (e.g. divi -> divi-builder)
-            let builderParam = this.builder;
-            if (builderParam === 'divi') {
-                builderParam = 'divi-builder';
-            }
-
-            let typeParam = this.goal === 'leads' ? 'lead' : (this.goal === 'improve-checkout' ? 'store_checkout' : 'wc');
-
-			const path = addQueryArgs(`${window.setup_wizard_obj.rest_api_url}wpfunnels/v1/templates/get_templates`, {
-				builder: builderParam,
-				type: typeParam
-			});
-
-			apiFetch({ path: path })
-				.then(response => {
-					if (response.success && response.templates && response.templates.length > 0) {
-						this.templates = this.filterTemplates(response.templates);
-					} else if (builderParam === 'bricks' || builderParam === 'oxygen') {
-						// Fallback to Gutenberg templates if no templates found for Bricks or Oxygen
-						this.fetchGutenbergFallback(typeParam);
-						return;
-					}
-				})
-				.catch(error => {
-					console.error('Error fetching templates:', error);
-					// Also fallback to Gutenberg on error for Bricks/Oxygen
-					if (builderParam === 'bricks' || builderParam === 'oxygen') {
-						this.fetchGutenbergFallback(typeParam);
-						return;
-					}
-				})
-				.finally(() => {
-					this.loading = false;
-				});
-		},
-		fetchGutenbergFallback(typeParam) {
-			const fallbackPath = addQueryArgs(`${window.setup_wizard_obj.rest_api_url}wpfunnels/v1/templates/get_templates`, {
-				builder: 'gutenberg',
-				type: typeParam
-			});
-
-			apiFetch({ path: fallbackPath })
-				.then(response => {
-					if (response.success && response.templates) {
-						this.templates = this.filterTemplates(response.templates);
-					}
-				})
-				.catch(error => {
-					console.error('Error fetching Gutenberg fallback templates:', error);
-				})
-				.finally(() => {
-					this.loading = false;
-				});
-		},
-		filterTemplates(templates) {
-			if (!this.isStoreCheckout && !this.isSalesFunnel) {
-				return templates;
-			}
-
-			// For store checkout, only show templates that have both checkout AND thankyou steps
-			if (this.isStoreCheckout) {
-				return templates
-					.filter(template => template.templateType !== 'pro')
-					.filter(template => {
-						if (!template.steps || !Array.isArray(template.steps)) return false;
-						const stepTypes = template.steps.map(s => s.step_type);
-						return stepTypes.includes('checkout') && stepTypes.includes('thankyou');
-					})
-					.map(template => {
-						// Limit to one checkout + one thankyou step
-						const checkout = template.steps.find(s => s.step_type === 'checkout');
-						const thankyou = template.steps.find(s => s.step_type === 'thankyou');
-						return {
-							...template,
-							steps: [checkout, thankyou].filter(Boolean)
-						};
-					})
-					.sort((a, b) => a.ID - b.ID);
-			}
-
-			// For sales funnel, only show landing, checkout, and thankyou steps
-			if (this.isSalesFunnel) {
-				return templates
-					.filter(template => {
-						if (!template.steps || !Array.isArray(template.steps)) return false;
-						const stepTypes = template.steps.map(s => s.step_type);
-						// Must have at least checkout and thankyou
-						return stepTypes.includes('checkout') && stepTypes.includes('thankyou');
-					})
-					.map(template => {
-						// Keep only one of each: landing, checkout, and thankyou
-						const landing = template.steps.find(s => s.step_type === 'landing');
-						const checkout = template.steps.find(s => s.step_type === 'checkout');
-						const thankyou = template.steps.find(s => s.step_type === 'thankyou');
-						
-						// Return steps in order: landing (if exists), checkout, thankyou
-						const filteredSteps = [landing, checkout, thankyou].filter(Boolean);
-						
-						return {
-							...template,
-							steps: filteredSteps
-						};
-					});
-			}
-
-			return templates;
-		},
-		getCardImage(template) {
-			if (this.isStoreCheckout && template.steps) {
-				// For store checkout, use the checkout step's featured image
-				const checkoutStep = template.steps.find(s => s.step_type === 'checkout');
-				if (checkoutStep && checkoutStep.featured_image) {
-					return checkoutStep.featured_image;
-				}
-			}
-			return template.featured_image;
-		},
-		selectTemplate(template) {
-			if (!template || !template.ID) {
-				console.error('Invalid template:', template);
+		publishNav() {
+			if ( 'generating' === this.phase ) {
+				this.$emit( 'nav', {
+					label: 'Building...',
+					canProceed: false,
+					busy: true,
+					showBack: false,
+					showNext: true,
+				} );
 				return;
 			}
-			this.selectedTemplateId = template.ID;
+
+			this.$emit( 'nav', {
+				label: 'Import & Continue',
+				canProceed: !! this.selectedTemplateId,
+				busy: false,
+				showBack: true,
+				showNext: true,
+				showSkip: true,
+			} );
+		},
+
+		/**
+		 * Resolve the builder slug the template API expects. Divi ships its
+		 * templates under `divi-builder`, and "Others" has no templates of its
+		 * own so it borrows Gutenberg's.
+		 *
+		 * @return {string} Builder slug.
+		 */
+		builderParam() {
+			if ( 'divi' === this.builder ) {
+				return 'divi-builder';
+			}
+			if ( 'others' === this.builder ) {
+				return 'gutenberg';
+			}
+			return this.builder || 'gutenberg';
+		},
+
+		fetchTemplates() {
+			this.loading = true;
+			const builder = this.builderParam();
+
+			this.requestTemplates( builder )
+				.then( ( templates ) => {
+					if ( templates.length ) {
+						this.templates = this.filterTemplates( templates );
+						return null;
+					}
+					// Bricks and Oxygen have thin template libraries; fall back.
+					if ( 'bricks' === builder || 'oxygen' === builder ) {
+						return this.requestTemplates( 'gutenberg' );
+					}
+					return null;
+				} )
+				.then( ( fallback ) => {
+					if ( fallback?.length ) {
+						this.templates = this.filterTemplates( fallback );
+					}
+				} )
+				.catch( ( error ) => {
+					console.error( 'Error fetching templates:', error );
+				} )
+				.finally( () => {
+					this.loading = false;
+					this.publishNav();
+				} );
+		},
+
+		/**
+		 * @param {string} builder Builder slug.
+		 * @return {Promise<Array>} Templates, or an empty array.
+		 */
+		requestTemplates( builder ) {
+			const path = addQueryArgs(
+				`${ window.setup_wizard_obj.rest_api_url }wpfunnels/v1/templates/get_templates`,
+				{ builder, type: 'store_checkout' }
+			);
+
+			return apiFetch( { path } ).then( ( response ) =>
+				response.success && response.templates ? response.templates : []
+			);
+		},
+
+		/**
+		 * Instant Checkout is the one we steer people towards, so it carries a
+		 * badge and is pinned ahead of the ID-ordered rest.
+		 *
+		 * @param {Object} template Template to test.
+		 * @return {boolean} Whether this is the suggested template.
+		 */
+		isSuggested( template ) {
+			return ( template?.title || '' ).toLowerCase().includes( 'instant checkout' );
+		},
+
+		/**
+		 * Position of a template in the curated list, or -1 if it isn't offered.
+		 *
+		 * @param {Object} template Template to look up.
+		 * @return {number} Index in OFFERED_TEMPLATES.
+		 */
+		offeredIndex( template ) {
+			const title = ( template?.title || '' ).toLowerCase();
+			return OFFERED_TEMPLATES.findIndex( ( name ) => title.includes( name ) );
+		},
+
+		/**
+		 * Reduce to the curated templates, trimmed to their checkout and
+		 * thank-you steps, in the order OFFERED_TEMPLATES lists them.
+		 *
+		 * @param {Array} templates Raw templates from the API.
+		 * @return {Array} Curated, ordered templates.
+		 */
+		filterTemplates( templates ) {
+			return templates
+				.filter( ( tpl ) => 'pro' !== tpl.templateType )
+				.filter( ( tpl ) => {
+					const types = ( tpl.steps || [] ).map( ( s ) => s.step_type );
+					return types.includes( 'checkout' ) && types.includes( 'thankyou' );
+				} )
+				.filter( ( tpl ) => this.offeredIndex( tpl ) !== -1 )
+				.map( ( tpl ) => ( {
+					...tpl,
+					steps: [
+						tpl.steps.find( ( s ) => 'checkout' === s.step_type ),
+						tpl.steps.find( ( s ) => 'thankyou' === s.step_type ),
+					].filter( Boolean ),
+				} ) )
+				.sort( ( a, b ) => this.offeredIndex( a ) - this.offeredIndex( b ) );
+		},
+
+		cardImage( template ) {
+			const checkout = ( template.steps || [] ).find( ( s ) => 'checkout' === s.step_type );
+			return checkout?.featured_image || template.featured_image;
+		},
+
+		stepCount( template ) {
+			return ( template.steps || [] ).length;
+		},
+
+		selectTemplate( template ) {
+			if ( ! template?.ID && ! template?.id ) {
+				return;
+			}
+			this.selectedTemplateId = template.ID || template.id;
 			this.selectedTemplate = template;
 		},
-		showPreview(template) {
+
+		showPreview( template ) {
 			this.previewTemplate = template;
 			this.showPreviewModal = true;
-			this.previewTab = 'listing';
 		},
+
 		closePreview() {
 			this.showPreviewModal = false;
 			this.previewTemplate = null;
 		},
-		importFromPreview(template) {
-			// Close the preview modal
-			this.closePreview();
-			
-			// Import the template
-			this.importTemplate(template);
-		},
-		importTemplate(template) {
-			// Select the template
-			this.selectedTemplateId = template.id;
-			this.selectedTemplate = template;
 
-			// Close preview modal if open
-			if (this.showPreviewModal) {
-				this.closePreview();
+		importFromPreview( template ) {
+			this.closePreview();
+			this.selectTemplate( template );
+			this.submit();
+		},
+
+		/**
+		 * Move on without importing a template.
+		 *
+		 * Reported as `skipped` rather than `abandoned` — the user saw the
+		 * offer and declined it, which the telemetry treats as a distinct
+		 * outcome from dropping out. No funnel is created, so the completion
+		 * step adapts its copy off the absent funnel ID.
+		 */
+		skip() {
+			const wizardObj = window.setup_wizard_obj || {};
+			const restApiUrl = wizardObj.rest_api_url || '';
+
+			if ( restApiUrl ) {
+				const base = restApiUrl.endsWith( '/' ) ? restApiUrl : `${ restApiUrl }/`;
+				apiFetch( {
+					url: `${ base }wpfunnels/v1/setup-wizard/track-step`,
+					method: 'POST',
+					data: {
+						event_type: 'skipped',
+						step_name: 'choose_template',
+						step_index: 3,
+						goal: 'improve-checkout',
+						time_on_step: 0,
+						total_steps: 4,
+					},
+				} ).catch( () => {} );
 			}
 
-			// Immediately go to next step
-			this.$emit('next-step', {
-				template: this.selectedTemplate
-			});
+			this.$emit( 'next-step' );
 		},
-		goBack() {
-			this.$emit('prev-step');
-		},
-		getDisplayStepCount(template) {
-			if (!template.steps) return 0;
-			// Since filterTemplates already filters the steps array,
-			// we can just return the length directly
-			return template.steps.length;
-		},
-		handleContinue() {
-			if (!this.selectedTemplateId) return;
 
-			this.$emit('next-step', {
-				template: this.selectedTemplate
-			});
-		}
-	}
-}
+		/**
+		 * Generate the funnel, then hand the wizard the created funnel so the
+		 * completion step can link straight to it.
+		 */
+		async submit() {
+			if ( ! this.selectedTemplate || 'generating' === this.phase ) {
+				return;
+			}
+
+			this.phase = 'generating';
+			this.errorMessage = '';
+			this.publishNav();
+
+			try {
+				const { funnelId, firstStepLink } = await generateFunnel( {
+					builder: this.builder,
+					template: this.selectedTemplate,
+				} );
+
+				this.$emit( 'next-step', { funnelId, firstStepLink, template: this.selectedTemplate } );
+			} catch ( error ) {
+				this.phase = 'select';
+				this.errorMessage = error?.message || 'Unable to generate the funnel. Please try again.';
+				this.publishNav();
+			}
+		},
+	},
+};
 </script>

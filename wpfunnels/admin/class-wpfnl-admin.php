@@ -979,7 +979,8 @@ class Wpfnl_Admin
 
 			$general_settings = Wpfnl_functions::get_general_settings();
 			$builder = $general_settings['builder'];
-			$funnel_builder_mode = isset( $general_settings['funnel_builder_mode'] ) ? $general_settings['funnel_builder_mode'] : 'horizontal';
+			$funnel_builder_mode = Wpfnl_functions::get_default_funnel_builder_mode();
+			$canvas_view_mode    = Wpfnl_functions::get_canvas_view_mode();
 
 			/**
 			 * This code snippet will check if pro addons is activated or not. if not activated
@@ -1045,6 +1046,7 @@ class Wpfnl_Admin
 				'totalAllowedFunnels' => $total_allowed_funnels,
 				'builder' => $builder,
 				'funnel_builder_mode' => $funnel_builder_mode,
+				'canvas_view_mode' => $canvas_view_mode,
 				'dependencyPlugins' => Wpfnl_functions::get_dependency_plugins_status(),
 				'isAnyPluginMissing' => Wpfnl_functions::is_any_plugin_missing(),
 				'isGlobalFunnelActivated' => Wpfnl_functions::is_global_funnel_activated(),

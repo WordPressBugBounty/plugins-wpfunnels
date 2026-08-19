@@ -83,7 +83,7 @@ $builders = \WPFunnels\Wpfnl_functions::get_supported_builders();
     <div class="wpfnl-field-wrapper">
         <div class="wpfnl-fields">
             <div class="wpfnl-items-wrapper" id="wpfunnels-canvas-mode">
-                <?php $canvas_mode = isset($this->general_settings['funnel_builder_mode']) ? $this->general_settings['funnel_builder_mode'] : 'horizontal'; ?>
+                <?php $canvas_mode = \WPFunnels\Wpfnl_functions::get_default_funnel_builder_mode(); ?>
                 <div class="wpfnl-single-item <?php echo $canvas_mode === 'horizontal' ? 'checked' : ''; ?>" data-value="horizontal">
                     <svg width="30" height="30" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="2" y="18" width="16" height="24" rx="4" fill="#7c3aed" opacity="0.85"/>

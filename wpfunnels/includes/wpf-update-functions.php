@@ -106,3 +106,37 @@ function wpf_create_3110_checkout_visits_table() {
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 	dbDelta( $sql );
 }
+
+
+/**
+ * Add an index on (funnel_id, status) to the stats table to avoid full
+ * table scans in funnel-level analytics lookups (e.g. the funnel canvas).
+ *
+ * Guarded with SHOW INDEX so it stays idempotent on sites where the index
+ * may already have been applied manually.
+ *
+ * @since 3.12.12
+ */
+function wpf_add_31212_stats_funnel_status_index() {
+	global $wpdb;
+	$table = $wpdb->prefix . 'wpfnl_stats';
+
+	// SHOW INDEX errors outright on a missing table, so confirm it exists
+	// first. Sites that predate the stats table get it from the 3.5.0
+	// callback, which ActionScheduler runs ahead of this one.
+	$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ); // phpcs:ignore
+	if ( ! $table_exists ) {
+		return true;
+	}
+
+	$exists = $wpdb->get_var( $wpdb->prepare(
+		'SHOW INDEX FROM ' . $table . ' WHERE Key_name = %s',
+		'idx_funnel_status'
+	) ); // phpcs:ignore
+
+	if ( ! $exists ) {
+		$wpdb->query( "ALTER TABLE {$table} ADD INDEX idx_funnel_status (funnel_id, status)" ); // phpcs:ignore
+	}
+
+	return true;
+}

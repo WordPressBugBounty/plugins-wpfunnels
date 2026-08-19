@@ -58,6 +58,19 @@ final class Manager {
 
 			$js_file = $build_dir . 'wpfnl-divi5-vb.js';
 			if ( ! file_exists( $js_file ) ) {
+				// Without this bundle Divi 5 never calls registerModule(), so the
+				// WPFunnels modules are missing from the module library with no
+				// visible error — it looks like a Divi incompatibility. Surface it
+				// so the real cause (an unbuilt bundle) is diagnosable.
+				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					error_log(
+						'WPFunnels: Divi 5 Visual Builder bundle missing at ' . $js_file
+						. ' — run `npm ci && npm run build` in'
+						. ' includes/core/widgets/divi-modules/divi-5/visual-builder/.'
+						. ' WPFunnels modules will not appear in the Divi 5 builder.'
+					);
+				}
 				return;
 			}
 

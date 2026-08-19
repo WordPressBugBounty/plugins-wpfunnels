@@ -142,6 +142,20 @@ class FunnelController extends Wpfnl_REST_Controller
 			],
 		]);
 
+		register_rest_route($this->namespace, '/' . $this->rest_base . '/getFunnelStats/', [
+			[
+				'methods' => \WP_REST_Server::READABLE,
+				'callback' => [
+					$this,
+					'get_funnel_stats'
+				],
+				'permission_callback' => [
+					$this,
+					'update_items_permissions_check'
+				],
+			],
+		]);
+
 		register_rest_route($this->namespace, '/' . $this->rest_base . '/getStepType/', [
 			[
 				'methods' => \WP_REST_Server::READABLE,
@@ -742,6 +756,65 @@ class FunnelController extends Wpfnl_REST_Controller
 
 
 	/**
+	 * Retrieves visit/conversion figures for a funnel's steps plus funnel totals.
+	 *
+	 * Deliberately kept out of get_funnel_data() so that opening a funnel on the
+	 * canvas never blocks on analytics. On sites with large amounts of tracked
+	 * traffic these aggregates can be slow, so the canvas renders its structure
+	 * first and fills the numbers in once this responds.
+	 *
+	 * @param mixed $request The request data.
+	 * @return \WP_REST_Response
+	 *
+	 * @since 3.12.12
+	 */
+	public function get_funnel_stats($request)
+	{
+		$funnel_id = isset($request['funnel_id']) ? absint($request['funnel_id']) : 0;
+
+		$response = [
+			'success'          => false,
+			'steps'            => (object) [],
+			'funnel_analytics' => [
+				'total_orders'  => 0,
+				'total_revenue' => 0,
+				'aov'           => 0,
+			],
+		];
+
+		if (!$funnel_id) {
+			return $this->prepare_item_for_response($response, $request);
+		}
+
+		$cache_key = 'wpfnl_funnel_stats_' . $funnel_id;
+		$cached    = get_transient($cache_key);
+
+		if (false !== $cached) {
+			return $this->prepare_item_for_response($cached, $request);
+		}
+
+		$steps    = get_post_meta($funnel_id, '_steps', true);
+		$steps    = is_array($steps) ? $steps : [];
+		$step_ids = array_map(
+			function ($step) {
+				return isset($step['id']) ? $step['id'] : null;
+			},
+			$steps
+		);
+
+		$response['success']          = true;
+		$response['steps']            = self::get_steps_analytics_map($step_ids);
+		$response['funnel_analytics'] = self::get_funnel_analytics($funnel_id);
+
+		// Cached so repeated canvas opens don't recompute the aggregates. Kept
+		// short enough that the numbers still track recent activity.
+		set_transient($cache_key, $response, 10 * MINUTE_IN_SECONDS);
+
+		return $this->prepare_item_for_response($response, $request);
+	}
+
+
+	/**
 	 * Prepares the response data for the funnel data based on the provided parameters.
 	 *
 	 * @param int $funnel_id The ID of the funnel.
@@ -896,7 +969,10 @@ class FunnelController extends Wpfnl_REST_Controller
 
 		$response['first_node_id'] = $this->get_first_step_node($first_step_id, $response['funnel_data']);
 		$response['conditional_data'] = $this->get_conditional_step($response['funnel_data']);
-		$response['funnel_analytics'] = self::get_funnel_analytics($funnel_id);
+
+		// Visit/conversion figures and funnel totals are intentionally absent
+		// here — the canvas fetches them separately via getFunnelStats so that
+		// opening a funnel never waits on analytics. See get_funnel_stats().
 		return $response;
 	}
 
@@ -1082,12 +1158,16 @@ class FunnelController extends Wpfnl_REST_Controller
 		$is_order_bump = false;
 		$ob_steps      = [];
 		$formatted_steps_order = [];
+
 		foreach ($steps_order as $step) {
 			$step_id = isset($step['id']) ? $step['id'] : null;
 			$_temp_step = $step;
-			$analytics = self::get_step_analytics($step_id);
-			$_temp_step['visit'] = $analytics['visit'];
-			$_temp_step['conversion'] = $analytics['conversion'];
+
+			// Null rather than 0 so the canvas can tell "not loaded yet" apart
+			// from a genuine zero and show a placeholder until getFunnelStats
+			// responds.
+			$_temp_step['visit'] = null;
+			$_temp_step['conversion'] = null;
 			$_temp_step['name'] = get_the_title($step_id);
 			$_step_type = get_post_meta($step_id, '_step_type', true);
 			$should_assign_product = in_array($_step_type, ['checkout', 'upsell', 'downsell']) && !get_post_meta($step_id, '_wpfnl_' . $_step_type . '_products', true);
@@ -1120,24 +1200,35 @@ class FunnelController extends Wpfnl_REST_Controller
 	}
 
 	/**
-	 * Get visit and conversion analytics data for a step.
+	 * Get visit and conversion analytics data for a set of steps in one batch.
 	 *
-	 * Queries the analytics tables to get total visits and conversions for a given step.
+	 * Replaces N per-step queries (previously run once per step in
+	 * get_steps_order_data()) with two GROUP BY queries covering the whole
+	 * funnel, avoiding an N+1 query pattern that caused the funnel canvas to
+	 * time out on funnels with several steps. Count semantics are unchanged
+	 * from the previous per-step queries — grouping by step_id and running
+	 * the same WHERE/JOIN conditions together is equivalent to running them
+	 * individually per step.
 	 *
-	 * @param int $step_id The step ID.
-	 * @return array Array with 'visit' and 'conversion' counts.
+	 * @param array $step_ids The step IDs to fetch analytics for.
+	 * @return array Map of step_id => ['visit' => int, 'conversion' => int].
 	 *
-	 * @since 3.5.0
+	 * @since 3.12.12
 	 */
-	private static function get_step_analytics($step_id)
+	private static function get_steps_analytics_map($step_ids)
 	{
-		$total = array(
-			'visit'      => 0,
-			'conversion' => 0,
-		);
+		$step_ids = array_values(array_unique(array_filter($step_ids)));
 
-		if (!$step_id) {
-			return $total;
+		$map = [];
+		foreach ($step_ids as $step_id) {
+			$map[$step_id] = array(
+				'visit'      => 0,
+				'conversion' => 0,
+			);
+		}
+
+		if (empty($step_ids)) {
+			return $map;
 		}
 
 		global $wpdb;
@@ -1147,53 +1238,68 @@ class FunnelController extends Wpfnl_REST_Controller
 		// Check if the analytics table exists before querying.
 		$table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $analytics_table));
 		if (!$table_exists) {
-			return $total;
+			return $map;
 		}
 
-		// Get total visits.
-		$cache_key_visits = 'wpfnl_pro_visits_' . $step_id;
-		$visits_data      = wp_cache_get($cache_key_visits, 'wpfnl_pro');
+		$cache_key = 'wpfnl_pro_steps_analytics_' . md5(implode(',', $step_ids));
+		$cached_map = wp_cache_get($cache_key, 'wpfnl_pro');
 
-		if (false === $visits_data) {
-			$query = $wpdb->prepare(
-				"SELECT wpft1.step_id, COUNT( DISTINCT( wpft1.id ) ) AS total_visits
-				FROM {$analytics_table} as wpft1
-				WHERE wpft1.step_id = %s
-				ORDER BY NULL",
-				$step_id
-			); // phpcs:ignore
-
-			$visits_data = $wpdb->get_row($query); // phpcs:ignore
-			wp_cache_set($cache_key_visits, $visits_data, 'wpfnl_pro', 3600);
+		if (false !== $cached_map) {
+			return $cached_map;
 		}
 
-		// Get conversions.
-		$cache_key_conversion = 'wpfnl_pro_conversion_' . $step_id;
-		$conversion_data      = wp_cache_get($cache_key_conversion, 'wpfnl_pro');
+		$placeholders = implode(', ', array_fill(0, count($step_ids), '%s'));
 
-		if (false === $conversion_data) {
-			$query = $wpdb->prepare(
-				"SELECT wpft1.step_id, COUNT( CASE WHEN wpft2.meta_key = 'conversion' AND wpft2.meta_value = 'yes' THEN wpft1.step_id ELSE NULL END ) AS conversions
-				FROM {$analytics_table} as wpft1
-				INNER JOIN {$analytics_meta_table} as wpft2 ON wpft1.id = wpft2.analytics_id
-				WHERE wpft1.step_id = %s
-				ORDER BY NULL",
-				$step_id
-			); // phpcs:ignore
+		// Get total visits, grouped per step.
+		$visits_query = $wpdb->prepare(
+			"SELECT wpft1.step_id, COUNT( DISTINCT( wpft1.id ) ) AS total_visits
+			FROM {$analytics_table} as wpft1
+			WHERE wpft1.step_id IN ({$placeholders})
+			GROUP BY wpft1.step_id
+			ORDER BY NULL",
+			$step_ids
+		); // phpcs:ignore
+		$visits_rows = $wpdb->get_results($visits_query); // phpcs:ignore
 
-			$conversion_data = $wpdb->get_row($query); // phpcs:ignore
-			wp_cache_set($cache_key_conversion, $conversion_data, 'wpfnl_pro', 3600);
+		foreach ($visits_rows as $row) {
+			if (isset($map[$row->step_id])) {
+				$map[$row->step_id]['visit'] = $row->total_visits;
+			}
 		}
 
-		if ($visits_data) {
-			$total['visit'] = $visits_data->total_visits;
+		// Get conversions, grouped per step.
+		//
+		// Read the meta table directly on its denormalised step_id rather than
+		// joining back through the analytics table. The join form had to walk
+		// every visit for the funnel (tens of thousands of rows) and look up
+		// each one's meta rows, which dominated the whole request on sites
+		// with real traffic volume. Filtering on step_id touches only the
+		// conversion rows themselves — a few thousand instead of ~150k.
+		//
+		// Counting meta rows keeps the original numbers intact, including the
+		// pre-existing behaviour where a visit carrying two 'conversion'='yes'
+		// meta rows counts twice.
+		$conversion_query = $wpdb->prepare(
+			"SELECT step_id, COUNT(*) AS conversions
+			FROM {$analytics_meta_table}
+			WHERE step_id IN ({$placeholders})
+			AND meta_key = 'conversion'
+			AND meta_value = 'yes'
+			GROUP BY step_id
+			ORDER BY NULL",
+			$step_ids
+		); // phpcs:ignore
+		$conversion_rows = $wpdb->get_results($conversion_query); // phpcs:ignore
+
+		foreach ($conversion_rows as $row) {
+			if (isset($map[$row->step_id])) {
+				$map[$row->step_id]['conversion'] = $row->conversions;
+			}
 		}
 
-		if ($conversion_data) {
-			$total['conversion'] = $conversion_data->conversions;
-		}
+		wp_cache_set($cache_key, $map, 'wpfnl_pro', 3600);
 
-		return $total;
+		return $map;
 	}
 
 	/**

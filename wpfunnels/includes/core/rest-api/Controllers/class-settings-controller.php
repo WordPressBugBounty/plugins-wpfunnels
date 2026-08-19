@@ -184,6 +184,17 @@ class SettingsController extends Wpfnl_REST_Controller {
             )
         );
 
+        register_rest_route(
+            $this->namespace, '/' . $this->rest_funnel_settings . '/canvas-view-mode' , array(
+                array(
+                    'methods'               => 'POST',
+                    'callback'              => array( $this, 'update_canvas_view_mode' ),
+                    'permission_callback'   => array( $this, 'update_items_permissions_check' ),
+                    'args'                  => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
+                )
+            )
+        );
+
     }
 
 
@@ -594,6 +605,41 @@ class SettingsController extends Wpfnl_REST_Controller {
             ];
         }
         return rest_ensure_response( $response );
+    }
+
+
+    /**
+     * Remember which canvas layout the current user last switched to.
+     *
+     * Stored per user rather than in the shared settings, so one admin flipping
+     * the view switcher does not change the canvas for the rest of the team. The
+     * site-wide default in Settings still applies to anyone who never switched.
+     *
+     * @param WP_REST_Request $request The REST request object.
+     *
+     * @return WP_REST_Response
+     * @since  3.12.13
+     */
+    public function update_canvas_view_mode( $request ) {
+        $mode    = isset( $request['mode'] ) ? sanitize_text_field( $request['mode'] ) : '';
+        $user_id = get_current_user_id();
+
+        if ( ! $user_id || ! in_array( $mode, Wpfnl_functions::get_funnel_builder_modes(), true ) ) {
+            return rest_ensure_response( array( 'success' => false ) );
+        }
+
+        update_user_meta( $user_id, Wpfnl_functions::CANVAS_VIEW_MODE_META_KEY, $mode );
+
+        if ( 'vertical' === $mode ) {
+            do_action( 'wpfunnels_vertical_mode_used' );
+        }
+
+        return rest_ensure_response(
+            array(
+                'success' => true,
+                'mode'    => $mode,
+            )
+        );
     }
 
 

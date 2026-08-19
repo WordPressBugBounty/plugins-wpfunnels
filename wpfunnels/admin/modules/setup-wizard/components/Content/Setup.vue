@@ -1,11 +1,8 @@
 <template>
-	<div class="wpfnl-required-installation">
+	<div class="wpfnl-wz-center wpfnl-wz-install">
 
-		<!-- Header — matches .wpfnl-mm-setup-header pattern from other steps -->
-		<div class="wpfnl-mm-setup-header">
-			<h2 class="wpfnl-mm-setup-title">{{ pluginsSectionTitle }}</h2>
-			<p class="wpfnl-mm-setup-subtitle">{{ pluginsSectionSubtitle }}</p>
-		</div>
+		<h1 class="wpfnl-wz-h1">{{ pluginsSectionTitle }}</h1>
+		<p class="wpfnl-wz-sub">{{ pluginsSectionSubtitle }}</p>
 
 		<!-- Single unified white card — matches .wpfnl-mm-setup-section pattern -->
 		<div class="wpfnl-ri-card">
@@ -115,34 +112,13 @@
 
 		</div>
 
-		<!-- Footer Buttons -->
-		<div class="wpfnl-mm-choose-goal-buttons wpfnl-mm-buttons-container">
-			<button class="wpfnl-mm-btn wpfnl-mm-btn-secondary" @click="goBack" :disabled="isProcessing">
-				<svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path d="M16 6H1M1 6L6 1M1 6L6 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-				</svg>
-				Back
-			</button>
-			<div class="wpfnl-mm-btn-group">
-				<button
-					class="wpfnl-mm-btn wpfnl-mm-btn-primary"
-					@click="handleContinue"
-					:disabled="isProcessing"
-				>
-					{{ installButtonLabel }}
-					<svg v-if="!isProcessing" width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path d="M1 6H16M16 6L11 1M16 6L11 11" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-					</svg>
-				</button>
-			</div>
-		</div>
-
 	</div>
 </template>
 
 <script>
 export default {
 	name: 'Setup',
+	emits: [ 'nav', 'next-step' ],
 	data() {
 		return {
 			selectedBuilder: 'gutenberg',
@@ -234,11 +210,35 @@ export default {
 			return '';
 		},
 	},
+	watch: {
+		// The footer label tracks what the button will actually do, which
+		// depends on the builder and Mail Mint choices plus install progress.
+		installButtonLabel: 'publishNav',
+		isProcessing: 'publishNav',
+	},
 	mounted() {
 		this.detectBuilder();
 		this.checkPluginStatuses();
+		this.publishNav();
 	},
 	methods: {
+		publishNav() {
+			this.$emit( 'nav', {
+				label: this.installButtonLabel,
+				canProceed: ! this.isProcessing,
+				busy: this.isProcessing,
+				showBack: true,
+				showNext: true,
+			} );
+		},
+
+		/**
+		 * Called by the wizard footer's Next button.
+		 */
+		submit() {
+			this.handleContinue();
+		},
+
 		detectBuilder() {
 			const getPlugins = window?.setup_wizard_obj?.getPlugins || [];
 			const oxygenData = getPlugins.find(p => p.name === 'oxygen');
@@ -373,7 +373,6 @@ export default {
 			}
 		},
 
-		goBack() { this.$emit('prev-step'); },
 	}
 }
 </script>

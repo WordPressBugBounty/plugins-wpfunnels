@@ -1,125 +1,129 @@
 <template>
-	<div class="wpfnl-wizard-welcome">
-		<!-- Heading Section -->
-		<div class="wpfnl-wizard-welcome-content">
-			<h2 class="wpfnl-wizard-welcome-title">
-				Let’s boost your WooCommerce revenue
-			</h2>
-			<p class="wpfnl-wizard-welcome-subtitle">
-				We’ll help you set up your first revenue-boosting funnel in just a few steps. No coding required.
+	<div class="wpfnl-wz-center wpfnl-wz-welcome">
+		<div class="wpfnl-wz-welcome-main">
+			<h1 class="wpfnl-wz-h1">
+				Welcome to WPFunnels
+			</h1>
+
+			<p class="wpfnl-wz-sub">
+				You're minutes away from a higher-converting WooCommerce store.
 			</p>
 
-            <!-- Buttons -->
-            <div class="wpfnl-mm-choose-goal-buttons">
-                <div class="wpfnl-mm-btn-group">
-                    <button 
-                        class="wpfnl-mm-btn wpfnl-mm-btn-primary" 
-                        @click="handleContinue"
-                    >
-                        Start setup
-                        <svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M1 6H16M16 6L11 1M16 6L11 11" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
+			<figure class="wpfnl-wz-art">
+				<img
+					:src="welcomeImage"
+					alt="A WPFunnels funnel showing landing, checkout, upsell, downsell and thank you steps"
+					width="1450"
+					height="832"
+				/>
+			</figure>
 
-            <!-- Consent Checkbox -->
-            <div class="wpfnl-mm-choose-goal-consent">
-                <label class="wpfnl-mm-checkbox">
-                    <input type="checkbox" id="consent-checkbox" v-model="agreeToShare" />
-                    <span class="wpfnl-mm-checkbox-checkmark"></span>
-                    <span class="wpfnl-mm-checkbox-label">
-                        I agree to share usage data to personalize my experience and improve this product.
-                    </span>
-                </label>
-            </div>
-
-            <figure class="welcome-image">
-                <img :src="welcomeImage" alt="WPFunnels Setup" width="725" height="388" />
-            </figure>
+			<button type="button" class="wpfnl-wz-btn wpfnl-wz-btn--primary wpfnl-wz-btn--lg" @click="submit">
+				Let's Start
+				<svg width="15" height="11" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+					<path d="M1 6H16M16 6L11 1M16 6L11 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+			</button>
 		</div>
-		
+
+		<label class="wpfnl-wz-consent">
+			<input type="checkbox" v-model="consent" />
+			<span class="wpfnl-wz-consent-box" aria-hidden="true"></span>
+			<span class="wpfnl-wz-consent-text">
+				Help improve WPFunnels by sharing non-sensitive usage data. We don't collect
+				any personal information.
+				<a
+					:href="privacyUrl"
+					class="wpfnl-wz-consent-link"
+					target="_blank"
+					rel="noopener noreferrer"
+					@click.stop
+				>Learn more</a>
+			</span>
+		</label>
 	</div>
 </template>
 
 <script>
-	import apiFetch from '@wordpress/api-fetch';
-	import Sales from './Icons/Sales.vue';
-	import Leads from './Icons/Leads.vue';
+import apiFetch from '@wordpress/api-fetch';
+
 export default {
-    name: 'Welcome',
-	components: {
-		Sales,
-		Leads,
-	}, 
+	name: 'Welcome',
+	props: {
+		agreeToShare: {
+			type: Boolean,
+			default: true,
+		},
+	},
+	emits: [ 'nav', 'next-step' ],
 	data() {
 		return {
-			selectedGoal: 'sales', // Default to sales funnel as shown in design
-			agreeToShare: true, // Default to checked as shown in design
-            welcomeImage: window.setup_wizard_obj.welcome_image,
+			consent: this.agreeToShare,
+			welcomeImage: window?.setup_wizard_obj?.welcome_image || '',
+			// Static — the wizard doesn't otherwise depend on PHP for this, so keep the link on the frontend.
+			privacyUrl: 'https://getwpfunnels.com/privacy-policy/',
 			contactRequestInFlight: false,
 			contactCreated: false,
-		}
+		};
+	},
+	mounted() {
+		this.publishNav();
 	},
 	methods: {
+		publishNav() {
+			this.$emit( 'nav', {
+				label: 'Get started',
+				canProceed: true,
+				busy: false,
+				showBack: false,
+				showNext: true,
+			} );
+		},
+
+		/**
+		 * Register the admin as a Mail Mint contact.
+		 *
+		 * Only runs when the user has opted in, and only once — the wizard
+		 * creates the contact here rather than on completion so a user who
+		 * drops out later is still reachable.
+		 */
 		maybeCreateContact() {
-			if (!this.agreeToShare || this.contactCreated || this.contactRequestInFlight) {
+			if ( ! this.consent || this.contactCreated || this.contactRequestInFlight ) {
 				return;
 			}
 
 			const wizardObj = window.setup_wizard_obj || {};
-			const restApiUrl = wizardObj.rest_api_url;
-			if (!restApiUrl) {
+			if ( ! wizardObj.rest_api_url ) {
 				return;
 			}
-
-			const payload = {
-				email: wizardObj.admin_email,
-				name: wizardObj.admin_name
-			};
 
 			this.contactRequestInFlight = true;
-			apiFetch({
-				path: `${restApiUrl}wpfunnels/v1/settings/create-contact/`,
+			apiFetch( {
+				path: `${ wizardObj.rest_api_url }wpfunnels/v1/settings/create-contact/`,
 				method: 'POST',
-				data: payload
-			})
-				.then(() => {
+				data: {
+					email: wizardObj.admin_email,
+					name: wizardObj.admin_name,
+				},
+			} )
+				.then( () => {
 					this.contactCreated = true;
-				})
-				.catch(error => {
-					console.error('Error creating contact:', error);
-				})
-				.finally(() => {
+				} )
+				.catch( ( error ) => {
+					console.error( 'Error creating contact:', error );
+				} )
+				.finally( () => {
 					this.contactRequestInFlight = false;
-				});
+				} );
 		},
-		selectGoal(goal) {
-			this.selectedGoal = goal;
-		},
-		goBack() {
-			this.$emit('prev-step');
-		},
-		handleContinue() {
-			if (!this.selectedGoal) {
-				return;
-			}
 
+		/**
+		 * Called by the body CTA and by the footer's Next button.
+		 */
+		submit() {
 			this.maybeCreateContact();
-			this.proceedToNextStep();
+			this.$emit( 'next-step', { agreeToShare: this.consent } );
 		},
-		proceedToNextStep() {
-			// Emit event or navigate to next step
-			this.$emit('next-step', {
-				goal: this.selectedGoal,
-				agreeToShare: this.agreeToShare
-			});
-		},
-		showHelp() {
-			// Handle help action
-			window.open('https://getwpfunnels.com/docs/', '_blank');
-		}
-	}
-}
+	},
+};
 </script>

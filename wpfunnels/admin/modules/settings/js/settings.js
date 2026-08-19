@@ -289,7 +289,7 @@ jQuery(function ($) {
             var payload = {
                 'funnel_type': $('#wpfunnels-funnel-type .wpfnl-single-item.checked').attr('data-value'),
                 'builder': $('#wpfunnels-page-builder .wpfnl-single-item.checked').attr('data-value'),
-                'funnel_builder_mode': $('#wpfunnels-canvas-mode .wpfnl-single-item.checked').attr('data-value') || 'horizontal',
+                'funnel_builder_mode': $('#wpfunnels-canvas-mode .wpfnl-single-item.checked').attr('data-value') || 'vertical',
                 'uninstall_cleanup': $('#wpfnl-data-cleanup').is(':checked') ? 'on' : 'off',
                 'paypal_reference': $('#wpfunnels-paypal-reference').is(':checked') ? 'on' : 'off',
                 'analytics_roles': userRole,

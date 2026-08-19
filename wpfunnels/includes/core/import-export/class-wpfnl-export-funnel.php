@@ -166,7 +166,10 @@ class Wpfnl_Export {
             $is_export = apply_filters( 'wpfunnels/allow_to_export', true );
             $steps     = get_post_meta( $funnel_id, '_steps', true );
             $all_funnel_meta     = get_post_meta( $funnel_id );
-            $exclude_funnel_meta = ['funnel_automation_data', 'global_funnel_start_condition' ];
+            $exclude_funnel_meta = array_merge(
+                [ 'funnel_automation_data', 'global_funnel_start_condition' ],
+                Wpfnl_functions::VOLATILE_TRANSFER_META_KEYS
+            );
             $all_funnel_meta = $this->exclude_meta( $all_funnel_meta, $exclude_funnel_meta );
 
             $funnel_data['funnel_id']   = $funnel_id;
@@ -179,18 +182,22 @@ class Wpfnl_Export {
                 foreach ( $steps as $key => $step ) {
                     if( isset( $step['id'], $step['step_type']) ){
                         $all_meta     = get_post_meta( $step['id'] );
-                        $exclude_step_meta = [
-                            '_wpfnl_checkout_products', 
-                            '_wpfnl_checkout_discount_main_product', 
-                            'order-bump-settings', 
-                            '_wpfnl_upsell_products', 
-                            '_wpfnl_upsell_discount', 
-                            '_wpfnl_downsell_products', 
-                            '_wpfnl_downsell_discount',
-                            'global_funnel_upsell_rules',
-                            'global_funnel_downsell_rules',
-                        ];
-                        
+                        $exclude_step_meta = array_merge(
+                            [
+                                '_wpfnl_checkout_products',
+                                '_wpfnl_checkout_discount_main_product',
+                                'order-bump-settings',
+                                '_wpfnl_upsell_products',
+                                '_wpfnl_upsell_discount',
+                                '_wpfnl_downsell_products',
+                                '_wpfnl_downsell_discount',
+                                'global_funnel_upsell_rules',
+                                'global_funnel_downsell_rules',
+                            ],
+                            Wpfnl_functions::VOLATILE_TRANSFER_META_KEYS
+                        );
+
+
                         $all_meta = $this->exclude_meta( $all_meta, $exclude_step_meta );
                         $post_step = get_post($step['id']);
                         $step_slug = isset( $post_step->post_name) ? $post_step->post_name : '';
@@ -251,6 +258,7 @@ class Wpfnl_Export {
             $is_export = apply_filters( 'wpfunnels/allow_to_export_ab_step', true );
             if ( $is_export ) {
                 $all_meta     = get_post_meta( $step_id );
+                $all_meta     = $this->exclude_meta( $all_meta, Wpfnl_functions::VOLATILE_TRANSFER_META_KEYS );
                 $step_data = array(
                     'id'            => $step_id,
                     'title'         => get_the_title( $step_id ),

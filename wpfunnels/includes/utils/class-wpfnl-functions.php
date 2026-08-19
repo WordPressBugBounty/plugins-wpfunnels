@@ -15,6 +15,59 @@ class Wpfnl_functions {
 	public static $installed_plugins;
 
 	/**
+	 * Canvas layout used when nothing has been stored yet.
+	 *
+	 * Installs that predate this default are pinned to `horizontal` once, by
+	 * Wpfnl_Activator::maybe_pin_legacy_builder_mode(), so flipping this value
+	 * only affects sites that never ran on the old default.
+	 *
+	 * @since 3.12.13
+	 */
+	const DEFAULT_FUNNEL_BUILDER_MODE = 'vertical';
+
+	/**
+	 * User meta key holding a single admin's preferred canvas layout.
+	 *
+	 * Overrides the site-wide default for that user only, so switching views on
+	 * the canvas survives a reload without changing anything for their teammates.
+	 *
+	 * @since 3.12.13
+	 */
+	const CANVAS_VIEW_MODE_META_KEY = '_wpfnl_canvas_view_mode';
+
+	/**
+	 * Post meta keys that must not travel between sites on funnel export/import.
+	 *
+	 * These hold per-site render caches or bookkeeping that is only meaningful on the site
+	 * that produced them. Carrying them into a new site makes the imported step inherit the
+	 * source site's cached state:
+	 *
+	 * - `_elementor_css` records that a `post-{ID}.css` file was already generated. Elementor
+	 *   regenerates only when the recorded status is empty (`Base::enqueue()`), and `Post_CSS`
+	 *   does not override `is_update_required()`, so a stale record makes it enqueue a CSS file
+	 *   that was never written here — the step renders with no per-post styles at all.
+	 * - `_elementor_element_cache` holds pre-rendered element HTML from the source site.
+	 * - `_elementor_page_assets` holds the cached widget style handles to enqueue.
+	 * - `_edit_lock` / `_edit_last` / `_wp_old_slug` / `_eael_post_view_count` reference users,
+	 *   locks, and slugs that do not exist on the destination.
+	 *
+	 * Elementor's own `files_manager->clear_cache()` clears the first three, but only when the
+	 * builder post-import pass runs. Excluding them on both sides keeps an import correct even
+	 * when Elementor is absent or `allow_url_fopen` is disabled.
+	 *
+	 * @since 2.5.15
+	 */
+	const VOLATILE_TRANSFER_META_KEYS = [
+		'_elementor_css',
+		'_elementor_element_cache',
+		'_elementor_page_assets',
+		'_edit_lock',
+		'_edit_last',
+		'_wp_old_slug',
+		'_eael_post_view_count',
+	];
+
+	/**
 	 * Get all the steps of the funnel
 	 *
 	 * @param $funnel_id
@@ -1265,11 +1318,61 @@ class Wpfnl_functions {
 				'enable_skip_cart'     => 'off',
 				'skip_cart_for'        => 'whole',
 				'uninstall_cleanup'    => 'off',
-				'funnel_builder_mode'  => 'horizontal',
+				'funnel_builder_mode'  => self::DEFAULT_FUNNEL_BUILDER_MODE,
 			)
 		);
 		$saved_settings   = self::get_admin_settings( '_wpfunnels_general_settings', $default_settings );
 		return wp_parse_args( $saved_settings, $default_settings );
+	}
+
+
+	/**
+	 * Valid canvas layouts.
+	 *
+	 * @return array
+	 * @since  3.12.13
+	 */
+	public static function get_funnel_builder_modes() {
+		return array( 'horizontal', 'vertical' );
+	}
+
+
+	/**
+	 * Site-wide default canvas layout, as chosen in Settings.
+	 *
+	 * @return string 'horizontal' or 'vertical'.
+	 * @since  3.12.13
+	 */
+	public static function get_default_funnel_builder_mode() {
+		$general_settings = self::get_general_settings();
+		$mode             = isset( $general_settings['funnel_builder_mode'] ) ? $general_settings['funnel_builder_mode'] : self::DEFAULT_FUNNEL_BUILDER_MODE;
+
+		return in_array( $mode, self::get_funnel_builder_modes(), true ) ? $mode : self::DEFAULT_FUNNEL_BUILDER_MODE;
+	}
+
+
+	/**
+	 * Canvas layout to open the builder in for a given user.
+	 *
+	 * A user who has switched views on the canvas keeps that view on their next
+	 * visit; everyone else gets the site-wide default from Settings.
+	 *
+	 * @param int $user_id User to resolve for. Defaults to the current user.
+	 *
+	 * @return string 'horizontal' or 'vertical'.
+	 * @since  3.12.13
+	 */
+	public static function get_canvas_view_mode( $user_id = 0 ) {
+		$user_id = $user_id ? $user_id : get_current_user_id();
+
+		if ( $user_id ) {
+			$preference = get_user_meta( $user_id, self::CANVAS_VIEW_MODE_META_KEY, true );
+			if ( in_array( $preference, self::get_funnel_builder_modes(), true ) ) {
+				return $preference;
+			}
+		}
+
+		return self::get_default_funnel_builder_mode();
 	}
 
 
@@ -5238,6 +5341,21 @@ class Wpfnl_functions {
 			'run_ab_split_test'                           => __( 'Run A/B Split Test', 'wpfnl' ),
 			'to_funnel_update_msg'                        => __( 'Please update to WPFunnels Pro 1.7.3 or higher to use this feature.', 'wpfnl' ),
 			'conditions'                                  => __( 'Conditions', 'wpfnl' ),
+
+			// -----vertical flow canvas------
+			'order_bumps'                                 => __( 'Order Bumps', 'wpfnl' ),
+			'checkout_products'                           => __( 'Products', 'wpfnl' ),
+			'store_conditions'                            => __( 'Store Conditions', 'wpfnl' ),
+			'add_featured_image'                          => __( 'Add Featured Image', 'wpfnl' ),
+			'automation'                                  => __( 'Automation', 'wpfnl' ),
+			'add_conditional_next_step'                   => __( 'Add Conditional Next Step', 'wpfnl' ),
+			'add_step_here'                               => __( 'Add step here', 'wpfnl' ),
+			'paste_here'                                  => __( 'Paste here', 'wpfnl' ),
+			'conditional'                                 => __( 'Conditional', 'wpfnl' ),
+			'click_to_configure'                          => __( 'Click to configure', 'wpfnl' ),
+			'journey_ends_here'                           => __( 'Journey ends here', 'wpfnl' ),
+			'activated_conditional_flow'                  => __( 'Activated Conditional Flow', 'wpfnl' ),
+			'need_reconfigure_condition'                  => __( 'Need reconfigure condition', 'wpfnl' ),
 
 			// -----step settings drawer------
 			'assign_the_main_funnel_product'              => __( 'Assign the main funnel product here.', 'wpfnl' ),

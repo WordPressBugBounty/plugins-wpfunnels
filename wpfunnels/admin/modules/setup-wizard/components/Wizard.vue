@@ -1,166 +1,273 @@
 <template>
-	<div class="wpfnl-mm-setup-wizard">
-		<Sidebar
+	<div class="wpfnl-wz">
+		<TopBar
 			:currentStep="currentStep"
-			:selectedGoal="'improve-checkout'"
-			:storeCheckoutPhase="storeCheckoutPhase"
-			@show-exit-modal="handleShowExitModal"
+			:totalSteps="totalSteps"
+			@exit="requestExit"
 		/>
+
 		<Content
-			ref="contentComponent"
+			ref="content"
 			:currentStep="currentStep"
-			:selectedBuilder="selectedBuilder"
+			:builder="builder"
+			:funnelId="funnelId"
+			:firstStepLink="firstStepLink"
 			:agreeToShare="agreeToShare"
 			:prefetchedTemplates="prefetchedTemplates"
+			@nav="onNav"
 			@next-step="handleNextStep"
 			@prev-step="handlePrevStep"
-			@store-checkout-phase="handleStoreCheckoutPhase"
+			@exit="requestExit"
+		/>
+
+		<!-- Welcome carries its own CTA; the footer takes over from step 2. -->
+		<WizardFooter
+			v-if="currentStep > 1"
+			:label="nav.label"
+			:canProceed="nav.canProceed"
+			:busy="nav.busy"
+			:showBack="nav.showBack && currentStep > 1"
+			:showNext="nav.showNext"
+			:showSkip="nav.showSkip"
+			@back="handlePrevStep"
+			@next="submitActiveStep"
+			@skip="skipActiveStep"
 		/>
 	</div>
 </template>
 
 <script>
-import Content from './Content/Content.vue'
-import Sidebar from './Sidebar/Sidebar.vue'
-import apiFetch from '@wordpress/api-fetch'
-import { addQueryArgs } from '@wordpress/url'
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
+import Content from './Content/Content.vue';
+import TopBar from './Chrome/TopBar.vue';
+import WizardFooter from './Chrome/WizardFooter.vue';
 
-const nonce = window.setup_wizard_obj.nonce
-apiFetch.use(apiFetch.createNonceMiddleware(nonce))
+const nonce = window.setup_wizard_obj.nonce;
+apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
+
+const TOTAL_STEPS = 4;
+
+/**
+ * Step slugs, indexed by their 1-based position. Used for telemetry so the
+ * reported step names stay stable even if the labels change.
+ */
+const STEP_NAMES = {
+	1: 'welcome',
+	2: 'required_installation',
+	3: 'choose_template',
+	4: 'complete',
+};
+
+const DEFAULT_NAV = {
+	label: 'Next',
+	canProceed: true,
+	busy: false,
+	showBack: true,
+	showNext: true,
+	showSkip: false,
+};
 
 export default {
 	name: 'Wizard',
 	components: {
 		Content,
-		Sidebar,
+		TopBar,
+		WizardFooter,
 	},
+
 	data() {
 		return {
 			currentStep: 1,
-			agreeToShare: false,
-			selectedBuilder: '',
+			totalSteps: TOTAL_STEPS,
+
+			// Collected across the flow.
+			agreeToShare: true,
+			builder: 'gutenberg',
+			funnelId: null,
+			firstStepLink: '',
+
+			// Footer state, published by whichever step is active.
+			nav: { ...DEFAULT_NAV },
+
+			prefetchedTemplates: [],
 			stepEnteredAt: Date.now(),
 			consentSaved: false,
-			prefetchedTemplates: [],
-			storeCheckoutPhase: 'select',
-		}
+		};
 	},
 
 	mounted() {
-		this.trackStep('viewed', this.currentStep);
-		this.prefetchTemplates('gutenberg');
+		this.trackStep( 'viewed', this.currentStep );
+		this.prefetchTemplates();
 	},
 
 	methods: {
-		prefetchTemplates(builder) {
-			const resolved = builder === 'divi' ? 'divi-builder'
-				: builder === 'others' ? 'gutenberg'
-				: (builder || 'gutenberg');
+		/**
+		 * Receive footer state from the active step.
+		 *
+		 * @param {Object} state Partial nav state.
+		 */
+		onNav( state ) {
+			this.nav = { ...DEFAULT_NAV, ...( state || {} ) };
+		},
 
-			const baseUrl = (window.setup_wizard_obj?.rest_api_url || '').replace(/\/$/, '');
-			const path = addQueryArgs(`${baseUrl}/wpfunnels/v1/templates/get_templates`, {
-				builder: resolved,
+		/**
+		 * Ask the active step to advance. Steps own their own validation and
+		 * side effects (installing plugins, generating a funnel), so the footer
+		 * never advances the wizard directly.
+		 */
+		submitActiveStep() {
+			const step = this.$refs.content?.activeStep();
+			if ( step && 'function' === typeof step.submit ) {
+				step.submit();
+				return;
+			}
+			this.handleNextStep();
+		},
+
+		/**
+		 * Let the active step handle being skipped. Falls through to a plain
+		 * advance for steps that offer no skip of their own.
+		 */
+		skipActiveStep() {
+			const step = this.$refs.content?.activeStep();
+			if ( step && 'function' === typeof step.skip ) {
+				step.skip();
+				return;
+			}
+			this.handleNextStep();
+		},
+
+		requestExit() {
+			this.$refs.content?.showExitModal();
+		},
+
+		/**
+		 * Warm the store-checkout template grid so the template step renders
+		 * instantly. Re-run whenever the builder choice changes, since the API
+		 * result is builder-specific.
+		 */
+		prefetchTemplates() {
+			const builder = 'divi' === this.builder ? 'divi-builder'
+				: 'others' === this.builder ? 'gutenberg'
+				: ( this.builder || 'gutenberg' );
+
+			const baseUrl = ( window.setup_wizard_obj?.rest_api_url || '' ).replace( /\/$/, '' );
+			const path = addQueryArgs( `${ baseUrl }/wpfunnels/v1/templates/get_templates`, {
+				builder,
 				type: 'store_checkout',
-			});
+			} );
 
-			apiFetch({ path })
-				.then(response => {
-					if (response.success && response.templates && response.templates.length > 0) {
+			apiFetch( { path } )
+				.then( ( response ) => {
+					if ( response.success && response.templates?.length ) {
 						this.prefetchedTemplates = response.templates;
-					} else if (resolved !== 'gutenberg') {
-						this.prefetchTemplates('gutenberg');
 					}
-				})
-				.catch(() => {});
+				} )
+				.catch( () => {} );
 		},
 
-		getStepName(stepIndex) {
-			return { 1: 'welcome', 2: 'required_installation', 3: 'store_checkout' }[stepIndex] || 'unknown';
+		getStepName( stepIndex ) {
+			return STEP_NAMES[ stepIndex ] || 'unknown';
 		},
 
-		trackStep(eventType, stepIndex) {
-			const stepName = this.getStepName(stepIndex);
-			const timeOnStep = Math.round((Date.now() - this.stepEnteredAt) / 1000);
+		trackStep( eventType, stepIndex ) {
+			const restApiUrl = window.setup_wizard_obj?.rest_api_url || '';
+			if ( ! restApiUrl ) {
+				return;
+			}
 
-			const wizardObj = window.setup_wizard_obj || {};
-			const restApiUrl = wizardObj.rest_api_url || '';
-			const url = restApiUrl
-				? (restApiUrl.endsWith('/') ? restApiUrl : restApiUrl + '/') + 'wpfunnels/v1/setup-wizard/track-step'
-				: null;
+			const base = restApiUrl.endsWith( '/' ) ? restApiUrl : `${ restApiUrl }/`;
 
-			if (!url) return;
-
-			apiFetch({
-				url,
+			apiFetch( {
+				url: `${ base }wpfunnels/v1/setup-wizard/track-step`,
 				method: 'POST',
 				data: {
 					event_type: eventType,
-					step_name: stepName,
+					step_name: this.getStepName( stepIndex ),
 					step_index: stepIndex,
 					goal: 'improve-checkout',
-					time_on_step: eventType === 'viewed' ? 0 : timeOnStep,
+					time_on_step: 'viewed' === eventType
+						? 0
+						: Math.round( ( Date.now() - this.stepEnteredAt ) / 1000 ),
+					total_steps: TOTAL_STEPS,
 				},
-			}).catch(() => {});
+			} ).catch( () => {} );
 		},
 
-		saveConsent(consented) {
-			if (this.consentSaved) return;
+		/**
+		 * Persist the telemetry opt-in from the welcome step. Every later
+		 * track-step call is gated on this, so it runs before step 2.
+		 *
+		 * @param {boolean} consented Whether the user opted in.
+		 */
+		saveConsent( consented ) {
+			if ( this.consentSaved ) {
+				return;
+			}
 			this.consentSaved = true;
 
-			const wizardObj = window.setup_wizard_obj || {};
-			const restApiUrl = wizardObj.rest_api_url || '';
-			const url = restApiUrl
-				? (restApiUrl.endsWith('/') ? restApiUrl : restApiUrl + '/') + 'wpfunnels/v1/setup-wizard/save-consent'
-				: null;
+			const restApiUrl = window.setup_wizard_obj?.rest_api_url || '';
+			if ( ! restApiUrl ) {
+				return;
+			}
 
-			if (!url) return;
+			const base = restApiUrl.endsWith( '/' ) ? restApiUrl : `${ restApiUrl }/`;
 
-			apiFetch({
-				url,
+			apiFetch( {
+				url: `${ base }wpfunnels/v1/setup-wizard/save-consent`,
 				method: 'POST',
-				data: { consented: !!consented },
-			}).catch(() => {});
+				data: { consented: !! consented },
+			} ).catch( () => {} );
 		},
 
-		handleNextStep(data) {
-			if (data && data.agreeToShare !== undefined) {
+		/**
+		 * Advance, folding whatever the finished step collected into wizard state.
+		 *
+		 * @param {Object} data Payload emitted by the step.
+		 */
+		handleNextStep( data ) {
+			if ( data?.agreeToShare !== undefined ) {
 				this.agreeToShare = data.agreeToShare;
 			}
-			if (data && data.builder) {
-				this.selectedBuilder = data.builder;
-				this.prefetchTemplates(data.builder);
+			if ( data?.builder ) {
+				const builderChanged = data.builder !== this.builder;
+				this.builder = data.builder;
+				if ( builderChanged ) {
+					this.prefetchTemplates();
+				}
+			}
+			if ( data?.funnelId ) {
+				this.funnelId = data.funnelId;
+			}
+			if ( data?.firstStepLink ) {
+				this.firstStepLink = data.firstStepLink;
 			}
 
-			if (this.currentStep === 1) {
-				this.saveConsent(this.agreeToShare);
+			if ( 1 === this.currentStep ) {
+				this.saveConsent( this.agreeToShare );
 			}
 
-			this.trackStep('completed', this.currentStep);
-			if (this.currentStep < 3) {
+			this.trackStep( 'completed', this.currentStep );
+
+			if ( this.currentStep < TOTAL_STEPS ) {
 				this.currentStep++;
 				this.stepEnteredAt = Date.now();
-				this.trackStep('viewed', this.currentStep);
+				this.nav = { ...DEFAULT_NAV };
+				this.trackStep( 'viewed', this.currentStep );
 			}
 		},
 
 		handlePrevStep() {
-			if (this.currentStep > 1) {
-				this.trackStep('completed', this.currentStep);
-				this.currentStep--;
-				this.stepEnteredAt = Date.now();
-				this.trackStep('viewed', this.currentStep);
+			if ( this.currentStep <= 1 ) {
+				return;
 			}
-		},
-
-		handleShowExitModal() {
-			if (this.$refs.contentComponent) {
-				this.$refs.contentComponent.showExitModal();
-			}
-		},
-
-		handleStoreCheckoutPhase(phase) {
-			this.storeCheckoutPhase = phase;
+			this.trackStep( 'completed', this.currentStep );
+			this.currentStep--;
+			this.stepEnteredAt = Date.now();
+			this.nav = { ...DEFAULT_NAV };
+			this.trackStep( 'viewed', this.currentStep );
 		},
 	},
-}
+};
 </script>

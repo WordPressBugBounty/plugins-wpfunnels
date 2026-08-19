@@ -18,8 +18,16 @@ use WPFunnels\Admin\Notices\Notice as Admin_Notice;
 class Wpfnl_Import {
 
     /**
+     * Whether an Elementor step was imported and the file cache still needs flushing.
+     *
+     * @var bool
+     * @since 2.5.15
+     */
+    private $needs_elementor_cache_flush = false;
+
+    /**
      * Initialize ajax callback
-     * 
+     *
      * @since 1.7.5
      */
     public function __construct() {
@@ -186,14 +194,23 @@ class Wpfnl_Import {
         }
 
         // Security: Validate JSON structure
-        json_decode( $content, true );
+        $decoded = json_decode( $content, true );
         if ( json_last_error() !== JSON_ERROR_NONE ) {
             return new \WP_Error( 'invalid_json', __( 'Invalid JSON format.', 'wpfnl-pro' ) );
         }
 
-        // Security: Check for PHP code in content
-        if ( preg_match( '/<\?php|<\?=|<script|javascript:/i', $content ) ) {
-            return new \WP_Error( 'malicious_content', __( 'File contains potentially malicious content.', 'wpfnl-pro' ) );
+        // Security: Check for PHP open tags in content.
+        // NOTE: `<script` and `javascript:` are deliberately NOT checked here. Funnel steps
+        // legitimately carry marketing tags (Meta Pixel, gtag) and page-builder link fields
+        // inside their page content, and scanning the raw payload for them rejected valid
+        // exports. That content is stored as post data and is never executed by the importer.
+        if ( preg_match( '/<\?php|<\?=/i', $content ) ) {
+            return new \WP_Error( 'php_code', __( 'File contains PHP code and cannot be imported.', 'wpfnl-pro' ) );
+        }
+
+        // Security: Confirm the payload is actually a funnel export rather than arbitrary JSON.
+        if ( ! $this->is_valid_funnel_export( $decoded ) ) {
+            return new \WP_Error( 'invalid_structure', __( 'This file is not a valid WPFunnels export.', 'wpfnl-pro' ) );
         }
 
         $path = wp_upload_dir();
@@ -218,6 +235,160 @@ class Wpfnl_Import {
         chmod( $file_path, 0600 );
 
         return $file_path;
+    }
+
+
+    /**
+     * Determine whether a decoded payload matches the funnel export format.
+     *
+     * A valid export is a non-empty list of funnel objects, each carrying the keys that
+     * `import_funnels()` reads unconditionally. Validating the shape up front rejects
+     * arbitrary JSON before it is written to disk and queued, and surfaces a clear error
+     * to the user instead of failing halfway through the background import.
+     *
+     * @param mixed $decoded The decoded JSON payload.
+     *
+     * @return bool True when the payload is a well-formed funnel export.
+     * @since 2.5.15
+     */
+    private function is_valid_funnel_export( $decoded ) {
+        if ( ! is_array( $decoded ) || empty( $decoded ) ) {
+            return false;
+        }
+
+        foreach ( $decoded as $funnel ) {
+            if ( ! is_array( $funnel ) ) {
+                return false;
+            }
+            if ( empty( $funnel['funnel_id'] ) ) {
+                return false;
+            }
+            if ( ! isset( $funnel['funnel_meta'] ) || ! is_array( $funnel['funnel_meta'] ) ) {
+                return false;
+            }
+            if ( ! isset( $funnel['steps_data'] ) || ! is_array( $funnel['steps_data'] ) ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Unserialize an imported meta value without instantiating PHP objects.
+     *
+     * Behaves like `maybe_unserialize()` but passes `allowed_classes => false`, so a crafted
+     * `O:` payload in an import file resolves to `__PHP_Incomplete_Class` instead of a real
+     * object. That blocks PHP object injection (POP chains via `__wakeup`/`__destruct`),
+     * which is the one genuinely executable path in the import flow.
+     *
+     * @param mixed $original The value to unserialize.
+     *
+     * @return mixed The unserialized value, or the original value when it is not serialized.
+     * @since 2.5.15
+     */
+    private function safe_maybe_unserialize( $original ) {
+        if ( ! is_string( $original ) ) {
+            return $original;
+        }
+
+        $trimmed = trim( $original );
+        if ( ! is_serialized( $trimmed ) ) {
+            return $original;
+        }
+
+        $result = @unserialize( $trimmed, [ 'allowed_classes' => false ] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+
+        // `unserialize()` returns false both on failure and for the serialized value `false`.
+        if ( false === $result && 'b:0;' !== $trimmed ) {
+            return $original;
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * Determine which page builder a step was actually built with.
+     *
+     * Resolved from the step's own exported meta rather than `get_builder_type()`, which reads
+     * the destination site's WPFunnels setting (default `gutenberg`) and says nothing about the
+     * funnel being imported. Relying on that setting meant an Elementor funnel imported into a
+     * site that had not switched its builder skipped Elementor's post-import pass entirely,
+     * leaving images unmapped and the source site's render caches in place.
+     *
+     * Mirrors the detection order already used by `Wpfnl_functions::get_page_builder_by_step_id()`.
+     *
+     * @param array $step_data Exported step payload, expected to carry a `meta` array.
+     *
+     * @return string Builder slug, falling back to the site setting when nothing is detected.
+     * @since 2.5.15
+     */
+    private function detect_step_builder( $step_data ) {
+        $meta = isset( $step_data['meta'] ) && is_array( $step_data['meta'] ) ? $step_data['meta'] : [];
+
+        $value = function( $key ) use ( $meta ) {
+            return isset( $meta[ $key ][0] ) ? $meta[ $key ][0] : '';
+        };
+
+        if ( ! empty( $value( '_elementor_edit_mode' ) ) || ! empty( $value( '_elementor_data' ) ) ) {
+            return 'elementor';
+        }
+        if ( 'on' === $value( '_et_pb_use_builder' ) ) {
+            return 'divi-builder';
+        }
+        if ( 'bricks' === $value( '_bricks_editor_mode' ) ) {
+            return 'bricks';
+        }
+        if ( ! empty( $value( 'ct_builder_shortcodes' ) ) ) {
+            return 'oxygen';
+        }
+
+        return Wpfnl_functions::get_builder_type();
+    }
+
+
+    /**
+     * Run the page-builder specific post-import pass for a freshly created step.
+     *
+     * For Elementor this is what remaps media through `Control_Media::on_import()`, pulling
+     * remote images into this site's library instead of leaving them pointed at the source.
+     *
+     * @param int    $step_id      Newly created step id.
+     * @param string $builder_type Builder slug from `detect_step_builder()`.
+     *
+     * @return void
+     * @since 2.5.15
+     */
+    private function run_builder_post_import( $step_id, $builder_type ) {
+        // Every source below fetches remote assets while processing the template.
+        if ( ! ini_get( 'allow_url_fopen' ) ) {
+            return;
+        }
+
+        if ( 'gutenberg' === $builder_type && class_exists( '\WPFunnels\Batch\Gutenberg\Wpfnl_Gutenberg_Source' ) ) {
+            $gutenberg_source = new \WPFunnels\Batch\Gutenberg\Wpfnl_Gutenberg_Source;
+            $gutenberg_source->import_single_template( $step_id );
+        }
+
+        if ( 'elementor' === $builder_type && class_exists( '\Elementor\Plugin' ) && class_exists( '\WPFunnels\Batch\Elementor\Wpfnl_Elementor_Source' ) ) {
+            $elementor_source = new \WPFunnels\Batch\Elementor\Wpfnl_Elementor_Source;
+            $elementor_source->import_single_template( $step_id );
+            // Flushed once after the whole import instead of per step; clear_cache() globs and
+            // unlinks the entire Elementor CSS directory on every call.
+            $this->needs_elementor_cache_flush = true;
+        }
+
+        if ( 'divi-builder' === $builder_type && class_exists( '\WPFunnels\Batch\Divi\Wpfnl_Divi_Source' ) ) {
+            $divi_source = new \WPFunnels\Batch\Divi\Wpfnl_Divi_Source;
+            $divi_source->import_single_template( $step_id );
+        }
+
+        if ( 'oxygen' === $builder_type && class_exists( '\WPFunnels\Batch\Oxygen\Wpfnl_Oxygen_Source' ) ) {
+            $oxygen_source = new \WPFunnels\Batch\Oxygen\Wpfnl_Oxygen_Source;
+            $oxygen_source->import_single_template( $step_id );
+        }
     }
 
 
@@ -271,16 +442,22 @@ class Wpfnl_Import {
                 $funnel->update_meta( $funnel_id, '_is_imported', 'yes' );
 
                 foreach( $data[ 'funnel_meta' ] as $meta_key => $meta ) {
+                    if( !isset( $data[ 'funnel_meta' ][ $meta_key ][ 0 ] ) ) {
+                        continue;
+                    }
+                    if( in_array( $meta_key, Wpfnl_functions::VOLATILE_TRANSFER_META_KEYS, true ) ) {
+                        continue;
+                    }
                     if( !in_array( $meta_key, $exclude_meta ) ) {
-                        $funnel->update_meta( $funnel_id, $meta_key, maybe_unserialize( $data[ 'funnel_meta' ][ $meta_key ][ 0 ] ) );
+                        $funnel->update_meta( $funnel_id, $meta_key, $this->safe_maybe_unserialize( $data[ 'funnel_meta' ][ $meta_key ][ 0 ] ) );
                     }
                     else {
                         if( 'funnel_data' === $meta_key ) {
-                            $funnel_data = maybe_unserialize( $data[ 'funnel_meta' ][ $meta_key ][ 0 ] );
+                            $funnel_data = $this->safe_maybe_unserialize( $data[ 'funnel_meta' ][ $meta_key ][ 0 ] );
                         }
 
                         if( '_funnel_data' === $meta_key ) {
-                            $funnel_data = maybe_unserialize( $data[ 'funnel_meta' ][ $meta_key ][ 0 ] );
+                            $funnel_data = $this->safe_maybe_unserialize( $data[ 'funnel_meta' ][ $meta_key ][ 0 ] );
                         }
                     }
                 }
@@ -314,6 +491,14 @@ class Wpfnl_Import {
             }
         }
 
+        // Flush Elementor's file cache once for the whole import. clear_cache() unlinks the
+        // entire Elementor CSS directory and runs three delete_post_meta_by_key() sweeps, so
+        // doing it per step multiplied that by the step count.
+        if( $this->needs_elementor_cache_flush && class_exists( '\Elementor\Plugin' ) ) {
+            Plugin::$instance->files_manager->clear_cache();
+            $this->needs_elementor_cache_flush = false;
+        }
+
         update_option( 'wpfnl_import_notice', $message );
         return true;
     }
@@ -331,7 +516,7 @@ class Wpfnl_Import {
         if (!is_array($step_data)) {
             return false;
         }
-        $builder_type = Wpfnl_functions::get_builder_type();
+        $builder_type = $this->detect_step_builder($step_data);
         $previous_step_id        = isset($step_data['id']) ? $step_data['id'] : '';
         $title          = isset($step_data['title']) ? $step_data['title'] : '';
         $slug          = isset($step_data['slug']) ? $step_data['slug'] : '';
@@ -352,7 +537,10 @@ class Wpfnl_Import {
 
             $step->update_meta($step_id, '_funnel_id', $funnel_id);
             $step->update_meta($step_id, '_wp_page_template', $page_template);
-            $exclude_meta = array('_wpfnl_ab_testing_start_settings', '_funnel_id');
+            $exclude_meta = array_merge(
+                array('_wpfnl_ab_testing_start_settings', '_funnel_id'),
+                Wpfnl_functions::VOLATILE_TRANSFER_META_KEYS
+            );
             if ( ! Wpfnl_functions::is_wpfnl_pro_activated() ) {
                 $exclude_meta = array_merge( $exclude_meta, array(
                     '_wpfnl_maybe_enable_condition',
@@ -397,35 +585,8 @@ class Wpfnl_Import {
                 update_post_meta($step_id, '_wpfnl_maybe_enable_condition', 'yes');
             }
 
-            if (('gutenberg' === $builder_type)  && class_exists('\WPFunnels\Batch\Gutenberg\Wpfnl_Gutenberg_Source')) {
-                if (ini_get('allow_url_fopen')) {
-                    $gutenberg_source  = new \WPFunnels\Batch\Gutenberg\Wpfnl_Gutenberg_Source;
-                    $gutenberg_source->import_single_template($step_id);
-                }
-            }
+            $this->run_builder_post_import($step_id, $builder_type);
 
-            // Elementor Data.
-            if (('elementor' === $builder_type) && class_exists('\Elementor\Plugin') && class_exists('\WPFunnels\Batch\Elementor\Wpfnl_Elementor_Source')) {
-                if (ini_get('allow_url_fopen')) {
-                    $elementor_source  = new \WPFunnels\Batch\Elementor\Wpfnl_Elementor_Source;
-                    $elementor_source->import_single_template($step_id);
-                    Plugin::$instance->files_manager->clear_cache();
-                }
-            }
-
-            if (('divi-builder' === $builder_type) && class_exists('\WPFunnels\Batch\Divi\Wpfnl_Divi_Source')) {
-                if (ini_get('allow_url_fopen')) {
-                    $divi_source  = new \WPFunnels\Batch\Divi\Wpfnl_Divi_Source;
-                    $divi_source->import_single_template($step_id);
-                }
-            }
-
-            if (('oxygen' === $builder_type) && class_exists('\WPFunnels\Batch\Oxygen\Wpfnl_Oxygen_Source')) {
-                if (ini_get('allow_url_fopen')) {
-                    $oxygen_source  = new \WPFunnels\Batch\Oxygen\Wpfnl_Oxygen_Source;
-                    $oxygen_source->import_single_template($step_id);
-                }
-            }
             delete_post_meta($step_id, '_funnel_id');
             update_post_meta($step_id, '_funnel_id', $funnel_id);
 
@@ -490,8 +651,8 @@ class Wpfnl_Import {
      * @return void
     */
     public function update_ab_testing_settings( $funnel_id, $step_id, $settings, $prev_settings ){
-        $settings = maybe_unserialize($settings);
-        $prev_settings = maybe_unserialize($prev_settings);
+        $settings = $this->safe_maybe_unserialize($settings);
+        $prev_settings = $this->safe_maybe_unserialize($prev_settings);
         
         if( isset( $settings['variations'] ) ){
             $new_settings = [];
@@ -531,7 +692,10 @@ class Wpfnl_Import {
                     
                     if ( 'original' !== $variation['variationType'] && isset($prev_settings[$key]['meta']) ){
                         $metas = $prev_settings[$key]['meta'];
-                        $exclude_meta = array( '_wpfnl_ab_testing_start_settings','_wpfnl_automation_steps', '_parent_step_id' );
+                        $exclude_meta = array_merge(
+                            array( '_wpfnl_ab_testing_start_settings','_wpfnl_automation_steps', '_parent_step_id' ),
+                            Wpfnl_functions::VOLATILE_TRANSFER_META_KEYS
+                        );
                         $page_template  = isset( $metas['page_template'] ) ? $metas['page_template'] : '';
                         $title          = isset( $metas['title'] ) ? $metas['title'] : '';
                         $post_content   = isset( $metas['post_content'] ) ? $metas['post_content'] : '';
@@ -554,9 +718,12 @@ class Wpfnl_Import {
                                     }
                                 }
                                 $this->update_meta_by_sql( $sql_query_arr ); // update meta
+                                // Variants carry their own builder content, so they need the
+                                // same post-import pass as a regular step.
+                                $this->run_builder_post_import( $new_step_id, $this->detect_step_builder( $metas ) );
                             }
                         }
-                        
+
                     }else{
                         $new_step_id = $step_id;
                     }
@@ -564,7 +731,10 @@ class Wpfnl_Import {
                     $variations[$variation_key]['id'] = $new_step_id;
                     $variations[$variation_key]['stepType'] = get_post_meta( $step_id, '_step_type', true );
                     $step_edit_link =  get_edit_post_link($new_step_id);
-                    if( 'elementor' ===  Wpfnl_functions::get_builder_type() ){
+                    // `ab_step_data[]` nests the full step payload under its `meta` key
+                    // (see Wpfnl_Export::export_ab_step_metas()), so detection reads that.
+                    $variation_step_data = isset( $prev_settings[$key]['meta'] ) ? $prev_settings[$key]['meta'] : [];
+                    if( 'elementor' === $this->detect_step_builder( $variation_step_data ) ){
                         $step_edit_link = str_replace('&amp;','&',$step_edit_link);
                         $step_edit_link = str_replace('edit','elementor',$step_edit_link);
                     }

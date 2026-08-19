@@ -3,9 +3,9 @@ Contributors: coderexltd, getwpfunnels, coderexco
 Donate link: https://getwpfunnels.com/
 Tags: funnel builder, woocommerce checkout, order bump, woocommerce funnel builder, one click upsell
 Requires at least: 6.1
-Tested up to:  7.0
+Tested up to:  7.1
 Requires PHP: 7.4
-Stable tag: 3.12.11
+Stable tag: 3.12.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -334,25 +334,31 @@ You can revoke your consent at any time. If you would like your previously colle
 
 = 1. What makes WPFunnels different from other WooCommerce funnel plugins? =
 
-WPFunnels is a WooCommerce funnel builder that lets you visually design the entire customer journey — from landing page to checkout to post-purchase offers — inside WordPress.
+WPFunnels is a WooCommerce funnel builder that lets you visually design the entire customer journey.
 
-Unlike most WooCommerce plugins that only focus on one feature (such as upsells or checkout customization), WPFunnels gives you a complete toolkit to increase your store’s average order value.
+* You may improve the overall checkout experience of buyers when they are ready to check out (with custom checkout pages, personalized order bumps, and one-click upsells)
+* Or, you may create dedicated sales funnels for specific products along with their own custom landing, checkout, and offer pages.
 
-With WPFunnels you can:
+Unlike most WooCommerce plugins that only focus on one feature (such as upsells or checkout customization), WPFunnels gives you a complete toolkit to increase your store's average order value.
 
-• Plan funnel flows on a visual canvas  
-• Create optimized WooCommerce checkout pages  
-• Add WooCommerce order bumps on the checkout page  
-• Create WooCommerce one click upsell and downsell offers after checkout (Pro)  
-• Track funnel performance with analytics (Pro)  
-• Run A/B tests on funnel steps (Pro)  
-• Integrate with payment gateways and automation tools  
+With WPFunnels, you can:
+• Set up a storewide checkout that applies across your entire store
+• Build dedicated funnels for specific products
+• Plan funnel flows on a visual canvas
+• Create an optimized WooCommerce checkout page
+• Add WooCommerce order bumps on the checkout page
+• Create WooCommerce one-click upsell and downsell offers after checkout (free plan includes 1 upsell; unlimited upsells and downsells in Pro)
+• Set conditional offers based on what's in the buyer's cart (Pro)
+• Track funnel performance with analytics (Pro)
+• Run A/B tests on funnel steps (Pro)
+• Integrate with payment gateways and automation tools
 
 Everything is managed from one place inside your WordPress dashboard.
 
+
 = 2. Why should I focus on increasing Average Order Value and not Traffic? =
 
-If you have moderate traction (at least 500 traffic per month and 1-2% conversion rate), then you can easily increase your revenue by 20-30% simply by focusing on AOV.
+If you have moderate traction (at least 500 traffic per month and a 1-2% conversion rate), then you can easily increase your revenue by 20-30% simply by focusing on AOV.
 
 Sure, you could invest in getting more traffic or working on CRO. But if all the buyers do is place a single order, then you will still be stuck with stagnant profit margins because your acquisition costs will increase.
 
@@ -360,93 +366,178 @@ Hence, if you focus on AOV, you will have the chance to ensure you earn more tha
 
 = 3. What is a WooCommerce sales funnel? =
 
-A WooCommerce sales funnel is a structured buying journey designed to convert visitors into buyers and increase the value of each order.
+WooCommerce sales funnel is a structured buying journey designed to convert visitors into buyers and increase the value of each order.
 
-Instead of sending customers directly to a basic checkout page, a your funnel will guide buyers them through optimized steps that increase conversions and revenue.
+Instead of sending customers straight to a basic checkout page, a funnel guides them through optimized steps that increase conversions and revenue.
 
-A typical WooCommerce sales funnel includes:
+With WPFunnels, you can set this up in two ways:
 
-1. Landing or product page  
-2. Optimized checkout page  
-3. Thank you page  
+1. Storewide checkout
+Replace the default WooCommerce checkout with a frictionless one, add order bumps and one-click upsells based on products in the cart, and let customers feel they are shopping from the store like usual, while you earn more from every order.
 
-To increase revenue further, you may add:
+2. Dedicated funnels
+Create a custom journey (landing page, checkout with order bump, one-click upsell page, thank you page) for a specific product to run dedicated campaigns around it.
 
-• Order bumps on the checkout page  
-• One-click upsell or downsell offers after checkout  
+In both cases, you have the tools needed to increase average order value (using order bumps and post-purchase upsells), and increase conversions (using custom discounts, frictionless checkout, personalized offers based on conditions, etc.).
 
-These additional offers can significantly increase your average order value without investing in additional traffic.
+Overall, you can earn more without focusing heavily on increasing traffic.
 
 = 4. Why should I use a WooCommerce funnel builder plugin? =
 
-Most WooCommerce stores rely on the default checkout flow. This will limit your ability to increase revenue without heavily investing on paid acquisition or traffic.
+Most WooCommerce stores rely on the default checkout flow. This limits your ability to increase revenue without heavily investing in paid acquisition or traffic.
 
 A WooCommerce funnel builder helps you optimize this process by allowing you to:
-
-• Customize your checkout experience  
-• Add order bump offers during checkout  
-• Show one-click upsell offers after checkout  
-• Design a complete funnel flow for your products
+• Customize the checkout experience storewide
+• Add order bump offers during checkout
+• Show one-click upsell offers after checkout
+• Set conditional offers based on the buyer's cart (Pro)
+• Design a complete funnel flow for your products when you need one
 
 This allows you to increase conversions and average order value without needing additional traffic.
 
-This realiable sales funnel builder makes it possible to create and launch these revenue-focused funnels directly inside WordPress without using expensive SaaS tools.
+This reliable sales funnel builder makes it possible to create and launch these revenue-focused checkout funnels directly inside WordPress, without relying on expensive SaaS tools.
 
 = 5. Who should use WPFunnels? =
 
-WPFunnels is built primarily for WooCommerce store owners who want to increase revenue (or AOV) and optimize their checkout experience.
+WPFunnels is built primarily for WooCommerce store owners who want to increase revenue (or AOV) and optimize their checkout experience — whether you sell physical products, digital products, courses, subscriptions, or memberships through WooCommerce.
 
-So you are recommended to the plugin if you are a
-• eCommerce store owner  
-• Digital product seller 
+The Plugin is a great fit for you if you are a(n):
+• eCommerce store owner
+• Digital product seller
 • Course creator using WooCommerce
 • Membership and subscription business
-• Marketing agency managing WooCommerce stores  
+• Marketing agency managing WooCommerce stores
 
-That being said, the plugin is not just limited to eCommerce funnels. For any product or service you offer, you can use sales funnels to increase your conversion.
+If you want a quick win, you can start with a storewide checkout in minutes. If you want a fully custom journey for a specific product or campaign, you can build a dedicated funnel instead.
 
-WPFunnels is among the few WordPress funnel builder plugins that can give an easy solution to help you create sales funnels that work from any users such as:
+Overall, it's the perfect solution for building high-converting eCommerce funnels.
 
-- Digital Marketer
-- Marketing Strategist
-- Marketing Coach
-- Fitness Trainers
-- Gym Equipment Shop
-- Health Supplement Seller
-- Legal Advisor
-- Online Coach
-- Educational Portal
-- Counselor
-- Software Firm
-- Marketing Agency
-- eCommerce Shop
+= 6. What are the basic requirements for WPFunnels to work? =
+If you simply want to create lead generation funnels, you only need WPFunnels. To be able to manage the leads, you may use Mail Mint.
 
-However, it is not limited to these niches. Any business can benefit from using sales funnels.
+To create sales funnels, you will simply need WooCommerce and WPFunnels installed.
 
-= 6. What types of funnels can I create with WPFunnels? =
-With WP Funnels you can create different types of WooCommerce funnels to increase revenue and conversions.
+Then, depending on your requirements, you can choose your own page builder to design the pages. We recommend using Elementor.
 
-Examples include:
+These are enough to start creating funnels.
 
-• WooCommerce product sales funnels  
-• Checkout sales funnel with order bumps  
-• One-click upsell funnels  
-• Lead generation funnels  
-• Course funnels 
-• Subscription funnels  
-• Product launch funnel
-• Affiliate Sales Funnel
+= 7. How long does it take to create a funnel with WPFunnels? =
+
+You can create a working WooCommerce sales funnel in just a few minutes.
+
+If you want a quick win, set up a storewide checkout: turn it on, add order bumps or upsells, and you're done in minutes — no new pages to design.
+
+If you want a fully custom journey for a specific product, WPFunnels includes ready-to-use funnel templates:
+
+1. Choose a funnel template  
+2. Customize your funnel pages  
+3. Set up checkout offers such as order bumps or upsells  
+4. Launch the funnel
+
+Most users can create their first funnel in less than 10 minutes.
+
+= 8. Do customers need to enter their payment details again to accept a one-click upsell? = 
+
+No. Once a customer completes the payment for their original order, they don't need to enter their payment details again to accept a one-click upsell. They can simply accept the offer with one click, and it will be added to the order.
+
+= 9. Do I need to replace my existing WooCommerce product pages to use WPFunnels? =
+
+No. Your existing WooCommerce product pages will continue to work as they are.
+
+For a storewide checkout, your funnel journey begins from the checkout step. The product page remains as is.
+
+When a person wants to checkout, that's when he/she enters the funnel. In this case, you can customize the checkout experience, add order bumps, show one-click upsells or downsells (Pro), and create a custom thank you page.
+
+So no need to redesign the product page.
+
+If you create a regular sales funnel, you get a custom journey with a custom landing page, checkout, and offer pages. This funnel is not visible on your website. You simply choose the product that will be sold in this funnel and bring traffic into its landing page with separate marketing efforts.
+
+Either way, there's no need to rebuild your products or redesign your entire store. You can start with one product or a few products first, and then build for more products whenever you're ready.
+
+= 10. Do I need any coding and designing skills? =
+
+No. WPfunnels comes with different types of templates that meet the design and structure requirements to sell different types of products and courses.
+
+No coding is required.
+
+This WooCommerce upsell plugin works with popular page builders such as Elementor, Gutenberg, Divi, Bricks, and Oxygen. You can simply use the builder you are comfortable with to design your funnel pages.
+
+The plugin also provides pre-built templates and funnel elements to make the process easier.
+
+= 11. What Page builders does WP Funnels support? =
+
+Currently, WPFunnels works well with Gutenberg, Elementor, Bricks, Divi, and Oxygen Builder. We’re looking to support more page builders soon.
+
+You will get to add important page elements such as the Next Step button, Checkout form, etc when designing your pages.
+
+If you use Gutenberg, Elementor, Oxygen, Bricks, or Divi, you will get their respective blocks, widgets, and modules for funnel creation.
+
+Meanwhile, you may use our <a href="https://getwpfunnels.com/docs/wpfunnels-shortcodes/shortcodes-to-create-a-functional-sales-funnel/"target="_blank">shortcodes</a> for other page builders.
+
+= 12. Is WPFunnels compatible with my WooCommerce theme? =
+
+WPFunnels is designed to work with most WooCommerce-compatible WordPress themes.
+
+Since the plugin works directly with WooCommerce and popular page builders, it integrates well with themes such as:
+-  Astra 
+-  Kadence 
+-  Blocksy 
+-  Storefront 
+-  GeneratePress 
+-  WoodMart 
+-  Flatsome 
+-  And most other WooCommerce themes 
+
+If you use a highly customized or niche theme, we recommend testing your funnel in a staging or local environment. If you notice any issues, let us know, and we will get it fixed soon.
+
+= 13. Will WPFunnels slow down my WooCommerce store? ==
+No. WPFunnels is built to work efficiently with WooCommerce and only loads the resources required for your funnels.
+Your store's overall performance depends on several factors, including your hosting environment, theme, installed plugins, and page builder. WPFunnels is designed to fit naturally into your existing WooCommerce setup without adding unnecessary overhead.
+For the best performance, we recommend:
+-  Using quality WordPress hosting 
+-  Keeping WordPress, WooCommerce, and your plugins updated 
+-  Using a caching and image optimization solution 
+-  Avoiding unnecessary plugins running on your store 
+With a properly optimized WooCommerce website, you can create high-converting funnels while maintaining a fast shopping experience.
+
+= 14. Does WPFunnels support Facebook Pixel and Google Tag Manager? =
+
+Yes. WPFunnels comes with built-in support for Facebook Pixel and Google Tag Manager.
+
+You can add your Facebook Pixel ID or Google Tag Manager ID from Settings → Events & Other Integrations.
+
+Once configured, when creating funnels, you can enable tracking for all the pages in the funnel for useful metrics, which include:
+-  View Content 
+-  Add to Cart 
+-  Initiate Checkout 
+-  Add Payment Info 
+-  Purchase 
+
+= 15. What types of funnels can I create with WP Funnels? =
+
+With WP Funnels, you can create different types of WooCommerce funnels to increase revenue and conversions.
+
+Using a Storewide checkout — apply an optimized checkout, order bumps, and upsells across your entire store instantly, without building separate funnel pages.
+
+Build Dedicated funnels — create a custom journey for specific products or campaigns, such as:
+• WooCommerce product sales funnels
+• Checkout sales funnel with order bumps
+• One-click upsell funnels
+• Lead generation funnels
+• Course funnels (for courses sold via WooCommerce)
+• Subscription funnels
+• Product launch funnels
 
 You can also create conditional funnels based on the products in a customer's cart (Pro), allowing you to show more relevant offers.
 
-Now, the free plugin lets you create the basics - landing page, checkout page, and thank you page - and you will be able to add one order bumps to your checkout page, and a single one-click upsell to the checkout flow. 
+The free plugin lets you create up to 3 funnels and 3 store-wide checkouts. And on each, you can add 1 order bump and 1 one-click upsell after checkout (which no other tools offer for free).
 
 Plus, you will get a few pre-built templates to save you some time.
 
-Other than eCommerce funnels, you can also build the following:
+However, other than eCommerce funnels, WPFunnels will also let you build the following:
 
 - Opt-in Lead Generation Funnel
-- Subscription funnels
+- Subscription Funnels
 - Free Webinar Funnel
 - Paid Webinar Funnel
 - Tripwire Funnel
@@ -460,75 +551,42 @@ Other than eCommerce funnels, you can also build the following:
 - Survey Funnel (coming soon)
 - Mixture of multiple sales funnels - Hybrid funnels
 
-= 7. How long does it take to create a funnel with WPFunnels? =
+These aren't necessarily for eCommercestores, but are some additional types of funnels using the plugin.
 
-You can create a working WooCommerce sales funnel in just a few minutes.
-
-WPFunnels includes ready-to-use funnel templates that allow you to launch quickly. You simply:
-
-1. Choose a funnel template  
-2. Customize your funnel pages  
-3. Set up checkout offers such as order bumps or upsells  
-4. Launch the funnel
-
-Most users can create their first funnel in less than 15 minutes.
-
-= 8. Do I need any coding and designing skills? =
-
-No. WPfunnels come with different types of templates that meet the design and structure requirements to sell different types of products and courses.
-
-No coding is required.
-
-This WooCommerce upsell plugin works with popular page builders such as Elementor, Gutenberg, Divi, Bricks, and Oxygen. You can simply use the builder you are comfortable with to design your funnel pages.
-
-The plugin also provides pre-built templates and funnel elements to make the process easier.
-
-
-= 9. What are the basic requirements for WPFunnels to work? =
-If you simply want to create lead generation funnels, you only need WPFunnels. To be able to manage the leads, you may use Mail Mint.
-
-To create sales funnels, you will simply need WooCommerce and WPFunnels installed.
-
-Then, depending on your requirements, you can choose your own page builder to design the pages. We recommend using Elementor.
-
-These are enough to start creating funnels.
-
-= 10. What Page builders do WP Funnels support? =
-
-Currently, WPFunnels works well with Gutenberg, Elementor, Bricks, Divi, and Oxygen builder. We’re looking to support more page builders soon.
-
-You will get to add important page elements such as the Next Step button, Checkout form, etc when designing your pages.
-
-If you use Gutenberg, Elementor, Oxygen, Bricks, or Divi, you will get their respective blocks, widgets, and modules for funnel creation.
-
-Meanwhile, you may use our <a href="https://getwpfunnels.com/docs/wpfunnels-shortcodes/shortcodes-to-create-a-functional-sales-funnel/"target="_blank">shortcodes</a> for other page builders.
-
-= 11. I can't find a certain funnel feature that I need = 
+= 16. I can't find a certain funnel feature that I need = 
 
 If you can't find a certain feature that you think is available in the plugin, you can open a thread and mention the feature.
 
 And if there is a feature that is not available in the plugin but you think will be helpful for building funnels, you can <a href="https://getwpfunnels.com/ideas/" target="_blank">let us know here.</a>
 
-= 12. How can I report security bugs? =
+= 17. How can I report security bugs? =
 
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. 
 
-The Patchstack team help validate, triage and handle any security vulnerabilities. <a href="https://patchstack.com/database/vdp/wpfunnels" target="_blank">Report a security vulnerability.</a>
+The Patchstack team helps validate, triage, and handle any security vulnerabilities. <a href="https://patchstack.com/database/vdp/wpfunnels" target="_blank">Report a security vulnerability.</a>
 
 == Screenshots ==
-1. Create Your First Funnel
-2. Import Preferred Funnel Template Or Start From Scratch
-3. Add Your First Funnel step 
-4. Add Upsell Step
-5. Add Conditional Actions
-6. Set Up Conditional Statements & Add Steps From The Same Tab
-7. Create Your Funnel Journey
-8. Run A/B Testing In A Clean UI
-9. Add Order Bump Offers Easily
-10. Add as many Funnel steps as you want for a complete user journey
-11. All Your Funnels In One Place
+1. Store Checkout to Replace Default WooCommerce Checkout
+2. Create Funnel With Pre-Built Template In A Few Clicks
+3. Increase AOV With Quick Order Bump Offers During Checkout
+4. Make One-click Upsell Offers To Earn More
+5. Full Customer Buyer Journey With Higher AOV
+6. Set Up Conditional Offers
+7. Run A/B Testing To Find Out What Works Best
+8. The Visual Funnel Canvas
 
 == Changelog ==
+
+= 3.12.12 (2026-08-19) =
+* New: Compatibility: Verified compatibility with WordPress 7.1
+* Improvement: Hardened funnel import against malicious and malformed files
+* Improvement: Improved the overall funnel building experience
+* Fix: Funnel exports containing tracking scripts were rejected during import
+* Fix: Imported funnels lost their styling when built with a different page builder
+* Fix: WPFunnels modules were missing from the Divi 5 visual builder
+* Fix: Test emails could not be sent from the automation email template preview
+* Fix: Email builder failed to open from the funnel canvas on some sites
+* Fix: Funnel canvas was slow to load on sites with a lot of analytics data
 
 = 3.12.11 (2026-08-06) =
 * Fix: Product and post categories now load correctly in the automation email builder panels
@@ -900,245 +958,5 @@ The Patchstack team help validate, triage and handle any security vulnerabilitie
 * Compatibility: User role management of WPFunnels Pro
 * Compatibility: Tutor LMS for Upsell and Downsell
 * BugFix: Displaying wrong discount amount on step settings
-
-= 3.4.16 (2024-09-23) =
-* Compatibility: Basic features compatibility with step duplication feature in WPFunnels Pro
-* Compatibility: Basic funnel compatibility with the conditional actions for automation in WPFunnels Pro
-* BugFix: Opt-in carry data issue from landing to custom step
-* BugFix : Bricks class initialization issue
-* BugFix : Import funnel issue after trashing more than 3 funnels
-
-= 3.4.15 (2024-09-11) =
-* New : Templates for custom step types
-* Enhancement : Template showcase journey
-* Compatibility : Conflict with Astra Pro plugin
-* BugFix : Order Bump discount issue on checkout page
-* Bugfix : Order Bump description retrieving issue on canvas
-* Bugfix : JS error on funnel canvas
-
-= 3.4.14 (2024-09-03) =
-* BugFix : Resolved subscription creation issues
-
-= 3.4.13 (2024-08-29) =
-* New : Added feature comparison page
-* Enhancement : Updated UI for adding Product to the checkout
-* Enhancement : Restrict saving an order bump without adding product
-* Enhancement : Added a warning icon if condition is not configured properly
-* Compatibility : Added compatibility with Google SiteKit conversion tracking
-* BugFix : Resolved order bump discount issue for multiple quantity
-* BugFix : Resolved empty cart issue after purchasing with Stripe
-
-= 3.4.12 (2024-08-21) =
-* Enhancement : Setup wizard UI
-* BugFix : Resolved payment section issue on checkout
-
-= 3.4.11 (2024-08-20) =
-* BugFix : Resolved multi-step checkout issue
-
-= 3.4.10 (2024-08-19) =
-* Enhancement : Setup wizard UI
-* Enhancement : Update step icons and step connector
-* Compatibility : Added compatibility with Google Site Kit plugin
-* Compatibility : Added compatibility with Elementor form 
-* Compatibility : Allow to use pop-up order bump as pre-purchase upsell for pro users
-
-= 3.4.9 (2024-08-08) =
-* New : Integrated Elementor form with WPFunnels
-* Enhancement : Reduced API calling on funnel canvas to improve performance
-* Compatibility : Added compatibility with Drip Integration
-* BugFix : Resolved console error on canvas
-
-= 3.4.8 (2024-07-29) =
-* Enhancement : Added filter hook on checkout discount
-* Enhancement : Added a functionality to validate Google Map API Key before applying
-* Compatibility : Made compatible with Astra Pro plugin
-* Compatibility : Added compatibility with Astra child themes
-* BugFix : Resolved checkout design issue
-
-= 3.4.7 (2024-07-11) =
-* Enhancement : Removed Qubely dependency for templates
-
-= 3.4.6 (2024-07-05) =
-* BugFix : Resolved settings js enqueuing issue
-
-= 3.4.5 (2024-07-05) =
-* New : Add optin settings on settings panel
-* Enhancement : Improved general and permalink settings page design
-
-= 3.4.4 (2024-07-01) =
-* BugFix : Resolved course saving issue on checkout step drawer
-
-= 3.4.3 (2024-06-28) =
-* BugFix : Resolved conflict with WP Rocket
-
-= 3.4.2 (2024-06-28) =
-* Compatibility : Added compatibility with latest WPFunnels Pro Integrations Addon for Pabbly Connect and Email Marketing
-* Compatibility : Added compatibility with latest Mail Mint Pro
-
-= 3.4.1 (2024-06-26) =
-* New : Added custom script support
-* New : Added bricks child themes support for templates
-* Compatibility : Allowed to add step in the middle of the step
-* Enhancement : Update Pro modal with pricing
-* BugFix : Resolved template sync issue on setup wizard
-* BugFix : Resolved IP blocking issue for getting templates
-* BugFix : Resolved product changing issue on checkout
-* BugFix : Resolved step positioning issue on funnel canvas
-
-= 3.4.0 (2024-06-13) =
-* New : Added Bricks templates
-* New : Introduced full-width setup wizard
-* New : Integrated with Google Autocomplete
-* New : Added compatibility with Product Addons for WooCommerce - Product Options with Custom Fields
-* Enhancement : Updated the notice and tooltip messages
-* BugFix : Resolved the contact status issue 
-* BugFix : Resolve PHP dedicated warnings
-* BugFix : Resolved template layout issue for lead funnel
-
-= 3.3.1 (2024-06-06) =
-* BugFix : Resolved spelling issue on pro modal
-
-= 3.3.0 (2024-05-29) =
-* BugFix : Resolved orderbump discount issue
-
-= 3.2.2 (2024-05-29) =
-* New : Added template layout for scratch funnel
-* New : Added bundle product support for checkout
-* New : Added composite product support for checkout
-* Enhancement : Auto sync template after changing the funnel type
-* Enhancement : Added toaster notification for all the confirmation message
-* Enhancement : Updated trash icon
-* BugFix : Resolved template filter issue on funnel template showcase
-* BugFix : Resolved orderbump replace settings issue
-
-= 3.2.1 (2024-05-21) =
-* Enhancement : Added a modal to show the pro features
-
-= 3.2.0 (2024-05-21) =
-* New : Opt-in form integration with Mail Mint
-* Bug Fix : Resolved duplicate discount on funnel checkout 
-
-= 3.1.10 (2024-05-18) =
-* Bug Fix : Resolved Php error
-
-= 3.1.9 (2024-05-17) =
-* Bug Fix : Resolved file missing issue
-
-= 3.1.8 (2024-05-17) =
-* New : Allowed to disable payment gateways for a specific funnel checkout
-* New : Added create product option on step drawer 
-* New : Added trash module for funnel
-* Enhancement : Improved Order bump UI
-* Enhancement : Disallowed to update step slug with duplicate value
-* Enhancement : Re-arranged settings menu
-* Enhancement : Optimized checkout performance
-* Bug Fix : Resolved order bump style issue on frontend
-* Bug Fix : Resolved step importing issue in funnel canvas
-
-= 3.1.7 (2024-05-06) =
-* Enhancement : Improved discount application on funnel checkout
-* Compatibility : Compatible with updated A/B testing
-* Bug Fix : Resolved order bump issue with price in Checkout page
-
-= 3.1.6 (2024-05-03) =
-* Enhancement : Update checkout fields value after keyup
-* Enhancement : Added confirmation message when stating or resuming the A/B testing.
-* Bug Fix : Resolved style issue on template showcase page 
-
-
-= 3.1.5 (2024-04-30) =
-* Bug Fix : Resolved style issue on funnel listing page 
-* Bug Fix : Resolved php warning on settings page
-
-= 3.1.4 (2024-04-25) =
-* New : Allowed to clear funnel data on plugin uninstall
-* Enhancement : Enhanced the template showcase by creating new template menu 
-* Compatibility : Compatible with GBF Skip cart feature
-* Compatibility : Compatible with latest WooCommerce 
-* Bug Fix : Resolved discount calculation issue on step's drawer
-
-
-= 3.1.3 (2024-04-18) =
-* Compatibility : Extra theme for divi templates
-* Compatibility : Checkoutify orderbump with wpfunnels step's condition 
-* Bug Fix : Resolved static email address issue for sending test email from WPFunnels with Mail Mint automation
-* Bug Fix : Resolved carry data issue from opt-in to checkout
-
-= 3.1.2 (2024-04-16) =
-* Enhancement : Added a filter hook for updating product price
-
-= 3.1.1 (2024-04-05) =
-* Compatibility : Compatible with WordPress 6.5
-
-= 3.1.0 (2024-04-04) =
-* New : Integrated Bricks with WPFunnels
-* New : Made whole canvas translatable
-* New : Added edit funnel option in frontend for administrator
-* Enhancement : Enhanced the performance of calculating discount in step's drawer 
-* Enhancement : Enhanced experience for unsupported page builders
-* Compatibility : Compatible with time-bound discount
-* Bug fix : Resolved 'invalid payment gateway' issue in funnel checkout
-* Bug fix : Resolved pricing issue in funnel checkout
-* Bug fix : Resolved rendering issue for 2-step checkout with shortcode
-
-= 3.0.14 (2024-03-29) =
-* Enhancement : Update setup wizard video
-
-= 3.0.13 (2024-03-20) =
-* Compatibility : Compatible with bricks theme
-* Bug Fix: Resolved redirecting issue after optin submission with shortcode
-* Bug Fix: Resolved multiple optin form showing issue in a step
-
-= 3.0.12 (2024-03-15) =
-* Bug Fix: Resolved coupon issue in funnel checkout
-
-= 3.0.11 (2024-03-14) =
-* Compatibility: Compatible with quantity selector in funnel checkout
-
-= 3.0.10 (2024-03-13) =
-* Bux Fix: Removed multiple Add Step node from a funnel canvas
-* Bux Fix: Resolved funnel duplication issue
-* Bux Fix: Resolved add next step issue in conditional drawer
-
-
-= 3.0.9 (2024-03-06) =
-* Improvement : Restricted the import of the 'Thank You' step to the middle of the funnel on the canvas for streamlined user journeys
-* Improvement : Restricted the import of checkout steps for lead funnels to focus on lead generation efficiency.
-* Improvement : Implemented real-time updates for funnel link in the canvas.
-* Bux Fix: Resolved an issue affecting the conditional enablement of landing and custom steps
-* Bux Fix: Addressed import conflicts between A/B testing variations and main steps
-* Bux Fix: Fixed a loading issue in the step drawer for custom steps
-
-= 3.0.8 (2024-02-29) =
-* Improvement : Enhanced setup wizard.
-* Bux Fix: Resolved loader issue in step drawer
-
-= 3.0.7 (2024-02-15) =
-* Improvement : Allow copying of A/B testing URL for each step.
-* Improvement: Enhanced Order Bump action in the funnel checkout
-* Bug Fix: Resolved Cross Site Scripting (XSS) issue on settings page
-
-= 3.0.6 (2024-02-01) =
-* Bug Fix: Resolved PHP error in funnel checkout
-
-= 3.0.5 (2024-01-24) =
-* New: Support for Mail Mint lead form as a funnel opt-in form
-* Compatibility: Compatible funnel checkout discount with taxes
-
-= 3.0.4 (2024-01-22) =
-* Bug Fix: Resolved step view link issue in funnel canvas
-
-= 3.0.3 (2024-01-17) =
-* Bug Fix: Resolved funnel importing issue
-
-= 3.0.2 (2024-01-15) =
-* Bug Fix: Resolved migration issue with old UI
-
-= 3.0.1 (2024-01-11) =
-* Bug Fix: Resolved coupon issue in funnel checkout
-
-= 3.0.0 (2024-01-11) =
-* New: Implemented new UI for WPFunnels canvas
-* Bug Fix: Resolved session expire issue in funnel checkout
 
 The full changelog is available [here](https://getwpfunnels.com/changelog/).

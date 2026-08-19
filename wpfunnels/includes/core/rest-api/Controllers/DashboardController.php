@@ -428,6 +428,59 @@ class DashboardController extends Wpfnl_REST_Controller
 			}
 		}
 
+		// ── Build the checklist deep links ──
+		// The checklist actions should drop the user into the place where the step
+		// actually gets done, rather than the funnel list: the order bump tab of the
+		// newest funnel's checkout step, and the canvas of that funnel for the upsell.
+		// Drafts count too — a funnel does not need to be live to be worked on.
+		$order_bump_url     = '';
+		$funnel_builder_url = '';
+		$recent_funnels     = get_posts(array(
+			'post_type'   => WPFNL_FUNNELS_POST_TYPE,
+			'post_status' => array('publish', 'draft'),
+			'numberposts' => 10,
+			'orderby'     => 'date',
+			'order'       => 'DESC',
+			'fields'      => 'ids',
+			'meta_query'  => $exclude_sc_meta,
+		));
+
+		if (!empty($recent_funnels)) {
+			// The upsell step is added on the canvas, so that is where its action goes.
+			$funnel_builder_url = admin_url(
+				sprintf('admin.php?page=edit_funnel&id=%d', $recent_funnels[0])
+			);
+		}
+
+		foreach ($recent_funnels as $recent_funnel_id) {
+			$recent_steps = Wpfnl_functions::get_steps($recent_funnel_id);
+
+			if (!is_array($recent_steps) || empty($recent_steps)) {
+				continue;
+			}
+
+			foreach ($recent_steps as $recent_step) {
+				$recent_step_type = isset($recent_step['step_type']) ? $recent_step['step_type'] : '';
+				$recent_step_id   = isset($recent_step['id']) ? (int)$recent_step['id'] : 0;
+
+				if ('checkout' !== $recent_step_type || !$recent_step_id) {
+					continue;
+				}
+
+				// The hash is what tells the canvas which step settings drawer and
+				// tab to open once the funnel editor has finished loading.
+				$order_bump_url = admin_url(
+					sprintf(
+						'admin.php?page=edit_funnel&id=%d&step_id=%d#%d/settings/order-bump/',
+						$recent_funnel_id,
+						$recent_step_id,
+						$recent_step_id
+					)
+				);
+				break 2;
+			}
+		}
+
 		// ── Step 3: Check for real orders through funnels ──
 		if ($is_wc_active && !empty($funnels)) {
 			global $wpdb;
@@ -453,9 +506,8 @@ class DashboardController extends Wpfnl_REST_Controller
 		// ── Build checklist step completion data ──
 		$completed_count = 0;
 		$steps_status = array(
-			'woocommerce_connected' => $is_wc_active,
-			'funnel_created' => $has_funnel_created,
 			'store_checkout_created' => $has_store_checkout_created,
+			'funnel_created' => $has_funnel_created,
 			'order_bump_added' => $has_order_bump,
 			'upsell_added' => $has_upsell,
 			'test_order_placed' => $has_real_order,
@@ -478,6 +530,8 @@ class DashboardController extends Wpfnl_REST_Controller
 			'completed_count' => $completed_count,
 			'total_steps' => $total_steps,
 			'progress_percent' => $progress_percent,
+			'order_bump_url' => $order_bump_url,
+			'funnel_builder_url' => $funnel_builder_url,
 		));
 	}
 
