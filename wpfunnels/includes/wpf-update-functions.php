@@ -115,6 +115,14 @@ function wpf_create_3110_checkout_visits_table() {
  * Guarded with SHOW INDEX so it stays idempotent on sites where the index
  * may already have been applied manually.
  *
+ * Return value follows the batched-migration contract documented on
+ * Wpfnl_Activator::run_update_callback_end(): true means "there is more work
+ * left, queue me again", false means "finished". This callback completes in a
+ * single pass, so it always returns false. Returning true here is what caused
+ * the runaway ActionScheduler loop fixed in 3.12.13 — do not change it back.
+ *
+ * @return bool Always false; this migration never needs a second pass.
+ *
  * @since 3.12.12
  */
 function wpf_add_31212_stats_funnel_status_index() {
@@ -126,7 +134,7 @@ function wpf_add_31212_stats_funnel_status_index() {
 	// callback, which ActionScheduler runs ahead of this one.
 	$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ); // phpcs:ignore
 	if ( ! $table_exists ) {
-		return true;
+		return false;
 	}
 
 	$exists = $wpdb->get_var( $wpdb->prepare(
@@ -138,5 +146,5 @@ function wpf_add_31212_stats_funnel_status_index() {
 		$wpdb->query( "ALTER TABLE {$table} ADD INDEX idx_funnel_status (funnel_id, status)" ); // phpcs:ignore
 	}
 
-	return true;
+	return false;
 }

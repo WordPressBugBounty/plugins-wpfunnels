@@ -33,6 +33,25 @@ class Wpfnl_Activator
 	 */
 	const BUILDER_MODE_PINNED_OPTION = 'wpfunnels_builder_mode_pinned';
 
+	/**
+	 * Seconds to wait before re-queuing a DB update callback that reported
+	 * more work to do. Throttles a misbehaving callback instead of letting it
+	 * saturate the ActionScheduler queue runner.
+	 *
+	 * @since 3.12.13
+	 */
+	const REQUEUE_DELAY = MINUTE_IN_SECONDS;
+
+	/**
+	 * One-time cleanup of the ActionScheduler rows left behind by the runaway
+	 * update-callback loop that shipped in 3.12.12.
+	 *
+	 * @since 3.12.13
+	 */
+	const RUNAWAY_PURGE_HOOK   = 'wpfunnels_purge_runaway_update_actions';
+	const RUNAWAY_PURGE_OPTION = 'wpfunnels_runaway_update_actions_purged';
+	const RUNAWAY_PURGE_BATCH  = 5000;
+
 	private static $db_updates = array(
 		'3.5.0' => array(
 			'wpf_create_350_stat_table',
@@ -56,6 +75,8 @@ class Wpfnl_Activator
 		add_action( 'init', array( __CLASS__, 'maybe_pin_legacy_builder_mode' ), 1 );
 		add_action( 'init', array( __CLASS__, 'update' ), 20 );
 		add_action('wpfunnels_run_update_callback', array( __CLASS__, 'run_update_callback' ) );
+		add_action( 'init', array( __CLASS__, 'maybe_schedule_runaway_purge' ), 21 );
+		add_action( self::RUNAWAY_PURGE_HOOK, array( __CLASS__, 'purge_runaway_update_actions' ) );
 	}
 
 	/**
@@ -132,24 +153,200 @@ class Wpfnl_Activator
 	/**
 	 * Triggered when a callback has ran.
 	 *
-	 * @param $callback
-	 * @param $result
+	 * A truthy $result means the callback processed one batch and has more work
+	 * left, so it gets queued again; a falsy $result means it finished. Callbacks
+	 * that do all their work in one pass MUST return false — returning true from a
+	 * single-pass callback is what produced the runaway queue fixed in 3.12.13.
+	 *
+	 * Two guards keep a callback that gets this wrong from flooding the queue:
+	 * the re-queue is skipped when an identical action is already pending, and it
+	 * is spaced out by REQUEUE_DELAY rather than being due the instant it lands.
+	 * A genuine batched migration loses nothing from the delay; a buggy one is
+	 * capped at one row per interval instead of saturating the queue runner.
+	 *
+	 * @param string $callback Callback name.
+	 * @param bool   $result   Whether the callback has more work queued up.
 	 */
 	protected static function run_update_callback_end( $callback, $result ) {
-		if ( $result ) {
-			as_schedule_single_action(
-				time(),
-				'wpfunnels_run_update_callback',
-				array(
-					'update_callback' => $callback,
-				),
-				'wpfunnels-db-updates'
-			);
-		} else {
-			update_option('wpfunnels_'.$callback.'_update', 'completed');
+		if ( ! $result ) {
+			update_option( 'wpfunnels_' . $callback . '_update', 'completed' );
+			return;
+		}
+
+		$args = array( 'update_callback' => $callback );
+
+		if ( as_next_scheduled_action( 'wpfunnels_run_update_callback', $args, 'wpfunnels-db-updates' ) ) {
+			return;
+		}
+
+		as_schedule_single_action(
+			time() + self::REQUEUE_DELAY,
+			'wpfunnels_run_update_callback',
+			$args,
+			'wpfunnels-db-updates'
+		);
+	}
+
+
+
+	/**
+	 * Queue the one-time purge of runaway update-callback rows.
+	 *
+	 * 3.12.12 shipped a callback that reported "more work to do" on every run,
+	 * so ActionScheduler re-queued it without pause and affected sites ended up
+	 * with millions of rows in actionscheduler_actions. The return-value fix
+	 * stops the loop, but it cannot remove what already accumulated, and the
+	 * volume is far past what the Scheduled Actions screen can delete by hand.
+	 *
+	 * @since 3.12.13
+	 */
+	public static function maybe_schedule_runaway_purge() {
+		if ( 'completed' === get_option( self::RUNAWAY_PURGE_OPTION ) ) {
+			return;
+		}
+
+		// Front-end requests are the bulk of a site's traffic and there is no
+		// reason to spend a queue lookup on each one; admin and cron hits are
+		// frequent enough to get the chain started and to restart it if it
+		// ever breaks part-way through.
+		if ( ! is_admin() && ! wp_doing_cron() ) {
+			return;
+		}
+
+		if ( ! function_exists( 'as_schedule_single_action' ) || ! function_exists( 'as_next_scheduled_action' ) ) {
+			return;
+		}
+
+		// Covers in-progress as well as pending, so a batch that is mid-flight
+		// does not get a duplicate queued alongside it.
+		if ( as_next_scheduled_action( self::RUNAWAY_PURGE_HOOK, array(), 'wpfunnels-db-updates' ) ) {
+			return;
+		}
+
+		self::queue_purge_batch( time() );
+	}
+
+
+	/**
+	 * Delete one batch of finished update-callback rows, chaining the next
+	 * batch until nothing is left.
+	 *
+	 * Only rows in a terminal state are touched. Pending and in-progress rows
+	 * are left alone so a site part-way through a legitimate migration does not
+	 * lose queued work.
+	 *
+	 * @since 3.12.13
+	 */
+	public static function purge_runaway_update_actions() {
+		global $wpdb;
+
+		$actions_table = $wpdb->prefix . 'actionscheduler_actions';
+
+		if ( ! self::table_exists( $actions_table ) ) {
+			self::finish_runaway_purge();
+			return;
+		}
+
+		$ids = $wpdb->get_col( $wpdb->prepare(
+			"SELECT action_id FROM {$actions_table} WHERE hook = %s AND status IN ( %s, %s, %s ) LIMIT %d",
+			'wpfunnels_run_update_callback',
+			'complete',
+			'canceled',
+			'failed',
+			self::RUNAWAY_PURGE_BATCH
+		) ); // phpcs:ignore
+
+		if ( empty( $ids ) ) {
+			self::finish_runaway_purge();
+			return;
+		}
+
+		$ids          = array_map( 'absint', $ids );
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		$logs_table   = $wpdb->prefix . 'actionscheduler_logs';
+
+		// Logs first: dropping the actions before their logs would strand the
+		// log rows with no id left to match them on.
+		if ( self::table_exists( $logs_table ) ) {
+			$wpdb->query( $wpdb->prepare( "DELETE FROM {$logs_table} WHERE action_id IN ({$placeholders})", $ids ) ); // phpcs:ignore
+		}
+
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$actions_table} WHERE action_id IN ({$placeholders})", $ids ) ); // phpcs:ignore
+
+		// Chain the next batch by hand rather than using a recurring action.
+		// ActionScheduler re-creates a recurring action after the callback
+		// returns, from the action object it read before execution, so a
+		// recurring purge could not switch itself off from in here — it would
+		// keep queueing a fresh row every interval long after the work ran out.
+		self::queue_purge_batch( time() + MINUTE_IN_SECONDS );
+	}
+
+
+	/**
+	 * Queue a single purge batch, unless one is already waiting.
+	 *
+	 * The pending check is deliberately narrower than as_next_scheduled_action(),
+	 * which reports true for the in-progress action as well. Called from inside
+	 * a running batch, that would always short-circuit and the chain would stop
+	 * after its first pass.
+	 *
+	 * @param int $timestamp When the batch should run.
+	 *
+	 * @since 3.12.13
+	 */
+	protected static function queue_purge_batch( $timestamp ) {
+		if ( ! function_exists( 'as_schedule_single_action' ) || ! function_exists( 'as_get_scheduled_actions' ) ) {
+			return;
+		}
+
+		$pending = as_get_scheduled_actions(
+			array(
+				'hook'     => self::RUNAWAY_PURGE_HOOK,
+				'status'   => ActionScheduler_Store::STATUS_PENDING,
+				'group'    => 'wpfunnels-db-updates',
+				'per_page' => 1,
+			),
+			'ids'
+		);
+
+		if ( ! empty( $pending ) ) {
+			return;
+		}
+
+		as_schedule_single_action( $timestamp, self::RUNAWAY_PURGE_HOOK, array(), 'wpfunnels-db-updates' );
+	}
+
+
+	/**
+	 * Mark the purge done and make sure no further batch is queued.
+	 *
+	 * @since 3.12.13
+	 */
+	protected static function finish_runaway_purge() {
+		update_option( self::RUNAWAY_PURGE_OPTION, 'completed' );
+
+		// Nothing should be queued at this point, since a batch only chains a
+		// successor when it actually deleted something. Swept anyway so a row
+		// left over from an interrupted run cannot keep the chain alive.
+		if ( function_exists( 'as_unschedule_all_actions' ) ) {
+			as_unschedule_all_actions( self::RUNAWAY_PURGE_HOOK, array(), 'wpfunnels-db-updates' );
 		}
 	}
 
+
+	/**
+	 * Whether a database table exists.
+	 *
+	 * @param string $table Fully prefixed table name.
+	 * @return bool
+	 *
+	 * @since 3.12.13
+	 */
+	protected static function table_exists( $table ) {
+		global $wpdb;
+
+		return (bool) $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) ) ); // phpcs:ignore
+	}
 
 
 	/**

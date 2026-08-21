@@ -5,7 +5,7 @@ Tags: funnel builder, woocommerce checkout, order bump, woocommerce funnel build
 Requires at least: 6.1
 Tested up to:  7.1
 Requires PHP: 7.4
-Stable tag: 3.12.12
+Stable tag: 3.12.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -577,8 +577,11 @@ The Patchstack team helps validate, triage, and handle any security vulnerabilit
 
 == Changelog ==
 
+= 3.12.13 (2026-08-21) =
+* Fix: Action scheduler compatibility issues.
+
 = 3.12.12 (2026-08-19) =
-* New: Compatibility: Verified compatibility with WordPress 7.1
+* Compatibility: Verified compatibility with WordPress 7.1
 * Improvement: Hardened funnel import against malicious and malformed files
 * Improvement: Improved the overall funnel building experience
 * Fix: Funnel exports containing tracking scripts were rejected during import
