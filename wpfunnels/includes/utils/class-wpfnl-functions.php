@@ -36,6 +36,23 @@ class Wpfnl_functions {
 	const CANVAS_VIEW_MODE_META_KEY = '_wpfnl_canvas_view_mode';
 
 	/**
+	 * Session key holding the ids of the orders this session actually placed.
+	 *
+	 * Ownership has to be recorded per order. A marker that is not bound to a
+	 * specific order authorises every order id a caller cares to submit.
+	 *
+	 * @since 3.12.14
+	 */
+	const OWNED_ORDERS_SESSION_KEY = 'wpfnl_owned_orders';
+
+	/**
+	 * Upper bound on the owned-order list carried in a single session.
+	 *
+	 * @since 3.12.14
+	 */
+	const MAX_OWNED_ORDERS = 50;
+
+	/**
 	 * Post meta keys that must not travel between sites on funnel export/import.
 	 *
 	 * These hold per-site render caches or bookkeeping that is only meaningful on the site
@@ -494,6 +511,10 @@ class Wpfnl_functions {
 		}
 
 		if ( $page === WPFNL_STORE_CHECKOUT_SLUG && $key === 'store_checkout' ) {
+			return true;
+		}
+
+		if ( defined( 'WPFNL_AI_FUNNEL_PAGE_SLUG' ) && $page === WPFNL_AI_FUNNEL_PAGE_SLUG && $key === 'ai_assistant' ) {
 			return true;
 		}
 
@@ -4196,9 +4217,259 @@ class Wpfnl_functions {
 	}
 
 	/**
+	 * Records that the current session placed the given order.
+	 *
+	 * Call this immediately after a funnel order is created, so later offer
+	 * requests can prove ownership of that specific order.
+	 *
+	 * @param int $order_id The order the session just placed.
+	 * @return void
+	 * @since 3.12.14
+	 */
+	public static function mark_order_owned_by_session( $order_id ) {
+		$order_id = absint( $order_id );
+
+		if ( ! $order_id || ! self::is_wc_active() || ! WC()->session ) {
+			return;
+		}
+
+		$owned = WC()->session->get( self::OWNED_ORDERS_SESSION_KEY, array() );
+		$owned = is_array( $owned ) ? array_map( 'absint', $owned ) : array();
+
+		if ( in_array( $order_id, $owned, true ) ) {
+			return;
+		}
+
+		$owned[] = $order_id;
+
+		// Keep the list bounded. This is written on every funnel checkout and a
+		// session has no business owning an unbounded number of orders.
+		if ( count( $owned ) > self::MAX_OWNED_ORDERS ) {
+			$owned = array_slice( $owned, - self::MAX_OWNED_ORDERS );
+		}
+
+		WC()->session->set( self::OWNED_ORDERS_SESSION_KEY, $owned );
+	}
+
+	/**
+	 * Whether the current session placed the given order.
+	 *
+	 * @param int $order_id The order to check.
+	 * @return bool
+	 * @since 3.12.14
+	 */
+	public static function session_owns_order( $order_id ) {
+		$order_id = absint( $order_id );
+
+		if ( ! $order_id || ! self::is_wc_active() || ! WC()->session ) {
+			return false;
+		}
+
+		$owned = WC()->session->get( self::OWNED_ORDERS_SESSION_KEY, array() );
+
+		if ( ! is_array( $owned ) ) {
+			return false;
+		}
+
+		return in_array( $order_id, array_map( 'absint', $owned ), true );
+	}
+
+	/**
+	 * Signs the privileged settings an opt-in form was rendered with.
+	 *
+	 * The notification recipient, its subject and the "register this visitor"
+	 * switch are rendered as hidden inputs, so they arrive back as request data
+	 * and cannot be trusted on their own. Signing them at render time lets the
+	 * submission handler tell its own configuration apart from a caller-supplied
+	 * one, without having to re-parse the page the form was placed on.
+	 *
+	 * @param string $admin_email        Notification recipient list as configured.
+	 * @param string $subject            Notification subject as configured.
+	 * @param string $allow_registration 'yes' when the form may create a user.
+	 * @return string
+	 * @since 3.12.14
+	 */
+	public static function get_optin_settings_token( $admin_email, $subject, $allow_registration = '' ) {
+		return wp_hash( 'wpfnl_optin_settings|' . $admin_email . '|' . $subject . '|' . $allow_registration );
+	}
+
+	/**
+	 * Whether the opt-in settings submitted with a form are the ones it was rendered with.
+	 *
+	 * @param string $token              Token supplied by the request.
+	 * @param string $admin_email        Notification recipient list from the request.
+	 * @param string $subject            Notification subject from the request.
+	 * @param string $allow_registration Registration switch from the request.
+	 * @return bool
+	 * @since 3.12.14
+	 */
+	public static function is_valid_optin_settings_token( $token, $admin_email, $subject, $allow_registration = '' ) {
+		if ( ! is_string( $token ) || '' === $token ) {
+			return false;
+		}
+
+		return hash_equals(
+			self::get_optin_settings_token( $admin_email, $subject, $allow_registration ),
+			$token
+		);
+	}
+
+	/**
+	 * Resolves what an order bump is actually configured to sell.
+	 *
+	 * The bump handler runs for unauthenticated callers, so the discount must be
+	 * pinned to the product it was configured for. Without this, a bump's discount
+	 * can be borrowed from any step on the site and applied to any product.
+	 *
+	 * Settings are read through the same filters the checkout renderer uses, so a
+	 * dynamically resolved (auto-match) bump validates against the product that was
+	 * actually offered rather than the one stored in the builder.
+	 *
+	 * @param int $step_id      Checkout step holding the bump settings.
+	 * @param mixed $key        Which bump on that step.
+	 * @param int $product_id   Product the request asked for.
+	 * @param int $variation_id Variation the request asked for, if any.
+	 * @return array|WP_Error   product_id, variation_id, cart_product_id, quantity and settings, or an error.
+	 * @since 3.12.14
+	 */
+	public static function resolve_order_bump_item( $step_id, $key, $product_id, $variation_id = 0 ) {
+		$step_id      = absint( $step_id );
+		$product_id   = absint( $product_id );
+		$variation_id = absint( $variation_id );
+
+		if ( ! self::is_wc_active() ) {
+			return new \WP_Error( 'wpfnl_wc_inactive', __( 'WooCommerce is not active.', 'wpfnl' ) );
+		}
+
+		// The bump must live on a real checkout step, not any post id the caller names.
+		if ( ! $step_id || 'checkout' !== get_post_meta( $step_id, '_step_type', true ) ) {
+			return new \WP_Error( 'wpfnl_invalid_step', __( 'Invalid checkout step.', 'wpfnl' ) );
+		}
+
+		$funnel_id   = self::get_funnel_id_from_step( $step_id );
+		$ob_settings = get_post_meta( $step_id, 'order-bump-settings', true );
+		$ob_settings = apply_filters( 'wpfunnels/order_bump_settings', $ob_settings, $funnel_id, $step_id );
+		$ob_settings = apply_filters( 'wpfunnels/order_bump_settings_on_frontend', $ob_settings, $funnel_id, $step_id );
+
+		if ( ! is_array( $ob_settings ) || ! isset( $ob_settings[ $key ] ) || ! is_array( $ob_settings[ $key ] ) ) {
+			return new \WP_Error( 'wpfnl_invalid_bump', __( 'Invalid order bump.', 'wpfnl' ) );
+		}
+
+		$settings = $ob_settings[ $key ];
+
+		if ( empty( $settings['product'] ) ) {
+			return new \WP_Error( 'wpfnl_invalid_bump', __( 'This order bump has no product configured.', 'wpfnl' ) );
+		}
+
+		$configured_id = absint( $settings['product'] );
+
+		if ( ! wc_get_product( $configured_id ) ) {
+			return new \WP_Error( 'wpfnl_invalid_product', __( 'The configured order bump product no longer exists.', 'wpfnl' ) );
+		}
+
+		// The discount belongs to the configured product. Anything else is a
+		// request to price one product using another product's offer.
+		if ( $product_id !== $configured_id ) {
+			return new \WP_Error( 'wpfnl_product_mismatch', __( 'This product is not part of the selected offer.', 'wpfnl' ) );
+		}
+
+		if ( $variation_id ) {
+			$variation = wc_get_product( $variation_id );
+
+			if ( ! $variation || $variation->get_parent_id() !== $configured_id ) {
+				return new \WP_Error( 'wpfnl_invalid_variation', __( 'Please choose a valid variation for this offer.', 'wpfnl' ) );
+			}
+		}
+
+		// Quantity is the merchant's. Letting the request set it widens the
+		// flat-discount cap, which is compared against price multiplied by quantity.
+		$quantity = isset( $settings['quantity'] ) ? absint( $settings['quantity'] ) : 0;
+		$quantity = max( 1, $quantity );
+
+		return array(
+			'product_id'      => $configured_id,
+			'variation_id'    => $variation_id,
+			'cart_product_id' => $variation_id ? $variation_id : $configured_id,
+			'quantity'        => $quantity,
+		);
+	}
+
+	/**
+	 * Resolves what an offer step is actually configured to sell.
+	 *
+	 * The offer cart handler runs for unauthenticated callers, so nothing about
+	 * the item may be taken from the request: the product and the quantity come
+	 * from the step's own configuration. The only choice the request gets is
+	 * which variation of that configured product to buy.
+	 *
+	 * @param int $step_id                 The offer step being purchased.
+	 * @param int $candidate_variation_id  Variation the request selected, if any.
+	 * @return array|WP_Error              product_id, variation_id and quantity, or an error.
+	 * @since 3.12.14
+	 */
+	public static function resolve_offer_cart_item( $step_id, $candidate_variation_id = 0 ) {
+		$step_id = absint( $step_id );
+
+		if ( ! self::is_wc_active() ) {
+			return new \WP_Error( 'wpfnl_wc_inactive', __( 'WooCommerce is not active.', 'wpfnl' ) );
+		}
+
+		if ( ! $step_id ) {
+			return new \WP_Error( 'wpfnl_invalid_step', __( 'Invalid offer step.', 'wpfnl' ) );
+		}
+
+		// Only a real upsell/downsell step may drive this. Without it, any post id
+		// could be used to borrow another step's discount configuration.
+		$step_type = get_post_meta( $step_id, '_step_type', true );
+
+		if ( ! in_array( $step_type, array( 'upsell', 'downsell' ), true ) ) {
+			return new \WP_Error( 'wpfnl_invalid_step', __( 'Invalid offer step.', 'wpfnl' ) );
+		}
+
+		$configured = get_post_meta( $step_id, '_wpfnl_' . $step_type . '_products', true );
+
+		if ( ! is_array( $configured ) || empty( $configured[0]['id'] ) ) {
+			return new \WP_Error( 'wpfnl_no_offer_product', __( 'This offer has no product configured.', 'wpfnl' ) );
+		}
+
+		$product_id = absint( $configured[0]['id'] );
+		$product    = wc_get_product( $product_id );
+
+		if ( ! $product ) {
+			return new \WP_Error( 'wpfnl_invalid_product', __( 'The configured offer product no longer exists.', 'wpfnl' ) );
+		}
+
+		// Quantity is the merchant's, not the caller's. Offer pages expose no
+		// quantity control, and letting the request set it turns the discount
+		// guard (which compares against the line total) into a lever.
+		$quantity = isset( $configured[0]['quantity'] ) ? absint( $configured[0]['quantity'] ) : 0;
+		$quantity = max( 1, $quantity );
+
+		$variation_id = absint( $candidate_variation_id );
+
+		if ( $variation_id ) {
+			$variation = wc_get_product( $variation_id );
+
+			if ( ! $variation || $variation->get_parent_id() !== $product_id ) {
+				return new \WP_Error( 'wpfnl_invalid_variation', __( 'Please choose a valid variation for this offer.', 'wpfnl' ) );
+			}
+		}
+
+		return array(
+			'product_id'   => $product_id,
+			'variation_id' => $variation_id,
+			'quantity'     => $quantity,
+		);
+	}
+
+	/**
 	 * Validates the order owner's authorization.
 	 *
-	 * @param WC_Order $order The order object to validate.
+	 * Every caller that resolves an order from a request-supplied id must pass
+	 * through here before acting on that order.
+	 *
+	 * @param WC_Order $order     The order object to validate.
+	 * @param string   $order_key Order key supplied by the request, if any.
 	 * @return bool
 	 * @since 2.7.13
 	 */
@@ -4216,24 +4487,17 @@ class Wpfnl_functions {
 			return true;
 		}
 
-		// If it's not a guest order, current user can pay but only if it's their own order,
-		// or they are an admin or shop manager or they are in a same session(for guest).
-
-		$order_has_customer  = ! empty( $order->get_customer_id() );
-		$is_authorized_owner = false;
-
-		$has_owner = ! empty( WC()->session->get( 'wpfnl_order_owner' ) );
-
-		if ( $order_has_customer ) {
-			$is_order_owned_by_current_user = $order->get_customer_id() === get_current_user_id();
-
-			$is_authorized_owner = $is_order_owned_by_current_user || current_user_can( 'manage_woocommerce' );
+		// A logged-in customer may act on their own order; so may a shop manager.
+		if ( ! empty( $order->get_customer_id() ) ) {
+			if ( $order->get_customer_id() === get_current_user_id() || current_user_can( 'manage_woocommerce' ) ) {
+				return true;
+			}
 		}
 
-		if ( ! $is_authorized_owner && ! $has_owner ) {
-			return false;
-		}
-		return true;
+		// Guest flows: this session must have placed this specific order. Note the
+		// check is against the order id, not a bare "has checked out" marker, so a
+		// session cannot authorise an order it did not create.
+		return self::session_owns_order( $order->get_id() );
 	}
 
 
@@ -6527,6 +6791,59 @@ class Wpfnl_functions {
 			}
 		}
 		return $custom_price;
+	}
+
+	/**
+	 * Enqueue the stylesheet a production webpack build extracted for a bundle.
+	 *
+	 * A production build (`npm run build`) extracts every entry's CSS to
+	 * admin/assets/dist/styles/<entry>.<contenthash>.css instead of injecting it
+	 * from JS, so each bundle needs its stylesheet enqueued alongside its script
+	 * or the screen renders unstyled. The filename carries a content hash, hence
+	 * the glob.
+	 *
+	 * A development build (`npm run start`) injects styles at runtime and emits
+	 * no stylesheet at all — nothing matches the glob and this is a no-op, which
+	 * is exactly what a dev build needs.
+	 *
+	 * @param string $entry  Webpack entry name, e.g. `automation-canvas`.
+	 * @param string $handle Style handle to register it under.
+	 * @param array  $deps   Style handles this stylesheet must load after. Only
+	 *                       pass handles guaranteed to be registered on the same
+	 *                       screen — WordPress silently drops a style whose
+	 *                       dependency is missing.
+	 *
+	 * @return void
+	 * @since 3.13.0
+	 */
+	public static function enqueue_bundle_style( $entry, $handle, $deps = array() ) {
+		$styles_dir = WPFNL_DIR . '/admin/assets/dist/styles/';
+
+		if ( ! is_dir( $styles_dir ) ) {
+			return;
+		}
+
+		$files = glob( $styles_dir . $entry . '.*.css' );
+
+		if ( empty( $files ) ) {
+			return;
+		}
+
+		// Newest wins, so a stale hash left behind by an interrupted build never
+		// shadows the current one.
+		usort(
+			$files,
+			function ( $a, $b ) {
+				return filemtime( $b ) - filemtime( $a );
+			}
+		);
+
+		wp_enqueue_style(
+			$handle,
+			WPFNL_URL . 'admin/assets/dist/styles/' . basename( $files[0] ),
+			$deps,
+			WPFNL_VERSION
+		);
 	}
 
 	/**

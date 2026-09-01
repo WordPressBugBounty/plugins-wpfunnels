@@ -9,6 +9,7 @@ namespace WPFunnels\Modules\Admin\Automations;
 
 use WPFunnels\Admin\Module\Wpfnl_Admin_Module;
 use WPFunnels\Traits\SingletonTrait;
+use WPFunnels\Wpfnl_functions;
 
 class Module extends Wpfnl_Admin_Module
 {
@@ -81,20 +82,8 @@ class Module extends Wpfnl_Admin_Module
             'after'
         );
 
-        // Enqueue automation-canvas styles
-        $automation_css_dir = WPFNL_DIR . '/admin/assets/dist/styles/';
-        if (is_dir($automation_css_dir)) {
-            $css_files = glob($automation_css_dir . 'automation-canvas.*.css');
-            if (!empty($css_files)) {
-                $css_file = basename($css_files[0]);
-                wp_enqueue_style(
-                    'wpfnl-automation-canvas-styles',
-                    WPFNL_URL . 'admin/assets/dist/styles/' . $css_file,
-                    [],
-                    $automation_version
-                );
-            }
-        }
+        // Enqueue automation-canvas styles extracted by a production build.
+        Wpfnl_functions::enqueue_bundle_style( 'automation-canvas', 'wpfnl-automation-canvas-styles' );
 
         // The automation editor's own full-screen overlay (.wpfnl-automation-modal, see
         // admin/src/automation-canvas/AutomationModal.scss) sits at z-index: 999999,

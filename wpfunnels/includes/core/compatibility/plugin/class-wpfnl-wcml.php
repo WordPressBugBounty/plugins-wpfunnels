@@ -8,7 +8,6 @@ namespace WPFunnels\Compatibility\Plugin;
 
 
 use WPFunnels\Traits\SingletonTrait;
-use WC_Session_Handler;
 use WPFunnels\Wpfnl_functions;
 use WPFunnels\Discount\WpfnlDiscount;
 use WPFunnels\Modules\Frontend\CheckoutHelper\CheckoutHelper;
@@ -175,8 +174,7 @@ class Wcml {
 			$orders[sanitize_text_field($_POST['_wpfunnels_checkout_id'])] = $order_id;
 			WC()->session->set('wpfnl_orders_'.$user_id.'_'.$funnel_id, $orders);
 
-			$session_handler = new WC_Session_Handler();
-			WC()->session->set('wpfnl_order_owner', $session_handler->generate_customer_id());
+			Wpfnl_functions::mark_order_owned_by_session( $order_id );
 
 			/**
 			 * Fires after a funnel order is placed.

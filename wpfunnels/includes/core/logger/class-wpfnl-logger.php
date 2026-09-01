@@ -10,6 +10,21 @@ class Wpfnl_Logger {
 
 	use SingletonTrait;
 
+	/**
+	 * Bumped whenever the directory hardening below changes, so an install
+	 * hardened by an earlier release re-runs it once on upgrade.
+	 *
+	 * @since 3.12.14
+	 */
+	const PROTECTION_VERSION = '2';
+
+	/**
+	 * Option holding the hardening version already applied.
+	 *
+	 * @since 3.12.14
+	 */
+	const PROTECTION_OPTION = '_wpfnl_log_protection_version';
+
 
 
 	/**
@@ -85,24 +100,141 @@ class Wpfnl_Logger {
 
 
 	/**
-	 * Harden the log directory: deny direct web access and prevent directory listing.
+	 * Harden the log directory.
+	 *
+	 * Server config files cannot carry this on their own: nginx never reads
+	 * .htaccess, and neither does Apache with AllowOverride None, so on those
+	 * hosts a log file under uploads stays fetchable no matter what is written
+	 * beside it. The unguessable file name suffix is therefore the defence that
+	 * holds everywhere, and the rules written here are the second layer for
+	 * servers that do honour them.
+	 *
+	 * The legacy directory used up to 3.0.5 is hardened too - installs that
+	 * upgraded through that release still have readable logs sitting there.
 	 *
 	 * @since 3.12.8
 	 */
 	protected function protect_log_folder() {
-		if ( ! is_dir( $this->log_location_dir ) || ! is_writable( $this->log_location_dir ) ) {
+		// Runs on every page load, so the settled state must cost nothing beyond
+		// one autoloaded option read.
+		if ( get_option( self::PROTECTION_OPTION ) === self::PROTECTION_VERSION ) {
 			return;
 		}
 
-		$htaccess = trailingslashit( $this->log_location_dir ) . '.htaccess';
-		if ( ! file_exists( $htaccess ) ) {
-			file_put_contents( $htaccess, "Order deny,allow\nDeny from all\n" );
+		$uploads = wp_upload_dir( null, false );
+		$legacy  = ! empty( $uploads['basedir'] ) ? $uploads['basedir'] . '/wpfunnels-logs' : '';
+
+		foreach ( array( $this->log_location_dir, $legacy ) as $dir ) {
+			if ( ! $dir || ! is_dir( $dir ) || ! is_writable( $dir ) ) {
+				continue;
+			}
+
+			$this->write_protection_files( $dir, true );
+			$this->rename_predictable_logs( $dir );
 		}
 
-		$index = trailingslashit( $this->log_location_dir ) . 'index.php';
-		if ( ! file_exists( $index ) ) {
-			file_put_contents( $index, "<?php\n// Silence is golden.\n" );
+		update_option( self::PROTECTION_OPTION, self::PROTECTION_VERSION );
+	}
+
+
+	/**
+	 * Write the deny rules and placeholders into a log directory.
+	 *
+	 * @param String $dir     Directory to protect.
+	 * @param Bool   $refresh Rewrite files that already exist.
+	 *
+	 * @since 3.12.14
+	 */
+	protected function write_protection_files( $dir, $refresh = false ) {
+		$dir = trailingslashit( $dir );
+
+		// Order/Deny is Apache 2.2 syntax. On a 2.4 build without
+		// mod_access_compat it is an unknown directive, which fails the whole
+		// directory with a 500 instead of denying anything - hence the guards.
+		$htaccess = $dir . '.htaccess';
+		if ( $refresh || ! file_exists( $htaccess ) ) {
+			$rules  = "# WPFunnels log files. Deny direct web access.\n";
+			$rules .= "<IfModule mod_authz_core.c>\n";
+			$rules .= "\tRequire all denied\n";
+			$rules .= "</IfModule>\n";
+			$rules .= "<IfModule !mod_authz_core.c>\n";
+			$rules .= "\tOrder deny,allow\n";
+			$rules .= "\tDeny from all\n";
+			$rules .= "</IfModule>\n";
+			$rules .= "Options -Indexes\n";
+
+			@file_put_contents( $htaccess, $rules ); // @codingStandardsIgnoreLine.
 		}
+
+		$index = $dir . 'index.php';
+		if ( ! file_exists( $index ) ) {
+			@file_put_contents( $index, "<?php\n// Silence is golden.\n" ); // @codingStandardsIgnoreLine.
+		}
+
+		$web_config = $dir . 'web.config';
+		if ( $refresh || ! file_exists( $web_config ) ) {
+			$config  = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+			$config .= "<configuration>\n";
+			$config .= "\t<system.webServer>\n";
+			$config .= "\t\t<security>\n";
+			$config .= "\t\t\t<requestFiltering>\n";
+			$config .= "\t\t\t\t<fileExtensions>\n";
+			$config .= "\t\t\t\t\t<add fileExtension=\".log\" allowed=\"false\" />\n";
+			$config .= "\t\t\t\t</fileExtensions>\n";
+			$config .= "\t\t\t</requestFiltering>\n";
+			$config .= "\t\t</security>\n";
+			$config .= "\t</system.webServer>\n";
+			$config .= "</configuration>\n";
+
+			@file_put_contents( $web_config, $config ); // @codingStandardsIgnoreLine.
+		}
+	}
+
+
+	/**
+	 * Rename log files still carrying a guessable name.
+	 *
+	 * Files written before 3.12.14 are named from a fixed prefix and the date
+	 * alone, so hardening new writes is not enough - the existing files stay
+	 * fetchable. Renaming keeps the contents and closes the exposure.
+	 *
+	 * @param String $dir Directory to migrate.
+	 *
+	 * @since 3.12.14
+	 */
+	protected function rename_predictable_logs( $dir ) {
+		$suffix = self::get_log_file_suffix();
+		$files  = glob( trailingslashit( $dir ) . '*.log' );
+
+		if ( ! is_array( $files ) ) {
+			return;
+		}
+
+		foreach ( $files as $file ) {
+			if ( false !== strpos( basename( $file ), $suffix ) ) {
+				continue;
+			}
+
+			$target = substr( $file, 0, -4 ) . '-' . $suffix . '.log';
+			if ( ! file_exists( $target ) ) {
+				@rename( $file, $target ); // @codingStandardsIgnoreLine.
+			}
+		}
+	}
+
+
+	/**
+	 * Site-specific suffix for log file names.
+	 *
+	 * Derived from the site salts, so it is stable for a site and unguessable
+	 * from outside it. This is what keeps the logs private on servers that
+	 * ignore .htaccess.
+	 *
+	 * @return String
+	 * @since 3.12.14
+	 */
+	public static function get_log_file_suffix() {
+		return wp_hash( 'wpfnl-log-file-name' );
 	}
 
 
@@ -165,7 +297,7 @@ class Wpfnl_Logger {
 		
 		if( $log_type && $content && defined( 'WPFNL_LOG_FILE' ) && defined( 'WPFNL_LOG_FILE_DIR' ) ){
 	
-			$file_name = WPFNL_LOG_FILE.'-'.trim(strtolower($log_type)).'-log-'.date('Y-m-d').'.log';
+			$file_name = WPFNL_LOG_FILE.'-'.trim(strtolower($log_type)).'-log-'.date('Y-m-d').'-'.self::get_log_file_suffix().'.log';
 			$time = new \DateTimeImmutable('now', wp_timezone());
 			$current_time = $time->format("h:i A");
 			$header_content = "\nWPFunnels - ".$current_time." - ".$header_text."\n";

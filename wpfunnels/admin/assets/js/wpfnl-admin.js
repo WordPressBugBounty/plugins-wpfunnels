@@ -2033,25 +2033,78 @@
      *
      * @since 1.0.0
      */
-    $('.wpfn-settings__nav .nav-li:not(.disabled)').on('click', function (e) {
-        var dataID = $(this).attr('data-id');
-        
-        $(this).addClass('active').siblings('.nav-li').removeClass('active');
+    function activateSettingsTab(dataID, syncHash) {
+        // dataID comes straight off the URL hash, which is not always a settings tab
+        // id: the funnel canvas parks router paths there (VerticalFlowView.vue sets
+        // `#<step_id>/automation/`). Resolve the panel with getElementById, which
+        // accepts any string, and bail before building a selector out of dataID —
+        // `$('#17/automation/')` throws "unrecognized expression", and on the
+        // ready-time syncSettingsTabFromHash() call that abort takes every event
+        // binding below it in this file down with it.
+        var containerEl = dataID ? document.getElementById(dataID) : null;
 
-        // Show the selected panel, hide others
-        $('#' + dataID).show().siblings('.wpfnl-funnel__single-settings').hide();
+        if (!containerEl) {
+            return false;
+        }
 
-        // Inside the visible panel, activate the first inner-tab
-        var $container = $('#' + dataID);
+        var $container = $(containerEl);
+        var $navItem = $('.wpfn-settings__nav .nav-li:not(.disabled)').filter(function () {
+            return $(this).attr('data-id') === dataID;
+        });
+
+        if (!$navItem.length) {
+            return false;
+        }
+
+        $navItem.addClass('active').siblings('.nav-li').removeClass('active');
+
+        // Show the selected panel, hide others.
+        $container.show().siblings('.wpfnl-funnel__single-settings').hide();
+
+        // Inside the visible panel, activate the first inner-tab.
         $container.find('.inner-tab').removeClass('active');
         $container.find('.wpfnl-tab-content').removeClass('active');
 
         var $firstInnerTab = $container.find('.inner-tab').first();
         var tabId = $firstInnerTab.data('tab');
 
-        $firstInnerTab.addClass('active');
-        $('#' + tabId).addClass('active');
+        if ($firstInnerTab.length) {
+            $firstInnerTab.addClass('active');
+        }
+
+        if (tabId) {
+            $container.find('.wpfnl-tab-content').filter(function () {
+                return this.id === String(tabId);
+            }).addClass('active');
+        }
+
+        if (syncHash && window.location.hash !== '#' + dataID) {
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState(null, '', window.location.pathname + window.location.search + '#' + dataID);
+            } else {
+                window.location.hash = dataID;
+            }
+        }
+
+        return true;
+    }
+
+    function syncSettingsTabFromHash() {
+        var dataID = (window.location.hash || '').replace(/^#/, '');
+
+        if (!dataID) {
+            return;
+        }
+
+        activateSettingsTab(dataID, false);
+    }
+
+    $('.wpfn-settings__nav .nav-li:not(.disabled)').on('click', function () {
+        activateSettingsTab($(this).attr('data-id'), true);
     });
+
+    syncSettingsTabFromHash();
+    $(window).on('hashchange', syncSettingsTabFromHash);
 
 
     /**

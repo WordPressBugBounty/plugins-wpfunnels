@@ -35,7 +35,10 @@
 							echo "<option value='' disabled selected>" . __('No log files available', 'wpfnl') . "</option>";
 						} else {
 							foreach ($files as $key => $file) {
-								echo "<option value='{$file}'>$file</option>";
+								// The value has to stay the real file name; the label drops
+								// the site-specific suffix so the list stays readable.
+								$label = str_replace( '-' . \Wpfnl_Logger::get_log_file_suffix(), '', $file );
+								echo "<option value='" . esc_attr( $file ) . "'>" . esc_html( $label ) . "</option>";
 							}
 						}
 					?>

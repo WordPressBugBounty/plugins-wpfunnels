@@ -79,6 +79,9 @@ class UninstallCleanup {
 		$wpfnl_tables = array(
 			$wpdb->prefix . 'wpfnl_analytics_meta',
 			$wpdb->prefix . 'wpfnl_analytics',
+			// AI copilot conversations and their messages.
+			$wpdb->prefix . 'wpfnl_ai_messages',
+			$wpdb->prefix . 'wpfnl_ai_conversations',
 		);
 		$wpfnl_tables = implode( ', ', $wpfnl_tables );
 

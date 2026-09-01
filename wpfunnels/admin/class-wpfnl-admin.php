@@ -166,6 +166,7 @@ class Wpfnl_Admin
 		$batch_processor = new BatchProcessingController();
 		new MigrationManager($batch_processor);
 
+
 		// Run stat status sync migration directly (independent of Action Scheduler).
 		$stat_sync = new \WPFunnels\Admin\Migrations\StatStatusSyncMigration();
 		$stat_sync->run();
@@ -840,6 +841,11 @@ class Wpfnl_Admin
 			wp_enqueue_style($this->plugin_name . '-email-builder', plugin_dir_url(__FILE__) . 'assets/dist/email-builder/email-builder.css', [], $this->version, 'all');
 		}
 
+		if ('wpfunnels_page_' . WPFNL_AI_FUNNEL_PAGE_SLUG === $hook) {
+			wp_enqueue_style('wpfnl-admin-app', plugin_dir_url(__FILE__) . 'assets/css/admin-app.css', [], $this->version, 'all');
+			wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'assets/css/wpfnl-admin.css', [], $this->version, 'all');
+		}
+
 		if ($this->is_current_page('wpfunnels')) {
 			wp_enqueue_style('wpfnl-admin-app', plugin_dir_url(__FILE__) . 'assets/css/admin-app.css', [], $this->version, 'all');
 		}
@@ -911,7 +917,89 @@ class Wpfnl_Admin
 			);
 		}
 
+		if ('wpfunnels_page_' . WPFNL_AI_FUNNEL_PAGE_SLUG === $hook) {
+			wp_enqueue_script('wpfnl-ai-funnel-app', plugin_dir_url(__FILE__) . 'assets/dist/js/ai-funnel-app.min.js', [], $this->version, true);
+			Wpfnl_functions::enqueue_bundle_style( 'ai-funnel-app', 'wpfnl-ai-funnel-app-bundle' );
+			$_ai_pro_active  = Wpfnl_functions::is_wpfnl_pro_activated();
+			$_ai_enabled     = \WPFunnels\AI\Settings\AISettings::isEnabled();
+			wp_localize_script('wpfnl-ai-funnel-app', 'WPFNAIFunnel', array(
+				'adminUrl' => esc_url_raw(admin_url('admin.php')),
+				'pageUrl' => esc_url_raw(add_query_arg(array(
+					'page' => WPFNL_AI_FUNNEL_PAGE_SLUG,
+				), admin_url('admin.php'))),
+				'funnelsUrl' => esc_url_raw(add_query_arg(array(
+					'page' => WPFNL_FUNNEL_PAGE_SLUG,
+				), admin_url('admin.php'))),
+				// The combined "AI Settings" tab was split into "MCP for AI Agents"
+				// and "AI Assistant" — deep-link to the AI Assistant tab, its direct
+				// feature successor.
+				'settingsUrl'  => esc_url_raw( add_query_arg( array( 'page' => WPFNL_GLOBAL_SETTINGS_SLUG ), admin_url( 'admin.php' ) ) . '#ai-assistant-settings' ),
+				'restApiUrl'   => esc_url_raw( get_rest_url() ),
+				'restNonce'    => wp_create_nonce( 'wp_rest' ),
+				// The copilot client reads rest_url/nonce; without these it falls
+				// back to an empty nonce and every REST call 401s.
+				'rest_url'     => esc_url_raw( get_rest_url() ),
+				'nonce'        => wp_create_nonce( 'wp_rest' ),
+				'rest_nonce'   => wp_create_nonce( 'wp_rest' ),
+				'settingsPage' => esc_url_raw( add_query_arg( array( 'page' => WPFNL_GLOBAL_SETTINGS_SLUG ), admin_url( 'admin.php' ) ) . '#ai-assistant-settings' ),
+				'isProActive'  => $_ai_pro_active  ? 'yes' : 'no',
+				'isAiEnabled'  => $_ai_enabled     ? 'yes' : 'no',
+			));
+		}
+
+		if ( 'wpfunnels_page_' . WPFNL_GLOBAL_SETTINGS_SLUG === $hook ) {
+			$_current_user  = wp_get_current_user();
+			$_settings_common_data = array(
+				'username'  => $_current_user ? $_current_user->user_login : '',
+				'rest_url'  => esc_url_raw( get_rest_url() ),
+				'nonce'     => wp_create_nonce( 'wp_rest' ),
+				'admin_url' => esc_url_raw( admin_url() ),
+			);
+
+			wp_enqueue_script( 'wpfnl-mcp-agent-settings', plugin_dir_url( __FILE__ ) . 'assets/dist/js/mcp-agent-settings.min.js', [], $this->version, true );
+			Wpfnl_functions::enqueue_bundle_style( 'mcp-agent-settings', 'wpfnl-mcp-agent-settings-bundle' );
+			wp_localize_script(
+				'wpfnl-mcp-agent-settings',
+				'WPFnlMcpSettings',
+				array_merge(
+					$_settings_common_data,
+					array(
+						'site_url' => esc_url_raw( home_url() ),
+					)
+				)
+			);
+
+			wp_enqueue_script( 'wpfnl-ai-assistant-settings', plugin_dir_url( __FILE__ ) . 'assets/dist/js/ai-assistant-settings.min.js', [], $this->version, true );
+			Wpfnl_functions::enqueue_bundle_style( 'ai-assistant-settings', 'wpfnl-ai-assistant-settings-bundle' );
+			wp_localize_script( 'wpfnl-ai-assistant-settings', 'WPFnlAiAssistantSettings', $_settings_common_data );
+		}
+
 		if (in_array($hook, $this->page_hooks)) {
+
+			// Admin header actions — the Knowledge Base, AI Assistant, Settings
+			// and Upgrade group rendered into #wpfnl-header-actions from every
+			// WPFunnels admin screen. Reuses the same WPFNAIFunnel global name
+			// the full-page ai-funnel-app bundle localizes (see above) so
+			// admin/src/copilot/services/ai.js works unmodified; safe because
+			// $this->page_hooks and the AI-funnel page hook never match on the
+			// same request.
+			$_settings_page_url = add_query_arg( array( 'page' => WPFNL_GLOBAL_SETTINGS_SLUG ), admin_url( 'admin.php' ) );
+
+			wp_enqueue_script('wpfnl-global-ai-drawer', plugin_dir_url(__FILE__) . 'assets/dist/js/global-ai-drawer.min.js', [], $this->version, true);
+			Wpfnl_functions::enqueue_bundle_style( 'global-ai-drawer', 'wpfnl-global-ai-drawer-bundle' );
+			wp_localize_script('wpfnl-global-ai-drawer', 'WPFNAIFunnel', array(
+				'adminUrl'        => esc_url_raw( admin_url( 'admin.php' ) ),
+				'settingsUrl'     => esc_url_raw( $_settings_page_url . '#ai-assistant-settings' ),
+				'settingsPageUrl' => esc_url_raw( $_settings_page_url ),
+				'isSettingsPage'  => isset( $_GET['page'] ) && WPFNL_GLOBAL_SETTINGS_SLUG === sanitize_text_field( wp_unslash( $_GET['page'] ) ),
+				'isPro'           => (bool) apply_filters( 'wpfunnels/is_pro_license_activated', false ),
+				'upgradeUrl'      => 'https://getwpfunnels.com/pricing/',
+				'restApiUrl'      => esc_url_raw( get_rest_url() ),
+				'restNonce'       => wp_create_nonce( 'wp_rest' ),
+				'rest_url'        => esc_url_raw( get_rest_url() ),
+				'nonce'           => wp_create_nonce( 'wp_rest' ),
+				'rest_nonce'      => wp_create_nonce( 'wp_rest' ),
+			));
 
 			$is_wc_installed = 'no';
 			$is_wpfunnels_installed = 'no';
@@ -972,8 +1060,10 @@ class Wpfnl_Admin
 
 			wp_enqueue_script($this->plugin_name . '-jed', plugin_dir_url(__FILE__) . 'assets/js/jed.js', ['jquery'], $this->version, true);
 			wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'assets/js/wpfnl-admin.js', ['jquery', 'jquery-ui-sortable'], $this->version, true);
+
 			wp_enqueue_script($this->plugin_name . '-runtime', plugin_dir_url(__FILE__) . 'assets/dist/runtime/index.min.js', ['jquery', 'wp-i18n', 'wp-util', 'updates', 'wp-color-picker', $this->plugin_name . '-jed'], $this->version, true);
 			wp_enqueue_script($this->plugin_name . '-funnel-window', plugin_dir_url(__FILE__) . 'assets/dist/js/funnel-components.min.js', ['jquery', 'wp-i18n', 'wp-util', 'updates', 'wp-color-picker', $this->plugin_name . '-jed', $this->plugin_name . '-runtime'], $this->version, true);
+			Wpfnl_functions::enqueue_bundle_style( 'funnel-components', $this->plugin_name . '-funnel-window-bundle' );
 			wp_enqueue_script($this->plugin_name . '-backbone-marionette', plugin_dir_url(__FILE__) . 'assets/lib/backbone/backbone.marionette.min.js', ['backbone'], $this->version, true);
 			wp_enqueue_script($this->plugin_name . '-backbone-radio', plugin_dir_url(__FILE__) . 'assets/lib/backbone/backbone.radio.min.js', ['backbone'], $this->version, true);
 
@@ -1066,6 +1156,7 @@ class Wpfnl_Admin
 				'global_funnel_type' => Wpfnl_functions::get_global_funnel_type(),
 				'individual_funnel_type' => get_post_meta($funnel_id, '_wpfnl_funnel_type', true),
 				'isStoreCheckout' => get_post_meta($funnel_id, '_wpfnl_funnel_type', true) === 'store_checkout',
+				'isSaleFunnel' => get_post_meta($funnel_id, '_wpfnl_funnel_type', true) === 'wc' || get_post_meta($funnel_id, '_wpfnl_funnel_type', true) === 'store_checkout',
 				'gbf_set_condition_steps' => $this->get_gbf_steps($funnel_id),
 				'reconfigurable_condition_data' => $this->get_reconfigurable_condition_data($funnel_id),
 				'mint_steps' => $this->mint_step_settings($funnel_id),
@@ -1166,6 +1257,7 @@ class Wpfnl_Admin
 
 			if ($this->is_current_page('wpfunnels')) {
 				wp_enqueue_script('wpfnl-admin-app', plugin_dir_url(__FILE__) . 'assets/dist/js/wpfnl-admin-app.min.js', array(), $this->version, true);
+				Wpfnl_functions::enqueue_bundle_style( 'wpfnl-admin-app', 'wpfnl-admin-app-bundle' );
 				wp_localize_script('wpfnl-admin-app', 'WPFAdminObj', array(
 					'rest_api_url' => get_rest_url(),
 					'security' => wp_create_nonce('wpfnl-admin'),
@@ -1827,7 +1919,7 @@ class Wpfnl_Admin
 		// Check if we're on a WPFunnels admin page.
 		$screen = get_current_screen();
 		
-		if ($screen && in_array($screen->id, $this->page_hooks)) {
+		if ($screen && (in_array($screen->id, $this->page_hooks) || 'wpfunnels_page_' . WPFNL_AI_FUNNEL_PAGE_SLUG === $screen->id)) {
 			$classes .= ' wpfunnels-body';
 		}
 		

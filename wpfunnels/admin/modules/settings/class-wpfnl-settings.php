@@ -204,6 +204,9 @@ class Module extends Wpfnl_Admin_Module
     public function update_general_settings($payload)
     {
         do_action('wpfunnels/before_settings_saved', $payload);
+
+        $this->save_ai_settings($payload);
+        $existing_settings = Wpfnl_functions::get_general_settings();
         $general_settings  = [
             'funnel_type'               => sanitize_text_field($payload['funnel_type']),
             'builder'                   => sanitize_text_field($payload['builder']),
@@ -482,6 +485,63 @@ class Module extends Wpfnl_Admin_Module
 		}
 		
 		as_unschedule_all_actions( 'wpfunnels_send_revenue_report_email', array(), 'wpfunnels' );
+	}
+
+
+	/**
+	 * Persist the AI Assistant fields that ride along with the settings save.
+	 *
+	 * Keys are stored through AISettings::connect(), which encrypts them. A
+	 * blank field means "keep the stored key", so an unrelated settings save
+	 * never wipes a connection.
+	 *
+	 * @param array $payload Settings payload.
+	 *
+	 * @since 3.13.0
+	 * @return void
+	 */
+	private function save_ai_settings( $payload ) {
+		if ( ! class_exists( '\WPFunnels\AI\Settings\AISettings' ) ) {
+			return;
+		}
+
+		$settings = '\WPFunnels\AI\Settings\AISettings';
+
+		foreach ( array( 'anthropic', 'openai', 'gemini' ) as $provider ) {
+			$field = 'ai_' . $provider . '_key';
+			$key   = isset( $payload[ $field ] ) ? trim( sanitize_text_field( $payload[ $field ] ) ) : '';
+
+			// An untouched field arrives blank, and the placeholder mask must
+			// never be stored as a credential.
+			if ( '' === $key || false !== strpos( $key, '•' ) ) {
+				continue;
+			}
+
+			call_user_func( array( $settings, 'connect' ), $provider, $key );
+		}
+
+		if ( isset( $payload['ai_provider'] ) && '' !== $payload['ai_provider'] ) {
+			$provider = sanitize_text_field( $payload['ai_provider'] );
+
+			// wordpress_ai needs no key; activating it is the whole connection.
+			if ( 'wordpress_ai' === $provider && ! call_user_func( array( $settings, 'isConnected' ), $provider ) ) {
+				call_user_func( array( $settings, 'connect' ), $provider, '' );
+			}
+
+			call_user_func( array( $settings, 'setActiveProvider' ), $provider );
+		}
+
+		if ( isset( $payload['ai_custom_instructions'] ) ) {
+			call_user_func( array( $settings, 'saveCustomInstructions' ), sanitize_textarea_field( $payload['ai_custom_instructions'] ) );
+		}
+
+		if ( isset( $payload['ai_enabled'] ) ) {
+			call_user_func( array( $settings, 'setEnabled' ), 'yes' === $payload['ai_enabled'] );
+		}
+
+		if ( isset( $payload['mcp_enabled'] ) ) {
+			update_option( '_wpfnl_mcp_enabled', 'yes' === $payload['mcp_enabled'] ? 'yes' : 'no' );
+		}
 	}
 
 

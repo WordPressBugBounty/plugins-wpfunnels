@@ -164,21 +164,51 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
      * @since 2.0.5
      */
     public function add_offer_product_to_cart(){
-        $product_id     = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0;
-        $quantity       = isset( $_POST['quantity'] ) ? intval( $_POST['quantity'] ) : 0;
-        $variation_id   = isset( $_POST['variation_id'] ) ? intval( $_POST['variation_id'] ) : 0;
-        $step_id        = isset( $_POST['step_id'] ) ? intval( $_POST['step_id'] ) : 0;
-        if( isset( $_POST['is_variable'], $_POST['attr'] ) && $_POST['is_variable'] == 'true' ){
-            $payload = [
-                'product_id' => $product_id,
-                'data'       => $_POST['attr'],
-            ];
-            $variation_id = $this->wpfnl_get_variation_id($payload);
+        $nonce = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : '';
+
+        if ( ! wp_verify_nonce( $nonce, 'wpfnl_offer_nonce' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
         }
 
+        $step_id = isset( $_POST['step_id'] ) ? intval( $_POST['step_id'] ) : 0;
 
-        $total = $this->get_discounted_price( $step_id, $product_id, $quantity );
-        $total = floatval($total)/intval($quantity);
+        // Which product is sold, and how many, come from the step configuration.
+        // Bail before touching the cart; the old code emptied it first and
+        // validated nothing.
+        $offer_item = Wpfnl_functions::resolve_offer_cart_item( $step_id );
+
+        if ( is_wp_error( $offer_item ) ) {
+            wp_send_json_error( array( 'message' => $offer_item->get_error_message() ), 400 );
+        }
+
+        // The request's only choice is which variation of that product to buy.
+        // Match against the configured parent, never a requested one: WC_Product
+        // throws on an id that is not a product.
+        if ( isset( $_POST['is_variable'], $_POST['attr'] ) && 'true' == $_POST['is_variable'] && is_array( $_POST['attr'] ) ) {
+            $variation_id = $this->wpfnl_get_variation_id(
+                [
+                    'product_id' => $offer_item['product_id'],
+                    'data'       => wc_clean( wp_unslash( $_POST['attr'] ) ),
+                ]
+            );
+
+            $offer_item = Wpfnl_functions::resolve_offer_cart_item( $step_id, $variation_id );
+
+            if ( is_wp_error( $offer_item ) ) {
+                wp_send_json_error( array( 'message' => $offer_item->get_error_message() ), 400 );
+            }
+        }
+
+        $product_id   = $offer_item['product_id'];
+        $variation_id = $offer_item['variation_id'];
+        $quantity     = $offer_item['quantity'];
+
+        // Price the item that is actually added to the cart. Pricing the parent
+        // of a variable product yields its cheapest variation's price.
+        $priced_id = $variation_id ? $variation_id : $product_id;
+
+        $total = $this->get_discounted_price( $step_id, $priced_id, $quantity );
+        $total = floatval( $total ) / $quantity;
         $custom_data = [
             'custom_price' 	=> $total,
         ];
@@ -217,6 +247,11 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
         $type = get_post_meta($step_id, '_step_type', true);
         $discount_data = get_post_meta($step_id, '_wpfnl_'.$type.'_discount', true);
         $product = wc_get_product( $product_id );
+
+        if ( ! $product ) {
+            return 0;
+        }
+
         $total = isset($discount_data['discountApplyTo']) && 'regular' === $discount_data['discountApplyTo'] ? $product->get_regular_price() : $product->get_sale_price();
         $total = !$total ? $product->get_price() : $total;
         $total = floatval($total) * intval($quantity);
@@ -773,11 +808,8 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
 
         $nonce = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : '';
 
-        if ( $nonce && ! wp_verify_nonce( $nonce, 'wpfnl_upsell_accepted_nonce' ) ) {
-            return array(
-                'status'    => 'success',
-                'message'   => __( 'Unauthorized request', 'wpfnl-pro' )
-            );
+        if ( ! wp_verify_nonce( $nonce, 'wpfnl_upsell_accepted_nonce' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
         }
 
 
@@ -808,14 +840,8 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
 
         $order = wc_get_order($order_id);
 
-        $wpfnl_functions_instance = new Wpfnl_functions();
-        if( method_exists($wpfnl_functions_instance,'is_valid_order_owner')){
-            if (!Wpfnl_functions::is_valid_order_owner($order, $order_key)) {
-                wp_send_json([
-                    'status'  => 'error',
-                    'message' => __( 'Unauthorized request', 'wpfnl-pro' ),
-                ]);
-            }
+        if ( ! Wpfnl_functions::is_valid_order_owner( $order, $order_key ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
         }
 
         if ( $order_id && $product_id ) {
@@ -849,11 +875,8 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
     public function process_downsell_accepted_action() {
 
         $nonce = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : '';
-        if ( $nonce && ! wp_verify_nonce( $nonce, 'wpfnl_downsell_accepted_nonce' ) ) {
-            return array(
-                'status'    => 'success',
-                'message'   => __( 'Unauthorized request', 'wpfnl-pro' )
-            );
+        if ( ! wp_verify_nonce( $nonce, 'wpfnl_downsell_accepted_nonce' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
         }
 
         $step_id        = isset( $_POST['step_id'] ) ? intval( $_POST['step_id'] ) : 0;
@@ -883,14 +906,8 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
 
         $order = wc_get_order($order_id);
 
-        $wpfnl_functions_instance = new Wpfnl_functions();
-        if( method_exists($wpfnl_functions_instance,'is_valid_order_owner')){
-            if (!Wpfnl_functions::is_valid_order_owner($order, $order_key)) {
-                wp_send_json([
-                    'status'  => 'error',
-                    'message' => __( 'Unauthorized request', 'wpfnl-pro' ),
-                ]);
-            }
+        if ( ! Wpfnl_functions::is_valid_order_owner( $order, $order_key ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
         }
 
         $all_products   = [];
@@ -928,10 +945,7 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
     public function process_upsell_rejected_action() {
         $nonce = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'wpfnl_upsell_rejected_nonce' ) ) {
-            return array(
-                'status'    => 'success',
-                'message'   => __( 'Unauthorized request', 'wpfnl-pro' )
-            );
+            wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
         }
 
         $step_id        = isset( $_POST['step_id'] ) ? intval( $_POST['step_id'] ) : 0;
@@ -966,6 +980,12 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
                 );
 
                 if ( $order_id ) {
+                    $order = wc_get_order( $order_id );
+
+                    if ( ! Wpfnl_functions::is_valid_order_owner( $order, $order_key ) ) {
+                        wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
+                    }
+
                     $data = array(
                         'order_id'      => $order_id,
                         'product_id'    => $product_id,
@@ -996,10 +1016,7 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
     public function process_downsell_rejected_action() {
         $nonce = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'wpfnl_downsell_rejected_nonce' ) ) {
-            return array(
-                'status'    => 'success',
-                'message'   => __( 'Unauthorized request', 'wpfnl-pro' )
-            );
+            wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
         }
         $step_id        = isset( $_POST['step_id'] ) ? intval( $_POST['step_id'] ) : 0;
         $funnel_id      = isset( $_POST['funnel_id'] ) ? intval( $_POST['funnel_id'] ) : 0;
@@ -1033,6 +1050,12 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
                 );
 
                 if ( $order_id ) {
+                    $order = wc_get_order( $order_id );
+
+                    if ( ! Wpfnl_functions::is_valid_order_owner( $order, $order_key ) ) {
+                        wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
+                    }
+
                     $data = array(
                         'order_id'      => $order_id,
                         'product_id'    => $product_id,
@@ -1061,14 +1084,25 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
      */
     public function wpfnl_after_process_with_auth_ajax()
     {
-        $step_id = $_POST['step_id'];
-        $order_id = $_POST['order_id'];
-        $order_key = $_POST['order_key'];
+        $nonce = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : '';
+
+        if ( ! wp_verify_nonce( $nonce, 'wpfnl_offer_nonce' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
+        }
+
+        $step_id   = isset( $_POST['step_id'] ) ? intval( $_POST['step_id'] ) : 0;
+        $order_id  = isset( $_POST['order_id'] ) ? intval( $_POST['order_id'] ) : 0;
+        $order_key = isset( $_POST['order_key'] ) ? sanitize_text_field( wp_unslash( $_POST['order_key'] ) ) : '';
+
+        if ( ! Wpfnl_functions::is_valid_order_owner( wc_get_order( $order_id ), $order_key ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
+        }
+
         $step_type = get_post_meta($step_id, '_step_type', true);
         $intent_id = '';
 
         if (isset($_POST['intent_id'])) {
-            $intent_id = $_POST['intent_id'];
+            $intent_id = sanitize_text_field( wp_unslash( $_POST['intent_id'] ) );
         }
 
         $extra_data = [];
@@ -1080,7 +1114,7 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
 
         $step_meta = get_post_meta($step_id, '_wpfnl_'.$step_type.'_products', true);
 
-        if ($step_meta[0]) {
+        if ( ! empty( $step_meta[0] ) ) {
             $step_meta = $step_meta[0];
         } else {
             wp_send_json([
@@ -1386,7 +1420,11 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
      * @param $funnel_id
      * @return string
      */
-    public function get_next_step_url( \WC_Order $order , $step_id, $funnel_id ) {
+    public function get_next_step_url( $order , $step_id, $funnel_id ) {
+        if ( ! is_a( $order, 'WC_Order' ) ) {
+            return false;
+        }
+
         $next_step       = Wpfnl_functions::get_next_conditional_step( $funnel_id, $step_id, $order, $this->offerStatus );
         $next_step       = apply_filters( 'wpfunnels/next_step_data', $next_step );
         $next_step_id = isset($next_step['step_id']) ? $next_step['step_id'] : '';

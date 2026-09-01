@@ -53,16 +53,6 @@ $live_redirect_link = add_query_arg(
         <nav class="wpfnl-dashboard__nav">
             <?php use WPFunnels\Wpfnl_functions;
             require_once WPFNL_DIR . '/admin/partials/dashboard-nav.php'; ?>
-
-            <?php
-                if ( !$is_pro_active ) {
-                    ?>
-                    <div class="wpfnl-dashboard__nav-right">
-                        <a href="https://getwpfunnels.com/pricing/" class="btn-default" target="_blank" title="Upgrade to Pro" aria-label="Upgrade to Pro">Upgrade to Pro</a>
-                    </div>
-                    <?php
-                }
-            ?>
         </nav>
 
         <div class="dashboard-nav__content">
@@ -195,6 +185,27 @@ $live_redirect_link = add_query_arg(
                         echo esc_html__('Add new Funnel', 'wpfnl');
                     ?>
                 </a>
+
+                <?php
+                    $ai_funnel_url = esc_url_raw(
+                        add_query_arg(
+                            array(
+                                'page' => WPFNL_AI_FUNNEL_PAGE_SLUG,
+                            ),
+                            admin_url( 'admin.php' )
+                        )
+                    );
+                ?>
+
+                <?php
+                    /**
+                     * Hook to add additional buttons after the "Add new Funnel" button
+                     * Used by WPFunnels Pro to add the "Create with AI" button
+                     *
+                     * @since 3.1.7
+                     */
+                    do_action( 'wpfunnels/after_funnel_list_header' );
+                    ?>
 
                 <?php
                 }

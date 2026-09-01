@@ -20,16 +20,6 @@ $is_integration_active     = apply_filters( 'wpfunnels/is_integration_license_ac
             <nav class="wpfnl-dashboard__nav">
                 <?php use WPFunnels\Wpfnl_functions;
                 require_once WPFNL_DIR . '/admin/partials/dashboard-nav.php'; ?>
-
-                <?php if ( ! $is_integration_active ) : ?>
-                    <div class="wpfnl-dashboard__nav-right">
-                        <?php if ( $is_pro_active ) : ?>
-                            <a href="https://getwpfunnels.com/pricing/" class="btn-default" target="_blank" title="<?php echo __('Upgrade Plan', 'wpfnl'); ?>" aria-label="<?php echo __('Upgrade Plan', 'wpfnl'); ?>"><?php echo __('Upgrade Plan', 'wpfnl'); ?></a>
-                        <?php else : ?>
-                            <a href="https://getwpfunnels.com/pricing/" class="btn-default" target="_blank" title="<?php echo __('Upgrade to Pro', 'wpfnl'); ?>" aria-label="<?php echo __('Upgrade to Pro', 'wpfnl'); ?>"><?php echo __('Upgrade to Pro', 'wpfnl'); ?></a>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
             </nav>
 
             <div class="dashboard-nav__content">

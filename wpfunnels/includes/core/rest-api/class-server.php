@@ -85,6 +85,7 @@ class Server
     protected function get_controllers()
     {
         return apply_filters( 'wpfunnels/rest_api_controllers', array(
+			'mcp_settings'          => 'McpSettingsController',
 			'settings'              => 'SettingsController',
 			'templates_library'     => 'TemplateLibraryController',
 			'order_bump'            => 'OrderBumpController',
@@ -101,7 +102,9 @@ class Server
             'setup_wizard'          => 'SetupWizardController',
             'store_checkout'        => 'StoreCheckoutController',
             'automation'            => 'WpfnlAutomationController',
-		));
+            'ai_chat'               => 'AiChatController',
+            'ai_generate'           => 'SingleShotAiController',
+        ));
     }
 
     /**

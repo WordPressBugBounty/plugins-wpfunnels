@@ -154,16 +154,6 @@ function wpfnl_sc_rule_tooltip( $rule, $condition_labels, $total_rules = 1 ) {
     <div class="wpfnl-dashboard">
         <nav class="wpfnl-dashboard__nav">
             <?php require_once WPFNL_DIR . '/admin/partials/dashboard-nav.php'; ?>
-
-            <?php if ( ! $is_pro_active ) : ?>
-                <div class="wpfnl-dashboard__nav-right">
-                    <a href="https://getwpfunnels.com/pricing/" class="btn-default" target="_blank"
-                       title="<?php esc_attr_e( 'Upgrade to Pro', 'wpfnl' ); ?>"
-                       aria-label="<?php esc_attr_e( 'Upgrade to Pro', 'wpfnl' ); ?>">
-                        <?php esc_html_e( 'Upgrade to Pro', 'wpfnl' ); ?>
-                    </a>
-                </div>
-            <?php endif; ?>
         </nav>
 
         <div class="dashboard-nav__content">

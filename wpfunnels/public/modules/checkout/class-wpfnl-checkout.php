@@ -9,7 +9,6 @@
 namespace WPFunnels\Modules\Frontend\Checkout;
 
 use Error;
-use WC_Session_Handler;
 use WPFunnels\Data_Store\Wpfnl_Steps_Store_Data;
 use WPFunnels\Frontend\Module\Wpfnl_Frontend_Module;
 use WPFunnels\Frontend\Wpfnl_Public;
@@ -581,8 +580,7 @@ class Module extends Wpfnl_Frontend_Module
 			$orders[ $checkout_id ]           = $order_id;
 			WC()->session->set( 'wpfnl_orders_' . $user_id . '_' . $funnel_id, $orders );
 
-			$session_handler = new WC_Session_Handler();
-			WC()->session->set( 'wpfnl_order_owner', $session_handler->generate_customer_id() );
+			Wpfnl_functions::mark_order_owned_by_session( $order_id );
 
 			/**
 			 * Fires after a funnel order is placed.
@@ -1448,6 +1446,10 @@ class Module extends Wpfnl_Frontend_Module
 	 * @since 1.1.
 	 */
 	public function wpfnl_order_bump_ajax() {
+		if ( ! check_ajax_referer( 'wpfnl', 'security', false ) ) {
+			wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
+		}
+
 		$step_id      = filter_input( INPUT_POST, 'step_id', FILTER_VALIDATE_INT );
 		$product_id   = filter_input( INPUT_POST, 'product', FILTER_VALIDATE_INT );
 		$variation_id = filter_input( INPUT_POST, 'variation_id', FILTER_VALIDATE_INT );
@@ -1460,14 +1462,30 @@ class Module extends Wpfnl_Frontend_Module
 		$type         = get_post_meta( $funnel_id, '_wpfnl_funnel_type', true );
 		$type         = !$type ? 'wc' : $type;
 
-		// Validate quantity - must be a positive integer
-		$quantity = absint( $quantity );
-		if ( $quantity < 1 ) {
-			$quantity = 1;
-		}
+		// The bump's discount is pinned to the product it was configured for, and
+		// the quantity is the merchant's. Otherwise any step's offer could be
+		// borrowed and applied to any product.
+		if ( 'lms' !== $type ) {
+			$bump = Wpfnl_functions::resolve_order_bump_item( $step_id, $key, $product_id, $variation_id );
 
-		// If variation_id exists, use it as product_id for cart functions.
-		$cart_product_id = $variation_id ? $variation_id : $product_id;
+			if ( is_wp_error( $bump ) ) {
+				wp_send_json_error( array( 'message' => $bump->get_error_message() ), 400 );
+			}
+
+			$product_id      = $bump['product_id'];
+			$variation_id    = $bump['variation_id'];
+			$quantity        = $bump['quantity'];
+			$cart_product_id = $bump['cart_product_id'];
+		} else {
+			// Validate quantity - must be a positive integer
+			$quantity = absint( $quantity );
+			if ( $quantity < 1 ) {
+				$quantity = 1;
+			}
+
+			// If variation_id exists, use it as product_id for cart functions.
+			$cart_product_id = $variation_id ? $variation_id : $product_id;
+		}
 
 		$class_object = Wpfnl_Public_Type_Factory::build( $type );
 		if( $class_object ) {

@@ -336,6 +336,15 @@ jQuery(function ($) {
                 'revenue_report_recipient'  : $('#wpfnl-revenue-report-recipient').val(),
                 'revenue_report_subject'    : $('#wpfnl-revenue-report-subject').val(),
                 'send_time'                 : $('#wpfnl-send-time').val(),
+
+                // AI Assistant and MCP settings are owned entirely by their own
+                // Vue apps and REST endpoints now (see admin/src/settings-ai) —
+                // each field there saves itself immediately. Do NOT send
+                // ai_enabled/ai_provider/ai_*_key/ai_custom_instructions/
+                // mcp_enabled here: those selectors target markup that no
+                // longer exists, so they always resolved to falsy/blank and
+                // silently overwrote (disabled) whatever the Vue apps had just
+                // saved the moment this button was clicked.
             };
 
             var thisLoader  = $(this).find('.wpfnl-loader');

@@ -24,6 +24,13 @@ use WPFunnels\Conditions\Wpfnl_Condition_Checker;
 class Ajax_Handler {
 
 	/**
+	 * Upper bound on notification recipients for a single opt-in submission.
+	 *
+	 * @since 3.12.14
+	 */
+	const MAX_NOTIFICATION_RECIPIENTS = 10;
+
+	/**
 	 * Initializes AJAX actions and filters for handling different types of form submissions.
 	 * Sets up AJAX hooks for various form submission scenarios, including shortcode and Gutenberg submissions.
 	 * Also hooks into the 'mailmint_after_form_submit_response' filter for processing form submissions.
@@ -48,7 +55,7 @@ class Ajax_Handler {
 	 * @since  2.5.7
 	 */
 	public function optin_form_submission() {
-		// check_ajax_referer( 'optin_form_nonce', 'security' );
+		check_ajax_referer( 'optin_form_nonce', 'security' );
 
 		$step_id  = isset( $_POST[ 'step_id' ] ) ? $_POST[ 'step_id' ] : '';
 		$postData = isset( $_POST[ 'postData' ] ) ? $_POST[ 'postData' ] : '';
@@ -147,7 +154,7 @@ class Ajax_Handler {
 		/**
 		 * User registration
 		 */
-		if ( !empty( $user_info[ 'optin_allow_registration' ] ) && $user_info[ 'optin_allow_registration' ] == 'yes' ) {
+		if ( !empty( $form[ 'settings' ][ 'allow_registration' ] ) && 'yes' == $form[ 'settings' ][ 'allow_registration' ] ) {
 
 			$this->create_user_optin_allow_registration( $name, $user_info );
 		}
@@ -156,11 +163,10 @@ class Ajax_Handler {
 		/**
 		 * Recaptcha Check
 		 */
-		$is_recaptcha           = isset( $post_data[ 'wpf-is-recapcha' ] ) ? $post_data[ 'wpf-is-recapcha' ] : 'no';
-		$recaptcha_site_key     = isset( $post_data[ 'wpf-optin-g-token' ] ) ? $post_data[ 'wpf-optin-g-token' ] : '';
-		$recaptcha_site_secrect = isset( $post_data[ 'wpf-optin-g-secret-key' ] ) ? $post_data[ 'wpf-optin-g-secret-key' ] : '';
+		$recaptcha          = $this->get_trusted_recaptcha_settings();
+		$recaptcha_response = isset( $post_data[ 'wpf-optin-g-token' ] ) ? $post_data[ 'wpf-optin-g-token' ] : '';
 
-		$response = $this->send_mail_after_checking_google_recaptcha_response( $is_recaptcha, $recaptcha_site_key, $recaptcha_site_secrect, $admin_email, $admin_email_subject, $user_info, $response );
+		$response = $this->send_mail_after_checking_google_recaptcha_response( $recaptcha[ 'enabled' ], $recaptcha_response, $recaptcha[ 'secret' ], $admin_email, $admin_email_subject, $user_info, $response );
 
 		if( \WPFunnels\Integrations\Helper::maybe_enabled() && !empty($form[ 'settings' ]['enable_mm_contact']) && 'yes' === $form[ 'settings' ]['enable_mm_contact'] ){
 			$lists = [];
@@ -257,10 +263,10 @@ class Ajax_Handler {
 	 */
 	public function wpfnl_shortcode_optin_submission( $response = [] ) {
 		$post = filter_input_array( INPUT_POST );
-		// if ( !wp_verify_nonce( htmlspecialchars( $post[ 'security' ] ?? '' ), 'optin_form_nonce' )
-		// 	&& !wp_verify_nonce( htmlspecialchars( $post[ 'wp_nonce' ] ?? '' ), 'wp_rest' ) ) {
-		// 	die( '-1' );
-		// }
+		if ( !wp_verify_nonce( htmlspecialchars( $post[ 'security' ] ?? '' ), 'optin_form_nonce' )
+			&& !wp_verify_nonce( htmlspecialchars( $post[ 'wp_nonce' ] ?? '' ), 'wp_rest' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
+		}
 
 		$return = true;
 		if ( empty( $response ) ) {
@@ -499,13 +505,44 @@ class Ajax_Handler {
 	 * @since 2.8.2
 	 */
 	private function process_recaptcha( $post_data, $response, $user_info ) {
-		$admin_email            = $post_data[ 'admin_email' ] ?? false;
-		$admin_email_subject    = $post_data[ 'admin_email_subject' ] ?? 'Opt-in form Submission';
-		$is_recaptcha           = $post_data[ 'wpf-is-recapcha' ] ?? 'false';
-		$recaptcha_site_key     = $post_data[ 'wpf-optin-g-token' ] ?? '';
-		$recaptcha_site_secrect = $post_data[ 'wpf-optin-g-secret-key' ] ?? '';
+		$admin_email         = $post_data[ 'admin_email' ] ?? false;
+		$admin_email_subject = $post_data[ 'admin_email_subject' ] ?? 'Opt-in form Submission';
+		$allow_registration  = $post_data[ 'optin_allow_registration' ] ?? '';
+		$token               = $post_data[ 'wpfnl_optin_settings_token' ] ?? '';
 
-		return $this->send_mail_after_checking_google_recaptcha_response( $is_recaptcha, $recaptcha_site_key, $recaptcha_site_secrect, $admin_email, $admin_email_subject, $user_info, $response );
+		// The recipient and subject are hidden inputs, so they come back as request
+		// data. Honour them only when they are still the ones this form was
+		// rendered with; otherwise there is no notification to send.
+		if ( ! Wpfnl_functions::is_valid_optin_settings_token( $token, (string) $admin_email, (string) $admin_email_subject, (string) $allow_registration ) ) {
+			$admin_email         = false;
+			$admin_email_subject = false;
+		}
+
+		$recaptcha           = $this->get_trusted_recaptcha_settings();
+		$recaptcha_response  = $post_data[ 'wpf-optin-g-token' ] ?? '';
+
+		return $this->send_mail_after_checking_google_recaptcha_response( $recaptcha[ 'enabled' ], $recaptcha_response, $recaptcha[ 'secret' ], $admin_email, $admin_email_subject, $user_info, $response );
+	}
+
+	/**
+	 * reCAPTCHA configuration as stored for the site.
+	 *
+	 * Never read the switch or the secret from a submission: both are rendered
+	 * into the form, so a caller can omit the switch or substitute keys for a
+	 * challenge they control.
+	 *
+	 * @return array
+	 * @since 3.12.14
+	 */
+	private function get_trusted_recaptcha_settings() {
+		$settings = Wpfnl_functions::get_recaptcha_settings();
+		$enabled  = isset( $settings[ 'enable_recaptcha' ] ) ? $settings[ 'enable_recaptcha' ] : 'no';
+		$secret   = isset( $settings[ 'recaptcha_site_secret' ] ) ? $settings[ 'recaptcha_site_secret' ] : '';
+
+		return array(
+			'enabled' => ( 'on' === $enabled && $secret ) ? 'on' : 'off',
+			'secret'  => $secret,
+		);
 	}
 
 	/**
@@ -614,18 +651,17 @@ class Ajax_Handler {
 		/**
 		 * User registration
 		 */
-		if ( !empty( $post_data[ 'optin_allow_registration' ] ) && $post_data[ 'optin_allow_registration' ] == 'yes' ) {
+		if ( !empty( $block_attr[ 'registration_checkbox' ] ) ) {
 
 			$this->create_user_optin_allow_registration( $name, $post_data );
 		}
 		/**
 		 * Check google Recaptcha V3
 		 */
-		$is_recaptcha           = isset( $post_data[ 'wpf-is-recapcha' ] ) ? $post_data[ 'wpf-is-recapcha' ] : 'false';
-		$recaptcha_site_key     = isset( $post_data[ 'wpf-optin-g-token' ] ) ? $post_data[ 'wpf-optin-g-token' ] : '';
-		$recaptcha_site_secrect = isset( $post_data[ 'wpf-optin-g-secret-key' ] ) ? $post_data[ 'wpf-optin-g-secret-key' ] : '';
+		$recaptcha          = $this->get_trusted_recaptcha_settings();
+		$recaptcha_response = isset( $post_data[ 'wpf-optin-g-token' ] ) ? $post_data[ 'wpf-optin-g-token' ] : '';
 
-		$response = $this->send_mail_after_checking_google_recaptcha_response( $is_recaptcha, $recaptcha_site_key, $recaptcha_site_secrect, $admin_email, $admin_email_subject, $post_data, $response );
+		$response = $this->send_mail_after_checking_google_recaptcha_response( $recaptcha[ 'enabled' ], $recaptcha_response, $recaptcha[ 'secret' ], $admin_email, $admin_email_subject, $post_data, $response );
 
 		
 		$user_data = [
@@ -735,10 +771,15 @@ class Ajax_Handler {
 	 */
 	private function send_email_to_admin( $emails = '', $subject = '', $user_info = [] ) {
 		$email_array = explode( ",", $emails );
+
+		// Bound the fan-out and drop anything that is not an address, so a single
+		// submission cannot be turned into a mail relay.
+		$email_array = array_slice( array_filter( array_map( 'trim', $email_array ) ), 0, self::MAX_NOTIFICATION_RECIPIENTS );
+
 		if ( is_array( $email_array ) ) {
 			foreach( $email_array as $email ) {
 
-				if ( $email ) {
+				if ( $email && is_email( $email ) ) {
 					$email        = trim( $email );
 					$current_date = date( "d M Y" );
 					$time         = new \DateTimeImmutable( 'now', wp_timezone() );
@@ -746,16 +787,20 @@ class Ajax_Handler {
 					$poweredBy    = __( 'WPFunnels', 'wpfnl' );
 					$info         = '';
 					if ( isset( $user_info[ 'first_name' ] ) && $user_info[ 'first_name' ] ) {
-						$info .= "First Name : {$user_info['first_name']}<br>";
+						$esc_first_name = esc_html( $user_info[ 'first_name' ] );
+						$info .= "First Name : {$esc_first_name}<br>";
 					}
 					if ( isset( $user_info[ 'last_name' ] ) && $user_info[ 'last_name' ] ) {
-						$info .= "Last Name : {$user_info['last_name']}<br>";
+						$esc_last_name = esc_html( $user_info[ 'last_name' ] );
+						$info .= "Last Name : {$esc_last_name}<br>";
 					}
 					if ( isset( $user_info[ 'email' ] ) && $user_info[ 'email' ] ) {
-						$info .= "Email : {$user_info['email']}<br><br>";
+						$esc_email = esc_html( $user_info[ 'email' ] );
+						$info .= "Email : {$esc_email}<br><br>";
 					}
 					if ( isset( $user_info[ 'phone' ] ) && $user_info[ 'phone' ] ) {
-						$info .= "Phone : {$user_info['phone']}<br><br>";
+						$esc_phone = esc_html( $user_info[ 'phone' ] );
+						$info .= "Phone : {$esc_phone}<br><br>";
 					}
 					if ( isset( $user_info[ 'web-url' ] ) && $user_info[ 'web-url' ] ) {
 						$esc_url = esc_url( $user_info[ 'web-url' ] );
@@ -783,12 +828,24 @@ class Ajax_Handler {
 	 * Create User as a subscriber
 	 * When allow the subscriber option for registration from builder
 	 *
+	 * Registration is refused unless the site itself allows it. Every caller
+	 * routes through here - the Elementor and Gutenberg submission handlers as
+	 * well as the after_optin_submit callback - so the site-wide switch is
+	 * enforced at this one choke point rather than at each call site, and any
+	 * future caller inherits it. On multisite, core filters
+	 * option_users_can_register from the network registration setting, so this
+	 * is the correct check there too.
+	 *
 	 * @param $name
 	 * @param $post_data
 	 *
 	 * @since 2.5.9
 	 */
 	public static function create_user_optin_allow_registration( $name, $post_data ) {
+		if ( ! get_option( 'users_can_register' ) ) {
+			return;
+		}
+
 		$exist_user_by_username = get_user_by( 'login', $name );
 		$exist_user_by_email    = get_user_by( 'email', $post_data[ 'email' ] );
 

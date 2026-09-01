@@ -574,6 +574,13 @@ class Wpfnl_Activator
 			PRIMARY KEY  (id)
     	) $charset_collate;";
 		dbDelta( $sql );
+
+		/**
+		 * Create the AI copilot conversation and message tables.
+		 *
+		 * @since 3.13.0
+		 */
+		\WPFunnels\AI\ConversationStore::createTables();
 	}
 
 

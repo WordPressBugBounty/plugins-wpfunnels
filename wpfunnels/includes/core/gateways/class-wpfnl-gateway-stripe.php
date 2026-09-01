@@ -204,12 +204,9 @@ class Wpfnl_Stripe_payment_process {
         $order->update_meta_data( '_wpfunnels_order', 'yes' );
         $order->save();
 
-        // Mark this session as the order owner so is_valid_order_owner() passes
-        // for subsequent upsell/downsell AJAX calls in the same browser session.
-        if ( WC()->session ) {
-            $session_handler = new \WC_Session_Handler();
-            WC()->session->set( 'wpfnl_order_owner', $session_handler->generate_customer_id() );
-        }
+        // Record this specific order against the session so is_valid_order_owner()
+        // passes for subsequent upsell/downsell AJAX calls in the same browser session.
+        Wpfnl_functions::mark_order_owned_by_session( $order->get_id() );
     }
 
     /**

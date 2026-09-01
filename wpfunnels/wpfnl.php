@@ -15,7 +15,7 @@
  * Plugin Name:       WPFunnels
  * Plugin URI:        https://getwpfunnels.com
  * Description:       Easiest 💥 Sales Funnel Builder 💥 For WordPress & WooCommerce by WPFunnels - Generate Leads & Craft A Highly-Converting Sales Journey In Minutes
- * Version:           3.12.13
+ * Version:           3.13.0
  * Author:            WPFunnels Team
  * Author URI:        https://getwpfunnels.com
  * License:           GPL-2.0+
@@ -40,7 +40,7 @@ if (!defined('WPINC')) {
  */
 
 if (!defined('WPFNL_VERSION')) {
-	define('WPFNL_VERSION', '3.12.13');
+	define('WPFNL_VERSION', '3.13.0');
 }
 
 if (!defined('WPFNL_FILE')) {
@@ -87,6 +87,7 @@ define('WPFNL_TRASH_FUNNEL_SLUG', 'trash_funnels');
 define('WPFNL_FUNNELS_POST_TYPE', 'wpfunnels');
 define('WPFNL_STEPS_POST_TYPE', 'wpfunnel_steps');
 define('WPFNL_CREATE_FUNNEL_SLUG', 'create_funnel');
+define('WPFNL_AI_FUNNEL_PAGE_SLUG', 'wpfnl-ai-funnel');
 define('WPFNL_GLOBAL_SETTINGS_SLUG', 'wpfnl_settings');
 define('WPFNL_AUTOMATIONS_SLUG', 'wpfnl_automations');
 define('WPFNL_ADDONS_SLUG', 'wpfnl_addons');

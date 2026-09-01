@@ -157,13 +157,21 @@ class WC_Shortcode_Optin {
 		$token_input 			= '';
 		$recaptch_script 		= '';
 		$is_recaptch_input 		= '';
-		$token_secret_key 		= '';
 		if('on' == $is_recaptch && '' != $site_key &&  '' != $site_secret_key){
 			$is_recaptch_input 	= '<input type="hidden" id="wpf-is-recapcha" name="wpf-is-recapcha" value="'.$is_recaptch.'"/>';
 			$token_input 		= '<input type="hidden" id="wpf-optin-g-token" name="wpf-optin-g-token" />';
-			$token_secret_key 	= '<input type="hidden" id="wpf-optin-g-secret-key" name="wpf-optin-g-secret-key" value="'.$site_secret_key.'" />';
 			$recaptch_script 	= '<script src="https://www.google.com/recaptcha/api.js?render='.$site_key.'"></script>';
 		}
+
+		// Sign the settings this form was rendered with. The submission handler
+		// trusts the recipient, subject and registration switch only when they
+		// still match what was configured here.
+		$optin_settings_token = Wpfnl_functions::get_optin_settings_token(
+			isset( $this->attributes['admin_email'] ) ? $this->attributes['admin_email'] : '',
+			isset( $this->attributes['admin_email_subject'] ) ? $this->attributes['admin_email_subject'] : '',
+			isset( $this->attributes['register_as_subscriber'] ) && 'true' == $this->attributes['register_as_subscriber'] ? 'yes' : ''
+		);
+
 		ob_start();
 		do_action( 'wpfunnels/before_optin_form' );
 		require WPFNL_DIR.'/includes/core/shortcodes/templates/optin/form.php';

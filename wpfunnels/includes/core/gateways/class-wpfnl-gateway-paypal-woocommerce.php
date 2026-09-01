@@ -260,8 +260,14 @@ class Wpfnl_Gateway_Paypal_WooCommerce extends Wpfnl_Gateway {
         }
         $order_id = isset( $_POST['order_id'] ) ? sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) : 0;
         $step_id    = isset( $_POST['step_id'] ) ? sanitize_text_field( wp_unslash( $_POST['step_id'] ) ) : 0;
+        $order_key  = isset( $_POST['order_key'] ) ? sanitize_text_field( wp_unslash( $_POST['order_key'] ) ) : '';
 
         $order = wc_get_order( $order_id );
+
+        if ( ! Wpfnl_functions::is_valid_order_owner( $order, $order_key ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
+        }
+
         $token              = $this->get_token( $order );
         $step_type          = isset( $_POST['step_type'] ) ? sanitize_text_field( wp_unslash( $_POST['step_type'] ) ) : '';
         $paypal_order_id    = $order->get_meta('_wpfunnels_paypal_'.$step_type.'_'.$step_id.'_order_id_' . $order->get_id());

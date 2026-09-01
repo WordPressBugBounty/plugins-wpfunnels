@@ -1197,6 +1197,7 @@
                 url: ajaxurl,
                 data: {
                     action: 'wpfnl_order_bump_ajax',
+                    security: window.wpfnl_obj.ajax_nonce,
                     step_id: step_id,
                     quantity: quantity,
                     product: product,

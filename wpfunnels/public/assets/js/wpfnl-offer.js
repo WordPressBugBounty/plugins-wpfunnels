@@ -57,6 +57,20 @@
                     }, 1500);
                 }
             },
+            error: function (xhr) {
+                // A rejected request (e.g. an expired nonce, or an order this
+                // visitor does not own) comes back as an HTTP error, so the
+                // success handler never runs. Without this the offer overlay
+                // would spin forever.
+                var message = "Something went wrong. Please refresh the page and try again.";
+                if (xhr && xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+                    message = xhr.responseJSON.data.message;
+                }
+                $(".wpfunnels-offer-loader p.description").text(message);
+                setTimeout(function () {
+                    $(".wpfunnels-offer-loader").hide();
+                }, 1500);
+            },
         });
     };
 
@@ -90,6 +104,7 @@
                     security = window.WPFunnelsOfferVars.wpfnl_capture_paypal_order_nonce;
                     var ajax_data = {
                         order_id: window.WPFunnelsOfferVars.order_id,
+                        order_key: window.WPFunnelsOfferVars.order_key,
                         step_id: window.WPFunnelsOfferVars.step_id,
                         action: "wpfnl_capture_paypal_order",
                         step_type: window.WPFunnelsOfferVars.offer_type,
@@ -101,6 +116,16 @@
                         data: ajax_data,
                         dataType: "json",
                         type: "POST",
+                        error: function (xhr) {
+                            var message = "Something went wrong. Please refresh the page and try again.";
+                            if (xhr && xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+                                message = xhr.responseJSON.data.message;
+                            }
+                            $(".wpfunnels-offer-loader p.description").text(message);
+                            setTimeout(function () {
+                                $(".wpfunnels-offer-loader").hide();
+                            }, 1500);
+                        },
                         success: function (response) {
                             var ajax_data = {
                                 action: "",
@@ -341,6 +366,7 @@
         if( 'yes' === offer_action && 'yes' ===  window.WPFunnelsOfferVars.maybe_unsupported_payment ){
             var ajax_data = {
                 action: 'wpfnl_load_payment',
+                security: window.WPFunnelsOfferVars.wpfnl_offer_nonce,
                 product_id: product_id,
                 step_id : window.WPFunnelsOfferVars.step_id,
                 quantity: quantity,

@@ -7,7 +7,6 @@
  */
 
 $pro_url = add_query_arg('wpfnl-dashboard', '1', GETWPFUNNEL_PRICING_URL);
-$is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
 
 ?>
 <div class="wpfnl">
@@ -15,16 +14,6 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
     <div class="wpfnl-dashboard">
         <nav class="wpfnl-dashboard__nav">
             <?php require_once WPFNL_DIR . '/admin/partials/dashboard-nav.php'; ?>
-
-            <?php
-                if ( !$is_pro_active ) {
-                    ?>
-                    <div class="wpfnl-dashboard__nav-right">
-                        <a href="https://getwpfunnels.com/pricing/" class="btn-default" target="_blank" title="Upgrade to Pro" aria-label="Upgrade to Pro">Upgrade to Pro</a>
-                    </div>
-                    <?php
-                }
-            ?>
         </nav>
 
         <div class="dashboard-nav__content">
@@ -92,6 +81,7 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
                                     <span><?php esc_html_e('Role Management', 'wpfnl'); ?></span>
                                 </li>
                             <?php } ?>
+
                             <!-- <//?php if (\WPFunnels\Wpfnl_functions::maybe_logger_enabled()) { ?> -->
                             <?php { ?>
                                 <li class="nav-li" data-id="log-settings">
@@ -99,6 +89,24 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
                                     <span><?php esc_html_e('Logs', 'wpfnl'); ?></span>
                                 </li>
                             <?php } ?>
+
+                            <li class="nav-li" data-id="mcp-settings">
+                                <svg width="20" height="20" viewBox="0 0 22 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.32781 2.31781L10.6625 9.61166L17.9564 10.9464L10.6625 12.2811L9.32781 19.575L7.99307 12.2811L0.699219 10.9464L7.99307 9.61166L9.32781 2.31781Z" stroke="#7A8B9A" stroke-width="1.4" stroke-linejoin="round"/>
+                                    <path d="M16.8785 0.700012L17.4504 3.90311L20.6535 4.47502L17.4504 5.04693L16.8785 8.25003L16.3066 5.04693L13.1035 4.47502L16.3066 3.90311L16.8785 0.700012Z" stroke="#7A8B9A" stroke-width="1.4" stroke-linejoin="round"/>
+                                </svg>
+                                <span><?php esc_html_e('MCP for AI Agents', 'wpfnl'); ?></span>
+                            </li>
+
+                            <li class="nav-li" data-id="ai-assistant-settings">
+                                <svg width="20" height="20" viewBox="0 0 21 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m2.7627 16.096c-1.0955-1.4027-1.7749-3.085-1.9608-4.8551-0.18583-1.77 0.12939-3.5567 0.90974-5.1564 0.78034-1.5996 1.9944-2.9478 3.5038-3.8909 1.5094-0.94309 3.2534-1.4431 5.0332-1.4431 1.7798 0 3.5238 0.50005 5.0332 1.4431 1.5094 0.9431 2.7235 2.2913 3.5038 3.8909s1.0956 3.3863 0.9097 5.1564c-0.1858 1.7701-0.8652 3.4524-1.9607 4.8551" stroke="#7A8B9A" stroke-linecap="round" stroke-width="1.5"/>
+                                    <path d="m4.6016 16.096v-4.3078c0-3.9364 1.8826-5.9046 5.6478-5.9046 3.7653 0 5.6479 1.9682 5.6479 5.9046v4.3078" stroke="#7A8B9A" stroke-linecap="round" stroke-width="1.5"/>
+                                    <path class="wpfnl-ai-nav-icon-eye" d="m7.6806 12.506c0.53877 0 0.97554-0.4368 0.97554-0.9755 0-0.5388-0.43677-0.9756-0.97554-0.9756-0.53878 0-0.97554 0.4368-0.97554 0.9756 0 0.5387 0.43676 0.9755 0.97554 0.9755z" fill="#7A8B9A"/>
+                                    <path class="wpfnl-ai-nav-icon-eye" d="m12.815 12.506c0.5388 0 0.9755-0.4368 0.9755-0.9755 0-0.5388-0.4367-0.9756-0.9755-0.9756s-0.9756 0.4368-0.9756 0.9756c0 0.5387 0.4368 0.9755 0.9756 0.9755z" fill="#7A8B9A"/>
+                                </svg>
+                                <span><?php esc_html_e('AI Assistant', 'wpfnl'); ?></span>
+                            </li>
                         </ul>
                     </nav>
 
@@ -226,7 +234,19 @@ $is_pro_active = apply_filters('wpfunnels/is_pro_license_activated', false);
                             <?php require WPFNL_DIR . '/admin/modules/settings/views/user-role-manager.php'; ?>
                         </div>
                     <?php } ?>
-                    
+
+                    <!-- MCP for AI Agents -->
+                    <div class="wpfnl-funnel__single-settings mcp" id="mcp-settings">
+                        <div id="wpfnl-mcp-settings-app"></div>
+                    </div>
+                    <!-- /MCP for AI Agents -->
+
+                    <!-- AI Assistant -->
+                    <div class="wpfnl-funnel__single-settings ai-assistant" id="ai-assistant-settings">
+                        <div id="wpfnl-ai-assistant-settings-app"></div>
+                    </div>
+                    <!-- /AI Assistant -->
+
                     <!-- Log settings -->
                     <div class="wpfnl-funnel__single-settings log-settings" id="log-settings">
                         <?php

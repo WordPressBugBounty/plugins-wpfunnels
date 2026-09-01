@@ -42,11 +42,8 @@ $nav_menus = apply_filters('wpfnl_dashboard_nav_lists', [
         //     'icon'  => 'addons-icon',
         //     'page'  => WPFNL_ADDONS_SLUG,
         // ],
-        'settings' => [
-            'title' => __('Settings', 'wpfnl'),
-            'icon'  => 'settings-icon-2x',
-            'page'  => WPFNL_GLOBAL_SETTINGS_SLUG,
-        ],
+        // Settings is not listed here — it is reached from the gear button in
+        // the header action group rendered into #wpfnl-header-actions below.
     ]);
 ?>
 
@@ -76,3 +73,8 @@ $nav_menus = apply_filters('wpfnl_dashboard_nav_lists', [
         }
     ?>
 </ul>
+
+<!-- Header action group (Knowledge Base, AI Assistant, Settings, Upgrade).
+     Rendered by admin/src/global-ai-drawer/HeaderActions.vue so every page
+     that includes this nav gets the same right-hand controls. -->
+<div id="wpfnl-header-actions" class="wpfnl-dashboard__nav-right"></div>

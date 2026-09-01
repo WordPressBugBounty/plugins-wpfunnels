@@ -171,7 +171,7 @@ class Wpfnl_Shortcode_Order_details {
 					do_action('wpfunnels/page_is_thankyou',$order_id);
 					$order 			= wc_get_order( $order_id );
 
-					if (!Wpfnl_functions::is_valid_order_owner( $order )){
+					if (!Wpfnl_functions::is_valid_order_owner( $order, $order_key )){
 						return '<p class="woocommerce-notice">' . __( 'You are not authorized to view the order details.', 'wpfnl' ) . '</p>';
 					}
 

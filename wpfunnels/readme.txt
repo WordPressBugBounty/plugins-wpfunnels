@@ -5,7 +5,7 @@ Tags: funnel builder, woocommerce checkout, order bump, woocommerce funnel build
 Requires at least: 6.1
 Tested up to:  7.1
 Requires PHP: 7.4
-Stable tag: 3.12.13
+Stable tag: 3.13.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -576,6 +576,17 @@ The Patchstack team helps validate, triage, and handle any security vulnerabilit
 8. The Visual Funnel Canvas
 
 == Changelog ==
+
+= 3.13.0 (2026-09-01) =
+* New: AI Assistant – Chat-based assistant panel to create and analyze funnels in natural language
+* New: MCP (Model Context Protocol) support introduced for AI agent integrations
+* New: AI Assistant to query analytics.
+* Security: Unauthorised order modification and detail exposure on upsell and downsell offer requests. Props to Artus KG for responsible disclosure.
+* Security: Offer payment form allowing products to be added to cart at a requester-controlled price. Props to Abdullah Kareem for responsible disclosure.
+* Security: Order bump discount being applicable to products outside the bump's configuration. Props to Aditya Gurav for responsible disclosure.
+* Security: Opt-in form notification emails being sendable to requester-controlled addresses. Props to Sai Praneeth Koti for responsible disclosure.
+* Security: Opt-in forms being able to create user accounts when site-wide registration was disabled. Props to D01EXPLOIT OFFICIAL for responsible disclosure.
+* Security: Event log files being publicly readable on nginx and other servers that ignore .htaccess. Props to Abdullah Kareem for responsible disclosure.
 
 = 3.12.13 (2026-08-21) =
 * Fix: Action scheduler compatibility issues.

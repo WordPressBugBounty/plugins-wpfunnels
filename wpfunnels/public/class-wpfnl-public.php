@@ -1224,8 +1224,10 @@ class Wpfnl_Public
 		// Extract user's email for potential login and registration.
 		$login = $user_info['email'] ? strstr($user_info['email'], '@', true) : '';
 
-		// Check WordPress site-wide registration setting FIRST.
-    	$can_register = get_option('users_can_register');
+		// Kept as an early-out next to the request-supplied flag; the
+		// authoritative check lives in create_user_optin_allow_registration(),
+		// which every registration path routes through.
+		$can_register = get_option('users_can_register');
 
 		// Check if opt-in registration is allowed and perform related actions.
 		if ( $can_register && !empty($post_data['optin_allow_registration']) && $post_data['optin_allow_registration'] == 'yes') {

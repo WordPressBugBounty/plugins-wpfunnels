@@ -256,6 +256,7 @@ class SetupWizard
         wp_enqueue_style('setup-wizard', WPFNL_URL . 'admin/assets/css/wpfnl-admin.css', false, '1.1', 'all');
         wp_enqueue_script('setup-wizard-runtime', WPFNL_URL . 'admin/assets/dist/runtime/index.min.js', array(), time(), true);
         wp_enqueue_script('setup-wizard', WPFNL_URL . 'admin/assets/dist/js/setup-wizard.min.js', array('jquery', 'wp-util', 'updates', 'setup-wizard-runtime'), time(), true);
+        Wpfnl_functions::enqueue_bundle_style( 'setup-wizard', 'setup-wizard-bundle' );
         wp_localize_script('setup-wizard', 'setup_wizard_obj',
             array(
                 'rest_api_url'          => esc_url_raw(get_rest_url()),

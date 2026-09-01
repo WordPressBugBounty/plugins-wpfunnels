@@ -64,6 +64,7 @@ class Module extends Steps
 			$step_id = filter_input(INPUT_GET, 'step_id', FILTER_VALIDATE_INT);
 			if (Wpfnl_functions::check_if_this_is_step_type_by_id($step_id, 'checkout')) {
 				wp_enqueue_script($this->type . '-js', WPFNL_URL . 'admin/assets/dist/js/order-bump.min.js', ['jquery', 'wp-util'], '1.0.0', true);
+				Wpfnl_functions::enqueue_bundle_style( 'order-bump', 'wpfnl-order-bump-bundle' );
 				wp_localize_script(
 					$this->type . '-js',
 					'CheckoutStep',

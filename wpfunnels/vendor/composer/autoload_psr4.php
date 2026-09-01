@@ -7,6 +7,8 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'cweagans\\Composer\\' => array($vendorDir . '/cweagans/composer-patches/src'),
+    'WP\\McpSchema\\' => array($vendorDir . '/wordpress/php-mcp-schema/src'),
+    'WP\\MCP\\' => array($vendorDir . '/wordpress/mcp-adapter/includes'),
     'Symfony\\Component\\Process\\' => array($vendorDir . '/symfony/process'),
     'Spatie\\TemporaryDirectory\\' => array($vendorDir . '/spatie/temporary-directory/src'),
     'Spatie\\Image\\' => array($vendorDir . '/spatie/image/src'),

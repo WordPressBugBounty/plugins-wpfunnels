@@ -7,6 +7,7 @@
 namespace WPFunnels\TemplateLibrary;
 
 use WPFunnels\Wpfnl;
+use WPFunnels\Wpfnl_functions;
 
 class Manager
 {
@@ -113,6 +114,7 @@ class Manager
                 }
             }
             wp_enqueue_script('funnel-template-library', WPFNL_URL . 'admin/assets/dist/js/template-library.min.js', ['jquery', 'wp-util'], WPFNL_VERSION, true);
+            Wpfnl_functions::enqueue_bundle_style( 'template-library', 'funnel-template-library-bundle' );
         }
     }
 

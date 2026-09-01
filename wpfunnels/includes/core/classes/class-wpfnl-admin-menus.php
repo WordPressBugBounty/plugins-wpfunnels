@@ -157,6 +157,15 @@ class Wpfnl_Menus
             [$this, 'render_settings_page']
         );
 
+        add_submenu_page(
+            WPFNL_MAIN_PAGE_SLUG,
+            __('AI Assistant', 'wpfnl'),
+            __('AI Assistant', 'wpfnl'),
+            Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
+            WPFNL_AI_FUNNEL_PAGE_SLUG,
+            [$this, 'render_ai_funnel_page']
+        );
+
         // add_submenu_page(
         //     WPFNL_MAIN_PAGE_SLUG,
         //     __('Documentation', 'wpfnl'),
@@ -248,6 +257,17 @@ class Wpfnl_Menus
     public function render_funnels_page()
     {
         Wpfnl::$instance->module_manager->get_admin_modules('funnels')->get_view();
+    }
+
+
+    /**
+     * Render AI funnel page.
+     *
+     * @since 3.10.0
+     */
+    public function render_ai_funnel_page()
+    {
+        require WPFNL_DIR . '/admin/views/ai-funnel.php';
     }
 
 
@@ -412,6 +432,8 @@ class Wpfnl_Menus
     {
         remove_submenu_page(WPFNL_MAIN_PAGE_SLUG, 'edit_funnel');
         remove_submenu_page(WPFNL_MAIN_PAGE_SLUG, 'trash_funnels');
+        // The AI Assistant page stays in the menu: it is a destination in its own
+        // right, not an internal screen like the funnel canvas above.
     }
 
 
@@ -427,7 +449,7 @@ class Wpfnl_Menus
         if (('edit_funnel' == sanitize_text_field( $_GET['page'] ) )) {
             remove_all_actions( 'admin_notices' );
         }
-		if ( 'wp_funnels' == sanitize_text_field( $_GET['page'] ) ||  'wpf_templates' == sanitize_text_field( $_GET['page'] ) ||  'trash_funnels' == sanitize_text_field( $_GET['page'] ) || 'wpfnl_settings' == sanitize_text_field( $_GET['page'] ) || 'wpf-license' == sanitize_text_field( $_GET['page'] )  ) {
+        if ( 'wp_funnels' == sanitize_text_field( $_GET['page'] ) ||  'wpf_templates' == sanitize_text_field( $_GET['page'] ) ||  'trash_funnels' == sanitize_text_field( $_GET['page'] ) || 'wpfnl_settings' == sanitize_text_field( $_GET['page'] ) || 'wpf-license' == sanitize_text_field( $_GET['page'] ) || WPFNL_AI_FUNNEL_PAGE_SLUG == sanitize_text_field( $_GET['page'] ) ) {
 			add_action('admin_footer', array( $this, 'remove_admin_notices' ));
 		}
 

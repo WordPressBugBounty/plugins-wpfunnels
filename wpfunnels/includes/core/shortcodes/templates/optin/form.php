@@ -14,6 +14,7 @@ echo esc_js($recaptch_script);
 		<input type="hidden" name="post_id" value="<?php echo get_the_ID(); ?>" />
 		<input type="hidden" name="admin_email" value="<?php echo esc_html($this->attributes['admin_email']); ?>" />
 		<input type="hidden" name="admin_email_subject" value="<?php echo esc_html($this->attributes['admin_email_subject']); ?>" />
+		<input type="hidden" name="wpfnl_optin_settings_token" value="<?php echo esc_attr($optin_settings_token); ?>" />
 		<input type="hidden" name="redirect_url" value="<?php echo esc_url($this->attributes['redirect_url']); ?>" />
 		<input type="hidden" name="notification_text" value="<?php echo esc_html($this->attributes['notification_text']); ?>" />
 		<input type="hidden" name="post_action" value="<?php echo esc_html($this->attributes['post_action']); ?>" />
@@ -24,7 +25,6 @@ echo esc_js($recaptch_script);
 		<?php
 		echo esc_html($is_recaptch_input);
 		echo esc_html($token_input);
-		echo esc_html($token_secret_key);
 		?>
 
 		<div class="wpfnl-optin-form-wrapper">

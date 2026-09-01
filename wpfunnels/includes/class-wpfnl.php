@@ -466,6 +466,21 @@ class Wpfnl
         $this->reporting	= Reporting::get_instance();
 		$this->reporting->init();
 
+		// AI copilot module: settings migration + conversation tables.
+		\WPFunnels\AI\AIInit::init();
+
+		// Tool layer: WordPress Abilities (always, when available) + the MCP
+		// server for external agents (gated on the `_wpfnl_mcp_enabled` option).
+		// Ability registration must NOT depend on that option — the in-plugin
+		// AI copilot resolves its own tools through the same registry
+		// (ToolGateway -> wp_get_abilities()), so turning off the external
+		// MCP endpoint would otherwise silently leave the copilot with zero
+		// tools to call.
+		if ( \WPFunnels\MCP\MCPInit::abilitiesApiAvailable() ) {
+			$expose_mcp_server = 'no' !== get_option( '_wpfnl_mcp_enabled', 'yes' );
+			( new \WPFunnels\MCP\MCPInit() )->init( $expose_mcp_server );
+		}
+
 		Wpfnl_Activator::init();
     }
 
