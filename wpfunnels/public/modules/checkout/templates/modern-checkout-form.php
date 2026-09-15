@@ -109,25 +109,27 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 						</button>
 					</li>
 
-					<li class="wpfnl-modern-multistep-nav-sep" aria-hidden="true" role="presentation">
-						<svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
-							<path d="M1 1L6 5.5L1 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-						</svg>
-					</li>
+					<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
+						<li class="wpfnl-modern-multistep-nav-sep" aria-hidden="true" role="presentation">
+							<svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+								<path d="M1 1L6 5.5L1 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</li>
 
-					<li class="wpfnl-modern-multistep-nav-step" role="presentation" data-step="shipping">
-						<button
-							type="button"
-							class="wpfnl-modern-multistep-nav-step-btn"
-							role="tab"
-							id="wpfnl-step-tab-shipping"
-							aria-controls="wpfnl-step-panel-shipping"
-							aria-selected="false"
-							data-step="shipping"
-						>
-							<?php esc_html_e( 'Shipping', 'wpfnl' ); ?>
-						</button>
-					</li>
+						<li class="wpfnl-modern-multistep-nav-step" role="presentation" data-step="billing">
+							<button
+								type="button"
+								class="wpfnl-modern-multistep-nav-step-btn"
+								role="tab"
+								id="wpfnl-step-tab-billing"
+								aria-controls="wpfnl-step-panel-billing"
+								aria-selected="false"
+								data-step="billing"
+							>
+								<?php esc_html_e( 'Billing', 'wpfnl' ); ?>
+							</button>
+						</li>
+					<?php endif; ?>
 
 					<li class="wpfnl-modern-multistep-nav-sep" aria-hidden="true" role="presentation">
 						<svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
@@ -153,6 +155,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 		<?php endif; ?>
 
 		<form name="checkout" method="post" class="checkout woocommerce-checkout <?php echo esc_attr( $loged_in_cls . ' ' . $create_acc_field ); ?>" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">
+			<input type="hidden" name="wpfnl_step_id" value="<?php echo esc_attr( get_the_ID() ); ?>" />
 
 			<?php if ( $checkout->get_checkout_fields() ) : ?>
 
@@ -183,6 +186,11 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 											$billing_email_field['class'] = array( 'form-row-fill' );
 										}
 										woocommerce_form_field( 'billing_email', $billing_email_field, $default_email );
+
+										// Signals form-billing.php that the contact section owns billing_email, so
+										// the billing fieldset skips it instead of emitting a second input with
+										// the same id.
+										do_action( 'wpfunnels/modern_checkout_email_rendered' );
 									}
 									?>
 
@@ -257,6 +265,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 											<?php echo esc_html( apply_filters( 'wpfunnels_logged_in_customer_info_text', sprintf( __( 'Welcome Back %1$s (%2$s)', 'wpfnl' ), $current_user_name, $current_user_email ) ) ); ?>
 											<div><input type="hidden" class="wpfnl-email-address" id="billing_email" name="billing_email" value="<?php echo esc_attr( $current_user_email ); ?>"/></div>
 										</div>
+										<?php do_action( 'wpfunnels/modern_checkout_email_rendered' ); ?>
 									<?php } ?>
 								</div>
 							</div>
@@ -266,27 +275,31 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 					</div>
 				</div>
 
-				<?php
-				/**
-				 * Fires before customer details in checkout page
-				 * @since 2.8.21
-				 */
-				do_action( 'wpfunnels/before_customer_details' );
-				?>
+				<div id="wpfnl_modern_customer_details" class="wpfnl-modern-customer-details">
+					<?php
+					/**
+					 * Fires before customer details in checkout page
+					 * @since 2.8.21
+					 */
+					do_action( 'wpfunnels/before_customer_details' );
+					?>
 
-				<!-- Billing Details Section -->
-				<?php do_action( 'woocommerce_checkout_billing' ); ?>
+					<!-- Shipping Details Section -->
+					<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
+						<?php do_action( 'woocommerce_checkout_shipping' ); ?>
+					<?php endif; ?>
 
-				<!-- Shipping Details Section -->
-				<?php do_action( 'woocommerce_checkout_shipping' ); ?>
+					<!-- Billing Details Section -->
+					<?php do_action( 'woocommerce_checkout_billing' ); ?>
 
-				<?php
-				/**
-				 * Fires after customer details in checkout page
-				 * @since 2.8.21
-				 */
-				do_action( 'wpfunnels/after_customer_details' );
-				?>
+					<?php
+					/**
+					 * Fires after customer details in checkout page
+					 * @since 2.8.21
+					 */
+					do_action( 'wpfunnels/after_customer_details' );
+					?>
+				</div>
 
 				<?php do_action( 'woocommerce_checkout_after_customer_details' ); ?>
 
@@ -300,6 +313,17 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 				</div>
 			</div>
 
+			<?php
+			/**
+			 * This layout renders the order review in the right column, outside the
+			 * checkout form. The hook's listeners emit hidden inputs (order bump
+			 * selection, Stripe's save-payment-method flag), so it has to fire inside
+			 * the form or the browser never submits them — every other WPFunnels
+			 * checkout template fires it inside the form for the same reason.
+			 */
+			do_action( 'woocommerce_checkout_after_order_review' );
+			?>
+
 		</form>
 
 		<?php if ( 'wpfnl-modern-multistep' === $checkout_layout ) : ?>
@@ -309,7 +333,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 					class="next-step-btn"
 					aria-label="Proceed to the next step"
 					current-step="information"
-					next-step="shipping"
+					next-step="<?php echo ( WC()->cart && WC()->cart->needs_shipping_address() ) ? 'billing' : 'payment'; ?>"
 				>
 					Proceed to Next Step
 				</button>
@@ -343,8 +367,6 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 				<?php do_action( 'woocommerce_checkout_order_review' ); ?>
 				<?php add_action( 'woocommerce_checkout_order_review', 'woocommerce_checkout_payment', 20 ); ?>
 			</div>
-
-			<?php do_action( 'woocommerce_checkout_after_order_review' ); ?>
 		</div>
 
 	</div>

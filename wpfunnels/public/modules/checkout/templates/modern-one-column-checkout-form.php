@@ -76,6 +76,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 <div class="wpfnl-modern-one-column-wrapper wpfnl-modern-checkout-wrapper">
 
 	<form name="checkout" method="post" class="checkout woocommerce-checkout <?php echo esc_attr( $loged_in_cls . ' ' . $create_acc_field ); ?>" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">
+		<input type="hidden" name="wpfnl_step_id" value="<?php echo esc_attr( get_the_ID() ); ?>" />
 
 		<?php if ( $checkout->get_checkout_fields() ) : ?>
 
@@ -106,6 +107,11 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 										$billing_email_field['class'] = array( 'form-row-fill' );
 									}
 									woocommerce_form_field( 'billing_email', $billing_email_field, $default_email );
+
+									// Signals form-billing.php that the contact section owns billing_email, so
+									// the billing fieldset skips it instead of emitting a second input with
+									// the same id.
+									do_action( 'wpfunnels/modern_checkout_email_rendered' );
 								}
 								?>
 
@@ -180,6 +186,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 										<?php echo esc_html( apply_filters( 'wpfunnels_logged_in_customer_info_text', sprintf( __( 'Welcome Back %1$s (%2$s)', 'wpfnl' ), $current_user_name, $current_user_email ) ) ); ?>
 										<div><input type="hidden" class="wpfnl-email-address" id="billing_email" name="billing_email" value="<?php echo esc_attr( $current_user_email ); ?>"/></div>
 									</div>
+									<?php do_action( 'wpfunnels/modern_checkout_email_rendered' ); ?>
 								<?php } ?>
 							</div>
 						</div>
@@ -198,20 +205,22 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 				do_action( 'wpfunnels/before_customer_details' );
 				?>
 
+				<!-- Shipping Section -->
+				<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
+					<div class="wpfnl-modern-section wpfnl-modern-section--shipping" data-section="shipping">
+						<div class="wpfnl-modern-section__content">
+							<div class="col-2" id="wpfnl_checkout_shipping">
+								<?php do_action( 'woocommerce_checkout_shipping' ); ?>
+							</div>
+						</div>
+					</div>
+				<?php endif; ?>
+
 				<!-- Billing Section -->
 				<div class="wpfnl-modern-section wpfnl-modern-section--billing" data-section="billing">
 					<div class="wpfnl-modern-section__content">
 						<div class="col-1" id="wpfnl_checkout_billing">
 							<?php do_action( 'woocommerce_checkout_billing' ); ?>
-						</div>
-					</div>
-				</div>
-
-				<!-- Shipping Section -->
-				<div class="wpfnl-modern-section wpfnl-modern-section--shipping" data-section="shipping">
-					<div class="wpfnl-modern-section__content">
-						<div class="col-2" id="wpfnl_checkout_shipping">
-							<?php do_action( 'woocommerce_checkout_shipping' ); ?>
 						</div>
 					</div>
 				</div>

@@ -33,6 +33,20 @@ class Module extends Wpfnl_Frontend_Module
 
 	public $step_id;
 
+	/**
+	 * Whether the funnel hidden fields have already been printed for this request.
+	 *
+	 * @var bool
+	 */
+	private $checkout_metas_rendered = false;
+
+	/**
+	 * Whether the additional information (order notes) block has already rendered.
+	 *
+	 * @var bool
+	 */
+	private $additional_fields_rendered = false;
+
 	// const CHECKOUT = "";
 
 	public function __construct()
@@ -120,7 +134,9 @@ class Module extends Wpfnl_Frontend_Module
 		add_filter( 'woocommerce_checkout_fields', array($this, 'set_option_data_in_checkout_filed'),10 );
 		add_filter( 'woocommerce_available_payment_gateways', array($this, 'conditional_payment_gateways'),10 );
 		add_action( 'woocommerce_checkout_after_customer_details', array( $this, 'add_custom_shipping_section' ), 10 );
-		add_action( 'woocommerce_checkout_order_review', array( $this, 'display_custom_coupon_field' ) );
+		add_action( 'wpfunnels/after_order_total', array( $this, 'display_custom_coupon_field' ), 5 );
+		add_filter( 'woocommerce_update_order_review_fragments', array( $this, 'split_after_order_total_fragment' ) );
+		add_filter( 'woocommerce_update_order_review_fragments', array( $this, 'wpfnl_update_checkout_fragments' ), 20 );
 
 		/* Manage Express Checkout buttons visibility dynamically */
 		add_filter( 'wc_stripe_show_payment_request_on_checkout', [$this, 'wpfnl_manage_stripe_express_checkout'], 9999, 2 );
@@ -429,6 +445,9 @@ class Module extends Wpfnl_Frontend_Module
 	 */
 	public function init_actions() {
 		add_action( 'woocommerce_after_order_notes', [$this, 'checkout_shortcode_metas']);
+		add_action( 'woocommerce_before_order_notes', [$this, 'mark_additional_fields_rendered'], 1 );
+		add_action( 'woocommerce_checkout_after_customer_details', [$this, 'maybe_render_additional_fields'], 15 );
+		add_action( 'woocommerce_checkout_after_customer_details', [$this, 'maybe_render_checkout_metas'], 20 );
 		$this->display_coupon_field();
 		$this->enable_checkout_hook();
 
@@ -445,6 +464,39 @@ class Module extends Wpfnl_Frontend_Module
 	 */
 	public function load_checkout_step_scripts() {
 		$this->load_google_map_api_scripts();
+		$this->load_tokenization_form_script();
+	}
+
+
+	/**
+	 * Load WooCommerce's saved payment method (tokenization) script on checkout steps.
+	 *
+	 * WooCommerce enqueues `woocommerce-tokenization-form` from inside
+	 * WC_Payment_Gateway::payment_fields(). On a funnel checkout the payment box is often
+	 * rendered for the first time by wc-ajax=update_order_review, where wp_enqueue_script()
+	 * is a no-op, so the saved payment method markup arrives without the script that selects
+	 * "Use a new payment method". Stripe's UPE script then reads the unchecked
+	 * #wc-stripe-payment-token-new radio as "customer picked a saved card", never creates a
+	 * PaymentMethod, and the order is placed with an empty wc-stripe-payment-method field.
+	 *
+	 * Enqueueing it up front on every checkout step keeps the AJAX rendered markup working.
+	 *
+	 * @since 3.13.2
+	 */
+	private function load_tokenization_form_script() {
+		if ( ! Wpfnl_functions::is_wc_active() || ! function_exists( 'WC' ) ) {
+			return;
+		}
+
+		$gateways = WC()->payment_gateways() ? WC()->payment_gateways()->payment_gateways() : [];
+
+		foreach ( $gateways as $gateway ) {
+			if ( 'yes' === $gateway->enabled && $gateway->supports( 'tokenization' ) ) {
+				// Also localises wc_tokenization_form_params, which the script reads.
+				$gateway->tokenization_script();
+				break;
+			}
+		}
 	}
 
 
@@ -637,6 +689,7 @@ class Module extends Wpfnl_Frontend_Module
 			|| Wpfnl_functions::is_product_option_from_post_data()
 			|| Wpfnl_functions::is_variation_selected_from_post_data()
 			|| Wpfnl_functions::maybe_select_quantity_from_post_data()
+			|| Wpfnl_functions::is_order_bump_already_accepted_from_cookie()
 			// || Wpfnl_functions::is_coupon_applied_from_post_data()
         ) {
             return;
@@ -1092,9 +1145,9 @@ class Module extends Wpfnl_Frontend_Module
 		if(!$checkout_id) {
 			return '';
 		}
-		$checkout_layout = Wpfnl::get_instance()->meta->get_checkout_meta_value($checkout_id, 'wpfnl_checkout_layout', 'wpfnl-col-2');
+		$checkout_layout = Wpfnl_functions::get_checkout_layout($checkout_id);
 
-		$floating_label = Wpfnl::get_instance()->meta->get_checkout_meta_value($checkout_id, 'wpfnl_floating_label', '');
+		$floating_label = Wpfnl_functions::get_checkout_step_setting($checkout_id, 'wpfnl_floating_label', '');
 
 		$output = '';
 		ob_start();
@@ -1193,8 +1246,13 @@ class Module extends Wpfnl_Frontend_Module
 	 */
 	public function checkout_shortcode_metas()
 	{
+		if ($this->checkout_metas_rendered) {
+			return;
+		}
+
 		if (Wpfnl_functions::check_if_this_is_step_type('checkout')) {
 			global $post;
+			$this->checkout_metas_rendered = true;
 			$this->step_id = $post->ID;
 			$step = new Wpfnl_Steps_Store_Data();
 			$step->read($this->step_id);
@@ -1204,6 +1262,92 @@ class Module extends Wpfnl_Frontend_Module
 			echo '<input type="hidden" class="input-hidden _wpfunnels_order_unique_identifier" name="_wpfunnels_order_unique_identifier" value="' . uniqid() . '">';
 			echo '<input type="hidden" class="input-hidden _wpfunnels_select_quantity" name="_wpfunnels_select_quantity" value="no">';
 		}
+	}
+
+
+	/**
+	 * Print the funnel hidden fields when the shipping section is skipped.
+	 *
+	 * The checkout layouts only run `woocommerce_checkout_shipping` when the cart
+	 * needs a shipping address, so a cart holding only virtual/downloadable
+	 * products never renders form-shipping.php and `woocommerce_after_order_notes`
+	 * never fires. Without the hidden fields the placed order gets no funnel meta,
+	 * and the customer lands on the WooCommerce order-received page instead of the
+	 * funnel thankyou step.
+	 *
+	 * @since 3.13.2
+	 */
+	public function maybe_render_checkout_metas()
+	{
+		$this->checkout_shortcode_metas();
+	}
+
+
+	/**
+	 * Record that the additional information block has rendered.
+	 *
+	 * Hooked as early as possible on `woocommerce_before_order_notes` so the
+	 * fallback below knows form-shipping.php already produced the section.
+	 *
+	 * @since 3.13.2
+	 */
+	public function mark_additional_fields_rendered()
+	{
+		$this->additional_fields_rendered = true;
+	}
+
+
+	/**
+	 * Render the additional information (order notes) block.
+	 *
+	 * WooCommerce ships this block inside form-shipping.php, which the checkout
+	 * layouts only render when the cart needs a shipping address — so a cart of
+	 * virtual/downloadable products lost the order notes field along with the
+	 * `woocommerce_before_order_notes` / `woocommerce_after_order_notes` hooks that
+	 * custom checkout fields rely on, and on shippable carts the block landed above
+	 * the "Use same address for billing" toggle. Rendering it here, on
+	 * `woocommerce_checkout_after_customer_details`, puts it after both address
+	 * forms for every cart.
+	 *
+	 * @since 3.13.2
+	 */
+	public function maybe_render_additional_fields()
+	{
+		if ( $this->additional_fields_rendered ) {
+			return;
+		}
+
+		if ( ! Wpfnl_functions::check_if_this_is_step_type( 'checkout' ) ) {
+			return;
+		}
+
+		if ( ! Wpfnl_functions::is_wc_active() || ! function_exists( 'WC' ) ) {
+			return;
+		}
+
+		$checkout = WC()->checkout();
+		if ( ! $checkout ) {
+			return;
+		}
+
+		$this->additional_fields_rendered = true;
+		?>
+		<div class="woocommerce-additional-fields">
+			<?php do_action( 'woocommerce_before_order_notes', $checkout ); ?>
+
+			<?php if ( apply_filters( 'woocommerce_enable_order_notes_field', 'yes' === get_option( 'woocommerce_enable_order_comments', 'yes' ) ) ) : ?>
+				<h3><?php esc_html_e( 'Additional information', 'woocommerce' ); ?></h3>
+
+				<div class="woocommerce-additional-fields__field-wrapper">
+					<?php foreach ( $checkout->get_checkout_fields( 'order' ) as $key => $field ) : ?>
+						<?php woocommerce_form_field( $key, $field, $checkout->get_value( $key ) ); ?>
+					<?php endforeach; ?>
+				</div>
+			<?php endif; ?>
+
+			<?php do_action( 'woocommerce_after_order_notes', $checkout ); ?>
+		</div>
+		<?php
 	}
 
 
@@ -1713,11 +1857,370 @@ class Module extends Wpfnl_Frontend_Module
 		if ( ! $this->is_modern_checkout_layout() || ! apply_filters( 'wpfunnels_should_render_custom_shipping', true ) ) {
 			return;
 		}
+		if ( ! Wpfnl_functions::is_wc_active() || ! function_exists( 'WC' ) || ! WC()->cart || ! WC()->cart->needs_shipping() ) {
+			return;
+		}
 		ob_start();
 		echo '<div class="wpfnl-customer-shipping">';
 		$this->wpfnl_cart_totals_shipping_html();
 		echo '</div>';
 		ob_end_flush();
+	}
+
+
+	/**
+	 * Give the `wpfunnels/after_order_total` block its own order-review fragment.
+	 *
+	 * WooCommerce's update_order_review AJAX returns the entire review-order template
+	 * under the `.woocommerce-checkout-review-order-table` key, and checkout.js runs
+	 * `$( key ).replaceWith( value )`. That selector matches only the <table>, so the
+	 * coupon field, order bumps and testimonials that our template appends after it
+	 * were injected again on every refresh while the previous copies remained as
+	 * siblings — one extra copy per AJAX call.
+	 *
+	 * Split the buffer at the wrapper emitted by review-order.php so each key matches
+	 * the outermost node of its own value, which makes both replacements idempotent.
+	 *
+	 * If the wrapper is missing — a theme or plugin overriding review-order.php with
+	 * its own copy — leave the fragments untouched and keep the previous behaviour.
+	 *
+	 * @param array $fragments Fragments keyed by CSS selector.
+	 *
+	 * @return array
+	 * @since  3.13.2
+	 */
+	public function split_after_order_total_fragment( $fragments ) {
+		$table_key = '.woocommerce-checkout-review-order-table';
+
+		if ( ! is_array( $fragments ) || empty( $fragments[ $table_key ] ) || ! is_string( $fragments[ $table_key ] ) ) {
+			return $fragments;
+		}
+
+		$wrapper = '<div class="wpfnl-after-order-total">';
+		// The wrapper is the last thing review-order.php prints; search from the end so
+		// markup echoed by a hooked callback can never be mistaken for it.
+		$position = strrpos( $fragments[ $table_key ], $wrapper );
+
+		if ( false === $position ) {
+			return $fragments;
+		}
+
+		$fragments['.wpfnl-after-order-total']  = substr( $fragments[ $table_key ], $position );
+		$fragments[ $table_key ]                = substr( $fragments[ $table_key ], 0, $position );
+
+		return $fragments;
+	}
+
+
+	/**
+	 * Update checkout fragments for customer details and multistep navigation
+	 * when cart items (or order bumps) change during update_order_review AJAX.
+	 *
+	 * @param array $fragments
+	 * @return array
+	 */
+	public function wpfnl_update_checkout_fragments( $fragments ) {
+		if ( ! Wpfnl_functions::is_wc_active() || ! function_exists( 'WC' ) || ! WC()->cart || ! WC()->checkout() ) {
+			return $fragments;
+		}
+
+		$checkout_id = Wpfnl_functions::get_checkout_id_from_post( $_POST );
+		if ( ! $checkout_id && ! empty( $_POST['wpfnl_step_id'] ) ) {
+			$checkout_id = absint( $_POST['wpfnl_step_id'] );
+		}
+		if ( ! $checkout_id && ! empty( $_POST['step_id'] ) ) {
+			$checkout_id = absint( $_POST['step_id'] );
+		}
+		if ( ! $checkout_id && ! empty( $_POST['post_data'] ) ) {
+			$post_data = array();
+			wp_parse_str( wp_unslash( $_POST['post_data'] ), $post_data );
+			if ( ! empty( $post_data['wpfnl_step_id'] ) ) {
+				$checkout_id = absint( $post_data['wpfnl_step_id'] );
+			} elseif ( ! empty( $post_data['_wpfunnels_checkout_id'] ) ) {
+				$checkout_id = absint( $post_data['_wpfunnels_checkout_id'] );
+			}
+		}
+
+		if ( ! $checkout_id ) {
+			return $fragments;
+		}
+
+		// Re-initialize actions for billing and shipping form rendering
+		add_filter( 'woocommerce_locate_template', array( new Wpfnl_Public(), 'wpfunnels_woocommerce_locate_template' ), 20, 3 );
+		remove_all_actions( 'woocommerce_checkout_billing' );
+		remove_all_actions( 'woocommerce_checkout_shipping' );
+		add_action( 'woocommerce_checkout_billing', array( WC()->checkout(), 'checkout_form_billing' ) );
+		add_action( 'woocommerce_checkout_shipping', array( WC()->checkout(), 'checkout_form_shipping' ) );
+
+		$checkout_layout = get_post_meta( $checkout_id, '_wpfnl_checkout_layout', true );
+		if ( empty( $checkout_layout ) && isset( $_SESSION['checkout_layout'] ) ) {
+			$checkout_layout = $_SESSION['checkout_layout'];
+		}
+
+		// 1. Render #customer_details for default, express, 2-step, modern-one-column
+		if ( 'wpfnl-modern-one-column' === $checkout_layout ) {
+			ob_start();
+			?>
+			<div class="col2-set" id="customer_details">
+				<?php do_action( 'wpfunnels/before_customer_details' ); ?>
+				<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
+					<div class="wpfnl-modern-section wpfnl-modern-section--shipping" data-section="shipping">
+						<div class="wpfnl-modern-section__content">
+							<div class="col-2" id="wpfnl_checkout_shipping">
+								<?php do_action( 'woocommerce_checkout_shipping' ); ?>
+							</div>
+						</div>
+					</div>
+				<?php endif; ?>
+				<div class="wpfnl-modern-section wpfnl-modern-section--billing" data-section="billing">
+					<div class="wpfnl-modern-section__content">
+						<div class="col-1" id="wpfnl_checkout_billing">
+							<?php do_action( 'woocommerce_checkout_billing' ); ?>
+						</div>
+					</div>
+				</div>
+				<?php do_action( 'wpfunnels/after_customer_details' ); ?>
+			</div>
+			<?php
+			$fragments['#customer_details'] = ob_get_clean();
+		} else {
+			ob_start();
+			?>
+			<div class="col2-set" id="customer_details">
+				<?php do_action( 'wpfunnels/before_customer_details' ); ?>
+				<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
+					<div class="col-1" id="wpfnl_checkout_shipping">
+						<?php do_action( 'woocommerce_checkout_shipping' ); ?>
+					</div>
+					<div class="col-2" id="wpfnl_checkout_billing">
+						<?php do_action( 'woocommerce_checkout_billing' ); ?>
+					</div>
+				<?php else : ?>
+					<div class="col-1" id="wpfnl_checkout_billing">
+						<?php do_action( 'woocommerce_checkout_billing' ); ?>
+					</div>
+				<?php endif; ?>
+				<?php do_action( 'wpfunnels/after_customer_details' ); ?>
+			</div>
+			<?php
+			$fragments['#customer_details'] = ob_get_clean();
+		}
+
+		// 2. Render #wpfnl_modern_customer_details for modern 2-column and modern multistep
+		ob_start();
+		?>
+		<div id="wpfnl_modern_customer_details" class="wpfnl-modern-customer-details">
+			<?php do_action( 'wpfunnels/before_customer_details' ); ?>
+			<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
+				<?php do_action( 'woocommerce_checkout_shipping' ); ?>
+			<?php endif; ?>
+			<?php do_action( 'woocommerce_checkout_billing' ); ?>
+			<?php do_action( 'wpfunnels/after_customer_details' ); ?>
+		</div>
+		<?php
+		$fragments['#wpfnl_modern_customer_details'] = ob_get_clean();
+
+		// 3. Render .wpfnl-multistep-wizard for multistep/express/2-step layouts
+		ob_start();
+		?>
+		<ul class="wpfnl-multistep-wizard">
+			<?php if ( ! is_user_logged_in() && 'yes' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) { ?>
+				<li class="login current">
+					<button type="button" data-target="login">
+						<span class="step-icon">
+							<?php include WPFNL_DIR . 'public/assets/icons/icon-login.php'; ?>
+						</span>
+						<span class="step-title">
+							<?php esc_html_e( 'Login', 'wpfnl' ); ?>
+						</span>
+					</button>
+				</li>
+			<?php } ?>
+
+			<?php
+			$shipping_active_cls = ( is_user_logged_in() || 'no' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) ? 'current' : '';
+			$billing_active_cls  = ( ( ! is_user_logged_in() && 'yes' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) || ( WC()->cart && ! WC()->cart->needs_shipping_address() ) ) ? 'current' : '';
+			?>
+			<?php if ( is_user_logged_in() || 'no' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) { ?>
+				<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) { ?>
+					<li class="shipping <?php echo esc_attr( $shipping_active_cls ); ?>">
+						<button type="button" data-target="shipping">
+							<span class="step-icon">
+								<?php include WPFNL_DIR . 'public/assets/icons/icon-shipping.php'; ?>
+							</span>
+							<span class="step-title">
+								<?php esc_html_e( 'Shipping', 'wpfnl' ); ?>
+							</span>
+						</button>
+					</li>
+				<?php } ?>
+				<li class="billing <?php echo esc_attr( $billing_active_cls ); ?>">
+					<button type="button" data-target="billing">
+						<span class="step-icon">
+							<?php include WPFNL_DIR . 'public/assets/icons/icon-billing.php'; ?>
+						</span>
+						<span class="step-title">
+							<?php esc_html_e( 'Billing', 'wpfnl' ); ?>
+						</span>
+					</button>
+				</li>
+				<li class="order-review">
+					<button type="button" data-target="order-review">
+						<span class="step-icon">
+							<?php include WPFNL_DIR . 'public/assets/icons/icon-order-review.php'; ?>
+						</span>
+						<span class="step-title">
+							<?php esc_html_e( 'Your Order', 'wpfnl' ); ?>
+						</span>
+					</button>
+				</li>
+			<?php } ?>
+		</ul>
+		<?php
+		$fragments['.wpfnl-multistep-wizard'] = ob_get_clean();
+
+		// 4. Render .wpfnl-modern-multistep-nav and .wpfnl-modern-multistep-navigation for modern multistep
+		ob_start();
+		?>
+		<nav class="wpfnl-modern-multistep-nav" aria-label="<?php esc_attr_e( 'Checkout steps', 'wpfnl' ); ?>">
+			<ul class="wpfnl-modern-multistep-nav-steps" role="tablist" aria-orientation="horizontal">
+				<li class="wpfnl-modern-multistep-nav-step active" role="presentation" data-step="information">
+					<button
+						type="button"
+						class="wpfnl-modern-multistep-nav-step-btn"
+						role="tab"
+						id="wpfnl-step-tab-information"
+						aria-controls="wpfnl-step-panel-information"
+						aria-selected="true"
+						data-step="information"
+					>
+						<?php esc_html_e( 'Information', 'wpfnl' ); ?>
+					</button>
+				</li>
+
+				<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
+					<li class="wpfnl-modern-multistep-nav-sep" aria-hidden="true" role="presentation">
+						<svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+							<path d="M1 1L6 5.5L1 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+					</li>
+
+					<li class="wpfnl-modern-multistep-nav-step" role="presentation" data-step="billing">
+						<button
+							type="button"
+							class="wpfnl-modern-multistep-nav-step-btn"
+							role="tab"
+							id="wpfnl-step-tab-billing"
+							aria-controls="wpfnl-step-panel-billing"
+							aria-selected="false"
+							data-step="billing"
+						>
+							<?php esc_html_e( 'Billing', 'wpfnl' ); ?>
+						</button>
+					</li>
+				<?php endif; ?>
+
+				<li class="wpfnl-modern-multistep-nav-sep" aria-hidden="true" role="presentation">
+					<svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+						<path d="M1 1L6 5.5L1 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+				</li>
+
+				<li class="wpfnl-modern-multistep-nav-step" role="presentation" data-step="payment">
+					<button
+						type="button"
+						class="wpfnl-modern-multistep-nav-step-btn"
+						role="tab"
+						id="wpfnl-step-tab-payment"
+						aria-controls="wpfnl-step-panel-payment"
+						aria-selected="false"
+						data-step="payment"
+					>
+						<?php esc_html_e( 'Payment', 'wpfnl' ); ?>
+					</button>
+				</li>
+			</ul>
+		</nav>
+		<?php
+		$fragments['.wpfnl-modern-multistep-nav'] = ob_get_clean();
+
+		ob_start();
+		?>
+		<div class="wpfnl-modern-multistep-navigation">
+			<button
+				type="button"
+				class="next-step-btn"
+				aria-label="Proceed to the next step"
+				current-step="information"
+				next-step="<?php echo ( WC()->cart && WC()->cart->needs_shipping_address() ) ? 'billing' : 'payment'; ?>"
+			>
+				<?php esc_html_e( 'Proceed to Next Step', 'wpfnl' ); ?>
+			</button>
+		</div>
+		<?php
+		$fragments['.wpfnl-modern-multistep-navigation'] = ob_get_clean();
+
+		// 5. Render #rex-checkout-tabs for multi-step-checkout layout
+		if ( 'wpfnl-multistep' === $checkout_layout ) {
+			ob_start();
+			?>
+			<div class="multistep-wrapper" id="rex-checkout-tabs">
+				<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
+					<div class="single-step" id="shipping">
+						<?php
+						if ( WC()->checkout()->get_checkout_fields() ) {
+							do_action( 'woocommerce_checkout_before_customer_details' );
+							do_action( 'woocommerce_checkout_shipping' );
+						}
+						?>
+						<div class="navigation">
+							<button type="button" id="shippingNext"><?php echo __( 'Next', 'wpfnl' ); ?></button>
+						</div>
+					</div>
+
+					<div class="single-step" id="billing">
+						<?php
+						if ( WC()->checkout()->get_checkout_fields() ) {
+							do_action( 'woocommerce_checkout_billing' );
+							do_action( 'woocommerce_checkout_after_customer_details' );
+						}
+						?>
+						<div class="navigation">
+							<button type="button" id="billingPrevious"><?php echo __( 'Previous', 'wpfnl' ); ?></button>
+							<button type="button" id="billingNext"><?php echo __( 'Next', 'wpfnl' ); ?></button>
+						</div>
+					</div>
+				<?php else : ?>
+					<div class="single-step" id="billing">
+						<?php
+						if ( WC()->checkout()->get_checkout_fields() ) {
+							do_action( 'woocommerce_checkout_before_customer_details' );
+							do_action( 'woocommerce_checkout_billing' );
+							do_action( 'woocommerce_checkout_after_customer_details' );
+						}
+						?>
+						<div class="navigation">
+							<button type="button" id="billingNext"><?php echo __( 'Next', 'wpfnl' ); ?></button>
+						</div>
+					</div>
+				<?php endif; ?>
+
+				<div class="single-step" id="review">
+					<?php do_action( 'woocommerce_checkout_before_order_review' ); ?>
+					<div id="order_review" class="woocommerce-checkout-review-order">
+						<?php do_action( 'woocommerce_checkout_order_review' ); ?>
+					</div>
+					<?php do_action( 'woocommerce_checkout_after_order_review' ); ?>
+					<div class="navigation">
+						<button type="button" id="reviewPrevious"><?php echo __( 'Previous', 'wpfnl' ); ?></button>
+					</div>
+				</div>
+			</div>
+			<?php
+			$fragments['#rex-checkout-tabs'] = ob_get_clean();
+		}
+
+		return $fragments;
 	}
 
 
@@ -1797,17 +2300,7 @@ class Module extends Wpfnl_Frontend_Module
 
 		$checkout_id = 0;
 		if ( wp_doing_ajax() ) {
-			if ( isset( $_POST['step_id'] ) ) {
-				$checkout_id = intval( wp_unslash( $_POST['step_id'] ) );
-			} elseif ( isset( $_POST['_wpfunnels_checkout_id'] ) ) {
-				$checkout_id = intval( wp_unslash( $_POST['_wpfunnels_checkout_id'] ) );
-			} elseif ( isset( $_POST['post_data'] ) ) {
-				$post_data = array();
-				parse_str( wp_unslash( $_POST['post_data'] ), $post_data );
-				if ( isset( $post_data['_wpfunnels_checkout_id'] ) ) {
-					$checkout_id = intval( $post_data['_wpfunnels_checkout_id'] );
-				}
-			}
+			$checkout_id = Wpfnl_functions::get_checkout_id_from_post( $_POST );
 		}
 
 		if ( ! $checkout_id ) {
@@ -1820,7 +2313,7 @@ class Module extends Wpfnl_Frontend_Module
 
 		$show_coupon = Wpfnl::get_instance()->meta->get_checkout_meta_value( $checkout_id, '_wpfnl_checkout_coupon' );
 
-		return 'yes' === $show_coupon;
+		return 'no' !== $show_coupon;
 	}
 
 
@@ -1832,17 +2325,7 @@ class Module extends Wpfnl_Frontend_Module
 	private function is_collapsible_coupon_enabled() {
 		$checkout_id = 0;
 		if ( wp_doing_ajax() ) {
-			if ( isset( $_POST['step_id'] ) ) {
-				$checkout_id = intval( wp_unslash( $_POST['step_id'] ) );
-			} elseif ( isset( $_POST['_wpfunnels_checkout_id'] ) ) {
-				$checkout_id = intval( wp_unslash( $_POST['_wpfunnels_checkout_id'] ) );
-			} elseif ( isset( $_POST['post_data'] ) ) {
-				$post_data = array();
-				parse_str( wp_unslash( $_POST['post_data'] ), $post_data );
-				if ( isset( $post_data['_wpfunnels_checkout_id'] ) ) {
-					$checkout_id = intval( $post_data['_wpfunnels_checkout_id'] );
-				}
-			}
+			$checkout_id = Wpfnl_functions::get_checkout_id_from_post( $_POST );
 		}
 
 		if ( ! $checkout_id ) {
@@ -1967,17 +2450,7 @@ class Module extends Wpfnl_Frontend_Module
 		$checkout_id = 0;
 
 		if ( wp_doing_ajax() ) {
-			if ( isset( $_POST['step_id'] ) ) {
-				$checkout_id = intval( wp_unslash( $_POST['step_id'] ) );
-			} elseif ( isset( $_POST['_wpfunnels_checkout_id'] ) ) {
-				$checkout_id = intval( wp_unslash( $_POST['_wpfunnels_checkout_id'] ) );
-			} elseif ( isset( $_POST['post_data'] ) ) {
-				$post_data = array();
-				parse_str( wp_unslash( $_POST['post_data'] ), $post_data );
-				if ( isset( $post_data['_wpfunnels_checkout_id'] ) ) {
-					$checkout_id = intval( $post_data['_wpfunnels_checkout_id'] );
-				}
-			}
+			$checkout_id = Wpfnl_functions::get_checkout_id_from_post( $_POST );
 		}
 
 		if ( ! $checkout_id ) {
@@ -1988,9 +2461,9 @@ class Module extends Wpfnl_Frontend_Module
 			return false;
 		}
 
-		$checkout_layout = Wpfnl::get_instance()->meta->get_checkout_meta_value( $checkout_id, 'wpfnl_checkout_layout', 'wpfnl-col-2' );
+		$checkout_layout = Wpfnl_functions::get_checkout_layout( $checkout_id );
 
-		return in_array( $checkout_layout, array( 'wpfnl-modern-checkout', 'wpfnl-modern-one-column' ), true );
+		return ( false !== strpos( $checkout_layout, 'modern' ) ) || in_array( $checkout_layout, array( 'wpfnl-modern-checkout', 'wpfnl-modern-one-column', 'wpfnl-modern-multistep' ), true );
 	}
 
 
@@ -2262,7 +2735,14 @@ class Module extends Wpfnl_Frontend_Module
 		}
 
 		if ( $checkout_id ) {
-			$checkout_layout = Wpfnl::get_instance()->meta->get_checkout_meta_value( $checkout_id, 'wpfnl_checkout_layout', 'wpfnl-col-2' );
+			if (
+				Wpfnl_functions::check_if_this_is_step_type_by_id( $checkout_id, 'checkout' ) &&
+				isset( $fields['order']['order_comments']['placeholder'] )
+			) {
+				$fields['order']['order_comments']['placeholder'] = esc_attr__( 'Notes about your order', 'wpfnl' );
+			}
+
+			$checkout_layout = Wpfnl_functions::get_checkout_layout( $checkout_id );
 
 			if ( 'wpfnl-modern-checkout' === $checkout_layout ) {
 				if ( isset( $fields['account']['account_username'] ) ) {

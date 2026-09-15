@@ -147,6 +147,4 @@ $addons = apply_filters('wpfnl_recommended_addons', $addons);
 
         </div>
     </div>
-
-    <?php require_once WPFNL_DIR . '/admin/partials/helper-resource.php'; ?>
 </div>

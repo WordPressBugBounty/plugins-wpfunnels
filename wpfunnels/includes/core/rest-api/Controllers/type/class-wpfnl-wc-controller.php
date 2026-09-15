@@ -30,12 +30,7 @@ class Wpfnl_Controller_Wc extends Wpfnl_Controller_Type
             $auto_coupon 		=  get_post_meta($step_id, '_wpfnl_checkout_auto_coupon', true);
             $discount 			=  '';
 
-            if ($use_of_coupon == 'yes') {
-                $use_of_coupon = true;
-            }
-            else {
-                $use_of_coupon = false;
-            }
+            $use_of_coupon = ( 'no' !== $use_of_coupon );
 
             if( $isMultipleProduct == 'yes' ) {
                 $isMultipleProduct = true;

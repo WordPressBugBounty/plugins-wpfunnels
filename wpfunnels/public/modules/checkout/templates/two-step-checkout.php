@@ -117,6 +117,7 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 ?>
 
 	<form name="checkout" method="post" class="checkout woocommerce-checkout <?php echo $loged_in_cls.' '.$create_acc_field; ?>" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">
+		<input type="hidden" name="wpfnl_step_id" value="<?php echo esc_attr( get_the_ID() ); ?>" />
 
 		<?php if ( $checkout->get_checkout_fields() ) : ?>
 
@@ -130,13 +131,18 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 					 */
 					do_action( 'wpfunnels/before_customer_details' ); 
 				?>
-				<div class="col-1" id="wpfnl_checkout_billing">
-					<?php do_action( 'woocommerce_checkout_billing' ); ?>
-				</div>
-
-				<div class="col-2" id="wpfnl_checkout_shipping">
-					<?php do_action( 'woocommerce_checkout_shipping' ); ?>
-				</div>
+				<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
+					<div class="col-1" id="wpfnl_checkout_shipping">
+						<?php do_action( 'woocommerce_checkout_shipping' ); ?>
+					</div>
+					<div class="col-2" id="wpfnl_checkout_billing">
+						<?php do_action( 'woocommerce_checkout_billing' ); ?>
+					</div>
+				<?php else : ?>
+					<div class="col-1" id="wpfnl_checkout_billing">
+						<?php do_action( 'woocommerce_checkout_billing' ); ?>
+					</div>
+				<?php endif; ?>
 				<?php 
 					/**
 					 * Fires after customer details in checkout page

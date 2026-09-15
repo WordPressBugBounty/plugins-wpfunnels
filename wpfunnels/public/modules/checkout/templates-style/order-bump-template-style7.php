@@ -91,7 +91,7 @@ if( $product ){
                         $isVariable = !empty($settings['isVariable']) ? $settings['isVariable'] : false; 
                     ?>
                     <input
-                        id="wpfnl-order-bump-cb-<?php echo $key ?>"
+                        id="wpfnl-order-bump-cb-<?php echo $key . ( $this->render_instance ? '-' . $this->render_instance : '' ); ?>"
                         class="wpfnl-order-bump-cb"
                         type="checkbox"
                         name="wpfnl-order-bump-cb-<?php echo $key ?>"
@@ -101,9 +101,10 @@ if( $product ){
                         data-step="<?php echo get_the_ID(); ?>"
                         data-lms="<?php echo $type; ?>"
                         data-is-variable="<?php echo $isVariable ? 'true' : 'false'; ?>"
+                        <?php checked( $this->is_order_bump_in_cart( $settings['product'] ) ); ?>
                         value="<?php echo $settings['product'] ?>"
                     >
-                    <label for="wpfnl-order-bump-cb-<?php echo $key ?>" style="background-color: <?php echo $orderbump_color; ?>">
+                    <label for="wpfnl-order-bump-cb-<?php echo $key . ( $this->render_instance ? '-' . $this->render_instance : '' ); ?>" style="background-color: <?php echo $orderbump_color; ?>">
                         <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M10.1667 1.16675V19.1667" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M1.16675 10.1667H19.1667" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

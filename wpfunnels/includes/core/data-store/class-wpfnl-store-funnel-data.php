@@ -58,22 +58,12 @@ class Wpfnl_Funnel_Store_Data extends Wpfnl_Abstract_Store_data implements Wpfnl
 		);
 		if ($funnel_id && ! is_wp_error($funnel_id)) {
 
-			$general_settings = get_option( '_wpfunnels_general_settings' );
-			if( isset($general_settings['funnel_type']) ){
-				if( 'woocommerce' == $general_settings['funnel_type'] ){
-					$general_settings['funnel_type'] = 'sales';
-					update_option( '_wpfunnels_general_settings', $general_settings );
-				}
-				if( 'sales' == $general_settings['funnel_type'] ){
-					if( Wpfnl_functions::is_wc_active() ){
-						update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'wc' );
-					}else{
-						update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lms' );
-					}
-
-				}else{
-					update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lead' );
-				}
+			// Provisional type only — callers that know the funnel's real type
+			// (create_funnel, the template importer) overwrite this straight after.
+			if( Wpfnl_functions::is_wc_active() ){
+				update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'wc' );
+			}else{
+				update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lms' );
 			}
 			$this->set_id($funnel_id);
 		}

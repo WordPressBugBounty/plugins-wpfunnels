@@ -3625,7 +3625,7 @@ class Checkout_Form extends Widget_Base
 
         //===Coupon Enabler===//
         $coupon_enabler = get_post_meta(get_the_ID(), '_wpfnl_checkout_coupon', true);
-        if ( $coupon_enabler != 'yes' ) {
+        if ( 'no' === $coupon_enabler ) {
             remove_action('woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10);
         }
 

@@ -2029,6 +2029,71 @@
     }
 
     /**
+     * Publish the admin-bar and settings top-bar heights as CSS custom
+     * properties so the settings sidebar and content column can each own a
+     * viewport-height scroll area without hard-coding either measurement.
+     *
+     * @since 1.0.0
+     */
+    function syncSettingsViewportOffset() {
+        var page = document.querySelector('.wpfnl-settings-page');
+
+        if (!page) {
+            return;
+        }
+
+        var adminBar = $('#wpadminbar').length ? $('#wpadminbar').outerHeight() : 0;
+        var $topBar = $(page).children('.wpfnl-dashboard').children('.wpfnl-dashboard__nav');
+        var $wrapper = $(page).find('.wpfnl-funnel-settings__wrapper');
+
+        // Measure where the columns actually start rather than adding up the
+        // admin bar and top bar: WordPress prints update/plugin notices above
+        // the shell, and missing their height pushes the sidebar past the fold.
+        // The wrapper is not itself sticky, so this stays stable while scrolled.
+        var offset = $wrapper.length
+            ? Math.round($wrapper[0].getBoundingClientRect().top + window.pageYOffset)
+            : adminBar + ($topBar.outerHeight() || 0);
+
+        page.style.setProperty('--wpfnl-settings-top', adminBar + 'px');
+        page.style.setProperty('--wpfnl-settings-offset', offset + 'px');
+
+        // HeaderActions.vue mounts into the top bar after this first pass, so
+        // re-measure whenever its height actually changes.
+        if (!page.wpfnlOffsetObserved && $topBar.length && window.ResizeObserver) {
+            page.wpfnlOffsetObserved = true;
+            new window.ResizeObserver(syncSettingsViewportOffset).observe($topBar[0]);
+        }
+    }
+
+    /**
+     * Mirror the active nav item into the sticky settings header: its label and
+     * icon become the page title, and panels that ship their own save controls
+     * (`data-save="false"`) hide the global "Save changes" button.
+     *
+     * @since 1.0.0
+     */
+    function updateSettingsHeader($navItem) {
+        var $header = $('.wpfn-settings__header');
+
+        if (!$header.length || !$navItem || !$navItem.length) {
+            return;
+        }
+
+        var $label = $navItem.children('span').not('.pro-tag, .pro-tag-icon').first();
+        var $icon = $navItem.find('svg').first();
+
+        $header.find('.wpfn-settings__header-text').text($label.text());
+
+        var $iconHolder = $header.find('.wpfn-settings__header-icon').empty();
+
+        if ($icon.length) {
+            $iconHolder.append($icon.clone());
+        }
+
+        $header.toggleClass('is-actionless', $navItem.attr('data-save') === 'false');
+    }
+
+    /**
      * settings page tab nav
      *
      * @since 1.0.0
@@ -2056,10 +2121,18 @@
             return false;
         }
 
-        $navItem.addClass('active').siblings('.nav-li').removeClass('active');
+        // The nav is split into groups, each with its own <ul>, so siblings()
+        // would only clear the active item within the group that was clicked.
+        $('.wpfn-settings__nav .nav-li').removeClass('active');
+        $navItem.addClass('active');
+
+        updateSettingsHeader($navItem);
 
         // Show the selected panel, hide others.
         $container.show().siblings('.wpfnl-funnel__single-settings').hide();
+
+        // The content column is its own scroll area — start each panel at the top.
+        $('.wpfn-settings__content').scrollTop(0);
 
         // Inside the visible panel, activate the first inner-tab.
         $container.find('.inner-tab').removeClass('active');
@@ -2103,8 +2176,15 @@
         activateSettingsTab($(this).attr('data-id'), true);
     });
 
+    syncSettingsViewportOffset();
+    $(window).on('resize', syncSettingsViewportOffset);
+
     syncSettingsTabFromHash();
     $(window).on('hashchange', syncSettingsTabFromHash);
+
+    // No hash (or an unrelated one): the markup already marks a panel active, so
+    // seed the sticky header from it.
+    updateSettingsHeader($('.wpfn-settings__nav .nav-li.active').first());
 
 
     /**
@@ -2538,19 +2618,6 @@
             }
         },
     )
-
-    /**
-     * Funnel window page and Empty funnel page help resource show/hide.
-     *
-     */
-    $(document).on('click', '.wpfnl-helper-btn', function (e) {
-        e.stopPropagation()
-        $(this).parent('.wpfnl-canvas-helper').toggleClass('show-helpers')
-    })
-
-    $(document).on('click', 'body', function () {
-        $('.wpfnl-canvas-helper').removeClass('show-helpers')
-    })
 
     /**
      * add new step option dropdown show/hide.

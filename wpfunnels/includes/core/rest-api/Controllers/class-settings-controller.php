@@ -152,17 +152,6 @@ class SettingsController extends Wpfnl_REST_Controller {
         );
 
         register_rest_route(
-            $this->namespace, '/' . $this->rest_funnel_settings . '/update-funnel-type' , array(
-                array(
-                    'methods'               => 'POST',
-                    'callback'              => array( $this, 'update_funnel_type' ),
-                    'permission_callback'   => array( $this, 'update_items_permissions_check' ),
-                    'args'                  => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
-                )
-            )
-        );
-
-        register_rest_route(
             $this->namespace, '/' . $this->rest_funnel_settings . '/update-builder-type' , array(
                 array(
                     'methods'               => 'POST',
@@ -482,11 +471,7 @@ class SettingsController extends Wpfnl_REST_Controller {
             } elseif( $request['settings_id'] === 'optin') {
                 $default = Wpfnl_functions::get_optin_settings();
                 $settings = Wpfnl_functions::get_admin_settings( '_wpfunnels_optin_settings', $default);
-            } elseif ($request['settings_id'] === 'funnel_type') {
-                $default = Wpfnl_functions::get_general_settings();
-                $settings = Wpfnl_functions::get_admin_settings( $request['group_id'], $default);
-            }
-            else {
+            } else {
                 $default = Wpfnl_functions::get_general_settings();
                 $settings = Wpfnl_functions::get_admin_settings( $request['group_id'], $default );
             }
@@ -510,12 +495,7 @@ class SettingsController extends Wpfnl_REST_Controller {
                 Wpfnl_functions::update_admin_settings($request['group_id'], $settings);
 
             }else {
-                if( 'funnel_type' === $request['settings_id'] ) {
-                    $general_settings = get_option( '_wpfunnels_general_settings' );
-                    $settings[$request['settings_id']] = isset($general_settings['funnel_type']) ? $general_settings['funnel_type'] : 'sales';
-                }else{
-                    $settings[$request['settings_id']] = $request['value'];
-                }
+                $settings[$request['settings_id']] = $request['value'];
 
                 Wpfnl_functions::update_admin_settings($request['group_id'], $settings);
 
@@ -549,33 +529,6 @@ class SettingsController extends Wpfnl_REST_Controller {
                 $response['success'] = true;
                 $response['is_lms'] = false;
             }
-        }
-        return rest_ensure_response( $response );
-    }
-
-
-    /**
-     * Update funnel type
-     *
-     * @param Array $request
-     *
-     * @return Array
-     * @since  2.5.3
-     */
-    public function update_funnel_type( $request ){
-
-        $response = [
-            'success' => false,
-        ];
-
-        if( $request['type'] ){
-            $type = $request['type'];
-            $general_settings = get_option( '_wpfunnels_general_settings' );
-            $general_settings['funnel_type'] = $type;
-            update_option('_wpfunnels_general_settings', $general_settings );
-            $response = [
-                'success' => true,
-            ];
         }
         return rest_ensure_response( $response );
     }
@@ -682,7 +635,7 @@ class SettingsController extends Wpfnl_REST_Controller {
             rest_ensure_response( $response );
         }
 
-        if( 'builder'  === $request['name'] || 'funnel_type' === $request['name'] ){
+        if( 'builder' === $request['name'] ){
             // Get and process the value using the appropriate method.
             $name  = sanitize_text_field($request['name']);
             $value = sanitize_text_field($request['value']);

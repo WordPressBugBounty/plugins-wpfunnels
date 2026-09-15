@@ -2419,7 +2419,7 @@ class Checkout extends Element
 
         //----Start Coupon Enabler----//
         $coupon_enabler = get_post_meta($this->post_id, '_wpfnl_checkout_coupon', true);
-        if ( $coupon_enabler != 'yes' ) {
+        if ( 'no' === $coupon_enabler ) {
             remove_action('woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10);
         }
         //----End Coupon Enabler----//

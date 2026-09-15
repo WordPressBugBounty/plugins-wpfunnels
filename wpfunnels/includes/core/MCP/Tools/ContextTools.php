@@ -102,13 +102,13 @@ class ContextTools {
 			],
 			'wpfunnels/update-global-settings' => [
 				'label'               => __( 'Update Global Settings', 'wpfnl' ),
-				'description'         => 'Update WPFunnels\' site-wide settings (default page builder, order bump enable, A/B testing enable, default funnel type, funnel builder mode, and similar toggles from Settings → General). Only recognized keys are written; unknown keys are ignored. This is a merge, not a full replace — existing settings not mentioned are left alone.',
+				'description'         => 'Update WPFunnels\' site-wide settings (default page builder, order bump enable, A/B testing enable, funnel builder mode, and similar toggles from Settings → General). Only recognized keys are written; unknown keys are ignored. This is a merge, not a full replace — existing settings not mentioned are left alone.',
 				'input_schema'        => [
 					'type'       => 'object',
 					'properties' => [
 						'settings' => [
 							'type'        => 'object',
-							'description' => 'Key/value pairs matching the keys returned by get-funnel-context\'s settings section (e.g. builder, order_bump, ab_testing, funnel_type, funnel_builder_mode).',
+							'description' => 'Key/value pairs matching the keys returned by get-funnel-context\'s settings section (e.g. builder, order_bump, ab_testing, funnel_builder_mode).',
 						],
 					],
 					'required'   => [ 'settings' ],
@@ -238,7 +238,6 @@ class ContextTools {
 			],
 			'funnels'      => $counts,
 			'settings'     => [
-				'default_funnel_type' => isset( $general['funnel_type'] ) ? $general['funnel_type'] : '',
 				'permalink_base'      => isset( $general['permalink'] ) ? $general['permalink'] : '',
 				'funnel_builder_mode' => isset( $general['funnel_builder_mode'] ) ? $general['funnel_builder_mode'] : 'horizontal',
 			],

@@ -645,6 +645,14 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 			return $quantity;
 		}
 
+		// When Pro is active, its own `woocommerce_checkout_cart_item_quantity` filter
+		// (registered unconditionally) already builds the current quantity selector markup.
+		// Rebuilding it here with this legacy markup would overwrite/corrupt that output
+		// whenever this filter gets dynamically added during the order bump accept flow.
+		if ( Wpfnl_functions::is_wpfnl_pro_activated() ) {
+			return $quantity;
+		}
+
 		$isQuantity = get_post_meta($step_id, '_wpfnl_quantity_support',true);
 		$order_bump_product = get_post_meta($step_id,'order-bump-settings',true);
 		$quantityLimit 	=  get_post_meta($step_id, '_wpfnl_quantity_limit', true);

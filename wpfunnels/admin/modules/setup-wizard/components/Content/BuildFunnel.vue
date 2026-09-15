@@ -960,11 +960,10 @@ export default {
 			this.funnelStatusMessage = 'Creating your funnel...';
 
 			try {
-				const funnelType = 'sales';
 				const templateType = 'wc';
 
 				// Update general settings
-				await this.updateGeneralSettings(funnelType);
+				await this.updateGeneralSettings();
 
 				// Create funnel
 				this.funnelStatusMessage = 'Creating funnel structure...';
@@ -1006,10 +1005,9 @@ export default {
 			}
 		},
 
-		updateGeneralSettings(funnelType) {
+		updateGeneralSettings() {
 			return new Promise((resolve, reject) => {
 				wpAjaxHelperRequest('update-general-settings', {
-					funnel_type: funnelType,
 					builder: this.builder || 'gutenberg'
 				})
 				.success(() => resolve())

@@ -400,62 +400,6 @@
   border-left: 3px solid #FFB802;
   display: block;
 }
-.wpfnl .wpfnl-canvas-helper {
-  display: flex;
-  flex-flow: row;
-  align-items: center;
-  position: absolute;
-  bottom: 24px;
-  right: 24px;
-  z-index: 2;
-}
-.wpfnl .wpfnl-canvas-helper .helper-btn {
-  background: #FFFFFF;
-  box-shadow: 0px 1px 2px rgba(190, 190, 215, 0.16);
-  border-radius: 100px;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-}
-.wpfnl .wpfnl-canvas-helper .help-resource {
-  position: absolute;
-  right: 0;
-  bottom: calc(100% + 12px);
-  background: #fff;
-  border-radius: 5px;
-  padding: 8px;
-  width: 170px;
-  border: 1px solid #EDECF2;
-  box-shadow: 0px 20px 20px rgba(190, 190, 215, 0.08);
-}
-.wpfnl .wpfnl-canvas-helper .help-resource:before {
-  content: "";
-  position: absolute;
-  bottom: -7px;
-  right: 15px;
-  width: 9px;
-  height: 9px;
-  background: #fff;
-  transform: rotate(45deg);
-  border-right: 1px solid #e7e7e7;
-  border-bottom: 1px solid #e7e7e7;
-}
-.wpfnl .wpfnl-canvas-helper .help-resource a {
-  font-size: 13px;
-  display: block;
-  color: #363B4E;
-  line-height: 1.2;
-  padding: 7px 10px 6px;
-  font-weight: 500;
-  border-radius: 5px;
-}
-.wpfnl .wpfnl-canvas-helper .help-resource a:hover {
-  background: #f6f5fa;
-}
 
 .wpfnl-switcher {
   position: relative;
@@ -2420,25 +2364,6 @@ body.folded .dashboard-nav__content .import-funnel-modal {
   line-height: 16px;
   color: #363B4E;
 }
-.wpfnl-dashboard__inner-content.no-funnel .wpfnl-canvas-helper {
-  position: relative;
-  bottom: 0;
-  right: 0;
-  z-index: 0;
-}
-.wpfnl-dashboard__inner-content.no-funnel .wpfnl-canvas-helper .helper-btn {
-  width: 45px;
-  height: 45px;
-}
-.wpfnl-dashboard__inner-content.no-funnel .wpfnl-canvas-helper .help-resource {
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-}
-.wpfnl-dashboard__inner-content.no-funnel .wpfnl-canvas-helper.show-helpers .help-resource {
-  opacity: 1;
-  visibility: visible;
-}
 
 @media only screen and (min-width: 1921px) {
   .wpfnl-dashboard {
@@ -3855,6 +3780,7 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   background-position-x: calc(100% - 15px);
   background-position-y: 13px;
   background-size: 12px 12px;
+  padding-top: 0px;
 }
 .template-library-modal .funnel-templates-header .funnel-global-import {
   min-width: 152px;
@@ -6029,65 +5955,6 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
   border: none;
   width: 30px;
   text-align: center;
-}
-.funnel-window .wpfnl-canvas-helper {
-  display: flex;
-  flex-flow: row;
-  align-items: center;
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  z-index: 2;
-}
-.funnel-window .wpfnl-canvas-helper .helper-btn {
-  background: #FFFFFF;
-  box-shadow: 0px 1px 2px rgba(190, 190, 215, 0.16);
-  border-radius: 100px;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-}
-.funnel-window .wpfnl-canvas-helper .help-resource {
-  position: absolute;
-  right: 0;
-  bottom: calc(100% + 12px);
-  background: #fff;
-  border: 1px solid #EDECF2;
-  border-radius: 5px;
-  padding: 8px;
-  width: 170px;
-  display: none;
-}
-.funnel-window .wpfnl-canvas-helper .help-resource:before {
-  content: "";
-  position: absolute;
-  bottom: -7px;
-  right: 15px;
-  width: 9px;
-  height: 9px;
-  background: #fff;
-  transform: rotate(45deg);
-  border-right: 1px solid #e7e7e7;
-  border-bottom: 1px solid #e7e7e7;
-}
-.funnel-window .wpfnl-canvas-helper .help-resource a {
-  font-size: 13px;
-  display: block;
-  color: #363B4E;
-  line-height: 1.2;
-  padding: 7px 10px 6px;
-  font-weight: 500;
-  border-radius: 5px;
-}
-.funnel-window .wpfnl-canvas-helper .help-resource a:hover {
-  background: #f1f1f1;
-}
-.funnel-window .wpfnl-canvas-helper.show-helpers .help-resource {
-  display: block;
 }
 
 .wpfnl-box {
@@ -21938,10 +21805,11 @@ body.toplevel_page_wpfunnels .wpfnl-admin-views-wrapper .wpfnl-admin-dashboard .
 .wpfnl .wpfnl-btn.view-analytics-stat .wpfnl-switcher label::after {
   width: 12px;
   height: 12px;
-  top: 2px;
+  top: 3px;
 }
 .wpfnl .wpfnl-btn.view-analytics-stat .wpfnl-switcher input[type=checkbox]:checked + label::after {
-  left: -14px;
+  left: 3px;
+  margin-left: 12px;
 }
 .wpfnl .automation-step-name .step-stats {
   position: relative;
@@ -23680,18 +23548,6 @@ body.rtl .steps-page__header-right .dropdown-option ul.wpfnl-dropdown a svg {
 body.rtl .funnel-window .wpfnl-canvas-zoom-control {
   left: inherit;
   right: 20px;
-}
-body.rtl .funnel-window .wpfnl-canvas-helper {
-  right: inherit;
-  left: 20px;
-}
-body.rtl .funnel-window .wpfnl-canvas-helper .help-resource {
-  right: inherit;
-  left: 0;
-}
-body.rtl .funnel-window .wpfnl-canvas-helper .help-resource:before {
-  bottom: -7px;
-  right: inherit;
 }
 body.rtl .wpfnl-drawing-window .drawflow .drawflow-node .inputs .input {
   left: -20px;

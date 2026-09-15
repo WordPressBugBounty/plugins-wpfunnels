@@ -82,15 +82,16 @@ if( $type === 'lms' ){
             <?php 
                 $isVariable = !empty($settings['isVariable']) ? $settings['isVariable'] : false; 
             ?>
-            <input type="checkbox" id="wpfnl-order-bump-cb-<?php echo $key ?>" data-quantity="<?php echo $settings['quantity']; ?>"
+            <input type="checkbox" id="wpfnl-order-bump-cb-<?php echo $key . ( $this->render_instance ? '-' . $this->render_instance : '' ); ?>" data-quantity="<?php echo $settings['quantity']; ?>"
                    data-step="<?php echo get_the_ID(); ?>" class="wpfnl-order-bump-cb" name="wpfnl-order-bump-cb-<?php echo $key ?>"
                    data-key="<?php echo $key; ?>"
                    data-is-variable="<?php echo $isVariable ? 'true' : 'false'; ?>"
                    data-lms="<?php echo $type; ?>"
                    data-replace="<?php echo $settings['isReplace']; ?>"
+                   <?php checked( $this->is_order_bump_in_cart( $settings['product'] ) ); ?>
                    value="<?php echo $settings['product'] ?>">
 
-            <label for="wpfnl-order-bump-cb-<?php echo $key ?>" style="color: <?php echo $ob_checkbox_title_color ?>" ><?php echo $settings['checkBoxLabel'] ?></label>
+            <label for="wpfnl-order-bump-cb-<?php echo $key . ( $this->render_instance ? '-' . $this->render_instance : '' ); ?>" style="color: <?php echo $ob_checkbox_title_color ?>" ><?php echo $settings['checkBoxLabel'] ?></label>
         </span>
 
         <span class="product-price" id="wpfnl-order-bump-price-<?php echo $key; ?>" style="--priceColor2: <?php echo $orderbump_priceColor ?> ">

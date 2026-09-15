@@ -9,7 +9,7 @@
 $pro_url = add_query_arg('wpfnl-dashboard', '1', GETWPFUNNEL_PRICING_URL);
 
 ?>
-<div class="wpfnl">
+<div class="wpfnl wpfnl-settings-page">
 
     <div class="wpfnl-dashboard">
         <nav class="wpfnl-dashboard__nav">
@@ -20,251 +20,281 @@ $pro_url = add_query_arg('wpfnl-dashboard', '1', GETWPFUNNEL_PRICING_URL);
             <div id="templates-library"></div>
             <?php do_action('wpfunnels_before_settings'); ?>
             <div class="wpfnl-funnel-settings__inner-content">
-                <h2 class="settings-heading"><?php esc_html_e('Settings', 'wpfnl'); ?></h2>
 
                 <div class="wpfnl-funnel-settings__wrapper">
                     <nav class="wpfn-settings__nav">
-                        <ul>
-                            <li class="nav-li active" data-id="general-settings">
-                                <?php include WPFNL_DIR . '/admin/partials/icons/settings-icon-2x.php'; ?>
-                                <span><?php esc_html_e('General', 'wpfnl'); ?></span>
-                            </li>
+                        <div class="wpfn-settings__nav-group">
+                            <span class="wpfn-settings__nav-group-label"><?php esc_html_e('General', 'wpfnl'); ?></span>
+                            <ul>
+                                <li class="nav-li active" data-id="general-settings">
+                                    <?php include WPFNL_DIR . '/admin/partials/icons/settings-icon-2x.php'; ?>
+                                    <span><?php esc_html_e('General', 'wpfnl'); ?></span>
+                                </li>
 
-                            <li class="nav-li" data-id="permalink-settings">
-                            <svg width="18" height="18" fill="none" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><g fill="#7A8B9A" stroke="#FAF9FF" stroke-width=".3" clip-path="url(#clip0_1920_6521)"><path d="M3.956 6.544A.975.975 0 015.402 7.85l-.067.074L3.18 10.08a3.534 3.534 0 00-1.06 2.1v.002a3.333 3.333 0 001.131 2.883l.003.003a3.444 3.444 0 004.66-.272l2.146-2.147a.976.976 0 011.38 1.379l-2.256 2.256A5.294 5.294 0 01.172 12.06a5.571 5.571 0 011.67-3.401l.003-.002 2.111-2.113zM8.69 1.81a5.42 5.42 0 017.09-.592v.001a5.298 5.298 0 01.525 7.941l-2.257 2.258a.976.976 0 01-1.38-1.38l2.258-2.256a3.345 3.345 0 00-.248-4.947l-.004-.003-.131-.097a3.438 3.438 0 00-4.442.424L7.943 5.314a.975.975 0 01-1.379-1.379l2.124-2.124.001-.002z"/><path d="M10.06 6.544a.975.975 0 011.38 1.38l-3.497 3.495a.975.975 0 11-1.379-1.379l3.496-3.496z"/></g><defs><clipPath id="clip0_1920_6521"><path fill="#fff" d="M0 0h18v18H0z"/></clipPath></defs></svg>
+                                <li class="nav-li" data-id="permalink-settings">
+                                <svg width="18" height="18" fill="none" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><g fill="#7A8B9A" stroke="#FAF9FF" stroke-width=".3" clip-path="url(#clip0_1920_6521)"><path d="M3.956 6.544A.975.975 0 015.402 7.85l-.067.074L3.18 10.08a3.534 3.534 0 00-1.06 2.1v.002a3.333 3.333 0 001.131 2.883l.003.003a3.444 3.444 0 004.66-.272l2.146-2.147a.976.976 0 011.38 1.379l-2.256 2.256A5.294 5.294 0 01.172 12.06a5.571 5.571 0 011.67-3.401l.003-.002 2.111-2.113zM8.69 1.81a5.42 5.42 0 017.09-.592v.001a5.298 5.298 0 01.525 7.941l-2.257 2.258a.976.976 0 01-1.38-1.38l2.258-2.256a3.345 3.345 0 00-.248-4.947l-.004-.003-.131-.097a3.438 3.438 0 00-4.442.424L7.943 5.314a.975.975 0 01-1.379-1.379l2.124-2.124.001-.002z"/><path d="M10.06 6.544a.975.975 0 011.38 1.38l-3.497 3.495a.975.975 0 11-1.379-1.379l3.496-3.496z"/></g><defs><clipPath id="clip0_1920_6521"><path fill="#fff" d="M0 0h18v18H0z"/></clipPath></defs></svg>
 
-                                <span><?php esc_html_e('Permalink', 'wpfnl'); ?></span>
-                            </li>
+                                    <span><?php esc_html_e('Permalink', 'wpfnl'); ?></span>
+                                </li>
 
-                            <li class="nav-li" data-id="optin-settings">
-                                <svg width="20" height="16" fill="none" viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg"><path fill="#7A8B9A" fill-rule="evenodd" stroke="#7A8B9A" stroke-width=".2" d="M17.852 11.007c0 1.59-1.334 2.881-2.973 2.881H5.12c-1.639 0-2.973-1.291-2.973-2.88V4.992c0-.53.15-1.03.41-1.457l4.76 4.612A3.825 3.825 0 0010 9.221a3.823 3.823 0 002.68-1.074l4.761-4.612c.26.428.41.926.41 1.457v6.014h0zM14.88 2.112H5.12c-.676 0-1.301.222-1.801.59l4.809 4.661A2.68 2.68 0 0010 8.11c.708 0 1.373-.266 1.87-.747l4.809-4.66a3.026 3.026 0 00-1.801-.591zm0-1.112H5.12C2.85 1 1 2.792 1 4.993v6.014C1 13.21 2.85 15 5.122 15h9.757C17.15 15 19 13.21 19 11.007V4.993C19 2.792 17.15 1 14.879 1z" clip-rule="evenodd"/></svg>
-                                <span><?php esc_html_e('Opt-in Settings', 'wpfnl'); ?></span>
-                            </li>
+                                <li class="nav-li" data-id="optin-settings">
+                                    <svg width="20" height="16" fill="none" viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg"><path fill="#7A8B9A" fill-rule="evenodd" stroke="#7A8B9A" stroke-width=".2" d="M17.852 11.007c0 1.59-1.334 2.881-2.973 2.881H5.12c-1.639 0-2.973-1.291-2.973-2.88V4.992c0-.53.15-1.03.41-1.457l4.76 4.612A3.825 3.825 0 0010 9.221a3.823 3.823 0 002.68-1.074l4.761-4.612c.26.428.41.926.41 1.457v6.014h0zM14.88 2.112H5.12c-.676 0-1.301.222-1.801.59l4.809 4.661A2.68 2.68 0 0010 8.11c.708 0 1.373-.266 1.87-.747l4.809-4.66a3.026 3.026 0 00-1.801-.591zm0-1.112H5.12C2.85 1 1 2.792 1 4.993v6.014C1 13.21 2.85 15 5.122 15h9.757C17.15 15 19 13.21 19 11.007V4.993C19 2.792 17.15 1 14.879 1z" clip-rule="evenodd"/></svg>
+                                    <span><?php esc_html_e('Opt-in Settings', 'wpfnl'); ?></span>
+                                </li>
 
-                            <?php if (\WPFunnels\Wpfnl_functions::is_lms_addon_active()) { ?>
-                            <li class="nav-li" data-id="lms-settings">
-                                <svg width="20" height="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill="#7A8B9A" d="M10 2L2 7v6c0 4.97 3.5 9 8 10 4.5-1 8-5.03 8-10V7l-8-5zm0 2.18l5.5 3.3V13c0 3.5-2.45 6.58-5.5 7.71-3.05-1.13-5.5-4.21-5.5-7.71V7.48l5.5-3.3zm-1.5 5.32v5h2v-5h-2zm-1-3v2h4V6.5h-4z"/></svg>
-                                <span><?php esc_html_e('LMS Settings', 'wpfnl'); ?></span>
-                            </li>
-                            <?php } ?>
+                                <?php if (\WPFunnels\Wpfnl_functions::is_wc_active()) { ?>
+                                    <li class="nav-li" data-id="offer-settings" >
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="3" y="8" width="18" height="4" rx="1" stroke="#7A8B9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M12 8V21" stroke="#7A8B9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M19 12V19C19 20.1046 18.1046 21 17 21H7C5.89543 21 5 20.1046 5 19V12" stroke="#7A8B9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M7.5 7.99994C6.11929 7.99994 5 6.88065 5 5.49994C5 4.11923 6.11929 2.99994 7.5 2.99994C9.474 2.96594 11.26 4.94894 12 7.99994C12.74 4.94894 14.526 2.96594 16.5 2.99994C17.8807 2.99994 19 4.11923 19 5.49994C19 6.88065 17.8807 7.99994 16.5 7.99994" stroke="#7A8B9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
 
-                            <?php if (\WPFunnels\Wpfnl_functions::is_wc_active() && 'lead' !== $global_funnel_type) { ?>
-                                <li class="nav-li" data-id="offer-settings" >
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <rect x="3" y="8" width="18" height="4" rx="1" stroke="#7A8B9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                        <path d="M12 8V21" stroke="#7A8B9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                        <path d="M19 12V19C19 20.1046 18.1046 21 17 21H7C5.89543 21 5 20.1046 5 19V12" stroke="#7A8B9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                        <path d="M7.5 7.99994C6.11929 7.99994 5 6.88065 5 5.49994C5 4.11923 6.11929 2.99994 7.5 2.99994C9.474 2.96594 11.26 4.94894 12 7.99994C12.74 4.94894 14.526 2.96594 16.5 2.99994C17.8807 2.99994 19 4.11923 19 5.49994C19 6.88065 17.8807 7.99994 16.5 7.99994" stroke="#7A8B9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        <span><?php esc_html_e('Offer Settings', 'wpfnl'); ?></span>
+                                    </li>
+                                <?php } ?>
+                            </ul>
+                        </div>
+
+                        <div class="wpfn-settings__nav-group">
+                            <span class="wpfn-settings__nav-group-label"><?php esc_html_e('Integrations', 'wpfnl'); ?></span>
+                            <ul>
+                                <li class="nav-li" data-id="event-tracking-setting">
+                                    <?php require WPFNL_DIR . '/admin/partials/icons/event-tracking-icon.php'; ?>
+                                    <span><?php esc_html_e('Events & Other Integrations', 'wpfnl'); ?></span>
+                                </li>
+
+                                <?php if (\WPFunnels\Wpfnl_functions::is_lms_addon_active()) { ?>
+                                <li class="nav-li" data-id="lms-settings">
+                                    <svg width="20" height="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill="#7A8B9A" d="M10 2L2 7v6c0 4.97 3.5 9 8 10 4.5-1 8-5.03 8-10V7l-8-5zm0 2.18l5.5 3.3V13c0 3.5-2.45 6.58-5.5 7.71-3.05-1.13-5.5-4.21-5.5-7.71V7.48l5.5-3.3zm-1.5 5.32v5h2v-5h-2zm-1-3v2h4V6.5h-4z"/></svg>
+                                    <span><?php esc_html_e('LMS Settings', 'wpfnl'); ?></span>
+                                </li>
+                                <?php } ?>
+                            </ul>
+                        </div>
+
+                        <div class="wpfn-settings__nav-group">
+                            <span class="wpfn-settings__nav-group-label"><?php esc_html_e('AI & Automation', 'wpfnl'); ?></span>
+                            <ul>
+                                <li class="nav-li" data-id="ai-assistant-settings" data-save="false">
+                                    <svg width="20" height="20" viewBox="0 0 21 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="m2.7627 16.096c-1.0955-1.4027-1.7749-3.085-1.9608-4.8551-0.18583-1.77 0.12939-3.5567 0.90974-5.1564 0.78034-1.5996 1.9944-2.9478 3.5038-3.8909 1.5094-0.94309 3.2534-1.4431 5.0332-1.4431 1.7798 0 3.5238 0.50005 5.0332 1.4431 1.5094 0.9431 2.7235 2.2913 3.5038 3.8909s1.0956 3.3863 0.9097 5.1564c-0.1858 1.7701-0.8652 3.4524-1.9607 4.8551" stroke="#7A8B9A" stroke-linecap="round" stroke-width="1.5"/>
+                                        <path d="m4.6016 16.096v-4.3078c0-3.9364 1.8826-5.9046 5.6478-5.9046 3.7653 0 5.6479 1.9682 5.6479 5.9046v4.3078" stroke="#7A8B9A" stroke-linecap="round" stroke-width="1.5"/>
+                                        <path class="wpfnl-ai-nav-icon-eye" d="m7.6806 12.506c0.53877 0 0.97554-0.4368 0.97554-0.9755 0-0.5388-0.43677-0.9756-0.97554-0.9756-0.53878 0-0.97554 0.4368-0.97554 0.9756 0 0.5387 0.43676 0.9755 0.97554 0.9755z" fill="#7A8B9A"/>
+                                        <path class="wpfnl-ai-nav-icon-eye" d="m12.815 12.506c0.5388 0 0.9755-0.4368 0.9755-0.9755 0-0.5388-0.4367-0.9756-0.9755-0.9756s-0.9756 0.4368-0.9756 0.9756c0 0.5387 0.4368 0.9755 0.9756 0.9755z" fill="#7A8B9A"/>
                                     </svg>
-
-                                    <span><?php esc_html_e('Offer Settings', 'wpfnl'); ?></span>
+                                    <span><?php esc_html_e('AI Assistant', 'wpfnl'); ?></span>
                                 </li>
-                            <?php } ?>
 
-                            <li class="nav-li" data-id="event-tracking-setting">
-                                <?php require WPFNL_DIR . '/admin/partials/icons/event-tracking-icon.php'; ?>
-                                <span><?php esc_html_e('Events & Other Integrations', 'wpfnl'); ?></span>
-                            </li>
-
-                            <li class="nav-li" data-id="notifications-settings">
-                                <?php require WPFNL_DIR . '/admin/partials/icons/notification-icon.php'; ?>
-                                <span><?php esc_html_e('Notifications', 'wpfnl'); ?></span>
-                            </li>
-
-                            <li class="nav-li" data-id="advance-settings">
-                                <?php require WPFNL_DIR . '/admin/partials/icons/advanced-settings.php'; ?>
-                                <span><?php esc_html_e('Advanced Settings', 'wpfnl'); ?></span>
-                            </li>
-                            <?php if (current_user_can('manage_options') ) { ?>
-                                <li class="nav-li" data-id="user-role-manager">
-                                    <?php require WPFNL_DIR . '/admin/partials/icons/role-management-menu-icon.php'; ?>
-                                    <span><?php esc_html_e('Role Management', 'wpfnl'); ?></span>
+                                <li class="nav-li" data-id="mcp-settings" data-save="false">
+                                    <svg width="20" height="20" viewBox="0 0 22 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9.32781 2.31781L10.6625 9.61166L17.9564 10.9464L10.6625 12.2811L9.32781 19.575L7.99307 12.2811L0.699219 10.9464L7.99307 9.61166L9.32781 2.31781Z" stroke="#7A8B9A" stroke-width="1.4" stroke-linejoin="round"/>
+                                        <path d="M16.8785 0.700012L17.4504 3.90311L20.6535 4.47502L17.4504 5.04693L16.8785 8.25003L16.3066 5.04693L13.1035 4.47502L16.3066 3.90311L16.8785 0.700012Z" stroke="#7A8B9A" stroke-width="1.4" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span><?php esc_html_e('MCP for AI Agents', 'wpfnl'); ?></span>
                                 </li>
-                            <?php } ?>
+                            </ul>
+                        </div>
 
-                            <!-- <//?php if (\WPFunnels\Wpfnl_functions::maybe_logger_enabled()) { ?> -->
-                            <?php { ?>
-                                <li class="nav-li" data-id="log-settings">
-                                    <?php require WPFNL_DIR . '/admin/partials/icons/log-settings.php'; ?>
-                                    <span><?php esc_html_e('Logs', 'wpfnl'); ?></span>
+                        <div class="wpfn-settings__nav-group">
+                            <span class="wpfn-settings__nav-group-label"><?php esc_html_e('Tools & Utilities', 'wpfnl'); ?></span>
+                            <ul>
+                                <li class="nav-li" data-id="notifications-settings">
+                                    <?php require WPFNL_DIR . '/admin/partials/icons/notification-icon.php'; ?>
+                                    <span><?php esc_html_e('Notifications', 'wpfnl'); ?></span>
                                 </li>
-                            <?php } ?>
 
-                            <li class="nav-li" data-id="mcp-settings">
-                                <svg width="20" height="20" viewBox="0 0 22 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9.32781 2.31781L10.6625 9.61166L17.9564 10.9464L10.6625 12.2811L9.32781 19.575L7.99307 12.2811L0.699219 10.9464L7.99307 9.61166L9.32781 2.31781Z" stroke="#7A8B9A" stroke-width="1.4" stroke-linejoin="round"/>
-                                    <path d="M16.8785 0.700012L17.4504 3.90311L20.6535 4.47502L17.4504 5.04693L16.8785 8.25003L16.3066 5.04693L13.1035 4.47502L16.3066 3.90311L16.8785 0.700012Z" stroke="#7A8B9A" stroke-width="1.4" stroke-linejoin="round"/>
-                                </svg>
-                                <span><?php esc_html_e('MCP for AI Agents', 'wpfnl'); ?></span>
-                            </li>
+                                <li class="nav-li" data-id="advance-settings">
+                                    <?php require WPFNL_DIR . '/admin/partials/icons/advanced-settings.php'; ?>
+                                    <span><?php esc_html_e('Advanced', 'wpfnl'); ?></span>
+                                </li>
 
-                            <li class="nav-li" data-id="ai-assistant-settings">
-                                <svg width="20" height="20" viewBox="0 0 21 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="m2.7627 16.096c-1.0955-1.4027-1.7749-3.085-1.9608-4.8551-0.18583-1.77 0.12939-3.5567 0.90974-5.1564 0.78034-1.5996 1.9944-2.9478 3.5038-3.8909 1.5094-0.94309 3.2534-1.4431 5.0332-1.4431 1.7798 0 3.5238 0.50005 5.0332 1.4431 1.5094 0.9431 2.7235 2.2913 3.5038 3.8909s1.0956 3.3863 0.9097 5.1564c-0.1858 1.7701-0.8652 3.4524-1.9607 4.8551" stroke="#7A8B9A" stroke-linecap="round" stroke-width="1.5"/>
-                                    <path d="m4.6016 16.096v-4.3078c0-3.9364 1.8826-5.9046 5.6478-5.9046 3.7653 0 5.6479 1.9682 5.6479 5.9046v4.3078" stroke="#7A8B9A" stroke-linecap="round" stroke-width="1.5"/>
-                                    <path class="wpfnl-ai-nav-icon-eye" d="m7.6806 12.506c0.53877 0 0.97554-0.4368 0.97554-0.9755 0-0.5388-0.43677-0.9756-0.97554-0.9756-0.53878 0-0.97554 0.4368-0.97554 0.9756 0 0.5387 0.43676 0.9755 0.97554 0.9755z" fill="#7A8B9A"/>
-                                    <path class="wpfnl-ai-nav-icon-eye" d="m12.815 12.506c0.5388 0 0.9755-0.4368 0.9755-0.9755 0-0.5388-0.4367-0.9756-0.9755-0.9756s-0.9756 0.4368-0.9756 0.9756c0 0.5387 0.4368 0.9755 0.9756 0.9755z" fill="#7A8B9A"/>
-                                </svg>
-                                <span><?php esc_html_e('AI Assistant', 'wpfnl'); ?></span>
-                            </li>
-                        </ul>
+                                <li class="nav-li" data-id="rollback-settings" data-save="false">
+                                    <?php require WPFNL_DIR . '/admin/partials/icons/rollback-settings-menu-icon.php'; ?>
+                                    <span><?php esc_html_e('Rollback Settings', 'wpfnl'); ?></span>
+                                </li>
+
+                                <?php if (current_user_can('manage_options') ) { ?>
+                                    <li class="nav-li" data-id="user-role-manager">
+                                        <?php require WPFNL_DIR . '/admin/partials/icons/role-management-menu-icon.php'; ?>
+                                        <span><?php esc_html_e('Role Management', 'wpfnl'); ?></span>
+                                    </li>
+                                <?php } ?>
+
+
+                                <!-- <//?php if (\WPFunnels\Wpfnl_functions::maybe_logger_enabled()) { ?> -->
+                                <?php { ?>
+                                    <li class="nav-li" data-id="log-settings">
+                                        <?php require WPFNL_DIR . '/admin/partials/icons/log-settings.php'; ?>
+                                        <span><?php esc_html_e('Logs', 'wpfnl'); ?></span>
+                                    </li>
+                                <?php } ?>
+                            </ul>
+                        </div>
                     </nav>
 
-                    <div class="wpfnl-funnel__single-settings general" id="general-settings">
-                        <h4 class="settings-title"><?php esc_html_e('General', 'wpfnl'); ?></h4>
-                        <?php do_action('wpfunnels_before_general_settings'); ?>
-                        <?php require WPFNL_DIR . '/admin/modules/settings/views/general-settings.php'; ?>
-                        <?php do_action('wpfunnels_after_general_settings'); ?>
-                    </div>
-                    <!-- /General Settings -->
+                    <div class="wpfn-settings__content">
+                        <header class="wpfn-settings__header">
+                            <h2 class="wpfn-settings__header-title">
+                                <span class="wpfn-settings__header-icon"></span>
+                                <span class="wpfn-settings__header-text"><?php esc_html_e('General', 'wpfnl'); ?></span>
+                            </h2>
 
-                    <div class="wpfnl-funnel__single-settings offer" id="offer-settings">
-                        <?php do_action('wpfunnels_before_offer_settings'); ?>
-                        <h4 class="settings-title"><?php esc_html_e('Offer Settings', 'wpfnl'); ?></h4>
-                        <?php require WPFNL_DIR . '/admin/modules/settings/views/offer-settings.php'; ?>
-                        <?php do_action('wpfunnels_after_offer_settings'); ?>
+                            <div class="wpfn-settings__header-actions">
+                                <span class="wpfnl-alert box"></span>
+                                <button class="btn-default update" id="wpfnl-update-global-settings">
+                                    <?php esc_html_e('Save changes', 'wpfnl'); ?>
+                                    <span class="wpfnl-loader"></span>
+                                </button>
+                            </div>
+                        </header>
 
-                        <?php if(!$is_pro_activated){ ?>
-                            <div class="upgrade-to-pro-hoverlay">
-                                <a
-                                    class="btn-default"
-                                    target="_blank"
-                                    href="<?php echo $pro_url;?>"
-                                    title="<?php esc_html_e('Click to Upgrade Pro', 'wpfnl'); ?>"
-                                >
-                                    <?php
-                                        require WPFNL_DIR . '/admin/partials/icons/pro-icon.php';
-                                    ?>
-                                    Upgrade To Pro Now
-                                </a>
+                        <div class="wpfn-settings__panels">
+
+                        <div class="wpfnl-funnel__single-settings general" id="general-settings">
+                            <h4 class="settings-title wpfnl-panel-title"><?php esc_html_e('General', 'wpfnl'); ?></h4>
+                            <?php do_action('wpfunnels_before_general_settings'); ?>
+                            <?php require WPFNL_DIR . '/admin/modules/settings/views/general-settings.php'; ?>
+                            <?php do_action('wpfunnels_after_general_settings'); ?>
+                        </div>
+                        <!-- /General Settings -->
+
+                        <div class="wpfnl-funnel__single-settings offer" id="offer-settings">
+                            <?php do_action('wpfunnels_before_offer_settings'); ?>
+                            <h4 class="settings-title wpfnl-panel-title"><?php esc_html_e('Offer Settings', 'wpfnl'); ?></h4>
+                            <?php require WPFNL_DIR . '/admin/modules/settings/views/offer-settings.php'; ?>
+                            <?php do_action('wpfunnels_after_offer_settings'); ?>
+                        </div>
+                        <!-- /Offer Settings -->
+
+                        <div class="wpfnl-funnel__single-settings permalink" id="permalink-settings">
+                            <?php do_action('wpfunnels_before_permalink_settings'); ?>
+                            <h4 class="settings-title wpfnl-panel-title"><?php esc_html_e('Permalink', 'wpfnl'); ?></h4>
+                            <?php require WPFNL_DIR . '/admin/modules/settings/views/permalink-settings.php'; ?>
+                            <?php do_action('wpfunnels_after_permalink_settings'); ?>
+                        </div>
+
+                        <div class="wpfnl-funnel__single-settings optin" id="optin-settings">
+                            <?php do_action('wpfunnels_before_optin_settings'); ?>
+                            <div class="email-settings">
+                                <h4 class="settings-title wpfnl-panel-title"><?php esc_html_e('Opt-in Settings', 'wpfnl'); ?></h4>
+                                <?php require WPFNL_DIR . '/admin/modules/settings/views/optin-settings.php'; ?>
+                            </div>
+                            <?php do_action('wpfunnels_after_optin_settings'); ?>
+                        </div>
+
+                        <!-- LMS Settings -->
+                        <?php if (\WPFunnels\Wpfnl_functions::is_lms_addon_active()) { ?>
+                            <div class="wpfnl-funnel__single-settings lms-settings" id="lms-settings">
+                                <?php do_action('wpfunnels_before_lms_settings'); ?>
+
+                                <h4 class="settings-title wpfnl-panel-title"><?php esc_html_e('LMS Settings', 'wpfnl'); ?></h4>
+
+                                <?php require WPFNL_DIR . '/admin/modules/settings/views/lms-settings.php'; ?>
+
+                                <?php do_action('wpfunnels_after_lms_settings'); ?>
                             </div>
                         <?php } ?>
-                    </div>
-                    <!-- /Offer Settings -->
+                        <!-- /LMS Settings -->
 
-                    <div class="wpfnl-funnel__single-settings permalink" id="permalink-settings">
-                        <?php do_action('wpfunnels_before_permalink_settings'); ?>
-                        <h4 class="settings-title"><?php esc_html_e('Permalink', 'wpfnl'); ?></h4>
-                        <?php require WPFNL_DIR . '/admin/modules/settings/views/permalink-settings.php'; ?>
-                        <?php do_action('wpfunnels_after_permalink_settings'); ?>
-                    </div>
+                        <!-- Event and other integration Settings -->
 
-                    <div class="wpfnl-funnel__single-settings optin" id="optin-settings">
-                        <?php do_action('wpfunnels_before_optin_settings'); ?>
-                        <div class="email-settings">
-                            <h4 class="settings-title"><?php esc_html_e('Opt-in Settings', 'wpfnl'); ?></h4>
-                            <?php require WPFNL_DIR . '/admin/modules/settings/views/optin-settings.php'; ?>
-                        </div>
-                        <?php do_action('wpfunnels_after_optin_settings'); ?>
-                    </div>
+                        <div class="wpfnl-funnel__single-settings event-tracking" id="event-tracking-setting">
+                            <h4 class="settings-title wpfnl-panel-title"><?php esc_html_e('Events & Other Integrations', 'wpfnl'); ?></h4>
+                            <?php require WPFNL_DIR . '/admin/modules/settings/views/other-integration-setting.php'; ?>
 
-                    <!-- LMS Settings -->
-                    <?php if (\WPFunnels\Wpfnl_functions::is_lms_addon_active()) { ?>
-                        <div class="wpfnl-funnel__single-settings lms-settings" id="lms-settings">
-                            <?php do_action('wpfunnels_before_lms_settings'); ?>
-
-                            <h4 class="settings-title"><?php esc_html_e('LMS Settings', 'wpfnl'); ?></h4>
-
-                            <?php require WPFNL_DIR . '/admin/modules/settings/views/lms-settings.php'; ?>
-
-                            <?php do_action('wpfunnels_after_lms_settings'); ?>
-                        </div>
-                    <?php } ?>
-                    <!-- /LMS Settings -->
-
-                    <!-- Event and other integration Settings -->
-
-                    <div class="wpfnl-funnel__single-settings event-tracking" id="event-tracking-setting">
-                        <h4 class="settings-title"><?php esc_html_e('Events & Other Integrations', 'wpfnl'); ?></h4>
-                        <?php require WPFNL_DIR . '/admin/modules/settings/views/other-integration-setting.php'; ?>
-
-                        <!--					<div class="google-place-api-settings">-->
-                        <!--						<h4 class="settings-title"> --><?php //esc_html_e('Google Maps API Integration', 'wpfnl'); 
-                                                                                    ?><!-- </h4>-->
-                        <!--						<div class="wpfnl-box">-->
-                        <!--							<div class="wpfnl-field-wrapper google-place-api">-->
-                        <!--								<label>--><?php //esc_html_e('Google Map API Key', 'wpfnl'); 
-                                                                        ?>
-                        <!--									<span class="wpfnl-tooltip">-->
-                        <!--										--><?php //require WPFNL_DIR . '/admin/partials/icons/question-tooltip-icon.php'; 
-                                                                        ?>
-                        <!--										<p>--><?php //esc_html_e('Connect with Google Autocomplete to allow customers to go through checkout faster. When a customer types in the Street address, Google will suggest a full address that the customer can add with one click.', 'wpfnl'); 
-                                                                            ?><!--</p>-->
-                        <!--									</span>-->
-                        <!--								</label>-->
-                        <!--								<div class="wpfnl-fields">-->
-                        <!--									<input type="password" name="wpfnl-google-map-api" id="wpfnl-google-map-api-key" value="--><?php //echo $this->google_map_api_key ; 
-                                                                                                                                                            ?><!--" />-->
-                        <!--									<div class="password-icon">-->
-                        <!--										<span class="eye-regular toggle-eye-icon">-->
-                        <!--											--><?php //require WPFNL_DIR . '/admin/partials/icons/eye-regular.php'; 
+                            <!--					<div class="google-place-api-settings">-->
+                            <!--						<h4 class="settings-title"> --><?php //esc_html_e('Google Maps API Integration', 'wpfnl'); 
+                                                                                        ?><!-- </h4>-->
+                            <!--						<div class="wpfnl-box">-->
+                            <!--							<div class="wpfnl-field-wrapper google-place-api">-->
+                            <!--								<label>--><?php //esc_html_e('Google Map API Key', 'wpfnl'); 
                                                                             ?>
-                        <!--										</span>-->
-                        <!--										<span class="eye-slash-regular toggle-eye-icon hide-eye-icon">-->
-                        <!--											--><?php //require WPFNL_DIR . '/admin/partials/icons/eye-slash-regular.php'; 
+                            <!--									<span class="wpfnl-tooltip">-->
+                            <!--										--><?php //require WPFNL_DIR . '/admin/partials/icons/question-tooltip-icon.php'; 
                                                                             ?>
-                        <!--										</span>-->
-                        <!--									</div>-->
-                        <!--								</div>-->
-                        <!--							</div>-->
-                        <!--						</div>-->
-                        <!--					</div>-->
-                    </div>
+                            <!--										<p>--><?php //esc_html_e('Connect with Google Autocomplete to allow customers to go through checkout faster. When a customer types in the Street address, Google will suggest a full address that the customer can add with one click.', 'wpfnl'); 
+                                                                                ?><!--</p>-->
+                            <!--									</span>-->
+                            <!--								</label>-->
+                            <!--								<div class="wpfnl-fields">-->
+                            <!--									<input type="password" name="wpfnl-google-map-api" id="wpfnl-google-map-api-key" value="--><?php //echo $this->google_map_api_key ; 
+                                                                                                                                                                ?><!--" />-->
+                            <!--									<div class="password-icon">-->
+                            <!--										<span class="eye-regular toggle-eye-icon">-->
+                            <!--											--><?php //require WPFNL_DIR . '/admin/partials/icons/eye-regular.php'; 
+                                                                                ?>
+                            <!--										</span>-->
+                            <!--										<span class="eye-slash-regular toggle-eye-icon hide-eye-icon">-->
+                            <!--											--><?php //require WPFNL_DIR . '/admin/partials/icons/eye-slash-regular.php'; 
+                                                                                ?>
+                            <!--										</span>-->
+                            <!--									</div>-->
+                            <!--								</div>-->
+                            <!--							</div>-->
+                            <!--						</div>-->
+                            <!--					</div>-->
+                        </div>
 
-                    <!-- Notifications Settings -->
-                    <div class="wpfnl-funnel__single-settings notifications" id="notifications-settings">
-                        <h4 class="settings-title"><?php esc_html_e('Notifications', 'wpfnl'); ?></h4>
-                        <?php require WPFNL_DIR . '/admin/modules/settings/views/notifications-settings.php'; ?>
-                    </div>
+                        <!-- Notifications Settings -->
+                        <div class="wpfnl-funnel__single-settings notifications" id="notifications-settings">
+                            <h4 class="settings-title wpfnl-panel-title"><?php esc_html_e('Notifications', 'wpfnl'); ?></h4>
+                            <?php require WPFNL_DIR . '/admin/modules/settings/views/notifications-settings.php'; ?>
+                        </div>
 
-                    <!-- Advanced setting -->
-                    <div class="wpfnl-funnel__single-settings advance-settings" id="advance-settings">
-                        <?php
-                        $rollback_versions = $this->get_roll_back_versions();
-                        ?>
-                        <h4 class="settings-title"><?php esc_html_e('Advanced Settings', 'wpfnl'); ?></h4>
-                        <?php require WPFNL_DIR . '/admin/modules/settings/views/advance-settings.php'; ?>
-                    </div>
+                        <!-- Advanced setting -->
+                        <div class="wpfnl-funnel__single-settings advance-settings" id="advance-settings">
+                            <h4 class="settings-title wpfnl-panel-title"><?php esc_html_e('Advanced', 'wpfnl'); ?></h4>
+                            <?php require WPFNL_DIR . '/admin/modules/settings/views/advance-settings.php'; ?>
+                        </div>
+                        <!-- /Advanced setting -->
+
+                        <!-- Rollback setting -->
+                        <div class="wpfnl-funnel__single-settings rollback-settings" id="rollback-settings">
+                            <?php
+                            $rollback_versions = $this->get_roll_back_versions();
+                            ?>
+                            <h4 class="settings-title wpfnl-panel-title"><?php esc_html_e('Rollback Settings', 'wpfnl'); ?></h4>
+                            <?php require WPFNL_DIR . '/admin/modules/settings/views/rollback-settings.php'; ?>
+                        </div>
+                        <!-- /Rollback setting -->
                     
-                    <!-- Role management -->
-                    <?php if (current_user_can('manage_options')) {
-                    ?>
-                        <div class="wpfnl-funnel__single-settings user-role-manager" id="user-role-manager">
-                            <h4 class="settings-title"><?php esc_html_e('Role Management', 'wpfnl'); ?></h4>
-                            <?php require WPFNL_DIR . '/admin/modules/settings/views/user-role-manager.php'; ?>
-                        </div>
-                    <?php } ?>
-
-                    <!-- MCP for AI Agents -->
-                    <div class="wpfnl-funnel__single-settings mcp" id="mcp-settings">
-                        <div id="wpfnl-mcp-settings-app"></div>
-                    </div>
-                    <!-- /MCP for AI Agents -->
-
-                    <!-- AI Assistant -->
-                    <div class="wpfnl-funnel__single-settings ai-assistant" id="ai-assistant-settings">
-                        <div id="wpfnl-ai-assistant-settings-app"></div>
-                    </div>
-                    <!-- /AI Assistant -->
-
-                    <!-- Log settings -->
-                    <div class="wpfnl-funnel__single-settings log-settings" id="log-settings">
-                        <?php
-                        $files = \Wpfnl_Logger::get_log_files();
+                        <!-- Role management -->
+                        <?php if (current_user_can('manage_options')) {
                         ?>
-                        <?php require WPFNL_DIR . '/admin/modules/settings/views/log-settings.php'; ?>
-                    </div>
+                            <div class="wpfnl-funnel__single-settings user-role-manager" id="user-role-manager">
+                                <h4 class="settings-title wpfnl-panel-title"><?php esc_html_e('Role Management', 'wpfnl'); ?></h4>
+                                <?php require WPFNL_DIR . '/admin/modules/settings/views/user-role-manager.php'; ?>
+                            </div>
+                        <?php } ?>
 
+                        <!-- MCP for AI Agents -->
+                        <div class="wpfnl-funnel__single-settings mcp" id="mcp-settings">
+                            <div id="wpfnl-mcp-settings-app"></div>
+                        </div>
+                        <!-- /MCP for AI Agents -->
+
+                        <!-- AI Assistant -->
+                        <div class="wpfnl-funnel__single-settings ai-assistant" id="ai-assistant-settings">
+                            <div id="wpfnl-ai-assistant-settings-app"></div>
+                        </div>
+                        <!-- /AI Assistant -->
+
+                        <!-- Log settings -->
+                        <div class="wpfnl-funnel__single-settings log-settings" id="log-settings">
+                            <?php
+                            $files = \Wpfnl_Logger::get_log_files();
+                            ?>
+                            <?php require WPFNL_DIR . '/admin/modules/settings/views/log-settings.php'; ?>
+                        </div>
+
+                        </div>
+                        <!-- /wpfn-settings__panels -->
+                    </div>
+                    <!-- /wpfn-settings__content -->
                 </div>
                 <!-- /funnel-settings__wrapper -->
-
-                <div class="wpfnl-funnel-settings__footer">
-                    <span class="wpfnl-alert box"></span>
-                    <button class="btn-default update" id="wpfnl-update-global-settings">
-                        <?php esc_html_e('Save', 'wpfnl'); ?>
-                        <span class="wpfnl-loader"></span>
-                    </button>
-                </div>
 
             </div>
             <!-- /funnel-settings__inner-content -->
@@ -345,7 +375,5 @@ $pro_url = add_query_arg('wpfnl-dashboard', '1', GETWPFUNNEL_PRICING_URL);
             </div>
         </div>
     </div>
-
-    <?php require_once WPFNL_DIR . '/admin/partials/helper-resource.php'; ?>
 </div>
 <!-- /.wpfnl -->

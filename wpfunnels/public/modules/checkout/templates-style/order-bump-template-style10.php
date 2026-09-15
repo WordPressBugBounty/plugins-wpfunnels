@@ -92,15 +92,16 @@ if ($type === 'lms') {
                 ?>
                 <div class="offer-checkbox" style="<?php echo $isVariable ? 'width:145px;' : ''; ?>" >
                     <span class="wpfnl-checkbox">
-                        <input type="checkbox" id="wpfnl-order-bump-cb-<?php echo $key ?>" data-quantity="<?php echo $settings['quantity']; ?>"
+                        <input type="checkbox" id="wpfnl-order-bump-cb-<?php echo $key . ( $this->render_instance ? '-' . $this->render_instance : '' ); ?>" data-quantity="<?php echo $settings['quantity']; ?>"
                             data-step="<?php echo get_the_ID(); ?>" class="wpfnl-order-bump-cb" name="wpfnl-order-bump-cb-<?php echo $key ?>"
                             data-key="<?php echo $key; ?>"
                             data-lms="<?php echo $type; ?>"
                             data-replace="<?php echo $settings['isReplace']; ?>"
                             data-is-variable="<?php echo $isVariable ? 'true' : 'false'; ?>"
+                            <?php checked( $this->is_order_bump_in_cart( $settings['product'] ) ); ?>
                             value="<?php echo $settings['product'] ?>">
 
-                        <label for="wpfnl-order-bump-cb-<?php echo $key ?>" id="wpfnl-order-bump-add-btn-<?php echo $key ?>" style="color: <?php echo $orderbump_color; ?>">Add</label>
+                        <label for="wpfnl-order-bump-cb-<?php echo $key . ( $this->render_instance ? '-' . $this->render_instance : '' ); ?>" id="wpfnl-order-bump-add-btn-<?php echo $key ?>" style="color: <?php echo $orderbump_color; ?>">Add</label>
                     </span>
                 </div>
             </div>

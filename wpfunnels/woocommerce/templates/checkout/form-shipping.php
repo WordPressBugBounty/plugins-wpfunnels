@@ -24,19 +24,13 @@ $hide_section_settings = \WPFunnels\Wpfnl_functions::get_checkout_section_headin
 
 		<?php if( !$hide_section_settings || ( isset($hide_section_settings['custom_heading']) && $hide_section_settings['custom_heading'] != '' )  ) { ?>
 			<h3>
-				<h3 id="ship-to-different-address">
-					<label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
-						<input id="ship-to-different-address-checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" <?php checked( apply_filters( 'woocommerce_ship_to_different_address_checked', 'shipping' === get_option( 'woocommerce_ship_to_destination' ) ? 1 : 0 ), 1 ); ?> type="checkbox" name="ship_to_different_address" value="1" /> <span>
-							<?php
-								if( isset($hide_section_settings['custom_heading']) && $hide_section_settings['custom_heading'] != '' ){
-									esc_html_e( $hide_section_settings['custom_heading'], 'woocommerce' );
-								}else{
-									esc_html_e( 'Ship to a different address?', 'woocommerce' );
-								}
-							?>
-						</span>
-					</label>
-				</h3>
+				<?php
+					if( isset($hide_section_settings['custom_heading']) && $hide_section_settings['custom_heading'] != '' ){
+						echo esc_html( $hide_section_settings['custom_heading'] );
+					}else{
+						esc_html_e( 'Shipping details', 'woocommerce' );
+					}
+				?>
 			</h3>
 		<?php } ?>
 
@@ -60,26 +54,14 @@ $hide_section_settings = \WPFunnels\Wpfnl_functions::get_checkout_section_headin
 
 	<?php endif; ?>
 </div>
-<div class="woocommerce-additional-fields">
-	<?php do_action( 'woocommerce_before_order_notes', $checkout ); ?>
-
-	<?php if ( apply_filters( 'woocommerce_enable_order_notes_field', 'yes' === get_option( 'woocommerce_enable_order_comments', 'yes' ) ) ) : ?>
-
-		<?php if ( ! WC()->cart->needs_shipping() || wc_ship_to_billing_address_only() ) : ?>
-			<h3>
-				<?php
-				esc_html_e( 'Additional information', 'woocommerce' );
-				?>
-			</h3>
-		<?php endif; ?>
-
-		<div class="woocommerce-additional-fields__field-wrapper">
-			<?php foreach ( $checkout->get_checkout_fields( 'order' ) as $key => $field ) : ?>
-				<?php woocommerce_form_field( $key, $field, $checkout->get_value( $key ) ); ?>
-			<?php endforeach; ?>
-		</div>
-
-	<?php endif; ?>
-
-	<?php do_action( 'woocommerce_after_order_notes', $checkout ); ?>
-</div>
+<?php
+/*
+ * The additional information (order notes) block is intentionally NOT rendered
+ * here. This template runs during `woocommerce_checkout_shipping`, which the
+ * checkout layouts fire before `woocommerce_checkout_billing` — so keeping the
+ * block here pushed the order notes above the "Use same address for billing"
+ * toggle, and skipped the block entirely on carts that need no shipping address.
+ * Module::maybe_render_additional_fields() renders it on
+ * `woocommerce_checkout_after_customer_details` instead, which is after both
+ * address forms and fires for every cart.
+ */

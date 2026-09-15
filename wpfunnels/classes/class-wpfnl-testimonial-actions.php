@@ -27,6 +27,7 @@ class Wpfnl_Testimonial_Action {
 	public function __construct() {
 		add_action( 'wpfunnels/before_checkout_form', array( $this, 'load_actions' ), 20, 1 );
 		add_action( 'wpfunnels/elementor_render_testimonial', array( $this, 'load_elementor_actions' ), 9999, 1 );
+		add_action( 'woocommerce_checkout_update_order_review', array( $this, 'load_ajax_actions' ), 5 );
 	}
 
 
@@ -46,6 +47,31 @@ class Wpfnl_Testimonial_Action {
 			if ( \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
 				return;
 			}
+		}
+
+		$this->checkout_id = (int) $checkout_id;
+		$this->config      = $this->get_config( $this->checkout_id );
+
+		$this->trigger_testimonial_actions();
+	}
+
+
+	/**
+	 * Load action hooks during the update_order_review AJAX request.
+	 *
+	 * `wpfunnels/before_checkout_form` only fires while the full checkout form is
+	 * rendered, so on an AJAX refresh nothing would be listening on
+	 * `wpfunnels/after_order_total`. The refreshed `.wpfnl-after-order-total`
+	 * fragment would then come back holding only the coupon field and replace the
+	 * rendered one, making the testimonial vanish after the first refresh.
+	 *
+	 * @return void
+	 */
+	public function load_ajax_actions() {
+		$checkout_id = Wpfnl_functions::get_checkout_id_from_post( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( ! $checkout_id ) {
+			return;
 		}
 
 		$this->checkout_id = (int) $checkout_id;

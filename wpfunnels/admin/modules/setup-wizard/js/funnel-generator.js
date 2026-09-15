@@ -51,7 +51,6 @@ export function filterStepsForImport( steps ) {
 function updateGeneralSettings( builder ) {
 	return new Promise( ( resolve, reject ) => {
 		wpAjaxHelperRequest( 'update-general-settings', {
-			funnel_type: 'sales',
 			builder: builder || 'gutenberg',
 		} )
 			.success( () => resolve() )

@@ -289,7 +289,6 @@ class SetupWizard
                 'is_cl_active'          => is_plugin_active( 'cart-lift/cart-lift.php' ) ? 'yes' : 'no',
                 'is_qb_active'          => is_plugin_active( 'qubely/qubely.php' ) ? 'yes' : 'no',
                 'is_pro_active'         => Wpfnl_functions::is_wpfnl_pro_activated() ? 'yes' : 'no',
-                'funnel_type'           => $this->get_funnel_type(),
                 'getPlugins'            => $this->get_essential_plugins(),
                 'defaultSettings'       => Wpfnl_functions::get_general_settings(),
                 'logo_url'              => WPFNL_URL .'admin/assets/images/setup-funnel-logo.png',
@@ -381,21 +380,6 @@ class SetupWizard
     }
 
 
-    /**
-     * Get funnel type
-     * 
-     * @since 2.5.3
-     */
-    private function get_funnel_type(){
-        $general_settings = get_option( '_wpfunnels_general_settings' );
-        if( isset($general_settings['funnel_type']) ){
-            if( 'woocommerce' == $general_settings['funnel_type'] ){
-                return 'sales';
-            }
-            return $general_settings['funnel_type'];
-        }
-        return 'sales';
-    }
 
 
 

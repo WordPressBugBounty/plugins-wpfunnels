@@ -48,7 +48,7 @@ class Reporting {
 		add_action( 'wpfunnels/offer_accepted', array( $this, 'update_offer_data' ), 10, 2 );
         add_filter( 'wpfunnels/funnels-overview-data', array($this, 'get_upsell_data'), 10, 3 );
         add_filter( 'wpfunnels/stat-interval-data', array($this, 'get_upsell_stat_data'), 10, 3 );
-        add_filter( 'wpfunnels/top-performing-funnels-data', array($this, 'get_conversion_data'), 10 );
+        add_filter( 'wpfunnels/top-performing-funnels-data', array($this, 'get_conversion_data'), 10, 3 );
 	}
 
 
@@ -203,17 +203,38 @@ class Reporting {
      *
      * @since 2.4.1
      */
-    public function get_conversion_data( $funnel_data ) {
+    public function get_conversion_data( $funnel_data, $start_date = null, $end_date = null ) {
         foreach ( $funnel_data as $key => $data ) {
             $funnel_id                  = $data['id'];
-            $views                      = $this->get_views($funnel_id);
-            $conversion                 = $this->get_conversion($funnel_id);
+            $views                      = $this->get_views($funnel_id, $start_date, $end_date);
+            $conversion                 = $this->get_conversion($funnel_id, $start_date, $end_date);
             $conversion_rate            = $this->get_conversion_rate( $views, $conversion );
             $funnel_data[$key]['views'] = $views;
             $funnel_data[$key]['conversion'] = $conversion;
             $funnel_data[$key]['conversion_rate'] = $conversion_rate;
         }
         return $funnel_data;
+    }
+
+
+    /**
+     * Build a date range clause for a table's date_created column.
+     *
+     * Returns an empty clause when either bound is missing, so callers keep
+     * their previous unscoped behaviour instead of returning nothing.
+     *
+     * @param string $column Fully qualified date column.
+     * @param string $start_date
+     * @param string $end_date
+     * @return array{0:string,1:array} Clause and its bind parameters.
+     *
+     * @since 3.13.0
+     */
+    private function get_date_clause( $column, $start_date, $end_date ) {
+        if ( empty( $start_date ) || empty( $end_date ) ) {
+            return array( '', array() );
+        }
+        return array( " AND $column >= %s AND $column <= %s ", array( $start_date, $end_date ) );
     }
 
 
@@ -225,11 +246,14 @@ class Reporting {
      * 
      * @since 2.4.1
      */
-    public function get_views( $funnel_id ) {
+    public function get_views( $funnel_id, $start_date = null, $end_date = null ) {
         global $wpdb;
         $table = $wpdb->prefix.'wpfnl_analytics';
-        $sql   = "SELECT count(id) as total from $table WHERE funnel_id=%d AND visitor_type='new'";
-        $count = $wpdb->get_var($wpdb->prepare($sql, $funnel_id));
+
+        list( $date_clause, $date_params ) = $this->get_date_clause( 'date_created', $start_date, $end_date );
+
+        $sql   = "SELECT count(id) as total from $table WHERE funnel_id=%d AND visitor_type='new'" . $date_clause;
+        $count = $wpdb->get_var($wpdb->prepare($sql, array_merge( array( $funnel_id ), $date_params )));
         return $count;
     }
 
@@ -242,21 +266,27 @@ class Reporting {
      *
      * @since 2.4.1
      */
-    public function get_conversion($funnel_id) {
+    public function get_conversion($funnel_id, $start_date = null, $end_date = null) {
         global $wpdb;
         $table = $wpdb->prefix.'wpfnl_stats';
+
+        list( $date_clause, $date_params ) = $this->get_date_clause( 'o1.paid_date', $start_date, $end_date );
+
         $sql   = "SELECT COUNT(DISTINCT o1.order_id) AS total_conversion
                     FROM $table o1
                     LEFT JOIN $table o2 ON o1.parent_id = o2.order_id AND o1.funnel_id = o2.funnel_id
                     WHERE o2.order_id IS NULL
                     AND o1.status='completed'
-                    AND o1.funnel_id='%d'";
-        $count = $wpdb->get_var($wpdb->prepare($sql, $funnel_id));
+                    AND o1.funnel_id='%d'" . $date_clause;
+        $count = $wpdb->get_var($wpdb->prepare($sql, array_merge( array( $funnel_id ), $date_params )));
 
         if ( !$count ) {
-            $optin_entries_table    = $wpdb->prefix.'wpfnl_optin_entries';
-            $optin_conversion_sql   = "SELECT COUNT(DISTINCT email) AS total_distinct_emails FROM $optin_entries_table WHERE funnel_id = %d;";
-            $count                  = $wpdb->get_var($wpdb->prepare($optin_conversion_sql, $funnel_id));
+            $optin_entries_table = $wpdb->prefix.'wpfnl_optin_entries';
+
+            list( $optin_date_clause, $optin_date_params ) = $this->get_date_clause( 'date_created', $start_date, $end_date );
+
+            $optin_conversion_sql = "SELECT COUNT(DISTINCT email) AS total_distinct_emails FROM $optin_entries_table WHERE funnel_id = %d" . $optin_date_clause;
+            $count                = $wpdb->get_var($wpdb->prepare($optin_conversion_sql, array_merge( array( $funnel_id ), $optin_date_params )));
         }
         return $count;
     }

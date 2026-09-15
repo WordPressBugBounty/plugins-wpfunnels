@@ -552,7 +552,6 @@ export default {
             builder: window.WPFunnelVars.builder,
             pluginInstallLoader: false,
             pluginInstallationErrorMessage: '',
-            funnelType: window.WPFunnelVars.global_funnel_type,
 			type: 'wc',
 			selectedType: 'wc',
             tempalateTypes : [],

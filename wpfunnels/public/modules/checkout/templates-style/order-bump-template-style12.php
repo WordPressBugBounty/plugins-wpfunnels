@@ -120,7 +120,7 @@ if( $type === 'lms' ){
     <div class="offer-checkbox" style="background-color: <?php echo $orderbump_color; ?>">
         <span class="wpfnl-checkbox">
             <input
-                id="wpfnl-order-bump-cb-<?php echo $key ?>"
+                id="wpfnl-order-bump-cb-<?php echo $key . ( $this->render_instance ? '-' . $this->render_instance : '' ); ?>"
                 class="wpfnl-order-bump-cb"
                 type="checkbox"
                 name="wpfnl-order-bump-cb-<?php echo $key ?>"
@@ -130,10 +130,11 @@ if( $type === 'lms' ){
                 data-step="<?php echo get_the_ID(); ?>"
                 data-lms="<?php echo $type; ?>"
                 data-is-variable="<?php echo $isVariable ? 'true' : 'false'; ?>"
+                <?php checked( $this->is_order_bump_in_cart( $settings['product'] ) ); ?>
                 value="<?php echo $settings['product'] ?>"
             >
 
-            <label for="wpfnl-order-bump-cb-<?php echo $key ?>" style="color: <?php echo $ob_checkbox_title_color ?>" ><?php echo $settings['checkBoxLabel'] ?></label>
+            <label for="wpfnl-order-bump-cb-<?php echo $key . ( $this->render_instance ? '-' . $this->render_instance : '' ); ?>" style="color: <?php echo $ob_checkbox_title_color ?>" ><?php echo $settings['checkBoxLabel'] ?></label>
         </span>
     </div>
     <?php

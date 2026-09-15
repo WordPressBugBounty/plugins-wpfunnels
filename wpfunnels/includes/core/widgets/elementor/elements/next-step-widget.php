@@ -365,10 +365,6 @@ class Step_Pointer extends Widget_Base
 			]
 		);
 
-		$general_data = get_option('_wpfunnels_general_settings');
-		$funnel_types = $general_data['funnel_type'];
-
-
 		$this->add_control(
 			'button_type_selector',
 			[

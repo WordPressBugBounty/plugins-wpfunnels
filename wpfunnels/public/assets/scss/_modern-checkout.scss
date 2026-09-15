@@ -79,6 +79,7 @@
 		}
 
 		.woocommerce-additional-fields,
+		.wpfnl-shipping-fields,
 		.wpfnl-billing-fields {
 			border: 1px solid #E5E7EB;
 			border-radius: 10px;
@@ -272,6 +273,7 @@
 			gap: 16px;
 
 			#shipping_phone_field,
+			#shipping_postcode_field,
 			#shipping_state_field,
 			#shipping_city_field,
 			#shipping_last_name_field,
@@ -510,11 +512,93 @@
 
 			}
 
+			.wpfnl-coupon-toggle-wrapper {
+				margin: 20px 0 0;
+
+				.wpfnl-coupon-toggle-notice {
+					color: #686B7D;
+					font-size: 14px;
+					font-weight: 500;
+					line-height: 1.4;
+				}
+
+				.wpfnl-coupon-toggle-link {
+					color: #0639FF;
+					font-weight: 600;
+					text-decoration: none;
+					margin-left: 4px;
+					cursor: pointer;
+
+					&:hover {
+						text-decoration: underline;
+					}
+				}
+			}
+
+			.wpfnl-custom-coupon-field {
+				display: flex;
+				align-items: stretch;
+				gap: 10px;
+				margin: 20px 0;
+
+				&.wpfnl-coupon-collapsible {
+					margin-top: 12px;
+				}
+
+				.wpfnl-coupon-col-1 {
+					flex: 1;
+					min-width: 0;
+				}
+
+				.wpfnl-coupon-col-2 {
+					flex-shrink: 0;
+				}
+
+				.wpfnl-coupon-code-input {
+					width: 100%;
+					height: 100%;
+					font-size: 14px;
+					font-weight: 500;
+					border-radius: 8px;
+					border: 1px solid #00000000;
+					background: #F3F3F5;
+					padding: 12px 15px;
+					color: #0A0A0A;
+
+					&::placeholder {
+						color: #9CA3AF;
+					}
+
+					&:focus {
+						outline: none;
+						border-color: #0639FF;
+					}
+				}
+
+				.wpfnl-submit-coupon {
+					height: 100%;
+					white-space: nowrap;
+					font-size: 14px;
+					font-weight: 600;
+					color: #1A241A;
+					background: #F3F3F5;
+					border: 1px solid #E5E7EB;
+					border-radius: 8px;
+					padding: 12px 20px;
+					cursor: pointer;
+					transition: background 0.2s ease;
+
+					&:hover {
+						background: #E5E7EB;
+					}
+				}
+			}
+
 		}
 
 		// Instant checkout step style adjustments
 		.wpfnl-instant-checkout-step {
-			margin-bottom: 0;
+			display: none;
 		}
 
 	}
@@ -808,6 +892,7 @@
 
 @media only screen and (max-width: 575px){
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields__field-wrapper #shipping_phone_field,
+	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields__field-wrapper #shipping_postcode_field,
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields__field-wrapper #shipping_state_field,
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields__field-wrapper #shipping_city_field,
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields__field-wrapper #shipping_last_name_field,
@@ -819,6 +904,7 @@
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields__field-wrapper #billing_last_name_field,
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields__field-wrapper #billing_first_name_field,
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields__field-wrapper #shipping_phone_field,
+	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields__field-wrapper #shipping_postcode_field,
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields__field-wrapper #shipping_state_field,
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields__field-wrapper #shipping_city_field,
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields__field-wrapper #shipping_last_name_field,
@@ -880,6 +966,35 @@
 	}
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields > #ship-to-different-address label span {
 		font-size: 18px;
+	}
+
+	.wpfnl-checkout.wpfnl-modern-checkout .wpfnl-billing-same-as-shipping.form-row {
+		margin-bottom: 20px;
+		padding: 12px 16px;
+		background: #F9FAFB;
+		border: 1px solid #E5E7EB;
+		border-radius: 8px;
+
+		label > span {
+			padding-left: 28px;
+			color: #374151;
+			font-size: 15px;
+			font-weight: 500;
+
+			&:before {
+				width: 18px;
+				height: 18px;
+				border-radius: 4px;
+				border: 1px solid rgba(0, 0, 0, 0.15);
+				background: #FFFFFF;
+				top: 1px;
+			}
+		}
+
+		label input[type=checkbox]:checked + span::before {
+			background-color: $primary-color;
+			border-color: $primary-color;
+		}
 	}
 
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields .shipping_address {

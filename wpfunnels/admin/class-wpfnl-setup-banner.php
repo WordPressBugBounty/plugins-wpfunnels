@@ -138,10 +138,7 @@ class SetupReminderBanner{
         $learn_more_url = 'https://getwpfunnels.com/docs/getting-started-with-wpfunnels/create-your-first-sales-funnel/';
         $dismiss_nonce = wp_create_nonce('dismiss_first_funnel_setup_reminder_banner');
 
-        $general_settings = get_option('_wpfunnels_general_settings', []);
-        $funnel_type = isset($general_settings['funnel_type']) ? $general_settings['funnel_type'] : 'sales';
-
-        if ('lead' === $funnel_type) {
+        if (!\WPFunnels\Wpfnl_functions::is_wc_active()) {
             $banner_title = esc_html__('Let’s launch your first lead funnel in 5 minutes!', 'wpfnl');
             $banner_description = esc_html__('Finish setting up your first lead funnel and start collecting more leads with better conversions.', 'wpfnl');
         } else {

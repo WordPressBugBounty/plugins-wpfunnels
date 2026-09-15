@@ -12,8 +12,6 @@ class Wpfnl_CPT
 {
     protected $args;
 
-    protected $is_gutenberg_editor_active = false;
-
     public function __construct()
     {
         add_action('init', [ $this, 'register_funnel_cpt' ]);
@@ -22,7 +20,6 @@ class Wpfnl_CPT
         add_filter('post_type_link', [ $this, 'step_post_type_permalinks' ], 10, 3);
         add_action('init', [ $this, 'rewrite_step_rule' ]);
         add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_assets' ] );
-        add_action( 'admin_footer', [ $this, 'print_admin_js_template' ] );
 
         if ( ! is_admin() ) {
             add_action( 'pre_get_posts', array( $this, 'add_steps_cpt_to_main_query' ), 20 );
@@ -390,45 +387,54 @@ class Wpfnl_CPT
         if (!current_user_can('wpf_manage_funnels')) {
             return;
         }
-        $this->is_gutenberg_editor_active = true;
         wp_enqueue_script( 'wpfnl-admin' . '-common', WPFNL_DIR_URL . '/admin/assets/js/wpfnl-admin-common.js', [ 'jquery' ], WPFNL_VERSION, true );
+        $this->enqueue_back_to_funnel_script();
     }
 
+
     /**
-     * Print admin js template - will add back to funnel button on admin
+     * Point the block editor back button at the funnel canvas
      *
-     * @since 2.0.3
+     * The editor builds its own back button linking to the step list screen and
+     * exposes no filter for that href, so the link is corrected in the browser.
+     *
+     * @since 3.13.2
      */
-    public function print_admin_js_template() {
-        if ( ! $this->is_gutenberg_editor_active ) {
+    private function enqueue_back_to_funnel_script() {
+        $step_id = get_the_ID();
+        if ( ! $step_id && isset( $_GET['post'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $step_id = intval( $_GET['post'] ); //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        }
+
+        if ( ! $step_id || WPFNL_STEPS_POST_TYPE !== get_post_type( $step_id ) ) {
             return;
         }
-        if (WPFNL_STEPS_POST_TYPE !== get_post_type()) {
+
+        $funnel_id = get_post_meta( $step_id, '_funnel_id', true );
+        if ( ! $funnel_id ) {
             return;
         }
-        $funnel_id = get_post_meta( get_the_id(), '_funnel_id', true );
+
         $funnel_window_url = add_query_arg(
             array(
                 'page'      => WPFNL_EDIT_FUNNEL_SLUG,
                 'id'        => $funnel_id,
-                'step_id'   => get_the_id(),
+                'step_id'   => $step_id,
             ),
             admin_url('admin.php')
         );
 
-
-        ?>
-
-        <script id="wpfnl-gutenberg-button-switch-mode" type="text/html">
-            <div id="wpfnl-switch-mode">
-                <a href="<?php echo esc_url($funnel_window_url); ?>" id="wpfnl-switch-mode-button" type="button" class="button button-primary button-large">
-                    <span class="wpfnl-switch-mode-on"><?php echo __( '&#8592; Back to Funnel Window', 'wpfnl' ); ?></span>
-                </a>
-            </div>
-        </script>
-    <?php
+        wp_enqueue_script( 'wpfnl-gutenberg-back', WPFNL_DIR_URL . '/admin/assets/js/wpfnl-gutenberg-back.js', [], WPFNL_VERSION, true );
+        wp_localize_script(
+            'wpfnl-gutenberg-back',
+            'wpfnlGutenbergBack',
+            array(
+                'postType'  => WPFNL_STEPS_POST_TYPE,
+                'funnelUrl' => $funnel_window_url,
+                'label'     => __( 'Back to Funnel Window', 'wpfnl' ),
+            )
+        );
     }
-
 
     function is_elementor(){
         global $post;

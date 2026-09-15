@@ -21,6 +21,44 @@ class Wpfnl_Order_Bump_Action {
     protected $selected_ob;
     protected $checkout_id;
 
+    /**
+     * Counts how many times each (checkout_id, bump key) pair has been
+     * rendered on this request. Some checkout layouts (e.g. the express
+     * checkout's two-column form) call `woocommerce_order_review()` more than
+     * once, which fires the order bump position hooks more than once too, so
+     * the same bump's markup ends up on the page more than once. Every
+     * occurrence still needs to work (it may be the one the customer actually
+     * sees), so instead of suppressing the repeats we give each render its
+     * own instance number and use it to keep the checkbox's `id`/`for` pair
+     * unique per occurrence -- see $render_instance below.
+     *
+     * @var array
+     */
+    protected static $render_counts = array();
+
+    /**
+     * The 0-based occurrence number of the bump currently being rendered,
+     * for the (checkout_id, key) pair being processed. Templates use this to
+     * suffix the checkbox's id/for attributes so duplicate renders on the
+     * same page never collide -- `data-key` (still just $key) is what JS
+     * uses to keep every occurrence of the same bump in sync.
+     *
+     * @var int
+     */
+    public $render_instance = 0;
+
+    /**
+     * @param int|string $checkout_id
+     * @param int|string $key
+     *
+     * @return void
+     */
+    private function mark_bump_render_instance( $checkout_id, $key ) {
+        $cache_key = $checkout_id . ':' . $key;
+        $this->render_instance = isset( self::$render_counts[ $cache_key ] ) ? self::$render_counts[ $cache_key ] : 0;
+        self::$render_counts[ $cache_key ] = $this->render_instance + 1;
+    }
+
     public function __construct() {
 
 		add_action( 'woocommerce_checkout_after_order_review', array( $this, 'add_order_bump_hidden_fields' ), 99 );
@@ -28,6 +66,7 @@ class Wpfnl_Order_Bump_Action {
 		add_action( 'wpfunnels/bricks_render_order_bump', array( $this, 'load_elementor_actions' ), 9999, 2 );
         add_action( 'wpfunnels/gb_render_order_bump_ajax', array( $this, 'load_gb_actions' ), 10, 2 );
         add_action( 'wpfunnels/before_checkout_form', array( $this, 'load_actions' ), 10, 2 );
+        add_action( 'woocommerce_checkout_update_order_review', array( $this, 'load_ajax_actions' ), 5 );
 
     }
 
@@ -41,10 +80,36 @@ class Wpfnl_Order_Bump_Action {
 		$this->ob_settings = $checkout_meta->get_checkout_meta_value(get_the_ID(), 'order-bump-settings', wpfnl()->meta->get_default_order_bump_meta());
 		foreach( $this->ob_settings as $key=>$settings ){
 			if ( $settings['isEnabled'] ) {
-				echo '<input type="hidden" name="_wpfunnels_order_bump_product_'.$key.'" value="">';
+				$in_cart = isset( $settings['product'] ) && $this->is_order_bump_in_cart( $settings['product'] );
+				echo '<input type="hidden" name="_wpfunnels_order_bump_product_'.$key.'" value="'.( $in_cart ? esc_attr( $settings['product'] ) : '' ).'">';
 				echo '<input type="hidden" name="_wpfunnels_order_bump_clicked" value="">';
 			}
 		}
+	}
+
+
+	/**
+	 * Load action hooks during the update_order_review AJAX request.
+	 *
+	 * `wpfunnels/before_checkout_form` only fires while the full checkout form is
+	 * rendered, so on an AJAX refresh nothing would be listening on
+	 * `wpfunnels/after_order_total`. An `after-order` bump would then be dropped from
+	 * the refreshed `.wpfnl-after-order-total` fragment and disappear from the page.
+	 *
+	 * @return void
+	 */
+	public function load_ajax_actions() {
+		$checkout_id = Wpfnl_functions::get_checkout_id_from_post( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( ! $checkout_id ) {
+			return;
+		}
+
+		// render_order_bump_after_order() falls back to this property when $post is
+		// unavailable, which is always the case during this AJAX request.
+		$this->checkout_id = (int) $checkout_id;
+
+		$this->load_actions( $checkout_id );
 	}
 
 
@@ -210,6 +275,33 @@ class Wpfnl_Order_Bump_Action {
 
 
     /**
+     * Check if an order bump product is already present in the cart so the
+     * checkbox can be rendered as checked after a page reload.
+     *
+     * @param int|string $product_id product/variation id stored in the order bump settings
+     *
+     * @return bool
+     */
+    public function is_order_bump_in_cart( $product_id ) {
+        if ( ! Wpfnl_functions::is_wc_active() || ! WC()->cart ) {
+            return false;
+        }
+
+        foreach ( WC()->cart->get_cart() as $cart_item ) {
+            if ( empty( $cart_item['wpfnl_order_bump'] ) ) {
+                continue;
+            }
+
+            if ( $cart_item['product_id'] == $product_id || ( ! empty( $cart_item['variation_id'] ) && $cart_item['variation_id'] == $product_id ) ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
      * Render popup style for order bump in elementor
      * builder preview
      *
@@ -260,6 +352,8 @@ class Wpfnl_Order_Bump_Action {
 			foreach( $this->ob_settings as $key=> $settings ){
 
 				if( $settings['isEnabled'] && $settings['position'] == 'popup'){
+
+					$this->mark_bump_render_instance( $checkout_id, $key );
 
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
@@ -342,6 +436,7 @@ class Wpfnl_Order_Bump_Action {
 			foreach( $this->ob_settings as $key=> $settings ){
 
 				if( $settings['isEnabled']  && $settings['position'] == 'before-checkout'){
+					$this->mark_bump_render_instance( $checkout_id, $key );
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
 					}
@@ -422,6 +517,7 @@ class Wpfnl_Order_Bump_Action {
 			foreach( $this->ob_settings as $key=> $settings ){
 				
 				if( $settings['isEnabled']  && $settings['position'] == 'before-lms-order'){
+					$this->mark_bump_render_instance( $checkout_id, $key );
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
 					}
@@ -502,6 +598,7 @@ class Wpfnl_Order_Bump_Action {
 			foreach( $this->ob_settings as $key=> $settings ){
 				
 				if( $settings['isEnabled']  && $settings['position'] == 'after-lms-order'){
+					$this->mark_bump_render_instance( $checkout_id, $key );
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
 					}
@@ -582,6 +679,7 @@ class Wpfnl_Order_Bump_Action {
 			foreach( $this->ob_settings as $key=> $settings ){
 
 				if( $settings['isEnabled']  && $settings['position'] == 'before-payment'){
+					$this->mark_bump_render_instance( $checkout_id, $key );
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
 					}
@@ -663,6 +761,7 @@ class Wpfnl_Order_Bump_Action {
 			foreach( $this->ob_settings as $key=> $settings ){
 
 				if( $settings['isEnabled']  && $settings['position'] == 'after-payment'){
+					$this->mark_bump_render_instance( $checkout_id, $key );
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
 					}
@@ -744,6 +843,7 @@ class Wpfnl_Order_Bump_Action {
 
 			foreach( $this->ob_settings as $key=> $settings ){
 				if( $settings['isEnabled'] && $settings['position'] == 'after-customer-details'){
+					$this->mark_bump_render_instance( $checkout_id, $key );
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
 					}
@@ -825,6 +925,7 @@ class Wpfnl_Order_Bump_Action {
 
 				if( $settings['isEnabled'] && $settings['position'] == 'after-order'){
 
+					$this->mark_bump_render_instance( $checkout_id, $key );
 
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
@@ -910,6 +1011,7 @@ class Wpfnl_Order_Bump_Action {
 			foreach( $this->ob_settings as $key=> $settings ){
 
 				if( $settings['isEnabled'] && $settings['position'] == 'before-order'){
+					$this->mark_bump_render_instance( $checkout_id, $key );
 					if( $settings['isEnabled'] === 'no' ){
 						continue;
 					}

@@ -34,6 +34,16 @@ class Wpfnl_Activator
 	const BUILDER_MODE_PINNED_OPTION = 'wpfunnels_builder_mode_pinned';
 
 	/**
+	 * Flags that a fresh install still owes the revenue report its schedule.
+	 *
+	 * Set while seeding on activation and cleared once Action Scheduler is
+	 * loaded and the recurring action is queued.
+	 *
+	 * @since 3.14.0
+	 */
+	const REVENUE_REPORT_PENDING_OPTION = 'wpfunnels_revenue_report_pending_schedule';
+
+	/**
 	 * Seconds to wait before re-queuing a DB update callback that reported
 	 * more work to do. Throttles a misbehaving callback instead of letting it
 	 * saturate the ActionScheduler queue runner.
@@ -76,6 +86,7 @@ class Wpfnl_Activator
 		add_action( 'init', array( __CLASS__, 'update' ), 20 );
 		add_action('wpfunnels_run_update_callback', array( __CLASS__, 'run_update_callback' ) );
 		add_action( 'init', array( __CLASS__, 'maybe_schedule_runaway_purge' ), 21 );
+		add_action( 'init', array( __CLASS__, 'maybe_schedule_seeded_revenue_report' ), 21 );
 		add_action( self::RUNAWAY_PURGE_HOOK, array( __CLASS__, 'purge_runaway_update_actions' ) );
 	}
 
@@ -369,6 +380,7 @@ class Wpfnl_Activator
 
 		if ( $is_new_install ) {
 			self::seed_default_builder_mode();
+			self::seed_default_notification_settings();
 		}
 
 		// add funnel type meta
@@ -430,6 +442,65 @@ class Wpfnl_Activator
 		}
 
 		update_option( self::BUILDER_MODE_PINNED_OPTION, 'yes' );
+	}
+
+	/**
+	 * Seed the notification settings for brand-new installs.
+	 *
+	 * The store revenue report is on out of the box from 3.14.0, but only for
+	 * sites created from that version onward: the choice is written into the
+	 * database here rather than flipped in the fallback that
+	 * Wpfnl_functions::get_notification_settings() applies, so an existing site
+	 * — which has either its own saved settings or no row at all — is left
+	 * exactly as it was and never starts mailing after an update.
+	 *
+	 * A site that somehow already holds notification settings is skipped, so
+	 * this can never overwrite a stored preference.
+	 *
+	 * @since 3.14.0
+	 */
+	private static function seed_default_notification_settings()
+	{
+		$stored = get_option( '_wpfunnels_notification_settings', array() );
+		if ( ! empty( $stored ) ) {
+			return;
+		}
+
+		update_option( '_wpfunnels_notification_settings', Wpfnl_functions::get_new_install_notification_settings() );
+
+		// Action Scheduler is not dependable during activation, so the actual
+		// queueing waits for a normal request on `init`.
+		update_option( self::REVENUE_REPORT_PENDING_OPTION, 'yes' );
+	}
+
+
+	/**
+	 * Queue the seeded revenue report once Action Scheduler is available.
+	 *
+	 * Only runs for an install that was just seeded — the flag is set nowhere
+	 * else — so no existing site's schedule is touched. If the admin saved the
+	 * settings before this ran, that save has already queued the action and this
+	 * only clears the flag.
+	 *
+	 * @since 3.14.0
+	 */
+	public static function maybe_schedule_seeded_revenue_report()
+	{
+		if ( 'yes' !== get_option( self::REVENUE_REPORT_PENDING_OPTION ) ) {
+			return;
+		}
+
+		if ( ! function_exists( 'as_schedule_recurring_action' ) || ! function_exists( 'as_next_scheduled_action' ) ) {
+			return;
+		}
+
+		$settings = Wpfnl_functions::get_notification_settings();
+
+		if ( 'yes' === $settings['enable_revenue_report'] && ! Wpfnl_functions::is_revenue_report_scheduled() ) {
+			Wpfnl_functions::schedule_revenue_report_email( $settings );
+		}
+
+		delete_option( self::REVENUE_REPORT_PENDING_OPTION );
 	}
 
 

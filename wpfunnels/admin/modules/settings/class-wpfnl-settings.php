@@ -88,7 +88,6 @@ class Module extends Wpfnl_Admin_Module
 	];
 
     protected $settings_meta_keys = [
-        '_wpfunnels_funnel_type' => 'sales',
         '_wpfunnels_builder' => 'elementor',
         '_wpfunnels_paypal_reference' => '',
         '_wpfunnels_order_bump' => '',
@@ -150,7 +149,6 @@ class Module extends Wpfnl_Admin_Module
     {
         $this->init_settings();
         $is_pro_activated   = Wpfnl_functions::is_wpfnl_pro_activated();
-        $global_funnel_type = Wpfnl_functions::get_global_funnel_type();
         require_once WPFNL_DIR . '/admin/modules/settings/views/view.php';
     }
 
@@ -208,7 +206,6 @@ class Module extends Wpfnl_Admin_Module
         $this->save_ai_settings($payload);
         $existing_settings = Wpfnl_functions::get_general_settings();
         $general_settings  = [
-            'funnel_type'               => sanitize_text_field($payload['funnel_type']),
             'builder'                   => sanitize_text_field($payload['builder']),
             'uninstall_cleanup'         => isset($payload['uninstall_cleanup']) ? sanitize_text_field($payload['uninstall_cleanup']) : 'off',
             'disable_analytics'         => isset($payload['analytics_roles']) ? $payload['analytics_roles'] : '',
@@ -253,7 +250,6 @@ class Module extends Wpfnl_Admin_Module
 
         foreach ($payload as $key => $value) {
             switch ($key) {
-                case 'funnel_type':
                 case 'builder':
                     $cache_key = 'wpfunnels_remote_template_data_' . WPFNL_VERSION;
                     delete_transient($cache_key);
@@ -274,6 +270,7 @@ class Module extends Wpfnl_Admin_Module
         Wpfnl_functions::update_admin_settings($this->prefix.'permalink_settings', $permalink_settings);
         Wpfnl_functions::update_admin_settings($this->prefix.'optin_settings', $optin_settings);
 		$this->save_recaptcha_settings($payload);
+		$this->save_tracking_consent($payload);
 		$this->save_user_role_management_data($payload);
 		$this->save_google_map_key($payload);
 		$this->save_lms_settings($payload);
@@ -294,6 +291,52 @@ class Module extends Wpfnl_Admin_Module
             'success' => true
         ];
     }
+
+	/**
+	 * Persist the usage-tracking opt-in from the Advanced panel.
+	 *
+	 * The toggle only sends a value when the user actually changed it (see
+	 * getTrackingConsentChange() in js/settings.js), so an unrelated save on a
+	 * site that has never answered the setup-wizard question leaves that
+	 * "undecided" state alone instead of writing an explicit "no". Consent
+	 * itself lives in the Linno telemetry option, not in general settings, and
+	 * the SDK migrates the legacy `wpfunnels_allow_tracking` key on read — so
+	 * existing users keep whatever they agreed to during onboarding.
+	 *
+	 * @param array $payload Settings payload from the save request.
+	 *
+	 * @since 3.13.0
+	 */
+	private function save_tracking_consent( $payload ) {
+		if ( ! isset( $payload['allow_tracking'] ) ) {
+			return;
+		}
+
+		$submitted = sanitize_text_field( $payload['allow_tracking'] );
+
+		if ( ! in_array( $submitted, [ 'yes', 'no' ], true ) ) {
+			return;
+		}
+
+		$consent = 'yes' === $submitted;
+
+		$telemetry = \WPFunnels\Tracking\Telemetry::instance();
+
+		if ( ! $telemetry ) {
+			return;
+		}
+
+		// Nothing to do when the toggle already matches what is stored — this
+		// also stops a redundant save from turning "never decided" into "no".
+		if ( $telemetry->get_consent_state() === ( $consent ? 'yes' : 'no' ) ) {
+			return;
+		}
+
+		$telemetry->save_consent( $consent );
+
+		do_action( 'wpfunnels_tracking_consent_updated', $consent );
+	}
+
 
 	/**
 	 * Save Facebook pixel settings
@@ -437,40 +480,7 @@ class Module extends Wpfnl_Admin_Module
 	 * @since 3.2.0
 	 */
 	private function schedule_revenue_report_email( $settings ) {
-		if ( ! function_exists( 'as_schedule_recurring_action' ) ) {
-			return;
-		}
-		
-		// Calculate next run time based on send_time
-		$send_time = isset( $settings['send_time'] ) ? $settings['send_time'] : '10:00';
-		$frequency = isset( $settings['revenue_report_frequency'] ) ? $settings['revenue_report_frequency'] : 'weekly';
-		
-		// Parse time (format: HH:MM)
-		list( $hour, $minute ) = explode( ':', $send_time );
-		
-		// Get current time
-		$now = current_time( 'timestamp' );
-		$today = strtotime( date( 'Y-m-d', $now ) );
-		
-		// Calculate first run time (today at specified time)
-		$first_run = $today + ( $hour * HOUR_IN_SECONDS ) + ( $minute * MINUTE_IN_SECONDS );
-		
-		// If the time has already passed today, schedule for tomorrow
-		if ( $first_run <= $now ) {
-			$first_run += DAY_IN_SECONDS;
-		}
-		
-		// Calculate interval based on frequency
-		$interval = ( $frequency === 'monthly' ) ? MONTH_IN_SECONDS : WEEK_IN_SECONDS;
-		
-		// Schedule recurring action
-		as_schedule_recurring_action( 
-			$first_run, 
-			$interval, 
-			'wpfunnels_send_revenue_report_email', 
-			array(), 
-			'wpfunnels' 
-		);
+		Wpfnl_functions::schedule_revenue_report_email( $settings );
 	}
 
 
@@ -480,11 +490,7 @@ class Module extends Wpfnl_Admin_Module
 	 * @since 3.2.0
 	 */
 	private function unschedule_revenue_report_email() {
-		if ( ! function_exists( 'as_unschedule_all_actions' ) ) {
-			return;
-		}
-		
-		as_unschedule_all_actions( 'wpfunnels_send_revenue_report_email', array(), 'wpfunnels' );
+		Wpfnl_functions::unschedule_revenue_report_email();
 	}
 
 

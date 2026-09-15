@@ -53,6 +53,13 @@ class Wpfnl_functions {
 	const MAX_OWNED_ORDERS = 50;
 
 	/**
+	 * Action Scheduler hook that sends the store revenue report email.
+	 *
+	 * @since 3.14.0
+	 */
+	const REVENUE_REPORT_HOOK = 'wpfunnels_send_revenue_report_email';
+
+	/**
 	 * Post meta keys that must not travel between sites on funnel export/import.
 	 *
 	 * These hold per-site render caches or bookkeeping that is only meaningful on the site
@@ -231,20 +238,83 @@ class Wpfnl_functions {
 	 * @return bool|int
 	 */
 	public static function get_checkout_id_from_post( $post = null ) {
-		if ( is_array( $post ) && ! empty( $post['_wpfunnels_checkout_id'] ) ) {
-			$checkout_id = filter_var( wp_unslash( $post['_wpfunnels_checkout_id'] ), FILTER_SANITIZE_NUMBER_INT );
-			return $checkout_id ? intval( $checkout_id ) : false;
+		if ( null === $post && ! empty( $_POST ) ) {
+			$post = $_POST;
 		}
 
-		if ( is_array( $post ) && isset( $post['post_data'] ) ) {
-			$post_data = array();
-			wp_parse_str( wp_unslash( $post['post_data'] ), $post_data );
-			if ( ! empty( $post_data['_wpfunnels_checkout_id'] ) ) {
-				$checkout_id = filter_var( $post_data['_wpfunnels_checkout_id'], FILTER_SANITIZE_NUMBER_INT );
-				return $checkout_id ? intval( $checkout_id ) : false;
+		if ( is_array( $post ) ) {
+			if ( ! empty( $post['_wpfunnels_checkout_id'] ) ) {
+				$checkout_id = filter_var( wp_unslash( $post['_wpfunnels_checkout_id'] ), FILTER_SANITIZE_NUMBER_INT );
+				if ( $checkout_id ) {
+					return intval( $checkout_id );
+				}
+			}
+			if ( ! empty( $post['wpfnl_step_id'] ) ) {
+				$checkout_id = self::get_posted_non_offer_step_id( wp_unslash( $post['wpfnl_step_id'] ) );
+				if ( $checkout_id ) {
+					return $checkout_id;
+				}
+			}
+			if ( ! empty( $post['step_id'] ) ) {
+				$checkout_id = self::get_posted_non_offer_step_id( wp_unslash( $post['step_id'] ) );
+				if ( $checkout_id ) {
+					return $checkout_id;
+				}
+			}
+
+			if ( isset( $post['post_data'] ) ) {
+				$post_data = array();
+				wp_parse_str( wp_unslash( $post['post_data'] ), $post_data );
+				if ( ! empty( $post_data['_wpfunnels_checkout_id'] ) ) {
+					$checkout_id = filter_var( $post_data['_wpfunnels_checkout_id'], FILTER_SANITIZE_NUMBER_INT );
+					if ( $checkout_id ) {
+						return intval( $checkout_id );
+					}
+				}
+				if ( ! empty( $post_data['wpfnl_step_id'] ) ) {
+					$checkout_id = self::get_posted_non_offer_step_id( $post_data['wpfnl_step_id'] );
+					if ( $checkout_id ) {
+						return $checkout_id;
+					}
+				}
+				if ( ! empty( $post_data['step_id'] ) ) {
+					$checkout_id = self::get_posted_non_offer_step_id( $post_data['step_id'] );
+					if ( $checkout_id ) {
+						return $checkout_id;
+					}
+				}
 			}
 		}
+
 		return false;
+	}
+
+
+	/**
+	 * Get a posted generic step id, unless it belongs to an offer step.
+	 *
+	 * Upsell/downsell requests post `step_id` too (accept/reject, gateway calls,
+	 * the offer fallback payment form), but they are not checkout requests.
+	 * Resolving them marks the request as a funnel step page, and released Pro
+	 * versions then reject it with "Your session is expired".
+	 *
+	 * @param mixed $value Posted step id.
+	 *
+	 * @return bool|int
+	 * @since 3.13.2
+	 */
+	private static function get_posted_non_offer_step_id( $value ) {
+		$step_id = intval( filter_var( $value, FILTER_SANITIZE_NUMBER_INT ) );
+		if ( $step_id <= 0 ) {
+			return false;
+		}
+
+		$step_type = get_post_meta( $step_id, '_step_type', true );
+		if ( in_array( $step_type, array( 'upsell', 'downsell' ), true ) ) {
+			return false;
+		}
+
+		return $step_id;
 	}
 
 
@@ -307,6 +377,23 @@ class Wpfnl_functions {
 			return ! empty( $post_data['_wpfunnels_variable_product'] ) && 'selected' === $post_data['_wpfunnels_variable_product'];
 		}
 		return ! empty( $_POST['_wpfunnels_variable_product'] ) && 'selected' === $_POST['_wpfunnels_variable_product'];
+	}
+
+
+	/**
+	 * Check if the customer has already accepted an order bump this session,
+	 * via the `wpfnl_order_bump` cookie set on accept/reject. Used to keep a
+	 * plain page reload from wiping an accepted bump back out of the cart.
+	 *
+	 * @return bool
+	 * @since 3.13.1
+	 */
+	public static function is_order_bump_already_accepted_from_cookie() {
+		if ( empty( $_COOKIE['wpfnl_order_bump'] ) ) {
+			return false;
+		}
+		$cookie = json_decode( wp_unslash( $_COOKIE['wpfnl_order_bump'] ), true );
+		return ! empty( $cookie['order_bump_accepted'] ) && 'yes' === $cookie['order_bump_accepted'];
 	}
 
 
@@ -652,6 +739,21 @@ class Wpfnl_functions {
 				);
 			}
 		}
+
+		// Some ajax actions (e.g. the order bump accept/reject handler) post the
+		// checkout step id directly as `step_id` instead of a serialized `post_data`
+		// form. Fall back to that so quantity/checkout-id dependent filters still
+		// resolve the correct step during those requests.
+		if ( ! empty( $_POST['step_id'] ) ) {
+			$step_id = filter_var( wp_unslash( $_POST['step_id'] ), FILTER_SANITIZE_NUMBER_INT );
+			if ( $step_id && self::check_if_this_is_step_type_by_id( intval( $step_id ), 'checkout' ) ) {
+				return array(
+					'status' => true,
+					'id'     => intval( $step_id ),
+				);
+			}
+		}
+
 		return array(
 			'status' => false,
 			'id'     => '',
@@ -1332,7 +1434,6 @@ class Wpfnl_functions {
 				'order_bump'           => 'off',
 				'ab_testing'           => 'off',
 				'allow_funnels'        => array( 'administrator' => 'true' ),
-				'funnel_type'          => 'sales',
 				'create_child_order'   => 'off',
 				'disable_theme_style'  => 'off',
 				'enable_log_status'    => 'off',
@@ -1457,6 +1558,340 @@ class Wpfnl_functions {
 		$saved_settings   = self::get_admin_settings( '_wpfunnels_offer_settings' );
 		return wp_parse_args( $saved_settings, $default_settings );
 	}
+
+	/**
+	 * Derive the shipping rate that applies to an offer (upsell/downsell) product.
+	 *
+	 * Two sources are consulted, in order:
+	 *
+	 *  1. The shipping method already chosen on the parent order, re-priced against
+	 *     the offer product's own shipping class when the store runs flat rate and
+	 *     the offer is merged into the main order.
+	 *  2. The shipping zone matching the order's destination. This is the only
+	 *     source available when the parent order never shipped — a virtual-only
+	 *     checkout carries no shipping method to clone.
+	 *
+	 * An offer product that does not need shipping never derives a rate, so a
+	 * virtual upsell can never add shipping to a physical parent order.
+	 *
+	 * @param \WC_Order $order       Parent order.
+	 * @param int       $product_id  Offer product id.
+	 * @param float     $total_price Offer line total, used as the shipping package cost.
+	 * @param int       $qty         Offer quantity.
+	 *
+	 * @return array Shipping data, or an empty array when no shipping applies.
+	 * @since 1.0.0
+	 */
+	public static function get_offer_shipping( $order, $product_id, $total_price = 0, $qty = 1 ) {
+		if ( ! $product_id || ! $order instanceof \WC_Order ) {
+			return array();
+		}
+
+		$product = wc_get_product( $product_id );
+
+		if ( ! $product || ! $product->needs_shipping() ) {
+			return array();
+		}
+
+		$shipping = self::get_offer_shipping_from_parent_order( $order, $product );
+
+		if ( empty( $shipping ) ) {
+			$shipping = self::get_offer_shipping_from_zones( $order, $product, $total_price, $qty );
+		}
+
+		/**
+		 * Filter the shipping data derived for an offer product.
+		 *
+		 * @param array      $shipping Derived shipping data, empty when none applies.
+		 * @param \WC_Order  $order    Parent order.
+		 * @param \WC_Product $product Offer product.
+		 *
+		 * @since 1.0.0
+		 */
+		return apply_filters( 'wpfunnels/offer_shipping', $shipping, $order, $product );
+	}
+
+
+	/**
+	 * Clone the parent order's shipping method for the offer product.
+	 *
+	 * When the store runs flat rate and offers are merged into the main order the
+	 * cloned cost is re-priced against the offer product's shipping class, which is
+	 * the behaviour this plugin has always described.
+	 *
+	 * @param \WC_Order   $order   Parent order.
+	 * @param \WC_Product $product Offer product.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	private static function get_offer_shipping_from_parent_order( $order, $product ) {
+		$shipping         = array();
+		$shipping_methods = $order->get_shipping_methods();
+
+		if ( empty( $shipping_methods ) ) {
+			return $shipping;
+		}
+
+		foreach ( $shipping_methods as $method ) {
+			if ( ! $method ) {
+				continue;
+			}
+
+			$shipping = array(
+				'name'         => $method->get_name(),
+				'method_title' => $method->get_method_title(),
+				'method_id'    => $method->get_method_id(),
+				'instance_id'  => $method->get_instance_id(),
+				'total'        => (float) $method->get_total(),
+				'total_tax'    => (float) $method->get_total_tax(),
+				'taxes'        => $method->get_taxes(),
+			);
+		}
+
+		if ( empty( $shipping ) ) {
+			return $shipping;
+		}
+
+		$offer_settings = self::get_offer_settings();
+		$offer_orders   = isset( $offer_settings['offer_orders'] ) ? $offer_settings['offer_orders'] : '';
+
+		if ( 'main-order' !== $offer_orders || 'flat_rate' !== $shipping['method_id'] ) {
+			return $shipping;
+		}
+
+		$tax_percentage = 0.0 !== (float) $shipping['total'] ? ( $shipping['total_tax'] * 100 ) / $shipping['total'] : 0;
+
+		foreach ( \WC_Shipping_Zones::get_zones() as $zone ) {
+			if ( empty( $zone['shipping_methods'] ) ) {
+				continue;
+			}
+
+			foreach ( $zone['shipping_methods'] as $method ) {
+				if ( ! $method instanceof \WC_Shipping_Flat_Rate ) {
+					continue;
+				}
+
+				if ( ! isset( $method->instance_id ) || $method->instance_id != $shipping['instance_id'] ) { // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+					continue;
+				}
+
+				$instance_settings = isset( $method->instance_settings ) ? $method->instance_settings : array();
+				$class_cost_key    = 'class_cost_' . $product->get_shipping_class_id();
+
+				if ( isset( $instance_settings[ $class_cost_key ] ) ) {
+					$shipping_cost = $instance_settings[ $class_cost_key ];
+				} elseif ( isset( $instance_settings['no_class_cost'] ) ) {
+					$shipping_cost = $instance_settings['no_class_cost'];
+				} else {
+					continue;
+				}
+
+				$shipping_cost         = $shipping_cost ? (float) $shipping_cost : 0;
+				$total_tax             = ( $shipping_cost * $tax_percentage ) / 100;
+				$shipping['total']     = $shipping_cost;
+				$shipping['total_tax'] = $total_tax;
+				$shipping['taxes']     = array( 'total' => array( $total_tax ) );
+			}
+		}
+
+		return $shipping;
+	}
+
+
+	/**
+	 * Derive a shipping rate for the offer product from the matching shipping zone.
+	 *
+	 * Used when the parent order carries no shipping method to clone — a physical
+	 * offer accepted on top of a virtual-only order.
+	 *
+	 * @param \WC_Order   $order       Parent order.
+	 * @param \WC_Product $product     Offer product.
+	 * @param float       $total_price Offer line total.
+	 * @param int         $qty         Offer quantity.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	private static function get_offer_shipping_from_zones( $order, $product, $total_price, $qty ) {
+		if ( ! class_exists( '\WC_Shipping_Zones' ) ) {
+			return array();
+		}
+
+		$package = self::get_offer_shipping_package( $order, $product, $total_price, $qty );
+
+		if ( empty( $package['destination']['country'] ) ) {
+			return array();
+		}
+
+		$zone = \WC_Shipping_Zones::get_zone_matching_package( $package );
+
+		if ( ! $zone ) {
+			return array();
+		}
+
+		foreach ( $zone->get_shipping_methods( true ) as $method ) {
+			$rates = $method->get_rates_for_package( $package );
+
+			if ( empty( $rates ) ) {
+				continue;
+			}
+
+			$rate = reset( $rates );
+
+			return array(
+				'name'         => $rate->get_label(),
+				'method_title' => $rate->get_label(),
+				'method_id'    => $rate->get_method_id(),
+				'instance_id'  => $rate->get_instance_id(),
+				'total'        => (float) $rate->get_cost(),
+				'total_tax'    => (float) $rate->get_shipping_tax(),
+				'taxes'        => $rate->get_taxes(),
+			);
+		}
+
+		return array();
+	}
+
+
+	/**
+	 * Build the shipping package for a single offer product.
+	 *
+	 * The destination falls back to the billing address because a virtual-only
+	 * parent order has no shipping address — WooCommerce never collects one when
+	 * the cart does not need shipping.
+	 *
+	 * @param \WC_Order   $order       Parent order.
+	 * @param \WC_Product $product     Offer product.
+	 * @param float       $total_price Offer line total.
+	 * @param int         $qty         Offer quantity.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	private static function get_offer_shipping_package( $order, $product, $total_price, $qty ) {
+		$qty         = max( 1, (int) $qty );
+		$total_price = (float) $total_price;
+
+		$destination = array(
+			'country'   => $order->get_shipping_country() ? $order->get_shipping_country() : $order->get_billing_country(),
+			'state'     => $order->get_shipping_state() ? $order->get_shipping_state() : $order->get_billing_state(),
+			'postcode'  => $order->get_shipping_postcode() ? $order->get_shipping_postcode() : $order->get_billing_postcode(),
+			'city'      => $order->get_shipping_city() ? $order->get_shipping_city() : $order->get_billing_city(),
+			'address'   => $order->get_shipping_address_1() ? $order->get_shipping_address_1() : $order->get_billing_address_1(),
+			'address_1' => $order->get_shipping_address_1() ? $order->get_shipping_address_1() : $order->get_billing_address_1(),
+			'address_2' => $order->get_shipping_address_2() ? $order->get_shipping_address_2() : $order->get_billing_address_2(),
+		);
+
+		return array(
+			'contents'        => array(
+				$product->get_id() => array(
+					'key'               => $product->get_id(),
+					'product_id'        => $product->get_id(),
+					'variation_id'      => 0,
+					'variation'         => array(),
+					'quantity'          => $qty,
+					'data'              => $product,
+					'line_total'        => $total_price,
+					'line_subtotal'     => $total_price,
+					'line_tax'          => 0,
+					'line_subtotal_tax' => 0,
+				),
+			),
+			'contents_cost'   => $total_price,
+			'applied_coupons' => array(),
+			'user'            => array( 'ID' => $order->get_customer_id() ),
+			'destination'     => $destination,
+			'cart_subtotal'   => $total_price,
+		);
+	}
+
+
+	/**
+	 * Record derived offer shipping on an order as a real shipping line item.
+	 *
+	 * Passing empty shipping data is a no-op, so an offer that needs no shipping
+	 * leaves the order — including any shipping line it already carries — alone.
+	 *
+	 * @param \WC_Order $order      Order to add the shipping line to.
+	 * @param array     $shipping   Shipping data from get_offer_shipping().
+	 * @param string    $offer_name Offer product name, recorded against the line.
+	 * @param int       $qty        Offer quantity.
+	 *
+	 * @return \WC_Order
+	 * @since 1.0.0
+	 */
+	public static function add_offer_shipping_to_order( $order, $shipping, $offer_name = '', $qty = 1 ) {
+		if ( ! $order instanceof \WC_Order || empty( $shipping ) || ! isset( $shipping['total'] ) ) {
+			return $order;
+		}
+
+		$item = new \WC_Order_Item_Shipping();
+		$item->set_props(
+			array(
+				'method_title' => ! empty( $shipping['method_title'] ) ? $shipping['method_title'] : __( 'Shipping', 'wpfnl' ),
+				'method_id'    => isset( $shipping['method_id'] ) ? $shipping['method_id'] : '',
+				'instance_id'  => isset( $shipping['instance_id'] ) ? $shipping['instance_id'] : '',
+				'total'        => wc_format_decimal( $shipping['total'] ),
+				'taxes'        => isset( $shipping['taxes'] ) && is_array( $shipping['taxes'] ) ? $shipping['taxes'] : array(),
+			)
+		);
+
+		if ( $offer_name ) {
+			$item->add_meta_data( 'Items', $offer_name . ' &times; ' . max( 1, (int) $qty ), true );
+		}
+
+		$item->save();
+		$order->add_item( $item );
+
+		self::maybe_backfill_shipping_address( $order );
+
+		$order->calculate_shipping();
+		$order->calculate_totals();
+		$order->save();
+
+		return $order;
+	}
+
+
+	/**
+	 * Copy the billing address onto the shipping address when the order has none.
+	 *
+	 * WooCommerce skips the billing-to-shipping copy at checkout whenever the cart
+	 * does not need a shipping address, so an order that only becomes shippable
+	 * through an offer would otherwise reveal an empty address block in the admin
+	 * order summary.
+	 *
+	 * @param \WC_Order $order Order to back-fill.
+	 *
+	 * @return \WC_Order
+	 * @since 1.0.0
+	 */
+	public static function maybe_backfill_shipping_address( $order ) {
+		if ( ! $order instanceof \WC_Order || $order->has_shipping_address() ) {
+			return $order;
+		}
+
+		$fields = array( 'first_name', 'last_name', 'company', 'address_1', 'address_2', 'city', 'state', 'postcode', 'country', 'phone' );
+
+		foreach ( $fields as $field ) {
+			$getter = 'get_billing_' . $field;
+			$setter = 'set_shipping_' . $field;
+
+			if ( ! is_callable( array( $order, $getter ) ) || ! is_callable( array( $order, $setter ) ) ) {
+				continue;
+			}
+
+			$value = $order->{$getter}();
+
+			if ( '' !== $value && null !== $value ) {
+				$order->{$setter}( $value );
+			}
+		}
+
+		return $order;
+	}
+
 
 	/**
 	 * Get GTM events
@@ -1597,6 +2032,107 @@ class Wpfnl_functions {
 
 		$notification_settings = self::get_admin_settings( '_wpfunnels_notification_settings' );
 		return wp_parse_args( $notification_settings, $default_notification_settings );
+	}
+
+
+	/**
+	 * Notification settings seeded into the database on a brand-new install.
+	 *
+	 * The store revenue report ships on for sites installed from 3.14.0 onward.
+	 * It is written in once, by Wpfnl_Activator, so the decision lives in the
+	 * database rather than in the fallback used by get_notification_settings():
+	 * a site that upgrades has no stored value, keeps the disabled fallback, and
+	 * never starts mailing on its own.
+	 *
+	 * @return array
+	 * @since 3.14.0
+	 */
+	public static function get_new_install_notification_settings() {
+		return array(
+			'enable_revenue_report'    => 'yes',
+			'revenue_report_frequency' => 'weekly',
+			'revenue_report_recipient' => get_option( 'admin_email' ),
+			'revenue_report_subject'   => 'Store Revenue Report - {period}',
+			'send_time'                => '10:00',
+		);
+	}
+
+
+	/**
+	 * Schedule the recurring revenue report email through Action Scheduler.
+	 *
+	 * Callers are responsible for clearing any existing schedule first; use
+	 * is_revenue_report_scheduled() when a duplicate must be avoided.
+	 *
+	 * @param array $settings Notification settings.
+	 *
+	 * @return void
+	 * @since 3.14.0
+	 */
+	public static function schedule_revenue_report_email( $settings ) {
+		if ( ! function_exists( 'as_schedule_recurring_action' ) ) {
+			return;
+		}
+
+		// Calculate next run time based on send_time.
+		$send_time = isset( $settings['send_time'] ) ? $settings['send_time'] : '10:00';
+		$frequency = isset( $settings['revenue_report_frequency'] ) ? $settings['revenue_report_frequency'] : 'weekly';
+
+		// Parse time (format: HH:MM).
+		list( $hour, $minute ) = array_pad( explode( ':', $send_time ), 2, '0' );
+
+		// Get current time.
+		$now   = current_time( 'timestamp' );
+		$today = strtotime( date( 'Y-m-d', $now ) );
+
+		// Calculate first run time (today at specified time).
+		$first_run = $today + ( $hour * HOUR_IN_SECONDS ) + ( $minute * MINUTE_IN_SECONDS );
+
+		// If the time has already passed today, schedule for tomorrow.
+		if ( $first_run <= $now ) {
+			$first_run += DAY_IN_SECONDS;
+		}
+
+		// Calculate interval based on frequency.
+		$interval = ( 'monthly' === $frequency ) ? MONTH_IN_SECONDS : WEEK_IN_SECONDS;
+
+		as_schedule_recurring_action(
+			$first_run,
+			$interval,
+			self::REVENUE_REPORT_HOOK,
+			array(),
+			'wpfunnels'
+		);
+	}
+
+
+	/**
+	 * Remove the recurring revenue report email schedule.
+	 *
+	 * @return void
+	 * @since 3.14.0
+	 */
+	public static function unschedule_revenue_report_email() {
+		if ( ! function_exists( 'as_unschedule_all_actions' ) ) {
+			return;
+		}
+
+		as_unschedule_all_actions( self::REVENUE_REPORT_HOOK, array(), 'wpfunnels' );
+	}
+
+
+	/**
+	 * Whether a revenue report email is already queued.
+	 *
+	 * @return bool
+	 * @since 3.14.0
+	 */
+	public static function is_revenue_report_scheduled() {
+		if ( ! function_exists( 'as_next_scheduled_action' ) ) {
+			return false;
+		}
+
+		return (bool) as_next_scheduled_action( self::REVENUE_REPORT_HOOK, array(), 'wpfunnels' );
 	}
 
 
@@ -3287,32 +3823,8 @@ class Wpfnl_functions {
 			'label' => 'Lead Gen Templates',
 		);
 
-		// If funnel type is set to lead only, show only lead templates
-		// if ( isset( $general_settings['funnel_type'] ) && 'lead' === $general_settings['funnel_type'] ) {
-		// 	$types = array(
-		// 		array(
-		// 			'slug'  => 'lead',
-		// 			'label' => 'Lead Gen Templates',
-		// 		),
-		// 	);
-		// }
-		
 		return apply_filters( 'wpfunnels/modify_template_type', $types );
 
-	}
-
-
-	/**
-	 * Get global funnel type
-	 *
-	 * @return Mix
-	 */
-	public static function get_global_funnel_type() {
-		$general_settings = self::get_general_settings();
-		if ( isset( $general_settings['funnel_type'] ) ) {
-			return $general_settings['funnel_type'];
-		}
-		return false;
 	}
 
 
@@ -3424,6 +3936,58 @@ class Wpfnl_functions {
 
 
 	/**
+	 * Resolve a checkout step setting that builders expose under two different keys.
+	 *
+	 * Every builder persists these settings to the underscore-prefixed post meta
+	 * (`_wpfnl_checkout_layout`, `_wpfnl_floating_label`). The Gutenberg checkout
+	 * block instead publishes its live attributes through the
+	 * `wpfunnels/checkout_meta_{$key}` filter, keyed without the underscore, so that
+	 * the editor preview reflects unsaved changes.
+	 *
+	 * Read the filtered value first so the block editor keeps winning, then fall back
+	 * to the stored meta so Elementor, Bricks, Divi, Oxygen and shortcode steps —
+	 * which register no such filter — resolve to their real setting instead of the
+	 * default.
+	 *
+	 * @param int    $checkout_id Checkout step ID.
+	 * @param string $key         Unprefixed meta key, e.g. `wpfnl_checkout_layout`.
+	 * @param string $default     Value to use when nothing is set anywhere.
+	 *
+	 * @return string
+	 * @since  3.13.2
+	 */
+	public static function get_checkout_step_setting( $checkout_id, $key, $default = '' ) {
+		if ( ! $checkout_id ) {
+			return $default;
+		}
+
+		// Passing false as the default keeps get_checkout_meta_value() from
+		// substituting one, so an empty result really means "no builder filter".
+		$value = Wpfnl::get_instance()->meta->get_checkout_meta_value( $checkout_id, $key, false );
+
+		if ( ! $value ) {
+			$value = get_post_meta( $checkout_id, '_' . $key, true );
+		}
+
+		return $value ? $value : $default;
+	}
+
+
+	/**
+	 * Get the checkout layout for a step.
+	 *
+	 * @param int    $checkout_id Checkout step ID.
+	 * @param string $default     Layout to use when nothing is set.
+	 *
+	 * @return string
+	 * @since  3.13.2
+	 */
+	public static function get_checkout_layout( $checkout_id, $default = 'wpfnl-col-2' ) {
+		return self::get_checkout_step_setting( $checkout_id, 'wpfnl_checkout_layout', $default );
+	}
+
+
+	/**
 	 * Check the checkout layout is express or not
 	 *
 	 * @return Bool
@@ -3470,21 +4034,6 @@ class Wpfnl_functions {
 		);
 	}
 
-
-
-	/**
-	 * Update funnel type to lead
-	 *
-	 * @since 2.5.1
-	 */
-	public static function update_funnel_type_to_lead() {
-
-		$saved_settings = self::get_admin_settings( '_wpfunnels_general_settings' );
-		if ( isset( $saved_settings['funnel_type'] ) ) {
-			$saved_settings['funnel_type'] = 'lead';
-			update_option( '_wpfunnels_general_settings', $saved_settings );
-		}
-	}
 
 
 	/**
@@ -3984,10 +4533,7 @@ class Wpfnl_functions {
 				'type'        => 'textarea',
 				'class'       => array( 'notes' ),
 				'label'       => __( 'Order notes', 'woocommerce' ),
-				'placeholder' => esc_attr__(
-					'Notes about your order, e.g. special notes for delivery.',
-					'woocommerce'
-				),
+				'placeholder' => esc_attr__( 'Notes about your order', 'wpfnl' ),
 				'name'        => 'order_comments',
 				'required'    => false,
 				'enable'      => 1,
@@ -5810,7 +6356,17 @@ class Wpfnl_functions {
 			'conversion'					  			  => __('Conversion', 'wpfnl'),
 			'conversion_rate'					  		  => __('Conversion Rate', 'wpfnl'),
 			'no_top_performing_funnels'					  => __('You have no top performing funnels', 'wpfnl'),
+			'view_all'					  				  => __('View all', 'wpfnl'),
 			'today'					  					  => __('Today', 'wpfnl'),
+			'yesterday'					  				  => __('Yesterday', 'wpfnl'),
+			'this_week'					  				  => __('This Week', 'wpfnl'),
+			'last_week'					  				  => __('Last Week', 'wpfnl'),
+			'this_month'				  				  => __('This Month', 'wpfnl'),
+			'last_month'				  				  => __('Last Month', 'wpfnl'),
+			'previous_month'			  				  => __('Previous month', 'wpfnl'),
+			'next_month'				  				  => __('Next month', 'wpfnl'),
+			'cancel'					  				  => __('Cancel', 'wpfnl'),
+			'apply'						  				  => __('Apply', 'wpfnl'),
 			'week_to_date'					  			  => __('Week to date', 'wpfnl'),
 			'month_to_date'					  			  => __('Month to date', 'wpfnl'),
 			'year_to_date'					  			  => __('Year to date', 'wpfnl'),

@@ -20,18 +20,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 $hide_section_settings = \WPFunnels\Wpfnl_functions::get_checkout_section_heading_settings( 'order' , get_the_ID() );
-$billing_active_cls ='';
-	if( is_user_logged_in() ){
-		$billing_active_cls ='current';
-	}else {
-		if( 'no' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ){
-			$billing_active_cls ='current';
-		}else{
-			$billing_active_cls ='';
-		}
+$shipping_active_cls = '';
+$billing_active_cls  = '';
+
+if ( is_user_logged_in() || 'no' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) {
+	if ( WC()->cart && WC()->cart->needs_shipping_address() ) {
+		$shipping_active_cls = 'current';
+	} else {
+		$billing_active_cls  = 'current';
 	}
-	$get_checkout_fields = get_post_meta(get_the_ID(),'wpfnl_checkout_additional_fields',true);
-	$is_order_comments_enable = isset($get_checkout_fields['order_comments']['enable']) ? $get_checkout_fields['order_comments']['enable'] : true;
+}
+
+$get_checkout_fields = get_post_meta(get_the_ID(),'wpfnl_checkout_additional_fields',true);
+$is_order_comments_enable = isset($get_checkout_fields['order_comments']['enable']) ? $get_checkout_fields['order_comments']['enable'] : true;
 ?>
 
 
@@ -67,6 +68,19 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 			<?php } ?>
 
 			<?php if( is_user_logged_in() ){ ?>
+				<?php if( WC()->cart && WC()->cart->needs_shipping_address() ) { ?>
+					<li class="shipping <?php echo $shipping_active_cls; ?>">
+						<button type="button" data-target="shipping">
+							<span class="step-icon">
+								<?php include WPFNL_DIR.'public/assets/icons/icon-shipping.php'; ?>
+							</span>
+							<span class="step-title">
+								<?php esc_html_e( 'Shipping', 'wpfnl' ); ?>
+							</span>
+						</button>
+					</li>
+				<?php } ?>
+
 				<li class="billing <?php echo $billing_active_cls; ?>">
 					<button type="button" data-target="billing">
 						<span class="step-icon">
@@ -77,24 +91,6 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 						</span>
 					</button>
 				</li>
-			<?php if( $is_order_comments_enable ||  WC()->cart->needs_shipping_address()) { ?>
-				<li class="shipping">
-					<button type="button" data-target="shipping">
-						<span class="step-icon">
-							<?php include WPFNL_DIR.'public/assets/icons/icon-shipping.php'; ?>
-						</span>
-						<?php if( WC()->cart->needs_shipping_address() ){ ?>
-							<span class="step-title">
-								<?php esc_html_e( 'Shipping', 'wpfnl' ); ?>
-							</span>
-						<?php }else{ ?>
-							<span class="step-title">
-								<?php esc_html_e( 'Additional Information', 'wpfnl' ); ?>
-							</span>
-						<?php } ?>
-					</button>
-				</li>
-				<?php } ?>
 
 				<li class="order-review">
 					<button type="button" data-target="order-review">
@@ -110,6 +106,19 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 
 				if( ! $checkout->is_registration_required() || 'yes' === get_option( 'woocommerce_enable_checkout_login_reminder' ) || $checkout->is_registration_enabled() ){
 				?>
+					<?php if( WC()->cart && WC()->cart->needs_shipping_address() ) { ?>
+					<li class="shipping <?php echo $shipping_active_cls; ?>">
+						<button type="button" data-target="shipping">
+							<span class="step-icon">
+								<?php include WPFNL_DIR.'public/assets/icons/icon-shipping.php'; ?>
+							</span>
+							<span class="step-title">
+								<?php esc_html_e( 'Shipping', 'wpfnl' ); ?>
+							</span>
+						</button>
+					</li>
+					<?php } ?>
+
 					<li class="billing <?php echo $billing_active_cls; ?>">
 						<button type="button" data-target="billing">
 							<span class="step-icon">
@@ -120,24 +129,6 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 							</span>
 						</button>
 					</li>
-					<?php if( $is_order_comments_enable ||  WC()->cart->needs_shipping_address()) { ?>
-					<li class="shipping">
-						<button type="button" data-target="shipping">
-							<span class="step-icon">
-								<?php include WPFNL_DIR.'public/assets/icons/icon-shipping.php'; ?>
-							</span>
-							<?php if( WC()->cart->needs_shipping_address() ){ ?>
-								<span class="step-title">
-									<?php esc_html_e( 'Shipping', 'wpfnl' ); ?>
-								</span>
-							<?php }else{ ?>
-								<span class="step-title">
-									<?php esc_html_e( 'Additional Information', 'wpfnl' ); ?>
-								</span>
-							<?php } ?>
-						</button>
-					</li>
-						<?php } ?>
 
 					<li class="order-review">
 						<button type="button" data-target="order-review">
@@ -163,6 +154,7 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 		}else{
 		?>
 		<form name="checkout" method="post" class="checkout woocommerce-checkout <?php echo $loged_in_cls.' '.$create_acc_field; ?>" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">
+			<input type="hidden" name="wpfnl_step_id" value="<?php echo esc_attr( get_the_ID() ); ?>" />
 			<?php if ( $checkout->get_checkout_fields() ) : ?>
 
 				<?php do_action( 'woocommerce_checkout_before_customer_details' ); ?>
@@ -175,31 +167,37 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 						 */
 						do_action( 'wpfunnels/before_customer_details' ); 
 					?>
-					<div class="col-1" id="wpfnl_checkout_billing">
-						<?php do_action( 'woocommerce_checkout_billing' ); ?>
-					</div>
+					<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
+						<div class="col-1" id="wpfnl_checkout_shipping">
+							<?php do_action( 'woocommerce_checkout_shipping' ); ?>
 
-					<div class="col-2" id="wpfnl_checkout_shipping">
-						<?php do_action( 'woocommerce_checkout_shipping' ); ?>
-
-						<div class="express-shipping-table">
-							<table>
-								<thead>
-									<?php
-										if ( WC()->cart->needs_shipping() && WC()->cart->show_shipping() ) { ?>
-											<?php do_action( 'woocommerce_review_order_before_shipping' ); ?>
-
-											<?php wc_cart_totals_shipping_html(); ?>
-
-											<?php do_action( 'woocommerce_review_order_after_shipping' ); ?>
-
+							<div class="express-shipping-table">
+								<table>
+									<thead>
 										<?php
-										}
-									?>
-								</thead>
-							</table>
+											if ( WC()->cart->needs_shipping() && WC()->cart->show_shipping() ) { ?>
+												<?php do_action( 'woocommerce_review_order_before_shipping' ); ?>
+
+												<?php wc_cart_totals_shipping_html(); ?>
+
+												<?php do_action( 'woocommerce_review_order_after_shipping' ); ?>
+
+											<?php
+											}
+										?>
+									</thead>
+								</table>
+							</div>
+							<!-- /.express-shipping-table -->
 						</div>
-						<!-- /.express-shipping-table -->
+						<div class="col-2" id="wpfnl_checkout_billing">
+							<?php do_action( 'woocommerce_checkout_billing' ); ?>
+						</div>
+					<?php else : ?>
+						<div class="col-1" id="wpfnl_checkout_billing">
+							<?php do_action( 'woocommerce_checkout_billing' ); ?>
+						</div>
+					<?php endif; ?>
 						
 					</div>
 					<?php 
@@ -226,11 +224,19 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 			<!-- multistep navigation -->
 			<div class="wpfnl-multistep-navigation">
 				<button type="button" class="previous btn-default" data-target="" disabled><?php echo __( 'Previous', 'wpfnl' ); ?></button>
-				<?php  if( !is_user_logged_in() && 'yes' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ){ ?>
-					<button type="button" class="next btn-default" data-target="billing"><?php echo __( 'Next', 'wpfnl' ); ?></button>
-				<?php  }else{ ?>
-					<button type="button" class="next btn-default" data-target="shipping"><?php echo __( 'Next', 'wpfnl' ); ?></button>
-				<?php  } ?>
+				<?php if( !is_user_logged_in() && 'yes' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ){ ?>
+					<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) { ?>
+						<button type="button" class="next btn-default" data-target="shipping"><?php echo __( 'Next', 'wpfnl' ); ?></button>
+					<?php } else { ?>
+						<button type="button" class="next btn-default" data-target="billing"><?php echo __( 'Next', 'wpfnl' ); ?></button>
+					<?php } ?>
+				<?php }else{ ?>
+					<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) { ?>
+						<button type="button" class="next btn-default" data-target="billing"><?php echo __( 'Next', 'wpfnl' ); ?></button>
+					<?php } else { ?>
+						<button type="button" class="next btn-default" data-target="order-review"><?php echo __( 'Next', 'wpfnl' ); ?></button>
+					<?php } ?>
+				<?php } ?>
 			</div>
 		</form>
 	</div>

@@ -111,6 +111,7 @@ if( $type === 'lms' ){
                            data-key="<?php echo $key; ?>"
                            data-lms="<?php echo $type; ?>"
                            data-replace="<?php echo $settings['isReplace']; ?>"
+                           <?php checked( $this->is_order_bump_in_cart( $order_bump_settings['product'] ) ); ?>
                            name="wpfnl-order-bump-cb" value="<?php echo $order_bump_settings["product"]; ?>">
                     <span class="wpfnl-bump-order-label"><?php echo $order_bump_settings["checkBoxLabel"]; ?></span>
                 </label>

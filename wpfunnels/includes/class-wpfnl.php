@@ -292,6 +292,17 @@ class Wpfnl
 			return;
 		}*/
 
+		/**
+		 * Store Checkout needs WooCommerce. While it is missing, keep the
+		 * activation endpoint registered so the Store Checkout screen can
+		 * install/activate WooCommerce without leaving the page.
+		 *
+		 * @since 3.13.1
+		 */
+		if ( ! Wpfnl_functions::is_wc_active() ) {
+			add_action( 'wp_ajax_plugin_install_success', array( $this, 'plugin_install_success' ) );
+		}
+
 		// load core modules
 		add_action( 'admin_footer', array($this, 'admin_footer_style') );
 		add_action( 'wpfunnels/pro_init', array( $this, 'after_pro_plugin_init' ) );

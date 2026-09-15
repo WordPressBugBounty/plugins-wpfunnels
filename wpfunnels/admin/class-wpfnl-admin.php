@@ -917,6 +917,38 @@ class Wpfnl_Admin
 			);
 		}
 
+		// Store Checkout without WooCommerce: power the "Plugin Required" modal
+		// rendered by admin/modules/store-checkout/views/woocommerce-required.php.
+		if ('wpfunnels_page_' . WPFNL_STORE_CHECKOUT_SLUG === $hook && !Wpfnl_functions::is_wc_active()) {
+			$wc_plugin = 'woocommerce/woocommerce.php';
+			$wc_status = Wpfnl_functions::is_plugin_installed($wc_plugin) ? 'inactive' : 'not-installed';
+			$wc_label  = 'not-installed' === $wc_status
+				? __('Install WooCommerce', 'wpfnl')
+				: __('Activate WooCommerce', 'wpfnl');
+
+			wp_enqueue_script(
+				$this->plugin_name . '-store-checkout-woo',
+				plugin_dir_url(__FILE__) . 'assets/js/wpfnl-store-checkout-woo.js',
+				['jquery', 'updates'],
+				$this->version,
+				true
+			);
+			wp_localize_script($this->plugin_name . '-store-checkout-woo', 'wpfnlStoreCheckoutWoo', array(
+				'ajaxUrl'     => admin_url('admin-ajax.php'),
+				'nonce'       => wp_create_nonce('wpfnl_activate_plugin_nonce'),
+				'plugin'      => $wc_plugin,
+				'slug'        => 'woocommerce',
+				'status'      => $wc_status,
+				'buttonLabel' => $wc_label,
+				'i18n'        => array(
+					'installing'  => __('Installing', 'wpfnl'),
+					'activating'  => __('Activating', 'wpfnl'),
+					'redirecting' => __('Redirecting', 'wpfnl'),
+					'error'       => __('Something went wrong. Please install and activate WooCommerce manually.', 'wpfnl'),
+				),
+			));
+		}
+
 		if ('wpfunnels_page_' . WPFNL_AI_FUNNEL_PAGE_SLUG === $hook) {
 			wp_enqueue_script('wpfnl-ai-funnel-app', plugin_dir_url(__FILE__) . 'assets/dist/js/ai-funnel-app.min.js', [], $this->version, true);
 			Wpfnl_functions::enqueue_bundle_style( 'ai-funnel-app', 'wpfnl-ai-funnel-app-bundle' );
@@ -1153,7 +1185,6 @@ class Wpfnl_Admin
 				'isLmsSettings' => Wpfnl_functions::is_enable_lms_settings(),
 				'isLmsDisbaled' => $this->maybe_lms_settings_disbaled(),
 				'lmsVersion' => (defined('WPFNL_PRO_LMS_VERSION') || defined('WPFUNNELS_PRO_LMS_VERSION')) && defined('LEARNDASH_VERSION') ? version_compare(LEARNDASH_VERSION, '4.2.1.1', '>=') : false,
-				'global_funnel_type' => Wpfnl_functions::get_global_funnel_type(),
 				'individual_funnel_type' => get_post_meta($funnel_id, '_wpfnl_funnel_type', true),
 				'isStoreCheckout' => get_post_meta($funnel_id, '_wpfnl_funnel_type', true) === 'store_checkout',
 				'isSaleFunnel' => get_post_meta($funnel_id, '_wpfnl_funnel_type', true) === 'wc' || get_post_meta($funnel_id, '_wpfnl_funnel_type', true) === 'store_checkout',
@@ -1266,6 +1297,7 @@ class Wpfnl_Admin
 					'isProActivated' => apply_filters('wpfunnels/is_wpfnl_pro_active', false),
 					'isWPFIntegrationActive' => apply_filters( 'wpfunnels/is_integration_license_active', false ),
 					'getText' => Wpfnl_functions::get_text(),
+					'startOfWeek' => (int) get_option('start_of_week', 0),
 					'admin_url' => admin_url(),
 				));
 			}
@@ -1714,15 +1746,9 @@ class Wpfnl_Admin
 	public function wpfnl_deactivated_plugin($filename)
 	{
 		if ('woocommerce/woocommerce.php' === $filename) {
-			if (!Wpfnl_functions::is_lms_addon_active()) {
-				Wpfnl_functions::update_funnel_type_to_lead();
-			}
 			Wpfnl_functions::wpfnl_delete_transient();
 		}
 		elseif ('sfwd-lms/sfwd_lms.php' === $filename) {
-			if (!Wpfnl_functions::is_wc_active()) {
-				Wpfnl_functions::update_funnel_type_to_lead();
-			}
 			Wpfnl_functions::wpfnl_delete_transient();
 		}
 		elseif ('wpfunnels-pro-lms/wpfunnels-pro-lms.php' === $filename) {

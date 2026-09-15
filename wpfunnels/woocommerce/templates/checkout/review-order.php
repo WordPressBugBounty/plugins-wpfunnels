@@ -23,8 +23,20 @@ defined( 'ABSPATH' ) || exit;
 
 $checkout_id = get_the_ID();
 if ( ! $checkout_id || 'wpfunnel_steps' !== get_post_type( $checkout_id ) ) {
-	$data        = \WPFunnels\Wpfnl_functions::get_sanitized_get_post();
-	$checkout_id = isset( $data['post']['step_id'] ) ? $data['post']['step_id'] : 0;
+	$data = \WPFunnels\Wpfnl_functions::get_sanitized_get_post();
+	if ( isset( $data['post']['step_id'] ) && ! empty( $data['post']['step_id'] ) ) {
+		$checkout_id = absint( $data['post']['step_id'] );
+	} elseif ( isset( $_POST['step_id'] ) && ! empty( $_POST['step_id'] ) ) {
+		$checkout_id = absint( $_POST['step_id'] );
+	} elseif ( isset( $_POST['post_data'] ) ) {
+		parse_str( $_POST['post_data'], $post_data );
+		if ( ! empty( $post_data['wpfnl_step_id'] ) ) {
+			$checkout_id = absint( $post_data['wpfnl_step_id'] );
+		}
+	}
+	if ( ! $checkout_id && ! empty( $_SERVER['HTTP_REFERER'] ) ) {
+		$checkout_id = url_to_postid( wp_unslash( $_SERVER['HTTP_REFERER'] ) );
+	}
 }
 $show_product_images = 'yes' === get_post_meta( $checkout_id, '_wpfnl_display_product_images', true );
 
@@ -49,20 +61,10 @@ do_action( 'wpfunnel_review_order_before_cart_contents' );
 
 			if ( $_product && $_product->exists() && $cart_item['quantity'] > 0 && apply_filters( 'woocommerce_checkout_cart_item_visible', true, $cart_item, $cart_item_key ) ) {
 
-				$step_id = 0;
-				$isQuantity = 'no';
-				if( wp_doing_ajax() ) {
-					if ( isset( $_POST['post_data'] ) ) {
-						parse_str( $_POST['post_data'], $post_data );
-						if ( isset( $post_data['_wpfunnels_checkout_id'] ) ) {
-							$step_id = $post_data['_wpfunnels_checkout_id'];
-						}
-					}
-				} else {
-					$step_id = get_the_ID();
-				}
-
-				$isQuantity = get_post_meta($step_id, '_wpfnl_quantity_support',true);
+				// $checkout_id is already resolved above (works for both a normal
+				// page load and ajax requests that post `step_id` directly, such as
+				// the order bump accept/reject handler).
+				$isQuantity = get_post_meta($checkout_id, '_wpfnl_quantity_support',true);
 				if( !\WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() ) {
 					$isQuantity = 'no';
 				}
@@ -234,8 +236,23 @@ do_action( 'wpfunnel_review_order_before_cart_contents' );
 </table>
 <?php
 	/**
+	 * Everything hooked here (coupon field, order bumps, testimonials) is rendered
+	 * outside the review-order table, but WooCommerce's update_order_review AJAX
+	 * replaces only the `.woocommerce-checkout-review-order-table` node with this
+	 * whole buffer. Without its own wrapper the appended markup would be re-inserted
+	 * on every refresh while the previous copy stayed behind as a sibling, so it
+	 * accumulated one duplicate per AJAX call.
+	 *
+	 * The wrapper gives Module::split_after_order_total_fragment() a node it can hand
+	 * WooCommerce as a separate fragment, making the replacement idempotent. It is
+	 * always emitted — even when empty — because it is the anchor that later
+	 * refreshes replace.
+	 */
+	echo '<div class="wpfnl-after-order-total">';
+	/**
 	 * Fires after order total in checkout page
 	 * @since 2.8.21
 	 */
 	do_action( 'wpfunnels/after_order_total' );
+	echo '</div>';
 ?>

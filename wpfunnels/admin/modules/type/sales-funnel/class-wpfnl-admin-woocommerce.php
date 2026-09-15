@@ -457,12 +457,10 @@ class Wpfunnels_Wc_Checkout extends Wpfnl_Funnel_Type
                     'toDate' => $dateTime->add(new \DateInterval('P1D'))->format('M d, Y')
                 ];
             }
-            if ( 'yes' === $use_of_coupon ) {
-                $use_of_coupon = true;
-            }
-            else {
-                $use_of_coupon = false;
-            }
+            // Unset meta means the coupon field is on: the frontend, the REST
+            // controller and the legacy products tab all treat anything but an
+            // explicit 'no' as enabled, so the settings toggle must match.
+            $use_of_coupon = ( 'no' !== $use_of_coupon );
 
             if( 'yes' === $isMultipleProduct ) {
                 $isMultipleProduct = true;

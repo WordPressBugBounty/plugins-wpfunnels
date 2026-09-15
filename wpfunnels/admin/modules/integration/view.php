@@ -227,8 +227,6 @@ $is_integration_active     = apply_filters( 'wpfunnels/is_integration_license_ac
         </div>
         
     </div>
-
-    <?php require_once WPFNL_DIR . '/admin/partials/helper-resource.php'; ?>
 </div>
 
 <script>

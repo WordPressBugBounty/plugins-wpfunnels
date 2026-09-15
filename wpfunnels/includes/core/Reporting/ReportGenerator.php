@@ -87,29 +87,36 @@ class ReportGenerator {
 	public static function get_stats( $start_date, $end_date, $interval ) {
 		$intervals	= self::get_intervals( $start_date, $end_date, $interval );
 		$response		= array();
-		foreach ( $intervals as $interval ) {
-			$start_date 			= isset($interval['start_date']) ? $interval['start_date'] : (new \DateTime('monday last week'))->format('Y-m-d H:i:s');
-			$end_date 				= isset($interval['end_date']) ? $interval['end_date'] : (new \DateTime('sunday last week'))->format('Y-m-d H:i:s');
-			$total_orders			= self::get_total_orders( $start_date, $end_date );
-			$total_customers 		= self::get_total_customers( $start_date, $end_date );
-			$total_sales 			= self::get_total_sales( $start_date, $end_date );
-			$total_checkout_sales 	= self::get_total_checkout_sales( $start_date, $end_date );
-			$total_ob_revenue 		= self::get_total_ob_sales( $start_date, $end_date );
-			$total_leads 		    = self::get_total_leads( $start_date, $end_date );
-			$wc_interval_total      = self::get_wc_total_sales( $start_date, $end_date );
+		foreach ( $intervals as $bucket ) {
+			// Bucket boundaries, not the whole requested range.
+			$bucket_start			= isset($bucket['start_date']) ? $bucket['start_date'] : (new \DateTime('monday last week'))->format('Y-m-d H:i:s');
+			$bucket_end 			= isset($bucket['end_date']) ? $bucket['end_date'] : (new \DateTime('sunday last week'))->format('Y-m-d H:i:s');
+			$total_orders			= self::get_total_orders( $bucket_start, $bucket_end );
+			$total_customers 		= self::get_total_customers( $bucket_start, $bucket_end );
+			$total_sales 			= self::get_total_sales( $bucket_start, $bucket_end );
+			$total_checkout_sales 	= self::get_total_checkout_sales( $bucket_start, $bucket_end );
+			$total_ob_revenue 		= self::get_total_ob_sales( $bucket_start, $bucket_end );
+			$total_leads 		    = self::get_total_leads( $bucket_start, $bucket_end );
+			$wc_interval_total      = self::get_wc_total_sales( $bucket_start, $bucket_end );
 			$store_sales            = max( 0, $wc_interval_total - (float) $total_sales );
 			$response['sales']['interval'][]	= apply_filters( 'wpfunnels/stat-interval-data',  array(
+				// Exposed so consumers can label buckets from the real
+				// boundaries instead of re-deriving them from the range start.
+				'start_date'			=> $bucket_start,
+				'end_date'				=> $bucket_end,
 				'total_orders'			=> (int) $total_orders,
 				'total_customers'		=> (int) $total_customers,
 				'total_sales'			=> self::format_price( $total_checkout_sales ),
 				'total_ob_revenue'		=> self::format_price( $total_ob_revenue ),
 				'total_funnel_sales'	=> self::format_price( $total_sales ),
 				'store_sales'			=> self::format_price( $store_sales ),
-			), $start_date, $end_date );
+			), $bucket_start, $bucket_end );
 
 			$response['lead']['interval'][]	= apply_filters( 'wpfunnels/stat-interval-data-leads',  array(
+				'start_date'	        => $bucket_start,
+				'end_date'		        => $bucket_end,
 				'total'			        => (int) $total_leads,
-			), $start_date, $end_date );
+			), $bucket_start, $bucket_end );
 		}
 		$response['status'] = true;
 		return apply_filters( 'wpfunnels/funnels-stats-data', $response );
@@ -139,13 +146,17 @@ class ReportGenerator {
 			$end_date = current_time( 'Y-m-d H:i:s' );
 		}
 
+		// Restricting to published funnels here — rather than skipping them after
+		// the fact — keeps LIMIT 3 from being eaten by trashed or draft funnels.
 		$sql = $wpdb->prepare(
-			"SELECT funnel_id,
-				SUM(CASE WHEN status = 'completed' THEN total_sales ELSE 0 END) AS total_revenue,
-				COUNT(CASE WHEN status = 'completed' THEN 1 END) AS order_count
-			 FROM {$table}
-			 WHERE paid_date >= %s AND paid_date <= %s
-			 GROUP BY funnel_id
+			"SELECT s.funnel_id,
+				SUM(CASE WHEN s.status = 'completed' THEN s.total_sales ELSE 0 END) AS total_revenue,
+				COUNT(CASE WHEN s.status = 'completed' THEN 1 END) AS order_count
+			 FROM {$table} s
+			 INNER JOIN {$wpdb->posts} p
+				ON p.ID = s.funnel_id AND p.post_status = 'publish'
+			 WHERE s.paid_date >= %s AND s.paid_date <= %s
+			 GROUP BY s.funnel_id
 			 ORDER BY total_revenue DESC
 			 LIMIT 3",
 			$start_date,
@@ -162,13 +173,16 @@ class ReportGenerator {
 		$funnel_data = array();
 		foreach ( $top_funnels as $top_funnel ) {
 			$funnel_id = $top_funnel->funnel_id;
-			if ( 'publish' !== get_post_status( $funnel_id ) ) {
-				continue;
-			}
-			$revenue  = (float) $top_funnel->total_revenue;
-			$orders   = (int) $top_funnel->order_count;
-			$aov      = $orders > 0 ? $revenue / $orders : 0;
-			$aov_lift = $store_aov > 0 ? round( ( ( $aov - $store_aov ) / $store_aov ) * 100, 1 ) : 0;
+			$revenue   = (float) $top_funnel->total_revenue;
+			$orders    = (int) $top_funnel->order_count;
+			$aov       = $orders > 0 ? $revenue / $orders : 0;
+
+			// With no orders there is no average order value to compare, so the
+			// lift is undefined. Reporting it as a number would always read
+			// -100% and look like a real result.
+			$aov_lift  = ( $orders > 0 && $store_aov > 0 )
+				? round( ( ( $aov - $store_aov ) / $store_aov ) * 100, 1 )
+				: null;
 
 			$funnel_data[] = array(
 				'id'              => $funnel_id,
@@ -327,12 +341,14 @@ class ReportGenerator {
 	/**
 	 * Get interval data
 	 *
-	 * This method generates an array of date intervals between the given start and end dates,
-	 * based on the specified interval type (day, month, quarter, hour).
+	 * Splits the given range into buckets aligned to calendar boundaries. The
+	 * first bucket starts exactly at $start_date and the last ends exactly at
+	 * $end_date, so the buckets are contiguous, cover the whole range and never
+	 * reach outside it — even when the range starts or ends mid-unit.
 	 *
 	 * @param string $start_date The start date in 'Y-m-d H:i:s' format.
 	 * @param string $end_date The end date in 'Y-m-d H:i:s' format.
-	 * @param string $interval_type The type of interval ('day', 'month', 'quarter', 'hour').
+	 * @param string $interval_type One of 'hour', 'day', 'week', 'month', 'quarter', 'year'.
 	 * @return array An array of intervals, where each interval is an associative array
 	 *               with 'start_date' and 'end_date' keys in 'Y-m-d H:i:s' format.
 	 * @throws \Exception If an invalid interval type is provided.
@@ -340,59 +356,79 @@ class ReportGenerator {
 	 * @since 3.2.0
 	 */
 	public static function get_intervals( $start_date, $end_date, $interval_type ) {
+		$valid_types = array( 'hour', 'day', 'week', 'month', 'quarter', 'year' );
+		if ( ! in_array( $interval_type, $valid_types, true ) ) {
+			throw new \Exception( "Invalid interval type: $interval_type" );
+		}
+
+		$start = new \DateTime( $start_date );
+		$end   = new \DateTime( $end_date );
+
+		if ( $end < $start ) {
+			return array();
+		}
+
 		$intervals = array();
+		$cursor    = clone $start;
 
-		// Convert start and end dates to DateTime objects
-		$start 	= new \DateTime($start_date);
-		$end 	= new \DateTime($end_date);
+		while ( $cursor <= $end ) {
+			$bucket_end = self::get_bucket_end( $cursor, $interval_type );
 
-		// Create interval based on interval type
-		switch ($interval_type) {
-			case 'day':
-				$interval = new \DateInterval('P1D');
-				break;
-			case 'month':
-				$interval = new \DateInterval('P1M');
-				$end->modify('last day of this month')->setTime(23, 59, 59);
-				break;
-			case 'quarter':
-				$interval = new \DateInterval('P3M');
-				$end->modify('last day of this quarter')->setTime(23, 59, 59);
-				break;
-			case 'hour':
-				$interval = new \DateInterval('PT1H');
-				break;
-			default:
-				throw new \Exception("Invalid interval type: $interval_type");
-		}
-
-		// Iterate over the date range
-		$period = new \DatePeriod($start, $interval, $end);
-		foreach ($period as $dt) {
-			$interval_end = clone $dt;
-			if ($interval_type === 'day') {
-				$interval_end->setTime(23, 59, 59);
-			} elseif ($interval_type === 'month') {
-				$interval_end->modify('last day of this month')->setTime(23, 59, 59);
-			} elseif ($interval_type === 'hour') {
-				$interval_end->setTime($interval_end->format('H'), 59, 59);
+			// Never report past the requested range.
+			if ( $bucket_end > $end ) {
+				$bucket_end = clone $end;
 			}
-			$intervals[] = array(
-				'start_date' => $dt->format('Y-m-d H:i:s'),
-				'end_date' => $interval_end->format('Y-m-d H:i:s')
-			);
-		}
 
-		// Handle the last interval for month type
-		if ($interval_type === 'month' && $end > $interval_end) {
-			$last_month_end = new \DateTime($end->format('Y-m-t').' 23:59:59');
 			$intervals[] = array(
-				'start_date' => $interval_end->format('Y-m-d H:i:s'),
-				'end_date' => $last_month_end->format('Y-m-d H:i:s')
+				'start_date' => $cursor->format( 'Y-m-d H:i:s' ),
+				'end_date'   => $bucket_end->format( 'Y-m-d H:i:s' ),
 			);
+
+			// Resume the instant after this bucket, so buckets never overlap
+			// and never leave a gap.
+			$cursor = ( clone $bucket_end )->modify( '+1 second' );
 		}
 
 		return $intervals;
+	}
+
+
+	/**
+	 * End of the calendar unit containing the given moment.
+	 *
+	 * @param \DateTime $date
+	 * @param string    $interval_type
+	 * @return \DateTime
+	 *
+	 * @since 3.13.0
+	 */
+	protected static function get_bucket_end( \DateTime $date, $interval_type ) {
+		$end = clone $date;
+
+		switch ( $interval_type ) {
+			case 'hour':
+				$end->setTime( (int) $end->format( 'H' ), 59, 59 );
+				break;
+			case 'day':
+				$end->setTime( 23, 59, 59 );
+				break;
+			case 'week':
+				$end->modify( 'sunday this week' )->setTime( 23, 59, 59 );
+				break;
+			case 'month':
+				$end->modify( 'last day of this month' )->setTime( 23, 59, 59 );
+				break;
+			case 'quarter':
+				$quarter_end_month = ( (int) ceil( ( (int) $end->format( 'n' ) ) / 3 ) ) * 3;
+				$end->setDate( (int) $end->format( 'Y' ), $quarter_end_month, 1 )
+					->modify( 'last day of this month' )->setTime( 23, 59, 59 );
+				break;
+			case 'year':
+				$end->setDate( (int) $end->format( 'Y' ), 12, 31 )->setTime( 23, 59, 59 );
+				break;
+		}
+
+		return $end;
 	}
 
 

@@ -60,12 +60,6 @@ jQuery(function ($) {
             $('#clear-template').trigger('click');
         });
 
-        $('#wpfunnels-funnel-type').on('click', '.wpfnl-single-item', function() {
-            $('#wpfunnels-funnel-type .wpfnl-single-item').removeClass('checked');
-            $(this).addClass('checked');
-            $('#clear-template').trigger('click');
-        });
-
         $('#wpfunnels-canvas-mode').on('click', '.wpfnl-single-item', function() {
             $('#wpfunnels-canvas-mode .wpfnl-single-item').removeClass('checked');
             $(this).addClass('checked');
@@ -235,6 +229,30 @@ jQuery(function ($) {
 
 
         /**
+         * Read the usage-tracking toggle, but only report an actual change.
+         *
+         * The toggle carries the state it was rendered with in `data-initial`
+         * ('yes' or 'no' — a site that has never been asked renders 'no', the
+         * same as an explicit opt-out). Returning null for an untouched toggle
+         * is what keeps an undecided site undecided.
+         *
+         * @returns {string|null} 'yes', 'no', or null when nothing changed.
+         * @since 3.13.0
+         */
+        function getTrackingConsentChange() {
+            var $toggle = $('#wpfnl-allow-tracking');
+
+            if (!$toggle.length) {
+                return null;
+            }
+
+            var current = $toggle.is(':checked') ? 'yes' : 'no';
+
+            return current === $toggle.data('initial') ? null : current;
+        }
+
+
+        /**
          * update general settings
          *
          * @param e
@@ -287,7 +305,6 @@ jQuery(function ($) {
             });
 
             var payload = {
-                'funnel_type': $('#wpfunnels-funnel-type .wpfnl-single-item.checked').attr('data-value'),
                 'builder': $('#wpfunnels-page-builder .wpfnl-single-item.checked').attr('data-value'),
                 'funnel_builder_mode': $('#wpfunnels-canvas-mode .wpfnl-single-item.checked').attr('data-value') || 'vertical',
                 'uninstall_cleanup': $('#wpfnl-data-cleanup').is(':checked') ? 'on' : 'off',
@@ -321,6 +338,11 @@ jQuery(function ($) {
                 'utm_campaign': $('#wpfnl-utm-campaign').val(),
                 'utm_content': $('#wpfnl-utm-content').val(),
                 'disable_theme_style': $('#disable-theme-style').is(':checked') ? 'on' : 'off',
+                // Telemetry consent is stored by the Linno SDK, not in general
+                // settings. Send it only when the toggle differs from what was
+                // rendered so that saving an unrelated field never converts a
+                // site that has simply never answered into an explicit "no".
+                'allow_tracking': getTrackingConsentChange(),
                 'enable_log_status': $('#enable-log-status').is(':checked') ? 'on' : 'off',
                 'enable_skip_cart': $('#enable-skip-cart').is(':checked') ? 'on' : 'off',
                 'skip_cart_for': $('input[name="skip-cart"]:checked').val(),
@@ -347,6 +369,13 @@ jQuery(function ($) {
                 // saved the moment this button was clicked.
             };
 
+            // jQuery.param() serialises null as an empty string, which PHP would
+            // read as an explicit "no". Drop the key entirely instead so an
+            // untouched toggle sends nothing at all.
+            if (null === payload.allow_tracking) {
+                delete payload.allow_tracking;
+            }
+
             var thisLoader  = $(this).find('.wpfnl-loader');
             var thisAlert   = $(this).siblings('.wpfnl-alert');
 
@@ -355,6 +384,17 @@ jQuery(function ($) {
             wpAjaxHelperRequest("update-general-settings", payload)
                 .success(function (response) {
                     thisLoader.fadeOut();
+
+                    // The page is not reloaded after a save, so re-baseline the
+                    // consent toggle — otherwise a second change in the same
+                    // visit would compare against the stale rendered value and
+                    // never be sent.
+                    var $trackingToggle = $('#wpfnl-allow-tracking');
+
+                    if ($trackingToggle.length) {
+                        $trackingToggle.data('initial', $trackingToggle.is(':checked') ? 'yes' : 'no');
+                    }
+
                     $('#wpfnl-toaster-wrapper').addClass('quick-toastify-successful-notification');
 
                     $('#wpfnl-toaster-icon').html('<svg width="26" height="26" fill="none" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg"><path fill="#4BAE4F" fill-rule="evenodd" d="M13 0C5.83 0 0 5.83 0 13s5.83 13 13 13 13-5.83 13-13S20.17 0 13 0z" clip-rule="evenodd"/><path fill="#fff" fill-rule="evenodd" d="M19.287 8.618a.815.815 0 010 1.148l-7.617 7.617a.812.812 0 01-1.148 0l-3.808-3.809a.815.815 0 010-1.147.815.815 0 011.147 0l3.235 3.234 7.044-7.043a.806.806 0 011.147 0z" clip-rule="evenodd"/></svg>');

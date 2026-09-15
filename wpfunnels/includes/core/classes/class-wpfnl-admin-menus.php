@@ -364,6 +364,14 @@ class Wpfnl_Menus
      */
     public function render_store_checkout_page()
     {
+        // Store Checkout takes over the WooCommerce checkout, so the screen is
+        // meaningless without WooCommerce. Offer to install/activate it instead
+        // of rendering an empty listing.
+        if ( ! Wpfnl_functions::is_wc_active() ) {
+            require WPFNL_DIR . '/admin/modules/store-checkout/views/woocommerce-required.php';
+            return;
+        }
+
         require WPFNL_DIR . '/admin/modules/store-checkout/views/store-checkout-listing.php';
     }
 

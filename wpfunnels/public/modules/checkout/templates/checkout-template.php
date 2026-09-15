@@ -1,14 +1,15 @@
 <?php
 // Exit if accessed directly.
 use WPFunnels\Wpfnl;
+use WPFunnels\Wpfnl_functions;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$checkout_layout = Wpfnl::get_instance()->meta->get_checkout_meta_value( $checkout_id, 'wpfnl_checkout_layout', 'wpfnl-col-2' );
+$checkout_layout = Wpfnl_functions::get_checkout_layout( $checkout_id );
 
-$floating_label = Wpfnl::get_instance()->meta->get_checkout_meta_value( $checkout_id, 'wpfnl_floating_label', 'wpfnl-col-2' );
+$floating_label = Wpfnl_functions::get_checkout_step_setting( $checkout_id, 'wpfnl_floating_label', 'wpfnl-col-2' );
 
 if( PHP_SESSION_DISABLED == session_status() ) {
 	session_start();

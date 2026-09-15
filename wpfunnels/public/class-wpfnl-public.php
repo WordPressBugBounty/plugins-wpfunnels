@@ -287,6 +287,13 @@ class Wpfnl_Public
 	public function wpfnl_order_bump_cart_item_quantity($quantity, $cart_item, $cart_item_key)
 	{
 		if (isset($cart_item['wpfnl_order_bump']) && $cart_item['wpfnl_order_bump'] && isset($cart_item['wpfnl_ob_quantity'])) {
+			// When the checkout step has quantity selection enabled, let the bump
+			// item go through the same editable quantity control as every other
+			// cart item instead of forcing a fixed, non-editable badge.
+			$step_id = wp_doing_ajax() ? Wpfnl_functions::is_funnel_checkout_page()['id'] : get_the_ID();
+			if ( 'yes' === get_post_meta( $step_id, '_wpfnl_quantity_support', true ) ) {
+				return $quantity;
+			}
 			return ' <strong class="product-quantity">' . $cart_item['quantity'] . '</strong>';
 		}
 		return $quantity;
@@ -347,14 +354,17 @@ class Wpfnl_Public
 
 	public function init_wp_actions()
 	{
-		if (Wpfnl_functions::is_funnel_step_page('')) {
+		$is_ajax = wp_doing_ajax() || isset( $_GET['wc-ajax'] );
+		if ( Wpfnl_functions::is_funnel_step_page('') || $is_ajax ) {
 			/**
 			 * Enqueue public styles
 			 */
-			add_action('wp_enqueue_scripts', array($this, 'enqueue_styles'));
-			add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
-			add_action('wp_enqueue_scripts', array($this, 'remove_theme_styles'));
-			add_filter('woocommerce_enqueue_styles', array($this, 'enqueue_wc_styles'), 9999);
+			if ( ! $is_ajax ) {
+				add_action('wp_enqueue_scripts', array($this, 'enqueue_styles'));
+				add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
+				add_action('wp_enqueue_scripts', array($this, 'remove_theme_styles'));
+				add_filter('woocommerce_enqueue_styles', array($this, 'enqueue_wc_styles'), 9999);
+			}
 
 			add_filter('woocommerce_locate_template', array($this, 'wpfunnels_woocommerce_locate_template'), 20, 3);
 		}

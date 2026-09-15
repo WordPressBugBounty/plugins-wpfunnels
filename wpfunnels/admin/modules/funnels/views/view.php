@@ -19,7 +19,6 @@ if ( $is_pro_active ) {
 $is_wc = \WPFunnels\Wpfnl_functions::is_wc_active();
 $is_lms = \WPFunnels\Wpfnl_functions::is_lms_addon_active();
 $is_mint_pro_active = \WPFunnels\Wpfnl_functions::is_mint_mrm_active();
-$global_funnel_type = \WPFunnels\Wpfnl_functions::get_global_funnel_type();
 
 $is_wc_installed = 'no';
 $is_lms_installed = 'no';
@@ -374,11 +373,9 @@ $live_redirect_link = add_query_arg(
                                 $view_link = add_query_arg($utm_settings,$view_link);
                                 $view_link   = strtolower($view_link);
                             }
-							if( 'lead' == $global_funnel_type && ( 'lms' == $_type  || 'wc' == $_type ) ){
-								echo '<div class="funnel__single-list list-body funnel-disabled" title="'.__('To run/edit this funnel, please change the funnel type to sales from WPFunnels - Settings', 'wpfnl').'">';
-							}elseif( 'sales' == $global_funnel_type && 'wc' == $_type &&  !$is_wc ){
+							if( 'wc' == $_type &&  !$is_wc ){
 								echo '<div class="funnel__single-list list-body funnel-disabled" title="'.__('To run/edit this funnel, please Activate WooCommerce.', 'wpfnl').'">';
-							}elseif( 'sales' == $global_funnel_type && 'lms' == $_type &&  !$is_lms ){
+							}elseif( 'lms' == $_type &&  !$is_lms ){
 								echo '<div class="funnel__single-list list-body funnel-disabled" title="'.__('To run/edit this funnel, please Activate LearnDash & WPFunnels Pro - LMS Funnel', 'wpfnl').'">';
 							}else{
 								echo '<div class="funnel__single-list list-body">';
@@ -401,7 +398,7 @@ $live_redirect_link = add_query_arg(
                                         <span class="builder-logo" title="<?php echo __('No Builder Found', 'wpfnl') ?>">
                                         </span>
                                     <?php } ?>
-                                    <?php if( ('lead' == $global_funnel_type && 'lead' !== $_type) || ( 'sales' == $global_funnel_type && ( ('wc' == $_type && !$is_wc) || ('lms' == $_type && !$is_lms) ) ) ){ ?>
+                                    <?php if( ('wc' == $_type && !$is_wc) || ('lms' == $_type && !$is_lms) ){ ?>
                                         <a href="#" class="name disabled"> <?php echo $funnel->get_funnel_name() ?></a>
                                     <?php }else{
 										$edit_funnel_url = isset($_GET['page']) && 'trash_funnels' === sanitize_text_field( $_GET['page'] ) ? '#' : esc_url_raw($edit_link);
@@ -499,8 +496,8 @@ $live_redirect_link = add_query_arg(
                                     <?php
                                         if( isset($_GET['page']) && 'trash_funnels' !== sanitize_text_field( $_GET['page'] ) ){
                                     ?>
-                                    <?php if( ('lead' == $global_funnel_type && 'lead' !== $_type) || ( 'sales' == $global_funnel_type && ( ('wc' == $_type && !$is_wc) || ('lms' == $_type && !$is_lms) ) ) ){ ?>
-                                        <a href="#" class="edit disabled" title="<?php esc_attr_e( 'Lead funnel type is activated in global settings', 'wpfnl' ) ?>">
+                                    <?php if( ('wc' == $_type && !$is_wc) || ('lms' == $_type && !$is_lms) ){ ?>
+                                        <a href="#" class="edit disabled" title="<?php esc_attr_e( 'Activate the plugin this funnel depends on to use it.', 'wpfnl' ) ?>">
                                             <?php require WPFNL_DIR . '/admin/partials/icons/edit-icon.php'; ?>
                                         </a>
                                     <?php }else{ ?>
@@ -513,8 +510,8 @@ $live_redirect_link = add_query_arg(
 									<?php
 										$disable_view_button = apply_filters( 'wpfunnels/disable_funnel_view_button', false, $funnel_id );
 
-                                        if( ('lead' == $global_funnel_type && 'lead' !== $_type) || ( 'sales' == $global_funnel_type && ( ('wc' == $_type && !$is_wc) || ('lms' == $_type && !$is_lms) ) ) ){ ?>
-                                            <a class="view <?php echo 'disabled'; ?>" title="<?php esc_attr_e( 'Lead funnel type is activated in global settings', 'wpfnl' ) ?>">
+                                        if( ('wc' == $_type && !$is_wc) || ('lms' == $_type && !$is_lms) ){ ?>
+                                            <a class="view <?php echo 'disabled'; ?>" title="<?php esc_attr_e( 'Activate the plugin this funnel depends on to use it.', 'wpfnl' ) ?>">
                                                 <?php require WPFNL_DIR . '/admin/partials/icons/eye-icon.php'; ?>
                                             </a>
                                             <?php
@@ -960,6 +957,4 @@ $live_redirect_link = add_query_arg(
                 </div>
             </div>
     </div>
-
-    <?php require_once WPFNL_DIR . '/admin/partials/helper-resource.php'; ?>
 </div>

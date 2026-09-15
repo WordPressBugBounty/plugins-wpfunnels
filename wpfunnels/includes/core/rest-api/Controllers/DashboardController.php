@@ -182,6 +182,17 @@ class DashboardController extends Wpfnl_REST_Controller
 
 
 	/**
+	 * Cache payload version. Bump whenever the shape or the meaning of a cached
+	 * report response changes, so entries written by an older build are ignored
+	 * instead of served until they expire.
+	 *
+	 * @var string
+	 * @since 3.13.0
+	 */
+	const CACHE_VERSION = 'v2';
+
+
+	/**
 	 * Build a cache key from a prefix and parameter array.
 	 *
 	 * @param string $prefix
@@ -191,7 +202,7 @@ class DashboardController extends Wpfnl_REST_Controller
 	 * @since 3.9.6
 	 */
 	protected function get_cache_key( $prefix, $params ) {
-		return 'wpfnl_dash_' . $prefix . '_' . md5( serialize( $params ) );
+		return 'wpfnl_dash_' . $prefix . '_' . self::CACHE_VERSION . '_' . md5( serialize( $params ) );
 	}
 
 

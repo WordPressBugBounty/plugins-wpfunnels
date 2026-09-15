@@ -98,26 +98,13 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
             $funnel->update_meta( $funnel_id, '_is_store_checkout', 'yes' );
         } else {
             if( $funnel_id ){
-                
-                if( isset( $general_settings['funnel_type'] ) ){
-                    if( 'woocommerce' == $general_settings['funnel_type'] ){
-                        $general_settings['funnel_type'] = 'sales';
-                        update_option( '_wpfunnels_general_settings', $general_settings );
-                    }
-                    if( 'sales' == $general_settings['funnel_type'] ){
-                        // Check if LMS add-on is active AND at least one LMS plugin (LearnDash or CreatorLMS) is active
-                        if( Wpfnl_functions::is_lms_addon_active() && Wpfnl_functions::is_any_lms_plugin_active() && isset($args['type']) && 'lms' === $args['type'] ){
-                            update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lms' );
-                        } elseif( Wpfnl_functions::is_wc_active() && isset($args['type']) && 'wc' === $args['type'] ){
-                            update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'wc' );
-                        } elseif( isset($args['type']) && 'lead' === $args['type'] ){
-                            update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lead' );
-                        }
-                    }else{
-                        if( isset($args['type']) && 'lead' === $args['type'] ){
-                            update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lead' );
-                        }
-                    }
+                // Check if LMS add-on is active AND at least one LMS plugin (LearnDash or CreatorLMS) is active
+                if( Wpfnl_functions::is_lms_addon_active() && Wpfnl_functions::is_any_lms_plugin_active() && isset($args['type']) && 'lms' === $args['type'] ){
+                    update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lms' );
+                } elseif( Wpfnl_functions::is_wc_active() && isset($args['type']) && 'wc' === $args['type'] ){
+                    update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'wc' );
+                } elseif( isset($args['type']) && 'lead' === $args['type'] ){
+                    update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lead' );
                 }
             }
         }

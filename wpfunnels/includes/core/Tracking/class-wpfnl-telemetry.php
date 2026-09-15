@@ -173,6 +173,46 @@ class Telemetry {
     }
 
     /**
+     * Read the stored consent decision.
+     *
+     * Delegates to the SDK, which also migrates the pre-Linno Appsero keys
+     * (`wpfunnels_allow_tracking` and friends) onto the shared Linno option — so
+     * a site that consented through an older setup wizard still reports 'yes'
+     * here. When the SDK is unavailable we read those same keys directly rather
+     * than reporting "no decision" and silently losing an existing opt-in.
+     *
+     * @return string|null 'yes', 'no', or null when the user has never decided.
+     */
+    public function get_consent_state(): ?string {
+        if ( $this->client ) {
+            return $this->client->get_optin_state();
+        }
+
+        foreach ( [ 'linno_telemetry_allow_tracking', WPFNL_SLUG . '_allow_tracking' ] as $option_key ) {
+            $value = get_option( $option_key, null );
+
+            if ( is_string( $value ) ) {
+                $value = strtolower( trim( $value ) );
+
+                if ( 'yes' === $value || 'no' === $value ) {
+                    return $value;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Whether the user has actively opted in to usage tracking.
+     *
+     * @return bool
+     */
+    public function has_consent(): bool {
+        return 'yes' === $this->get_consent_state();
+    }
+
+    /**
      * Dispatch a step-view or step-completion event from the REST layer.
      *
      * @param array $data Keys: event_type (viewed|completed), step_name, step_index, goal, time_on_step.

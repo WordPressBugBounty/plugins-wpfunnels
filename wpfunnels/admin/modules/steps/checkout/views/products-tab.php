@@ -19,7 +19,7 @@ $is_store_checkout = get_post_meta($funnel_id, '_wpfnl_funnel_type', true) === '
 
 $coupon_enable = get_post_meta($step_id, '_wpfnl_checkout_coupon', true);
 $coupon_enable_check = '';
-if($coupon_enable == 'yes') {
+if($coupon_enable != 'no') {
   $coupon_enable_check = 'checked';
 }
 

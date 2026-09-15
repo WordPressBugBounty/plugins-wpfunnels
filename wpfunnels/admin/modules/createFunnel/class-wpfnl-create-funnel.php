@@ -55,34 +55,16 @@ class Module extends Wpfnl_Admin_Module
                 update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'store_checkout' );
                 $funnel_type = 'store_checkout';
             } else {
-                $general_settings = get_option( '_wpfunnels_general_settings' );
-                if( isset($general_settings['funnel_type']) ){
-                    if( 'woocommerce' == $general_settings['funnel_type'] ){
-                        $general_settings['funnel_type'] = 'sales';
-                        update_option( '_wpfunnels_general_settings', $general_settings );
-                        
-                    }
-                    
-                    if( 'sales' == $general_settings['funnel_type'] ){
-                        // Check if LMS add-on is active AND at least one LMS plugin (LearnDash or CreatorLMS) is active
-                        if( Wpfnl_functions::is_lms_addon_active() && Wpfnl_functions::is_any_lms_plugin_active() && isset($payload['type']) && 'lms' === $payload['type'] ){
-                            update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lms' );
-                            $funnel_type = 'lms';
-                        }elseif( Wpfnl_functions::is_wc_active() && isset($payload['type']) && 'wc' === $payload['type'] ){
-                            update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'wc' );
-                            $funnel_type = 'wc';
-                        }elseif( isset($payload['type']) && 'lead' === $payload['type'] ){
-                            update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lead' );
-                            $funnel_type = 'lead';
-                        }
-
-                    }else{
-                       
-                        if( isset($payload['type']) && 'lead' === $payload['type'] ){
-                            update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lead' );
-                            $funnel_type = 'lead';
-                        }
-                    }
+                // Check if LMS add-on is active AND at least one LMS plugin (LearnDash or CreatorLMS) is active
+                if( Wpfnl_functions::is_lms_addon_active() && Wpfnl_functions::is_any_lms_plugin_active() && isset($payload['type']) && 'lms' === $payload['type'] ){
+                    update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lms' );
+                    $funnel_type = 'lms';
+                }elseif( Wpfnl_functions::is_wc_active() && isset($payload['type']) && 'wc' === $payload['type'] ){
+                    update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'wc' );
+                    $funnel_type = 'wc';
+                }elseif( isset($payload['type']) && 'lead' === $payload['type'] ){
+                    update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lead' );
+                    $funnel_type = 'lead';
                 }
             }
         }

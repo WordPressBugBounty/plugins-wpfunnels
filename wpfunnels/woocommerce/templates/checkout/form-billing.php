@@ -20,7 +20,16 @@ defined( 'ABSPATH' ) || exit;
 $hide_section_settings = \WPFunnels\Wpfnl_functions::get_checkout_section_heading_settings( 'billing' , get_the_ID() );
 
 ?>
-<div class="wpfnl-billing-fields woocommerce-billing-fields">
+<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
+	<p class="form-row form-row-wide wpfnl-billing-same-as-shipping">
+		<label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
+			<input class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" id="billing-same-as-shipping-checkbox" type="checkbox" name="billing_same_as_shipping" value="1" checked="checked" /> <span><?php esc_html_e( 'Use same address for billing', 'wpfnl' ); ?></span>
+		</label>
+	</p>
+<?php endif; ?>
+
+<?php $billing_container_style = ( WC()->cart && WC()->cart->needs_shipping_address() ) ? 'style="display: none;"' : ''; ?>
+<div class="wpfnl-billing-fields woocommerce-billing-fields" <?php echo $billing_container_style; ?>>
 	<?php if ( wc_ship_to_billing_address_only() && WC()->cart->needs_shipping() ) : ?>
 		<?php if( !$hide_section_settings || ( isset($hide_section_settings['custom_heading']) && $hide_section_settings['custom_heading'] != '' )  ) { ?>
 			<h3>
@@ -54,6 +63,35 @@ $hide_section_settings = \WPFunnels\Wpfnl_functions::get_checkout_section_headin
 	<div class="woocommerce-billing-fields__field-wrapper">
 		<?php
 		$fields = $checkout->get_checkout_fields( 'billing' );
+
+		/*
+		 * The modern layouts render billing_email up in their contact section — a
+		 * visible field for guests, a hidden input for logged-in customers — matching
+		 * how WooCommerce's own checkout keeps the email out of the billing address.
+		 * Without this the field is emitted twice, producing two inputs sharing
+		 * id="billing_email", which breaks label association and browser autofill.
+		 *
+		 * WC_Checkout::get_checkout_fields() caches its result on first call, and the
+		 * contact section calls it before this template runs, so a late
+		 * woocommerce_checkout_fields filter cannot remove the field — it has to come
+		 * out of the local copy here.
+		 */
+		$checkout_id = get_the_ID();
+		if ( ! $checkout_id && wp_doing_ajax() ) {
+			$checkout_id = \WPFunnels\Wpfnl_functions::get_checkout_id_from_post( $_POST );
+			if ( ! $checkout_id && ! empty( $_POST['wpfnl_step_id'] ) ) {
+				$checkout_id = absint( $_POST['wpfnl_step_id'] );
+			}
+		}
+		$checkout_layout = $checkout_id ? \WPFunnels\Wpfnl_functions::get_checkout_layout( $checkout_id ) : '';
+		if ( empty( $checkout_layout ) && isset( $_SESSION['checkout_layout'] ) ) {
+			$checkout_layout = $_SESSION['checkout_layout'];
+		}
+		$is_modern = ( false !== strpos( $checkout_layout, 'modern' ) ) || in_array( $checkout_layout, array( 'wpfnl-modern-checkout', 'wpfnl-modern-one-column', 'wpfnl-modern-multistep' ), true );
+
+		if ( did_action( 'wpfunnels/modern_checkout_email_rendered' ) || $is_modern ) {
+			unset( $fields['billing_email'] );
+		}
 
 		foreach ( $fields as $key => $field ) {
 			woocommerce_form_field( $key, $field, $checkout->get_value( $key ) );

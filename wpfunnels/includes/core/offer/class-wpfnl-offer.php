@@ -1218,16 +1218,20 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
 
                     $offer_product_id         = isset( $offer_product[ 'id' ] ) ? $offer_product[ 'id' ] : 0;
                     $offer_total_price        = isset( $offer_product[ 'total' ] ) ? $offer_product[ 'total' ] : 0;
-                    $shipping                 = $this->calculate_offer_product_shipping_price( $order, $offer_product_id, $offer_total_price );
+                    $offer_qty                = isset( $offer_product[ 'qty' ] ) ? $offer_product[ 'qty' ] : 1;
+                    $shipping                 = $this->calculate_offer_product_shipping_price( $order, $offer_product_id, $offer_total_price, $offer_qty );
                     $shipping_price           = isset( $shipping[ 'total' ] ) ? $shipping[ 'total' ] : 0;
                     $shipping_tax             = isset( $shipping[ 'total_tax' ] ) ? $shipping[ 'total_tax' ] : 0;
                     $shipping_price           = $shipping_price + $shipping_tax;
 
+                    /**
+                     * Charge the derived shipping alongside the offer product. The same
+                     * $shipping array is handed to after_offer_charged() below, which
+                     * records it as a shipping line, so the amount charged and the
+                     * amount recorded on the order stay in lockstep.
+                     */
                     $offer_product[ 'price' ] = $offer_total_price + $shipping_price;
                     $offer_product[ 'total' ] = $offer_total_price + $shipping_price;
-
-                    $offer_product[ 'price' ] = $offer_total_price;
-                    $offer_product[ 'total' ] = $offer_total_price;
 
                     // Handle chained products if pro plugin is active
                     $total_chained_product_price = 0;
@@ -1613,78 +1617,17 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
     /**
      * @desc calculate shipping cost for offer steps (upsell/downsell)
      *
+     * Delegates to the shared helper so the free and pro copies of this handler
+     * cannot drift apart.
+     *
      * @param \WC_Order $order
      * @param $product_id
      * @param $total_price
-     * @return int|mixed|void
+     * @param int $qty
+     * @return array
      */
-    private function calculate_offer_product_shipping_price( \WC_Order $order, $product_id, $total_price ) {
-        if( !$product_id ) {
-            return;
-        }
-        if( !WC()->shipping()->get_shipping_classes() ) {
-            return;
-        }
-
-        $product = wc_get_product( $product_id );
-        if( $product && $product->is_virtual() ) {
-            return;
-        }
-
-        $shipping            = [];
-        $shipping_methods    = $order->get_shipping_methods();
-        $offer_settings      = Wpfnl_functions::get_offer_settings();
-        $offer_orders_option = isset( $offer_settings[ 'offer_orders' ] ) ? $offer_settings[ 'offer_orders' ] : '';
-
-        if( !empty( $shipping_methods ) ) {
-            foreach( $shipping_methods as $key => $method ) {
-                if( $method ){
-                    $shipping = [
-                        'name'           => $method->get_name(),
-                        'method_title'   => $method->get_method_title(),
-                        'method_id'      => $method->get_method_id(),
-                        'instance_id'    => $method->get_instance_id(),
-                        'total'          => $method->get_total(),
-                        'total_tax'      => $method->get_total_tax(),
-                        'taxes'          => $method->get_taxes(),
-                        'tax_percentage' => ( $method->get_total() != 0 ) || ( $method->get_total() != 0.00 ) ? ( $method->get_total_tax() * 100 ) / $method->get_total() : 0,
-                    ];
-                }
-
-            }
-        }
-
-        if( 'main-order' === $offer_orders_option ) {
-            $wc_shipping_zones   = \WC_Shipping_Zones::get_zones();
-
-            if( !empty( $wc_shipping_zones ) && isset( $shipping[ 'method_id' ] ) && 'flat_rate' === $shipping[ 'method_id' ] ) {
-                foreach( $wc_shipping_zones as $zone ) {
-                    if( isset( $zone[ 'shipping_methods' ] ) && !empty( $zone[ 'shipping_methods' ] ) ) {
-                        foreach( $zone[ 'shipping_methods' ] as $method ) {
-                            if( 'WC_Shipping_Flat_Rate' === get_class( $method ) ) {
-                                if( isset( $method->instance_id ) && isset( $shipping[ 'instance_id' ] ) ) {
-                                    if( $method->instance_id == $shipping[ 'instance_id' ] ) {
-                                        $product_shipping_class_id = $product->get_shipping_class_id();
-                                        $instance_settings         = isset( $method->instance_settings ) ? $method->instance_settings : [];
-                                        $shipping_cost             = isset( $instance_settings[ 'class_cost_' . $product_shipping_class_id ] ) ? $instance_settings[ 'class_cost_' . $product_shipping_class_id ] : $instance_settings[ 'no_class_cost' ];
-                                        $shipping_cost             = $shipping_cost ? $shipping_cost : 0;
-                                        $tax_percentage          = isset( $shipping[ 'tax_percentage' ] ) ? $shipping[ 'tax_percentage' ] : 0;
-                                        $total_tax               = ( $shipping_cost * $tax_percentage ) / 100;
-                                        $shipping[ 'total' ]     = $shipping_cost;
-                                        $shipping[ 'total_tax' ] = $total_tax;
-                                        $shipping[ 'taxes' ]     = [
-                                            'total' => [ $total_tax ]
-                                        ];
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        unset( $shipping[ 'tax_percentage' ] );
-        return $shipping;
+    private function calculate_offer_product_shipping_price( \WC_Order $order, $product_id, $total_price, $qty = 1 ) {
+        return Wpfnl_functions::get_offer_shipping( $order, $product_id, $total_price, $qty );
     }
 
     /**
@@ -1882,6 +1825,15 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
                     wc_add_order_item_meta( $item_id, "_wpfunnels_{$step_type}", 'yes' );
                     wc_add_order_item_meta( $item_id, '_wpfunnels_step_id', $offer_product['step_id'] );
                     $order->update_meta_data( '_wpfunnels_offer_' . $step_id, $step_id );
+
+                    // Record any shipping derived for this offer so the amount charged
+                    // and the amount recorded on the order stay in lockstep.
+                    if ( ! empty( $shipping_data ) ) {
+                        $offer_name = isset( $offer_product['name'] ) ? $offer_product['name'] : '';
+                        $offer_qty  = isset( $offer_product['qty'] ) ? $offer_product['qty'] : 1;
+                        $order      = Wpfnl_functions::add_offer_shipping_to_order( $order, $shipping_data, $offer_name, $offer_qty );
+                    }
+
                     $order->calculate_totals();
                     $order->save();
                     

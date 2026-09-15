@@ -5,7 +5,7 @@ Tags: funnel builder, woocommerce checkout, order bump, woocommerce funnel build
 Requires at least: 6.1
 Tested up to:  7.1
 Requires PHP: 7.4
-Stable tag: 3.13.0
+Stable tag: 3.13.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -576,6 +576,39 @@ The Patchstack team helps validate, triage, and handle any security vulnerabilit
 8. The Visual Funnel Canvas
 
 == Changelog ==
+
+= 3.13.1 (2026-09-15) =
+* New: Custom date range picker for dashboard reports with quick presets and dual calendars.
+* New: "View all" link on the Top Performing Funnels section of the dashboard.
+* New: Checkout now collects shipping address first with a "Use same address for billing" option.
+* New: Store Checkout screen now prompts to install or activate WooCommerce when it is missing.
+* New: Added a toggle in Settings to manage usage data sharing.
+* Improvement: Redesigned Settings page with grouped sidebar navigation and a sticky save bar.
+* Improvement: Advanced and Rollback settings now have their own panels with clearer descriptions.
+* Improvement: Each funnel's own type now decides the available steps instead of a global setting.
+* Improvement: Pro offer settings like Skip Cart are now visible with clear upgrade notes instead of being hidden.
+* Improvement: Store revenue report email is now enabled by default on new installs.
+* Improvement: Dashboard reports now open on the last 7 days by default.
+* Improvement: Order bumps now support multiple bumps on the same page and remember their selected state.
+* Improvement: Shipping fields on checkout now appear only when the cart needs shipping.
+* Improvement: Refreshed coupon field styling in the modern checkout layout.
+* Fix: Upsell and downsell accept or reject failing with a session expired error.
+* Fix: Upsell and downsell shipping not being charged or added to the order.
+* Fix: Orders with only virtual products not redirecting to the funnel thank you step.
+* Fix: Order notes section missing on checkout when the cart had only virtual products.
+* Fix: Order bump selections not being saved with the order in modern checkout layouts.
+* Fix: Stripe payments failing on funnel checkout when saved payment methods were enabled.
+* Fix: Email field appearing twice in modern checkout layouts.
+* Fix: Coupon field, order bumps and testimonials being duplicated or lost after order review refreshed.
+* Fix: Coupon toggle showing as disabled on checkout steps that never turned it off.
+* Fix: Coupon field and modern layout not detected on Elementor, Bricks, Divi, Oxygen and shortcode checkout steps.
+* Fix: Instant checkout step appearing in the modern checkout layout.
+* Fix: Postcode field width, additional information heading and section order on checkouts that need shipping.
+* Fix: Top Performing Funnels showing incorrect data including drafts and wrong AOV lift calculations.
+* Fix: Report charts dropping days or using incorrect intervals for some date ranges.
+* Fix: Gutenberg editor back button not returning to the funnel canvas.
+* Fix: Order bump tab missing from step settings in the vertical canvas view.
+* Fix: Automation stats toggle switch misaligned when enabled.
 
 = 3.13.0 (2026-09-01) =
 * New: AI Assistant – Chat-based assistant panel to create and analyze funnels in natural language
