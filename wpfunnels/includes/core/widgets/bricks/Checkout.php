@@ -679,6 +679,10 @@ class Checkout extends Element
 				[
 					'property' => 'font',
 					'selector' => '.wpfnl-checkout .woocommerce-additional-fields > h3',
+                ],
+				[
+					'property' => 'font',
+					'selector' => '.wpfnl-checkout .woocommerce-shipping-fields .shipping-field-title',
                 ]
 			],
 		];
@@ -695,6 +699,10 @@ class Checkout extends Element
 					'property' => 'margin',
 					'selector' => '.wpfnl-checkout .woocommerce-additional-fields > h3',
 				],
+				[
+					'property' => 'margin',
+					'selector' => '.wpfnl-checkout .woocommerce-shipping-fields .shipping-field-title',
+				],
 			],
 		];
         $this->controls['shipping_heading_padding'] = [
@@ -709,6 +717,10 @@ class Checkout extends Element
 				[
 					'property' => 'padding',
 					'selector' => '.wpfnl-checkout .woocommerce-shipping-fields #ship-to-different-address',
+				],
+				[
+					'property' => 'padding',
+					'selector' => '.wpfnl-checkout .woocommerce-shipping-fields .shipping-field-title',
 				],
 			],
 		];

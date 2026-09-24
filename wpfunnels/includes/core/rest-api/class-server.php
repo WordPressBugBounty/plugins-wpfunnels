@@ -87,9 +87,13 @@ class Server
         return apply_filters( 'wpfunnels/rest_api_controllers', array(
 			'mcp_settings'          => 'McpSettingsController',
 			'settings'              => 'SettingsController',
+			// The React settings screen (?page=wpfunnels#/settings).
+			'settings_page'         => 'SettingsPageController',
 			'templates_library'     => 'TemplateLibraryController',
 			'order_bump'            => 'OrderBumpController',
 			'funnel_control'        => 'FunnelController',
+			// Funnel listing screen (?page=wpfunnels#/funnels).
+			'funnel_list'           => 'FunnelListController',
 			'offer'                 => 'OfferController',
 			'step_control'        	=> 'StepController',
 			'remote_funnel'         => 'RemoteFunnelsController',
@@ -101,7 +105,16 @@ class Server
             'plugin_installer'      => 'PluginInstallerController',
             'setup_wizard'          => 'SetupWizardController',
             'store_checkout'        => 'StoreCheckoutController',
+            /*
+             * Two different controllers answer to automations, and WPFunnels Pro
+             * overwrites the 'automation' key with its own CRM controller (see
+             * wpfunnels_add_analytics_controller in wpfnl-pro.php). Keeping this
+             * one under its own key means both register instead of the Pro one
+             * silently replacing it — which is what left the wpfnl/v1 namespace
+             * with no routes at all whenever Pro was active.
+             */
             'automation'            => 'WpfnlAutomationController',
+            'automation_canvas_crud' => 'WpfnlAutomationController',
             'ai_chat'               => 'AiChatController',
             'ai_generate'           => 'SingleShotAiController',
         ));

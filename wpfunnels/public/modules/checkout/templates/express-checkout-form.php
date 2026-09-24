@@ -47,7 +47,6 @@ if( ! is_user_logged_in() && 'yes' === get_option( 'woocommerce_enable_checkout_
 if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_login_reminder' ) && $checkout->is_registration_required() ){
 	$create_acc_field = ' no-create-acc-field ';
 }
-
 ?>
 
 
@@ -105,18 +104,18 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 			<?php }else{
 
 				if( ! $checkout->is_registration_required() || 'yes' === get_option( 'woocommerce_enable_checkout_login_reminder' ) || $checkout->is_registration_enabled() ){
-				?>
+					?>
 					<?php if( WC()->cart && WC()->cart->needs_shipping_address() ) { ?>
-					<li class="shipping <?php echo $shipping_active_cls; ?>">
-						<button type="button" data-target="shipping">
-							<span class="step-icon">
-								<?php include WPFNL_DIR.'public/assets/icons/icon-shipping.php'; ?>
-							</span>
-							<span class="step-title">
-								<?php esc_html_e( 'Shipping', 'wpfnl' ); ?>
-							</span>
-						</button>
-					</li>
+						<li class="shipping <?php echo $shipping_active_cls; ?>">
+							<button type="button" data-target="shipping">
+								<span class="step-icon">
+									<?php include WPFNL_DIR.'public/assets/icons/icon-shipping.php'; ?>
+								</span>
+								<span class="step-title">
+									<?php esc_html_e( 'Shipping', 'wpfnl' ); ?>
+								</span>
+							</button>
+						</li>
 					<?php } ?>
 
 					<li class="billing <?php echo $billing_active_cls; ?>">
@@ -140,19 +139,22 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 							</span>
 						</button>
 					</li>
-				<?php
+					<?php
 				}
 			}
 			?>
 		</ul>
 
 		<?php do_action( 'woocommerce_before_checkout_form', $checkout ); ?>
+
 		<?php
 		if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_required() && ! is_user_logged_in() ) {
 			echo esc_html( apply_filters( 'woocommerce_checkout_must_be_logged_in_message', __( 'You must be logged in to checkout.', 'wpfnl' ) ) );
+
 			echo "</div>";
 		}else{
 		?>
+
 		<form name="checkout" method="post" class="checkout woocommerce-checkout <?php echo $loged_in_cls.' '.$create_acc_field; ?>" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">
 			<input type="hidden" name="wpfnl_step_id" value="<?php echo esc_attr( get_the_ID() ); ?>" />
 			<?php if ( $checkout->get_checkout_fields() ) : ?>
@@ -160,13 +162,25 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 				<?php do_action( 'woocommerce_checkout_before_customer_details' ); ?>
 
 				<div class="col2-set" id="customer_details">
-					<?php 
+					<?php
 						/**
 						 * Fires before customer details in checkout page
 						 * @since 2.8.21
 						 */
-						do_action( 'wpfunnels/before_customer_details' ); 
+						do_action( 'wpfunnels/before_customer_details' );
 					?>
+
+					<?php
+					/*
+					 * Contact details above the address cards, the way WooCommerce's own checkout and
+					 * the modern layouts present them. Inside #customer_details so it stacks in the
+					 * customer column rather than spanning the full form width, and so the
+					 * update_order_review fragment rebuilds it along with the address cards.
+					 */
+					include WPFNL_DIR . 'public/modules/checkout/templates/parts/customer-information.php';
+					?>
+
+
 					<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
 						<div class="col-1" id="wpfnl_checkout_shipping">
 							<?php do_action( 'woocommerce_checkout_shipping' ); ?>
@@ -190,6 +204,7 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 							</div>
 							<!-- /.express-shipping-table -->
 						</div>
+
 						<div class="col-2" id="wpfnl_checkout_billing">
 							<?php do_action( 'woocommerce_checkout_billing' ); ?>
 						</div>
@@ -198,15 +213,15 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 							<?php do_action( 'woocommerce_checkout_billing' ); ?>
 						</div>
 					<?php endif; ?>
-						
-					</div>
-					<?php 
+
+					<!-- </div> -->
+					<?php
 						/**
 						 * Fires after customer details in checkout page
 						 * @since 2.8.21
 						 */
-						do_action( 'wpfunnels/after_customer_details' ); 
-					?>			
+						do_action( 'wpfunnels/after_customer_details' );
+					?>
 				</div>
 
 				<?php do_action( 'woocommerce_checkout_after_customer_details' ); ?>
@@ -216,14 +231,23 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 			<?php do_action( 'woocommerce_checkout_before_order_review' ); ?>
 
 			<div id="order_review" class="woocommerce-checkout-review-order">
-				<?php do_action( 'woocommerce_checkout_order_review' ); ?>
+				<?php
+				// The order summary (coupon field, order bumps, testimonials) already renders
+				// once in the always-visible .wpfnl-express-checkout-right column below —
+				// suppress it here so .wpfnl-after-order-total isn't duplicated on the page.
+				$GLOBALS['wpfnl_suppress_after_order_total'] = true;
+				do_action( 'woocommerce_checkout_order_review' );
+				$GLOBALS['wpfnl_suppress_after_order_total'] = false;
+				?>
 			</div>
 
 			<?php do_action( 'woocommerce_checkout_after_order_review' ); ?>
 
 			<!-- multistep navigation -->
 			<div class="wpfnl-multistep-navigation">
-				<button type="button" class="previous btn-default" data-target="" disabled><?php echo __( 'Previous', 'wpfnl' ); ?></button>
+				<button type="button" class="previous btn-default" data-target="" disabled>
+					<?php echo __( 'Previous', 'wpfnl' ); ?>
+				</button>
 				<?php if( !is_user_logged_in() && 'yes' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ){ ?>
 					<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) { ?>
 						<button type="button" class="next btn-default" data-target="shipping"><?php echo __( 'Next', 'wpfnl' ); ?></button>

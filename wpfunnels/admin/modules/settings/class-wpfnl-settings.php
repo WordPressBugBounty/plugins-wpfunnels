@@ -10,7 +10,6 @@ namespace WPFunnels\Modules\Admin\Settings;
 use WPFunnels\Admin\Module\Wpfnl_Admin_Module;
 use WPFunnels\Rollback;
 use WPFunnels\Traits\SingletonTrait;
-use WPFunnels\Wpfnl;
 use WPFunnels\Wpfnl_functions;
 
 class Module extends Wpfnl_Admin_Module
@@ -21,135 +20,40 @@ class Module extends Wpfnl_Admin_Module
 
     protected $prefix = '_wpfunnels_';
 
-    protected $general_settings;
-
-    protected $permalink_settings;
-
-    protected $optin_settings;
-
-    protected $offer_settings;
-
-    protected $user_roles;
-
-    protected $gtm_events;
-
-    protected $gtm_settings;
-
-    protected $facebook_pixel_events;
-
-    protected $facebook_pixel_settings;
-
-    protected $recaptcha_settings;
-
-    protected $utm_params;
-
-    protected $utm_settings;
-
-    protected $is_allow_sales;
-
-	/**
-	 * User Roles Settings.
-	 *
-	 * @var array $user_roles_settings An associative array containing user roles settings.
-	 */
-    protected $user_roles_settings;
-
-	/**
-	 * Notification Settings.
-	 *
-	 * @var array $notification_settings An associative array containing notification settings.
-	 */
-    protected $notification_settings;
-
-
-	/**
-	 * Google Maps API Key.
-	 *
-	 * This property stores the API key used for accessing Google Maps services.
-	 *
-	 * @var string $google_map_api_key The Google Maps API key.
-	 */
-    protected $google_map_api_key;
-
-    /**
-	 * Page hooks
-	 *
-	 * @var array
-	 */
-	private $page_hooks = [
-		'toplevel_page_wp_funnels',
-		'wp-funnels_page_wp_funnel_settings',
-		'wpfunnels_page_wpfnl_settings',
-		'wp-funnels_page_edit_funnel',
-		'wp-funnels_page_create_funnel',
-		'wp-funnels_page_wpfnl_settings',
-		'wp-funnels_page_wpf-license',
-		'wpfunnels_page_email-builder',
-	];
-
-    protected $settings_meta_keys = [
-        '_wpfunnels_builder' => 'elementor',
-        '_wpfunnels_paypal_reference' => '',
-        '_wpfunnels_order_bump' => '',
-        '_wpfunnels_ab_testing' => '',
-        '_wpfunnels_allow_funnels' => [
-			'administrator' => true,
-        ],
-        '_wpfunnels_permalink_settings' => '',
-        '_wpfunnels_optin_settings' => '',
-        '_wpfunnels_permalink_step_base' => 'wpfunnels',
-        '_wpfunnels_permalink_flow_base' => 'step',
-        '_wpfunnels_set_permalink' => 'step',
-    ];
-
     public function __construct()
     {
-        add_action('admin_enqueue_scripts', [$this, 'enqueue_scripts']);
         add_action('admin_init', [$this, 'after_permalink_settings_saved']);
 		add_action( 'admin_post_wpfunnels_rollback', [ $this, 'post_wpfunnels_rollback' ] );
 		add_action( 'wpfunnels_send_revenue_report_email', [ $this, 'send_revenue_report_email' ] );
         $this->init_ajax();
     }
 
-    public function is_wc_installed()
-    {
-        $path    = 'woocommerce/woocommerce.php';
-        $plugins = get_plugins();
-
-        return isset($plugins[ $path ]);
-    }
-
-    public function is_ff_installed()
-    {
-        $path    = 'fluentform/fluentform.php';
-        $plugins = get_plugins();
-
-        return isset($plugins[ $path ]);
-    }
-
-    public function is_elementor_installed()
-    {
-        $path    = 'elementor/elementor.php';
-        $plugins = get_plugins();
-
-        return isset($plugins[ $path ]);
-    }
-
-
-    public function enqueue_scripts( $hook )
-    {
-        if ( ! in_array( $hook, $this->page_hooks, true ) ) {
-            return;
-        }
-        wp_enqueue_script('settings', plugin_dir_url(__FILE__) . 'js/settings.js', ['jquery'], WPFNL_VERSION, true);
-    }
-
-
+    /**
+     * Render the settings screen.
+     *
+     * The screen is a route of the React admin now — `?page=wpfunnels#/settings`
+     * — which admin_init sends this page to (see
+     * Wpfnl_Menus::maybe_redirect_to_react_admin). Printing the app's root here
+     * keeps the page working for anyone who filters that redirect off; there is
+     * no server-rendered settings markup any more.
+     *
+     * @return void
+     * @since  1.0.0
+     */
     public function get_view()
     {
-        $this->init_settings();
-        $is_pro_activated   = Wpfnl_functions::is_wpfnl_pro_activated();
-        require_once WPFNL_DIR . '/admin/modules/settings/views/view.php';
+        /*
+         * The app reads its route from the fragment, which never reaches the
+         * server — so landing here with no fragment would open the dashboard.
+         * The bundle is a footer script, so this still prints before it runs.
+         */
+        wp_add_inline_script(
+            'wpfnl-react-admin',
+            "if ( ! window.location.hash ) { window.location.hash = '#/settings'; }",
+            'before'
+        );
+
+        require WPFNL_ADMIN_DIR . 'views/react-admin.php';
     }
 
     /**
@@ -160,6 +64,15 @@ class Module extends Wpfnl_Admin_Module
      */
     public function init_ajax()
     {
+        /*
+         * Only the two actions that are still posted to from outside this module
+         * are registered: the Vue template library's sync button
+         * (`clear-templates`) and the setup wizard (`update-general-settings`).
+         * Everything the settings screen itself used to post goes through
+         * wpfunnels/v1/settings/* now — see
+         * includes/core/rest-api/Controllers/class-settings-page-controller.php,
+         * which calls the very same handlers below.
+         */
         $this->validations = [
             'logged_in' => true,
             'user_can' => 'wpf_manage_funnels',
@@ -172,21 +85,6 @@ class Module extends Wpfnl_Admin_Module
             ->with_callback([ $this, 'clear_templates_data' ])
             ->with_validation($this->validations);
 
-		wp_ajax_helper()->handle('clear-transient')
-			->with_callback([ $this, 'clear_transient_cache_data' ])
-			->with_validation($this->validations);
-
-        wp_ajax_helper()->handle('wpfnl-show-log')
-            ->with_callback([ $this, 'wpfnl_show_log' ])
-            ->with_validation($this->validations);
-
-        wp_ajax_helper()->handle('wpfnl-delete-log')
-            ->with_callback([ $this, 'wpfnl_delete_log' ])
-            ->with_validation($this->validations);
-
-        wp_ajax_helper()->handle('wpfnl-send-test-notification')
-            ->with_callback([ $this, 'send_test_notification' ])
-            ->with_validation($this->validations);
     }
 
 
@@ -552,34 +450,6 @@ class Module extends Wpfnl_Admin_Module
 
 
     /**
-     * Initialize all the settings value
-     *
-     * @since 1.0.0
-     */
-    public function init_settings()
-    {
-        $this->general_settings     = Wpfnl_functions::get_general_settings();
-        $this->is_allow_sales       = Wpfnl_functions::maybe_allow_sales_funnel();
-        $this->permalink_settings   = Wpfnl_functions::get_permalink_settings();
-        $this->optin_settings       = Wpfnl_functions::get_optin_settings();
-        $this->offer_settings       = Wpfnl_functions::get_offer_settings();
-        $this->user_roles           = Wpfnl_functions::get_user_roles();
-        $this->gtm_events           = Wpfnl_functions::get_gtm_events();
-        $this->gtm_settings         = Wpfnl_functions::get_gtm_settings();
-        $this->facebook_pixel_events    = Wpfnl_functions::get_facebook_events();
-        $this->facebook_pixel_settings  = Wpfnl_functions::get_facebook_pixel_settings();
-        $this->utm_params           = Wpfnl_functions::get_utm_params();
-        $this->utm_settings         = Wpfnl_functions::get_utm_settings();
-        $this->recaptcha_settings   = Wpfnl_functions::get_recaptcha_settings();
-        $this->user_roles_settings 	= Wpfnl_functions::get_user_role_settings();
-        $this->google_map_api_key	= Wpfnl_functions::get_google_map_api_key();
-        $this->notification_settings = Wpfnl_functions::get_notification_settings();
-    }
-
-
-
-
-    /**
      * Clear saved templates data
      *
      * @param $payload
@@ -649,19 +519,6 @@ class Module extends Wpfnl_Admin_Module
         }
     }
 
-
-    /**
-     * Get settings by meta key
-     *
-     * @param $key
-     *
-     * @return mixed|string
-     * @since  1.0.0
-     */
-    public function get_settings_by_key($key)
-    {
-        return isset($this->settings_meta_keys[$key]) ? $this->settings_meta_keys[$key]: '';
-    }
 
     public function get_name()
     {

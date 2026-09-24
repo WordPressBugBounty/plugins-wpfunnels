@@ -11,6 +11,7 @@ use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use WPFunnels\Wpfnl;
 use WPFunnels\Wpfnl_functions;
 use WPFunnels\lms\helper\Wpfnl_lms_learndash_functions;
 
@@ -188,6 +189,50 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 			)
 		);
 
+		/*
+		 * Building a funnel out of a template, and clearing what the library
+		 * has cached. The template library screen is React (see
+		 * src/admin/pages/FunnelTemplates) and talks REST; the Vue library
+		 * still embedded in the funnel canvas and Store Checkout posts the same
+		 * work to admin-ajax, so both routes here hand straight over to the
+		 * handlers those calls already run rather than restating them.
+		 */
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . 'import-funnel',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'import_funnel' ),
+					'permission_callback' => array( $this, 'edit_items_permissions_check' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . 'finish-import',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'finish_import' ),
+					'permission_callback' => array( $this, 'edit_items_permissions_check' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . 'sync',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'sync_library' ),
+					'permission_callback' => array( $this, 'edit_items_permissions_check' ),
+				),
+			)
+		);
+
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . 'get_template_type_id',
@@ -218,6 +263,109 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 	 *
 	 * @return WP_REST_Response
 	 */
+	/**
+	 * Makes sure the current user may build a funnel from a template.
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 *
+	 * @return WP_Error|boolean
+	 * @since  3.13.5
+	 */
+	public function edit_items_permissions_check( $request ) {
+		if ( ! Wpfnl_functions::wpfnl_rest_check_manager_permissions( 'templates', 'edit' ) ) {
+			return new WP_Error( 'wpfunnels_rest_cannot_edit', __( 'Sorry, you cannot edit this resource.', 'wpfnl' ), array( 'status' => rest_authorization_required_code() ) );
+		}
+		return true;
+	}
+
+
+	/**
+	 * Create a funnel from a library template.
+	 *
+	 * First of the three calls that import a template: this creates the funnel
+	 * post and answers with its id, the steps are then created one by one
+	 * against the step controller, and `finish_import()` below closes the
+	 * import off.
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 *
+	 * @return WP_REST_Response The importer's own response, carrying `funnelID`.
+	 * @since  3.13.5
+	 */
+	public function import_funnel( $request ) {
+		$payload = $this->get_import_payload( $request );
+
+		return rest_ensure_response( Wpfnl::$instance->template_manager->import_funnel( $payload ) );
+	}
+
+
+	/**
+	 * Close off a template import.
+	 *
+	 * Answers with the `redirectLink` the caller should follow — where the
+	 * funnel wants to be opened depends on what was imported, so the server
+	 * decides it.
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 *
+	 * @return WP_REST_Response The importer's own response.
+	 * @since  3.13.5
+	 */
+	public function finish_import( $request ) {
+		$payload = $this->get_import_payload( $request );
+
+		return rest_ensure_response( Wpfnl::$instance->template_manager->after_funnel_creation( $payload ) );
+	}
+
+
+	/**
+	 * Drop everything the library has cached, so the next listing is fetched
+	 * fresh from the template server.
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 *
+	 * @return WP_REST_Response
+	 * @since  3.13.5
+	 */
+	public function sync_library( $request ) {
+		$settings = Wpfnl::$instance->module_manager->get_admin_modules( 'settings' );
+
+		if ( ! $settings ) {
+			return rest_ensure_response( array( 'success' => false ) );
+		}
+
+		return rest_ensure_response( $settings->clear_templates_data( array() ) );
+	}
+
+
+	/**
+	 * The request body as the importer expects to read it.
+	 *
+	 * The importer was written against `wp_ajax_helper`, which handed it a
+	 * plain array; REST params are the same shape, so this only unwraps them.
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 *
+	 * @return array Payload for the importer.
+	 * @since  3.13.5
+	 */
+	private function get_import_payload( $request ) {
+		$payload = $request->get_json_params();
+
+		if ( ! is_array( $payload ) ) {
+			$payload = $request->get_params();
+		}
+
+		// `source` names which registered source to import through, and there
+		// is only one the library offers.
+		if ( empty( $payload['source'] ) ) {
+			$payload['source'] = 'remote';
+		}
+
+		return $payload;
+	}
+
+
 	public function get_templates( $request ) {
 		$type_param = isset( $_GET['type'] ) ? sanitize_key( $_GET['type'] ) : 'wc';
 		$store_checkout_param = isset( $_GET['store_checkout'] ) ? sanitize_key( $_GET['store_checkout'] ) : 'no';
@@ -287,7 +435,7 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 		if ( is_wp_error( $response ) || ! is_array( $response ) || ! isset( $response['body'] ) ) {
 			return array(
 				'success' => false,
-				'message' => $response->get_error_message(),
+				'message' => is_wp_error( $response ) ? $response->get_error_message() : __( 'Unexpected response from the template server.', 'wpfnl' ),
 				'data'    => $response,
 			);
 		}
@@ -323,15 +471,21 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 		$builder_type = $builder ? $builder : Wpfnl_functions::get_builder_type();
 		$cache_key    = 'wpfunnels_remote_template_data_' . $type . '_' . $builder_type . '_' . WPFNL_VERSION;
 		$data         = get_transient( $cache_key );
-		$data 	   = false; // Disable cache to make sure we are always getting the latest templates. We can remove this line once we are sure there is no issue with the API response time.
-		if ( $data ) {
+
+		// A cached miss is stored as an empty array, which is falsy, so check
+		// against false explicitly or a failed fetch would be retried on every
+		// single request. An explicit refresh always goes out to the network.
+		if ( false !== $data && ! $force_update ) {
 			return;
 		}
 		if ( $type && ( $force_update || false === $data ) ) {
 			if ( false === $data ) {
 				$data = array();
 			}
-			$timeout = ( $force_update ) ? 40 : 55;
+			// Keep the blocking request well inside the web server's FastCGI/proxy
+			// timeout: this runs during an admin REST request, and up to four of
+			// these calls can happen back to back.
+			$timeout = ( $force_update ) ? 30 : 15;
 			
 			$template_url = self::$all_funnels_api_url;
 			if ( 'oxygen' === $builder_type ) {
@@ -370,7 +524,7 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 				);
 
 				if ( ! is_array( $template_data ) || ! $template_data['success'] ) {
-					set_transient( $cache_key, array(), 24 * HOUR_IN_SECONDS );
+					set_transient( $cache_key, array(), 15 * MINUTE_IN_SECONDS );
 					return false;
 				}
 			}
@@ -442,7 +596,7 @@ class TemplateLibraryController extends Wpfnl_REST_Controller {
 				);
 				
 				if ( ! is_array( $categories_data ) || ! $categories_data['success'] ) {
-					set_transient( $cache_key, array(), 24 * HOUR_IN_SECONDS );
+					set_transient( $cache_key, array(), 15 * MINUTE_IN_SECONDS );
 					return false;
 				}
 			}

@@ -30,7 +30,7 @@
                 <div id="wpfnl-create-funnel__template-wrapper" class="wpfnl-create-funnel__templates-wrapper">
                     <div class="funnel-templates-header">
                         <div class="template-library-filter-wrapper" :class="{ 'is-store-checkout': isStoreCheckout }">
-                            <span class="back-form-modal wpfnl-modal-close" :title="isStoreCheckout ? 'Back to Store Checkout List' : 'Back to Funnel list'" v-show="!showStepsPreview && !isTemplatePage">
+                            <span class="back-form-modal wpfnl-modal-close" :title="isStoreCheckout ? 'Back to Store Checkout List' : 'Back to Funnel list'" v-show="!showStepsPreview">
                                 <DoubleAngleLeft/>
                             </span>
 
@@ -231,7 +231,7 @@
                                 <div class="wpfnl-create-funnel__templates">
 
                                     <div class="create-funnel__single-template create__from-scratch"
-                                        v-if="(showProFilter && !showStepsPreview && !isTemplatePage) || ( 'other' === builder )">
+                                        v-if="(showProFilter && !showStepsPreview) || ( 'other' === builder )">
                                         <a id="wpfnl-create-funnel" href="#" class="btn-default" @click="showFunnelNameModal"
                                         v-if="!isAddNewFunnelButtonDisabled"> <PlusIcon /> Start From scratch </a>
 
@@ -530,7 +530,6 @@ export default {
             stepTemplateType: 'all',
             showProFilter: true,
             showStepsPreview: false,
-            isTemplatePage: window.template_library_object.isTemplatePage,
             image_path: window.template_library_object.image_path,
             globalImportProgress: '',
             supportedSteps : window.template_library_object.supported_steps,

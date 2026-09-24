@@ -33,6 +33,7 @@ if ( is_user_logged_in() || 'no' === get_option( 'woocommerce_enable_checkout_lo
 
 $get_checkout_fields = get_post_meta( get_the_ID(), 'wpfnl_checkout_additional_fields', true );
 $is_order_comments_enable = isset( $get_checkout_fields['order_comments']['enable'] ) ? $get_checkout_fields['order_comments']['enable'] : true;
+
 ?>
 <?php if( class_exists( '\WPFunnels\Wpfnl_functions' ) && \WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() && isset( $_SESSION[ 'checkout_layout' ] ) && ( 'wpfnl-express-checkout' === $_SESSION[ 'checkout_layout' ] || 'wpfnl-multistep' === $_SESSION[ 'checkout_layout' ] || 'wpfnl-2-step' === $_SESSION[ 'checkout_layout' ] )){?>
 <ul class="wpfnl-multistep-wizard">
@@ -173,6 +174,17 @@ if( isset( $_SESSION['checkout_layout'] ) && ( 'wpfnl-express-checkout' !== isse
 					 */
 					do_action( 'wpfunnels/before_customer_details' );
 				?>
+
+				<?php
+				/*
+				 * Contact details above the address cards, the way WooCommerce's own checkout and
+				 * the modern layouts present them. Inside #customer_details so it stacks in the
+				 * customer column rather than spanning the full form width, and so the
+				 * update_order_review fragment rebuilds it along with the address cards.
+				 */
+				include WPFNL_DIR . 'public/modules/checkout/templates/parts/customer-information.php';
+				?>
+
 				<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
 					<div class="col-1" id="wpfnl_checkout_shipping">
 						<?php do_action( 'woocommerce_checkout_shipping' ); ?>

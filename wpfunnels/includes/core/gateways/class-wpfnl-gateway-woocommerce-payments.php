@@ -64,7 +64,20 @@ class Wpfnl_Woocommerce_Payments {
   public function __construct() {
 
     add_filter( 'wc_payments_display_save_payment_method_checkbox', array( $this, 'should_tokenize_stripe' ), 11, 1 );
-    // add_action( 'wpfunnels/offer_funnel_started', array( $this, 'save_token_for_3ds' ), 10, 1 );
+    /**
+     * WCPay only tokenizes the card when the checkout posts
+     * `wc-woocommerce_payments-new-payment-method`, and only attaches a token to the
+     * order when it does. Without a token the offer intent has no payment method to
+     * charge. Mirrors what is already done for Stripe via add_stripe_hidden_field().
+     *
+     * save_token_for_3ds() is the fallback that builds a token out of the order's
+     * `_payment_method_id` once the offer funnel starts. It was left unhooked, so
+     * neither path ever produced a token.
+     *
+     * @modified_date 22-09-2026
+     */
+    add_action( 'woocommerce_checkout_after_order_review', array( $this, 'add_woop_hidden_field' ), 99 );
+    add_action( 'wpfunnels/offer_funnel_started', array( $this, 'save_token_for_3ds' ), 10, 1 );
     add_action( 'wp_ajax_wpfunnels_woop_create_payment_intent', array( $this, 'create_payment_intent' ) );
     add_action( 'wp_ajax_nopriv_wpfunnels_woop_create_payment_intent', array( $this, 'create_payment_intent' ) );
     add_action( 'wpfunnels/child_order_created_' . $this->key, array( $this, 'add_required_meta_to_child_order' ), 10, 3 );
@@ -99,7 +112,7 @@ class Wpfnl_Woocommerce_Payments {
 			$order_service = new \WC_Payments_Order_Service( $api_client );
 			$session_service = new \WC_Payments_Session_Service( $api_client );
 			$customer_services = new \WC_Payments_Customer_Service( $api_client, $api_account_service, $database_cache, $session_service );
-		} elseif ( version_compare( '7.7.0', WCPAY_VERSION_NUMBER, '<=' ) && version_compare( '9.9.0', WCPAY_VERSION_NUMBER, '>=' ) ) {
+		} elseif ( version_compare( '7.7.0', WCPAY_VERSION_NUMBER, '<=' ) && version_compare( '10.0.0', WCPAY_VERSION_NUMBER, '>' ) ) {
 			$order_service = new \WC_Payments_Order_Service( $api_client );
 			$session_service = new \WC_Payments_Session_Service( $api_client );
 			$customer_services = new \WC_Payments_Customer_Service( $api_client, $api_account_service, $database_cache, $session_service, $order_service );
@@ -172,15 +185,55 @@ class Wpfnl_Woocommerce_Payments {
     	$gateway  = $gateways['woocommerce_payments'];
     
       if ( $gateway ) {
-        try {
-          $token = $this->get_token_from_order( $order );
+        $response = null;
+        $token    = $this->get_token_from_order( $order );
 
-          $payment_information = new Payment_Information( '', $order, Payment_Type::SINGLE(), $token, Payment_Initiated_By::CUSTOMER() );
+        /**
+         * WCPay requires either a saved payment token or a payment method ID.
+         * The token only exists when the card was saved against the customer, so
+         * fall back to the payment method ID stored on the order (guest checkout,
+         * or when the shopper did not save the card). With neither of them WCPay
+         * throws Invalid_Payment_Method_Exception, so bail out with a response
+         * instead of letting the AJAX request fatal.
+         *
+         * @modified_date 22-09-2026
+         */
+        $payment_method = $token ? '' : $this->get_payment_method_id_from_order( $order );
+
+        if ( empty( $token ) && empty( $payment_method ) ) {
+          wp_send_json(
+            array(
+              'result'  => 'fail',
+              'message' => __( 'No saved payment method found for this order.', 'wpfnl' ),
+            )
+          );
+        }
+
+        try {
+          $payment_information = new Payment_Information( $payment_method, $order, Payment_Type::SINGLE(), $token, Payment_Initiated_By::CUSTOMER() );
 
           $response = $this->process_payment_against_intent( $order, $offer_product, $payment_information );
 
+        } catch ( \Throwable $e ) {
 
-        } catch ( Exception $e ) {
+          /**
+           * Always log this. The response deliberately stays generic for the
+           * shopper, so the logged line is the only way to tell an empty customer
+           * ID apart from a declined card when debugging a live site.
+           *
+           * @modified_date 22-09-2026
+           */
+          error_log(
+            sprintf(
+              'WPFunnels WooPayments offer intent failed for order #%1$d step #%2$d [%3$s]: %4$s (%5$s:%6$d)',
+              $order_id,
+              $step_id,
+              get_class( $e ),
+              $e->getMessage(),
+              $e->getFile(),
+              $e->getLine()
+            )
+          );
 
           wp_send_json(
             array(
@@ -280,11 +333,105 @@ class Wpfnl_Woocommerce_Payments {
    */
   public function get_token_from_order( $order, $has_token = false ) {
 
+    if ( ! $order instanceof \WC_Order ) {
+      return null;
+    }
+
     $order_tokens = $order->get_payment_tokens();
     $token_id     = end( $order_tokens );
     $token        = $token_id ? \WC_Payment_Tokens::get( $token_id ) : null;
     return $token;
 
+  }
+
+  /**
+   * Get the saved payment method (source) ID from the main order.
+   *
+   * Used as a fallback when the order carries no saved payment token, which is
+   * the case for guest checkouts and whenever the shopper did not save the card.
+   * WCPay stores the payment method ID on the order as `_payment_method_id`.
+   *
+   * @param object $order Object of current order.
+   *
+   * @since 3.11.1
+   * @return string Payment method ID, empty string when none is stored.
+   */
+  public function get_payment_method_id_from_order( $order ) {
+
+    if ( ! $order instanceof \WC_Order ) {
+      return '';
+    }
+
+    $payment_method = $order->get_meta( '_wpfnl_' . $this->key . '_source_id' );
+
+    if ( empty( $payment_method ) ) {
+      $payment_method = $order->get_meta( '_payment_method_id' );
+    }
+
+    /**
+     * WCPay only accepts pm_/src_/card_ prefixed IDs and throws on anything else,
+     * so treat an unusable value as "no payment method" and let the caller return
+     * a clean failure response instead.
+     */
+    if ( $payment_method && ! preg_match( '/^(pm|src|card)_/', $payment_method ) ) {
+      $payment_method = '';
+    }
+
+    return $payment_method ? $payment_method : '';
+  }
+
+  /**
+   * Resolve the WooPayments customer ID for an order.
+   *
+   * Mirrors what WCPay's own gateway does: look the customer up against the order's
+   * user and create one when the store has never seen them. Returns an empty string
+   * for guests with no customer on record, which the caller reports as a failure.
+   *
+   * @param object $order Object of current order.
+   *
+   * @since 3.11.1
+   * @return string Customer ID, empty string when none could be resolved.
+   */
+  public function get_customer_id_for_order( $order ) {
+
+    $customer_service = isset( $this->gateway_obj['customer_services'] ) ? $this->gateway_obj['customer_services'] : null;
+
+    if ( ! $customer_service || ! method_exists( $customer_service, 'get_customer_id_for_order' ) ) {
+      return '';
+    }
+
+    try {
+      $customer_id = $customer_service->get_customer_id_for_order( $order );
+    } catch ( \Throwable $e ) {
+      error_log( 'WPFunnels WooPayments customer lookup failed: ' . $e->getMessage() );
+      return '';
+    }
+
+    return $customer_id ? $customer_id : '';
+  }
+
+  /**
+   * Force WooPayments to save the card when the funnel has an offer step.
+   *
+   * WCPay calls must_save_payment_method_to_store() whenever
+   * `wc-woocommerce_payments-new-payment-method` is posted, which is what makes it
+   * attach a WC_Payment_Token to the order. That token is what the upsell intent is
+   * later charged against.
+   *
+   * @since 3.11.1
+   * @return void
+   */
+  public function add_woop_hidden_field() {
+
+    $checkout_id = Wpfnl_functions::get_checkout_id_from_post( $_POST );
+
+    $checkout_id = ! $checkout_id ? get_the_ID() : $checkout_id;
+
+    $funnel_id = Wpfnl_functions::get_funnel_id_from_step( $checkout_id );
+
+    if ( $checkout_id && $funnel_id && Wpfnl_functions::is_offer_exists_in_funnel( $funnel_id ) ) {
+      echo '<input type="hidden" name="wc-woocommerce_payments-new-payment-method" value="true" />';
+    }
   }
 
   /** 
@@ -296,14 +443,17 @@ class Wpfnl_Woocommerce_Payments {
    * @return bool
     */
    public function should_tokenize_stripe( $save_source ){
-    global $post;
-    if( !$post ){
-      return $save_source;
-    }
-    if ( wp_doing_ajax() || isset( $_GET['wc-ajax'] ) ) {
-      $checkout_id = Wpfnl_functions::get_checkout_id_from_post($_POST);
-    } else {
-      $checkout_id = $post->ID;
+    /**
+     * The old `global $post` guard returned early during the checkout POST, where
+     * $post is not set - so the filter never ran at the moment it mattered. Resolve
+     * the step the same way add_stripe_hidden_field() does instead.
+     *
+     * @modified_date 22-09-2026
+     */
+    $checkout_id = Wpfnl_functions::get_checkout_id_from_post( $_POST );
+
+    if ( ! $checkout_id ) {
+      $checkout_id = get_the_ID();
     }
 
     if( !$checkout_id  ){
@@ -344,8 +494,9 @@ class Wpfnl_Woocommerce_Payments {
 
         $order->update_meta_data( '_wpfnl_' . $this->key . '_source_id', $payment_method_id );
         $order->update_meta_data( '_wpfnl_' . $this->key . '_token', $token );
+        $order->save();
         $order->read_meta_data( true );
-      } catch ( Exception $e ) {
+      } catch ( \Throwable $e ) {
         error_log(print_r($e->getMessage(),1));
       }
     }
@@ -365,8 +516,11 @@ class Wpfnl_Woocommerce_Payments {
     $token = $this->get_token_from_order( $order, true );
 
     if ( empty( $token ) ) {
-      $source_id = $order->get_meta( '_wpfnl_' . $this->key . '_source_id' );
-      $token     = $order->get_meta( '_wpfnl_' . $this->key . '_token' );
+      $token = $order->get_meta( '_wpfnl_' . $this->key . '_token' );
+    }
+
+    if ( empty( $token ) ) {
+      $token = $this->get_payment_method_id_from_order( $order );
     }
 
     if ( ! empty( $token ) ) {
@@ -414,7 +568,7 @@ class Wpfnl_Woocommerce_Payments {
     if ( isset( $_POST['woop_intent_id'] ) ) {
       
       $stored_intent_id = $order->get_meta( '_wpfnl_woop_offer_stripe_intent_id_' . $product['step_id'] );
-      $payment_method   = $order->get_meta( '_wpfnl_' . $this->key . '_source_id' );
+      $payment_method   = $this->get_payment_method_id_from_order( $order );
       $intent_id        = sanitize_text_field( wp_unslash( $_POST['woop_intent_id'] ) );
       $confirm_intent = ( $intent_id === $stored_intent_id ) ? true : false;
       
@@ -462,13 +616,31 @@ class Wpfnl_Woocommerce_Payments {
    * @return mix object|bool         An intent or false.
    */
   public function process_payment_against_intent( $order, $offer_product, $payment_information ) {
-    if( !$order && !isset($offer_product['step_id'], $offer_product['id'], $offer_product['price'] ) ){
+    if( !$order || !isset($offer_product['step_id'], $offer_product['id'], $offer_product['price'] ) ){
       return false;
     }
     $f_name         = $order->get_billing_first_name();
     $l_name         = $order->get_billing_last_name();
     $email          = $order->get_billing_email();
     $customer_id    = $order->get_meta( '_stripe_customer_id' );
+
+    /**
+     * `customer` is listed in Create_And_Confirm_Intention::REQUIRED_PARAMS, and
+     * set_customer() runs the value through validate_stripe_id(). Both an empty value
+     * and a missing one make WCPay throw Invalid_Request_Parameter_Exception, so the
+     * ID has to be resolved rather than skipped. WCPay writes `_stripe_customer_id`
+     * onto the order when it attaches the intent, so that meta is the normal source;
+     * fall back to the same lookup WCPay's own gateway performs.
+     *
+     * @modified_date 22-09-2026
+     */
+    if ( empty( $customer_id ) ) {
+      $customer_id = $this->get_customer_id_for_order( $order );
+    }
+
+    if ( empty( $customer_id ) ) {
+      throw new \Exception( 'No WooPayments customer attached to order #' . $order->get_id() );
+    }
 
     $offer_amount   = \WC_Payments_Utils::prepare_amount( floatval($offer_product['price']), $order->get_currency() );
     $step_id        = $offer_product['step_id'];
@@ -517,7 +689,7 @@ class Wpfnl_Woocommerce_Payments {
       $request->set_metadata( $metadata );
       $request->set_level3( $this->get_level3_data_for_offer_product( $order, $offer_product, $amount_array ) );
       $request->set_off_session( $payment_information->is_merchant_initiated() );
-      $request->set_payment_methods( $payment_source );
+      $request->set_payment_methods( ! empty( $payment_source ) ? $payment_source : array( 'card' ) );
       $request->set_cvc_confirmation( $payment_information->get_cvc_confirmation() );
       $request->set_fingerprint( $payment_information->get_fingerprint() );
       if( $product ){

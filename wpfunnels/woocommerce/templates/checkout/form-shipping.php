@@ -23,7 +23,7 @@ $hide_section_settings = \WPFunnels\Wpfnl_functions::get_checkout_section_headin
 	<?php if ( true === WC()->cart->needs_shipping_address() ) : ?>
 
 		<?php if( !$hide_section_settings || ( isset($hide_section_settings['custom_heading']) && $hide_section_settings['custom_heading'] != '' )  ) { ?>
-			<h3>
+			<h3 class="shipping-field-title">
 				<?php
 					if( isset($hide_section_settings['custom_heading']) && $hide_section_settings['custom_heading'] != '' ){
 						echo esc_html( $hide_section_settings['custom_heading'] );
@@ -65,3 +65,27 @@ $hide_section_settings = \WPFunnels\Wpfnl_functions::get_checkout_section_headin
  * `woocommerce_checkout_after_customer_details` instead, which is after both
  * address forms and fires for every cart.
  */
+
+?>
+
+<div class="woocommerce-additional-fields">
+	<?php do_action( 'woocommerce_before_order_notes', $checkout ); ?>
+
+	<?php if ( apply_filters( 'woocommerce_enable_order_notes_field', 'yes' === get_option( 'woocommerce_enable_order_comments', 'yes' ) ) ) : ?>
+
+		<?php if ( ! WC()->cart->needs_shipping() || wc_ship_to_billing_address_only() ) : ?>
+
+			<h3><?php esc_html_e( 'Additional information', 'woocommerce' ); ?></h3>
+
+		<?php endif; ?>
+
+		<div class="woocommerce-additional-fields__field-wrapper">
+			<?php foreach ( $checkout->get_checkout_fields( 'order' ) as $key => $field ) : ?>
+				<?php woocommerce_form_field( $key, $field, $checkout->get_value( $key ) ); ?>
+			<?php endforeach; ?>
+		</div>
+
+	<?php endif; ?>
+
+	<?php do_action( 'woocommerce_after_order_notes', $checkout ); ?>
+</div>

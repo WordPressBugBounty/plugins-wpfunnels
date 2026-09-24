@@ -3,7 +3,7 @@
         'name' => 'wpfunnels/wpfunnels',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'be5a51cf76218e030a6ee8ef33df02b68ec36d78',
+        'reference' => 'ca72f5ce9041749925a172313df47753698d5ce1',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -241,7 +241,7 @@
         'wpfunnels/wpfunnels' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'be5a51cf76218e030a6ee8ef33df02b68ec36d78',
+            'reference' => 'ca72f5ce9041749925a172313df47753698d5ce1',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

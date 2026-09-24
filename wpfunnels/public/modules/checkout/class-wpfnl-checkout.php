@@ -171,7 +171,7 @@ class Module extends Wpfnl_Frontend_Module
 		if ( $checkout_id ) {
 			$express_checkout_enabled = get_post_meta( $checkout_id, '_wpfnl_express_checkout_enabled', true );
 			if ( 'yes' !== $express_checkout_enabled ) {
-				return false; // Hide Stripe Payment Request (Apple Pay / Google Pay) 
+				return false; // Hide Stripe Payment Request (Apple Pay / Google Pay)
 			}
 		}
 
@@ -446,7 +446,7 @@ class Module extends Wpfnl_Frontend_Module
 	public function init_actions() {
 		add_action( 'woocommerce_after_order_notes', [$this, 'checkout_shortcode_metas']);
 		add_action( 'woocommerce_before_order_notes', [$this, 'mark_additional_fields_rendered'], 1 );
-		add_action( 'woocommerce_checkout_after_customer_details', [$this, 'maybe_render_additional_fields'], 15 );
+		// add_action( 'woocommerce_checkout_after_customer_details', [$this, 'maybe_render_additional_fields'], 15 );
 		add_action( 'woocommerce_checkout_after_customer_details', [$this, 'maybe_render_checkout_metas'], 20 );
 		$this->display_coupon_field();
 		$this->enable_checkout_hook();
@@ -672,7 +672,7 @@ class Module extends Wpfnl_Frontend_Module
 		if(!Wpfnl_functions::is_wc_active() ){
 			return;
 		}
-		
+
 		$checkout_id = '';
 		if( wp_doing_ajax()  ){
 			$checkout_id = Wpfnl_functions::get_checkout_id_from_post($_POST);
@@ -1479,7 +1479,7 @@ class Module extends Wpfnl_Frontend_Module
 		 *
 		 * @param array $query_param
 		 * @return array $query_param
-		 * 
+		 *
 		 * @since 3.4.13
 		 */
 		return apply_filters( 'wpfunnels/prepare_query_param', $query_param );
@@ -1924,6 +1924,16 @@ class Module extends Wpfnl_Frontend_Module
 			return $fragments;
 		}
 
+		// These fragments re-render WPFunnels' own checkout markup. A theme or page
+		// builder that ships its own form-checkout.php lays the region out differently
+		// and can park the order notes block -- and anything hooked to
+		// `woocommerce_after_order_notes`, such as a relocated payment box -- inside
+		// #customer_details. Replacing that node with our markup deletes it on the first
+		// update_order_review, so only rebuild what we rendered ourselves.
+		if ( ! $this->is_wpfnl_checkout_template_request() ) {
+			return $fragments;
+		}
+
 		$checkout_id = Wpfnl_functions::get_checkout_id_from_post( $_POST );
 		if ( ! $checkout_id && ! empty( $_POST['wpfnl_step_id'] ) ) {
 			$checkout_id = absint( $_POST['wpfnl_step_id'] );
@@ -1957,6 +1967,12 @@ class Module extends Wpfnl_Frontend_Module
 			$checkout_layout = $_SESSION['checkout_layout'];
 		}
 
+		// Each fragment below re-fires the checkout form hooks, so the one-shot
+		// guard in checkout_shortcode_metas() has to be cleared before every render.
+		// Without this only the first fragment carries _wpfunnels_funnel_id and the
+		// placed order loses its funnel, so the buyer never reaches the offer step.
+		$this->checkout_metas_rendered = false;
+
 		// 1. Render #customer_details for default, express, 2-step, modern-one-column
 		if ( 'wpfnl-modern-one-column' === $checkout_layout ) {
 			ob_start();
@@ -1988,6 +2004,19 @@ class Module extends Wpfnl_Frontend_Module
 			?>
 			<div class="col2-set" id="customer_details">
 				<?php do_action( 'wpfunnels/before_customer_details' ); ?>
+
+				<?php
+				/*
+				 * The classic layouts render the contact card as the first child of
+				 * #customer_details, so this fragment has to reproduce it - replacing the node
+				 * without it would take the required email field off the page on the first
+				 * cart update. form-billing.php drops billing_email from the billing fieldset
+				 * unconditionally, so this stays the only copy of it.
+				 */
+				$checkout = WC()->checkout();
+				include WPFNL_DIR . 'public/modules/checkout/templates/parts/customer-information.php';
+				?>
+
 				<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
 					<div class="col-1" id="wpfnl_checkout_shipping">
 						<?php do_action( 'woocommerce_checkout_shipping' ); ?>
@@ -2006,6 +2035,8 @@ class Module extends Wpfnl_Frontend_Module
 			$fragments['#customer_details'] = ob_get_clean();
 		}
 
+		$this->checkout_metas_rendered = false;
+
 		// 2. Render #wpfnl_modern_customer_details for modern 2-column and modern multistep
 		ob_start();
 		?>
@@ -2022,61 +2053,105 @@ class Module extends Wpfnl_Frontend_Module
 
 		// 3. Render .wpfnl-multistep-wizard for multistep/express/2-step layouts
 		ob_start();
-		?>
-		<ul class="wpfnl-multistep-wizard">
-			<?php if ( ! is_user_logged_in() && 'yes' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) { ?>
-				<li class="login current">
-					<button type="button" data-target="login">
-						<span class="step-icon">
-							<?php include WPFNL_DIR . 'public/assets/icons/icon-login.php'; ?>
-						</span>
-						<span class="step-title">
-							<?php esc_html_e( 'Login', 'wpfnl' ); ?>
-						</span>
-					</button>
-				</li>
-			<?php } ?>
-
-			<?php
-			$shipping_active_cls = ( is_user_logged_in() || 'no' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) ? 'current' : '';
-			$billing_active_cls  = ( ( ! is_user_logged_in() && 'yes' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) || ( WC()->cart && ! WC()->cart->needs_shipping_address() ) ) ? 'current' : '';
+		if ( 'wpfnl-2-step' === $checkout_layout ) {
+			// The 2-step layout has its own wizard shape: Login (optional) / Information / Payment.
+			// Information covers both shipping and billing; Payment covers the order review.
+			$two_step_billing_active_cls = is_user_logged_in() || 'no' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ? 'current' : '';
 			?>
-			<?php if ( is_user_logged_in() || 'no' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) { ?>
-				<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) { ?>
-					<li class="shipping <?php echo esc_attr( $shipping_active_cls ); ?>">
-						<button type="button" data-target="shipping">
+			<ul class="wpfnl-multistep-wizard">
+				<?php if ( ! is_user_logged_in() && 'yes' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) { ?>
+					<li class="login current">
+						<button type="button" data-target="login">
 							<span class="step-icon">
-								<?php include WPFNL_DIR . 'public/assets/icons/icon-shipping.php'; ?>
+								<?php include WPFNL_DIR . 'public/assets/icons/icon-login.php'; ?>
 							</span>
 							<span class="step-title">
-								<?php esc_html_e( 'Shipping', 'wpfnl' ); ?>
+								<?php esc_html_e( 'Login', 'wpfnl' ); ?>
 							</span>
 						</button>
 					</li>
 				<?php } ?>
-				<li class="billing <?php echo esc_attr( $billing_active_cls ); ?>">
-					<button type="button" data-target="billing">
+
+				<li class="billing <?php echo esc_attr( $two_step_billing_active_cls ); ?>">
+					<button type="button" class="two-step" data-target="billing">
 						<span class="step-icon">
 							<?php include WPFNL_DIR . 'public/assets/icons/icon-billing.php'; ?>
 						</span>
 						<span class="step-title">
-							<?php esc_html_e( 'Billing', 'wpfnl' ); ?>
+							<?php esc_html_e( 'Information', 'wpfnl' ); ?>
 						</span>
 					</button>
 				</li>
+
 				<li class="order-review">
-					<button type="button" data-target="order-review">
+					<button type="button" class="two-step" data-target="order-review">
 						<span class="step-icon">
 							<?php include WPFNL_DIR . 'public/assets/icons/icon-order-review.php'; ?>
 						</span>
 						<span class="step-title">
-							<?php esc_html_e( 'Your Order', 'wpfnl' ); ?>
+							<?php esc_html_e( 'Payment', 'wpfnl' ); ?>
 						</span>
 					</button>
 				</li>
-			<?php } ?>
-		</ul>
-		<?php
+			</ul>
+			<?php
+		} else {
+			?>
+			<ul class="wpfnl-multistep-wizard">
+				<?php if ( ! is_user_logged_in() && 'yes' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) { ?>
+					<li class="login current">
+						<button type="button" data-target="login">
+							<span class="step-icon">
+								<?php include WPFNL_DIR . 'public/assets/icons/icon-login.php'; ?>
+							</span>
+							<span class="step-title">
+								<?php esc_html_e( 'Login', 'wpfnl' ); ?>
+							</span>
+						</button>
+					</li>
+				<?php } ?>
+
+				<?php
+				$shipping_active_cls = ( is_user_logged_in() || 'no' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) ? 'current' : '';
+				$billing_active_cls  = ( ( ! is_user_logged_in() && 'yes' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) || ( WC()->cart && ! WC()->cart->needs_shipping_address() ) ) ? 'current' : '';
+				?>
+				<?php if ( is_user_logged_in() || 'no' === get_option( 'woocommerce_enable_checkout_login_reminder' ) ) { ?>
+					<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) { ?>
+						<li class="shipping <?php echo esc_attr( $shipping_active_cls ); ?>">
+							<button type="button" data-target="shipping">
+								<span class="step-icon">
+									<?php include WPFNL_DIR . 'public/assets/icons/icon-shipping.php'; ?>
+								</span>
+								<span class="step-title">
+									<?php esc_html_e( 'Shipping', 'wpfnl' ); ?>
+								</span>
+							</button>
+						</li>
+					<?php } ?>
+					<li class="billing <?php echo esc_attr( $billing_active_cls ); ?>">
+						<button type="button" data-target="billing">
+							<span class="step-icon">
+								<?php include WPFNL_DIR . 'public/assets/icons/icon-billing.php'; ?>
+							</span>
+							<span class="step-title">
+								<?php esc_html_e( 'Billing', 'wpfnl' ); ?>
+							</span>
+						</button>
+					</li>
+					<li class="order-review">
+						<button type="button" data-target="order-review">
+							<span class="step-icon">
+								<?php include WPFNL_DIR . 'public/assets/icons/icon-order-review.php'; ?>
+							</span>
+							<span class="step-title">
+								<?php esc_html_e( 'Your Order', 'wpfnl' ); ?>
+							</span>
+						</button>
+					</li>
+				<?php } ?>
+			</ul>
+			<?php
+		}
 		$fragments['.wpfnl-multistep-wizard'] = ob_get_clean();
 
 		// 4. Render .wpfnl-modern-multistep-nav and .wpfnl-modern-multistep-navigation for modern multistep
@@ -2221,6 +2296,32 @@ class Module extends Wpfnl_Frontend_Module
 		}
 
 		return $fragments;
+	}
+
+
+	/**
+	 * Check that the posted checkout form was rendered by a WPFunnels checkout template.
+	 *
+	 * Every WPFunnels checkout form template prints a `wpfnl_step_id` hidden input inside
+	 * the form, so finding it in the serialized `post_data` is what separates our own
+	 * markup from a theme or page builder checkout that merely runs on a funnel step.
+	 *
+	 * @return bool
+	 * @since 3.14.0
+	 */
+	private function is_wpfnl_checkout_template_request() {
+		if ( ! empty( $_POST['wpfnl_step_id'] ) ) {
+			return true;
+		}
+
+		if ( empty( $_POST['post_data'] ) ) {
+			return false;
+		}
+
+		$post_data = array();
+		wp_parse_str( wp_unslash( $_POST['post_data'] ), $post_data );
+
+		return ! empty( $post_data['wpfnl_step_id'] );
 	}
 
 
@@ -2593,7 +2694,7 @@ class Module extends Wpfnl_Frontend_Module
 		if( !is_array($discount) ){
 			return;
 		}
-		
+
 		if( (isset($discount['discountOptions']) &&  $discount['discountOptions'] !== 'original') ){
 			if( 'regular' === $discount['discountapplyto'] ){
 				foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
@@ -2619,9 +2720,9 @@ class Module extends Wpfnl_Frontend_Module
 
 	/**
 	 * Check whether funnel checkout product is available on cart or not
-	 * 
+	 *
 	 * @return boolean true if funnel checkout product is available on cart, false otherwise
-	 * 
+	 *
 	 * @access public
 	 * @since 3.4.15
 	 */

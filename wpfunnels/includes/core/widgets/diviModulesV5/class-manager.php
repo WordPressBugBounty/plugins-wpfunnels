@@ -74,10 +74,16 @@ final class Manager {
 				return;
 			}
 
+			// Must list every Divi package the bundle externalises — see the
+			// `externals` map in visual-builder/webpack.config.js. An external
+			// left out here only works while Divi happens to print that package
+			// first, and silently throws the moment a Divi update reorders them.
+			// Deliberately excludes divi-module-library: we must print *before*
+			// it so we still catch the registerModuleLibraryStore.after action.
 			wp_enqueue_script(
 				'wpfnl-divi5-vb',
 				$build_url . 'wpfnl-divi5-vb.js',
-				[ 'divi-vendor-react', 'divi-vendor-wp-hooks', 'divi-module', 'divi-rest' ],
+				[ 'divi-vendor-react', 'divi-vendor-wp-hooks', 'divi-module', 'divi-rest', 'divi-icon-library' ],
 				\WPFNL_VERSION . '.' . (string) filemtime( $js_file ),
 				true
 			);

@@ -58,6 +58,34 @@ class WpfnlAutomationController extends WP_REST_Controller
             ]
         );
 
+        // Listing for the automations screen: the funnel-sourced automations
+        // with their contact counts, paginated. Deliberately separate from
+        // get_items(), which hands back Mail Mint's own unfiltered list and is
+        // what the MCP automation tools already read.
+        register_rest_route(
+            $this->namespace,
+            '/' . $this->rest_base . '/list',
+            [
+                [
+                    'methods' => WP_REST_Server::READABLE,
+                    'callback' => [$this, 'get_list'],
+                    'permission_callback' => [$this, 'get_items_permissions_check'],
+                    'args' => [
+                        'page' => [
+                            'description' => __('Current page of the collection.', 'wpfnl'),
+                            'type' => 'integer',
+                            'default' => 1,
+                        ],
+                        'per_page' => [
+                            'description' => __('Maximum number of items to be returned in the result set.', 'wpfnl'),
+                            'type' => 'integer',
+                            'default' => 10,
+                        ],
+                    ],
+                ],
+            ]
+        );
+
         // Get, update, delete single automation
         register_rest_route(
             $this->namespace,
@@ -138,6 +166,40 @@ class WpfnlAutomationController extends WP_REST_Controller
             'per_page' => $per_page
         ], 200);
     }
+
+    /**
+     * List the automations belonging to WPFunnels.
+     *
+     * Same data the legacy automations screen rendered server-side: the
+     * funnel-sourced automations only, each with the contact counts the list
+     * shows, wrapped in pagination. The query itself lives behind
+     * `wpfunnels/retrieve_all_automations`, which WPFunnels Pro implements, so
+     * without Pro this answers with an empty page rather than an error.
+     *
+     * @param WP_REST_Request $request Request object.
+     * @return WP_REST_Response
+     * @since 3.13.3
+     */
+    public function get_list($request)
+    {
+        $page     = max(1, (int) $request->get_param('page'));
+        $per_page = max(1, (int) $request->get_param('per_page'));
+
+        $result = \WPFunnels\Wpfnl_functions::retrieve_all_automations($page, $per_page);
+
+        return new WP_REST_Response(
+            [
+                'success'     => true,
+                'data'        => isset($result['data']) ? array_values($result['data']) : [],
+                'total'       => isset($result['total']) ? (int) $result['total'] : 0,
+                'total_pages' => isset($result['total_pages']) ? (int) $result['total_pages'] : 0,
+                'page'        => $page,
+                'per_page'    => $per_page,
+            ],
+            200
+        );
+    }
+
 
     /**
      * Check permissions for creating item

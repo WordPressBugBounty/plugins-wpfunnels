@@ -54,7 +54,6 @@ class Wpfnl_Modules_Manager extends Base_Manager {
     public function get_modules_names() {
         return [
             'admin' => array(
-                'funnels',
                 'funnel',
                 'settings',
                 'automations',

@@ -1,7 +1,7 @@
 <?php
 /**
  * Two step checkout
- * 
+ *
  * @package
  */
 
@@ -75,7 +75,7 @@ $billing_active_cls ='';
 					</span>
 				</button>
 			</li>
-			
+
 			<li class="order-review">
 				<button type="button" class="two-step" data-target="order-review">
 					<span class="step-icon">
@@ -116,21 +116,32 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 
 ?>
 
-	<form name="checkout" method="post" class="checkout woocommerce-checkout <?php echo $loged_in_cls.' '.$create_acc_field; ?>" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">
+	<form name="checkout" method="post" class="checkout woocommerce-checkout sfvafv <?php echo $loged_in_cls.' '.$create_acc_field; ?>" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">
 		<input type="hidden" name="wpfnl_step_id" value="<?php echo esc_attr( get_the_ID() ); ?>" />
 
 		<?php if ( $checkout->get_checkout_fields() ) : ?>
 
 			<?php do_action( 'woocommerce_checkout_before_customer_details' ); ?>
 
-			<div class="col2-set" id="customer_details">
-				<?php 
+			<div class="col2-set DSA" id="customer_details">
+				<?php
 					/**
 					 * Fires before customer details in checkout page
 					 * @since 2.8.21
 					 */
-					do_action( 'wpfunnels/before_customer_details' ); 
+					do_action( 'wpfunnels/before_customer_details' );
 				?>
+
+				<?php
+				/*
+				 * Contact details above the address cards, the way WooCommerce's own checkout and
+				 * the modern layouts present them. Inside #customer_details so it stacks in the
+				 * customer column rather than spanning the full form width, and so the
+				 * update_order_review fragment rebuilds it along with the address cards.
+				 */
+				include WPFNL_DIR . 'public/modules/checkout/templates/parts/customer-information.php';
+				?>
+
 				<?php if ( WC()->cart && WC()->cart->needs_shipping_address() ) : ?>
 					<div class="col-1" id="wpfnl_checkout_shipping">
 						<?php do_action( 'woocommerce_checkout_shipping' ); ?>
@@ -143,12 +154,12 @@ if( ! is_user_logged_in() && 'no' === get_option( 'woocommerce_enable_checkout_l
 						<?php do_action( 'woocommerce_checkout_billing' ); ?>
 					</div>
 				<?php endif; ?>
-				<?php 
+				<?php
 					/**
 					 * Fires after customer details in checkout page
 					 * @since 2.8.21
 					 */
-					do_action( 'wpfunnels/after_customer_details' ); 
+					do_action( 'wpfunnels/after_customer_details' );
 				?>
 			</div>
 

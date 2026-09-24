@@ -387,7 +387,12 @@ abstract class AbstractBlock {
      * @return string The cache buster value to use for the given file.
      */
     protected function get_file_version( $file ) {
-        return '2.0.3';
+        // Tie the asset version to the plugin version. A hardcoded version
+        // meant the browser kept serving a cached bundle across updates, so a
+        // release that changes the contract between the block script and its
+        // AJAX handler (a new nonce, say) would break the editor preview until
+        // the editor hard-refreshed.
+        return defined( 'WPFNL_VERSION' ) ? WPFNL_VERSION : '2.0.3';
     }
 
     /**
@@ -648,5 +653,44 @@ abstract class AbstractBlock {
     }
 
 
+
+
+	/**
+	 * Sanitize a CSS colour value before printing it inside a <style> block.
+	 *
+	 * Accepts hex, rgb()/rgba(), hsl()/hsla() and CSS colour keywords.
+	 * Anything else is discarded so block attributes can never break out
+	 * of the stylesheet.
+	 *
+	 * @param mixed $color Raw colour value.
+	 *
+	 * @return string Safe colour value, or an empty string.
+	 * @since 3.13.3
+	 */
+	protected function sanitize_css_color( $color ) {
+		if ( ! is_string( $color ) ) {
+			return '';
+		}
+
+		$color = trim( $color );
+
+		if ( '' === $color ) {
+			return '';
+		}
+
+		if ( preg_match( '/^#([A-Fa-f0-9]{3,4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/', $color ) ) {
+			return $color;
+		}
+
+		if ( preg_match( '/^(rgb|rgba|hsl|hsla)\(\s*[0-9.,%\s\/deg-]+\)$/i', $color ) ) {
+			return $color;
+		}
+
+		if ( preg_match( '/^[A-Za-z]+$/', $color ) ) {
+			return $color;
+		}
+
+		return '';
+	}
 
 }

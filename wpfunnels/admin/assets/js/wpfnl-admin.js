@@ -257,6 +257,18 @@
             $(document.body).on('click', '.wpfnl-bulk-delete', this.bulkDeleteFunnel)
             $(document.body).on('click', '.wpfnl-bulk-restore', this.bulkRestoreFunnel)
             $(document.body).on('click', '.wpfnl-bulk-export', this.bulkExportFunnel)
+            // Bound directly, NOT delegated through document.body: the modal wrapper has its
+            // own click handler calling stopPropagation() to keep backdrop clicks from closing
+            // the modal, so events from inside it never reach body.
+            $('.wpfnl-import-cancel').on('click', this.CancelImport)
+            $('.wpfnl-import-view-funnels').on('click', function (e) {
+                e.preventDefault()
+                window.location.reload()
+            })
+
+            // An import started in an earlier page view keeps running in the background, so
+            // pick it back up rather than leaving the user with no sign of it.
+            resumeImportIfRunning()
         }
 
         /**
@@ -477,6 +489,7 @@
                 bulk_trash_success: 'The selected funnels have been moved to Trash.',
                 bulk_delete_success: 'The selected funnels have been deleted permanently.',
                 bulk_restore_success: 'The selected funnels have been restored successfully.',
+                import_success: 'The funnels have been imported successfully.',
             }
         
             const toastKey = localStorage.getItem('wpfnl_show_toast')
@@ -823,6 +836,12 @@
         FunnelHandler.prototype.ShowImportFunnelModal = function (e) {
             e.stopPropagation()
             e.preventDefault()
+            // Reset back to the upload form: a previous run may have left the modal showing
+            // progress or a result card.
+            $('.wpfnl-import-progress').hide().removeClass('is-stalled')
+            $('.wpfnl-import-result').hide()
+            $('#wpfnl-import-funnels').show()
+            $('#wpfnl-export-import-warning').css('display', 'none')
             $('.import-funnel-modal').addClass('show-modal')
         }
 
@@ -855,6 +874,12 @@
         FunnelHandler.prototype.ShowImportFunnelModal = function (e) {
             e.stopPropagation()
             e.preventDefault()
+            // Reset back to the upload form: a previous run may have left the modal showing
+            // progress or a result card.
+            $('.wpfnl-import-progress').hide().removeClass('is-stalled')
+            $('.wpfnl-import-result').hide()
+            $('#wpfnl-import-funnels').show()
+            $('#wpfnl-export-import-warning').css('display', 'none')
             $('.import-funnel-modal').addClass('show-modal')
         }
 
@@ -956,11 +981,24 @@
                                 return
                             }
                             $('#wpfnl-import-funnel .wpfnl-loader').css('display', 'none')
-                            $('.import-funnel-modal').removeClass('show-modal')
-                            window.location.reload()
+                            // Deliberately no page reload here. The job has only been *queued*
+                            // at this point, so reloading used to land the user on an unchanged
+                            // funnel list and force them to keep refreshing to find out what
+                            // happened. Stay open and follow the job instead.
+                            showImportProgress()
+                            pollImportStatus(response?.data?.run_id || '')
                         },
                         error: function (jqXHR) {
                             // Validation failures are sent with a 4xx status code.
+                            const body =
+                                jqXHR && jqXHR.responseJSON ? jqXHR.responseJSON : null
+                            // 409: a run really is still going. Offer to clear it rather than
+                            // leaving the user stuck behind "Import already scheduled".
+                            if (body && body.data && body.data.can_reset) {
+                                showImportProgress()
+                                pollImportStatus(body.data.run_id || '')
+                                return
+                            }
                             handler.ShowImportWarning(handler.GetImportErrorMessage(jqXHR))
                         },
                     })
@@ -1014,6 +1052,320 @@
                 )
                 $('.import-funnel-modal .import-label > p').text('Supported formats: JSON file.')
             }
+        }
+
+        /**
+         * Translated string with an English fallback.
+         *
+         * Strings in this file are historically hardcoded; new ones go through
+         * WPFunnelVars.getText so they are actually translatable.
+         *
+         * @param key
+         * @param fallback
+         *
+         * @since 2.5.16
+         */
+        function importText(key, fallback) {
+            const bag = window.WPFunnelVars && WPFunnelVars.getText ? WPFunnelVars.getText : {}
+            return bag[key] || fallback
+        }
+
+        /**
+         * Swap the import modal into its progress state.
+         *
+         * @since 2.5.16
+         */
+        function showImportProgress() {
+            $('.import-funnel-modal').addClass('show-modal')
+            $('#wpfnl-import-funnels').hide()
+            $('.wpfnl-import-result').hide()
+            $('.wpfnl-import-progress').show()
+            $('.wpfnl-import-progress').removeClass('is-stalled')
+            $('.wpfnl-import-progress__label').text(
+                importText('import_preparing', 'Preparing import…'),
+            )
+            $('.wpfnl-import-progress__bar').css('width', '0%')
+            $('.wpfnl-import-progress__meta').text('')
+        }
+
+        /**
+         * Read the current import status.
+         *
+         * @param runId
+         *
+         * @since 2.5.16
+         */
+        function fetchImportStatus(runId) {
+            const base = window.WPFunnelVars ? WPFunnelVars.rest_api_url : ''
+            const url =
+                base +
+                'wpfunnels/v1/import-export/import-status' +
+                (runId ? '?run_id=' + encodeURIComponent(runId) : '')
+
+            return fetch(url, {
+                method: 'GET',
+                headers: { 'X-WP-Nonce': WPFunnelVars.nonce },
+            }).then(function (response) {
+                if (!response.ok) {
+                    throw new Error('status_request_failed')
+                }
+                return response.json()
+            })
+        }
+
+        /**
+         * Paint one status tick into the progress UI.
+         *
+         * @param status
+         *
+         * @since 2.5.16
+         */
+        function renderImportProgress(status) {
+            const pct = Math.max(0, Math.min(100, parseInt(status.pct, 10) || 0))
+
+            $('.wpfnl-import-progress__label').text(
+                status.label || importText('import_in_progress', 'Importing funnels…'),
+            )
+            $('.wpfnl-import-progress__bar').css('width', pct + '%')
+
+            let meta = ''
+            if (status.total_funnels) {
+                meta =
+                    status.done_funnels +
+                    ' / ' +
+                    status.total_funnels +
+                    ' ' +
+                    importText('import_funnels_word', 'funnels')
+                if (status.total_steps) {
+                    meta +=
+                        ' · ' +
+                        status.done_steps +
+                        ' / ' +
+                        status.total_steps +
+                        ' ' +
+                        importText('import_steps_word', 'steps')
+                }
+            }
+            $('.wpfnl-import-progress__meta').text(meta)
+        }
+
+        /**
+         * Render the terminal state: what landed, what did not.
+         *
+         * @param status
+         *
+         * @since 2.5.16
+         */
+        function renderImportResult(status) {
+            const imported = Array.isArray(status.imported) ? status.imported : []
+            const failed = Array.isArray(status.failed) ? status.failed : []
+
+            $('.wpfnl-import-progress').hide()
+            $('.wpfnl-import-result').show()
+
+            let summary = status.message || ''
+            if (!summary) {
+                summary =
+                    'failed' === status.state
+                        ? importText('import_failed', 'The import could not be completed.')
+                        : importText('import_completed', 'Import complete.')
+            }
+            $('.wpfnl-import-result__summary').text(summary)
+
+            const $list = $('.wpfnl-import-result__list').empty()
+
+            imported.forEach(function (item) {
+                const stepsWord = importText('import_steps_word', 'steps')
+                let note = item.steps + ' ' + stepsWord
+
+                // A partially imported funnel is the case worth being precise about: say how
+                // many steps are missing rather than just flagging it as odd.
+                if ('partial' === item.status) {
+                    const total = (item.steps || 0) + (item.failed_steps || 0)
+                    note =
+                        item.steps +
+                        ' / ' +
+                        total +
+                        ' ' +
+                        stepsWord +
+                        ' · ' +
+                        importText('import_partial', 'some steps failed')
+                }
+
+                $list.append(
+                    $('<li/>')
+                        .addClass('partial' === item.status ? 'is-failed' : '')
+                        .append($('<span/>').text(item.name || ''))
+                        .append($('<span/>').addClass('wpfnl-import-result__note').text(note)),
+                )
+            })
+
+            failed.forEach(function (item) {
+                $list.append(
+                    $('<li/>')
+                        .addClass('is-failed')
+                        .append($('<span/>').text(item.name || ''))
+                        .append(
+                            $('<span/>')
+                                .addClass('wpfnl-import-result__note')
+                                .text(item.message || importText('import_failed_item', 'failed')),
+                        ),
+                )
+            })
+
+            // Only claim success when nothing failed. A partial run has already been spelled
+            // out in the list above, and a cheerful toast on top of it would misrepresent it.
+            if (imported.length && !failed.length) {
+                try {
+                    localStorage.setItem('wpfnl_show_toast', 'import_success')
+                } catch (e) {
+                    // Private mode / blocked storage: the result card already says what happened.
+                }
+            }
+        }
+
+        /**
+         * Follow a background import to completion.
+         *
+         * Bounded polling with backoff rather than setInterval: the job can legitimately run
+         * for minutes, and a fixed short interval would hammer the REST route for the whole
+         * duration. Stall detection happens server-side — the process that died cannot report
+         * on itself — so this only has to react to the state it is handed.
+         *
+         * @param runId
+         *
+         * @since 2.5.16
+         */
+        async function pollImportStatus(runId) {
+            const started = Date.now()
+            const maxMs = 15 * 60 * 1000
+            let attempt = 0
+            let consecutiveErrors = 0
+
+            while (Date.now() - started < maxMs) {
+                const delay = attempt < 5 ? 1000 : attempt < 20 ? 2000 : 5000
+                await new Promise(function (resolve) {
+                    setTimeout(resolve, delay)
+                })
+                attempt++
+
+                let status
+                try {
+                    status = await fetchImportStatus(runId)
+                    consecutiveErrors = 0
+                } catch (e) {
+                    // A blip should not kill a long-running import view; three in a row means
+                    // something is actually wrong.
+                    consecutiveErrors++
+                    if (consecutiveErrors >= 3) {
+                        renderImportResult({
+                            state: 'failed',
+                            message: importText(
+                                'import_status_unavailable',
+                                'Lost contact with the import. Refresh the page to check on it.',
+                            ),
+                        })
+                        return
+                    }
+                    continue
+                }
+
+                if (!runId && status.run_id) {
+                    runId = status.run_id
+                }
+
+                // Somebody else started an import; this view is no longer authoritative.
+                if ('superseded' === status.state || 'idle' === status.state) {
+                    return
+                }
+
+                if ('stalled' === status.state) {
+                    $('.wpfnl-import-progress').addClass('is-stalled')
+                    $('.wpfnl-import-progress__label').text(
+                        importText(
+                            'import_stalled',
+                            'The import seems to have stopped responding. Cancel it to try again.',
+                        ),
+                    )
+                    return
+                }
+
+                renderImportProgress(status)
+
+                if ('completed' === status.state || 'failed' === status.state) {
+                    renderImportResult(status)
+                    return
+                }
+            }
+
+            $('.wpfnl-import-progress__label').text(
+                importText(
+                    'import_taking_long',
+                    'This import is taking longer than expected. Refresh the page to check on it.',
+                ),
+            )
+        }
+
+        /**
+         * Resume the progress view for an import still running from an earlier page view.
+         *
+         * @since 2.5.16
+         */
+        function resumeImportIfRunning() {
+            if (!$('.import-funnel-modal').length || !window.WPFunnelVars) {
+                return
+            }
+
+            fetchImportStatus('')
+                .then(function (status) {
+                    if ('running' === status.state || 'queued' === status.state) {
+                        showImportProgress()
+                        renderImportProgress(status)
+                        pollImportStatus(status.run_id || '')
+                    }
+                })
+                .catch(function () {
+                    // No import to resume, or the route is unreachable — stay quiet.
+                })
+        }
+
+        /**
+         * Clear a stuck import so a new one can be started.
+         *
+         * @param event
+         *
+         * @since 2.5.16
+         */
+        FunnelHandler.prototype.CancelImport = function (event) {
+            event.preventDefault()
+
+            const $button = $(this)
+            $button.find('.wpfnl-loader').css('display', 'inline-block')
+
+            fetch(WPFunnelVars.rest_api_url + 'wpfunnels/v1/import-export/import-reset', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': WPFunnelVars.nonce,
+                },
+            })
+                .then(function () {
+                    $button.find('.wpfnl-loader').css('display', 'none')
+                    $('.wpfnl-import-progress').hide().removeClass('is-stalled')
+                    $('.import-funnel-modal').removeClass('show-modal')
+                    $('#wpfnl-import-funnels').show()
+                    showToast(
+                        'success',
+                        importText('import_cancelled', 'The import has been cancelled.'),
+                    )
+                })
+                .catch(function () {
+                    $button.find('.wpfnl-loader').css('display', 'none')
+                    showToast(
+                        'error',
+                        importText('import_cancel_failed', 'Could not cancel the import.'),
+                    )
+                })
         }
 
         /**
@@ -2028,163 +2380,6 @@
         }
     }
 
-    /**
-     * Publish the admin-bar and settings top-bar heights as CSS custom
-     * properties so the settings sidebar and content column can each own a
-     * viewport-height scroll area without hard-coding either measurement.
-     *
-     * @since 1.0.0
-     */
-    function syncSettingsViewportOffset() {
-        var page = document.querySelector('.wpfnl-settings-page');
-
-        if (!page) {
-            return;
-        }
-
-        var adminBar = $('#wpadminbar').length ? $('#wpadminbar').outerHeight() : 0;
-        var $topBar = $(page).children('.wpfnl-dashboard').children('.wpfnl-dashboard__nav');
-        var $wrapper = $(page).find('.wpfnl-funnel-settings__wrapper');
-
-        // Measure where the columns actually start rather than adding up the
-        // admin bar and top bar: WordPress prints update/plugin notices above
-        // the shell, and missing their height pushes the sidebar past the fold.
-        // The wrapper is not itself sticky, so this stays stable while scrolled.
-        var offset = $wrapper.length
-            ? Math.round($wrapper[0].getBoundingClientRect().top + window.pageYOffset)
-            : adminBar + ($topBar.outerHeight() || 0);
-
-        page.style.setProperty('--wpfnl-settings-top', adminBar + 'px');
-        page.style.setProperty('--wpfnl-settings-offset', offset + 'px');
-
-        // HeaderActions.vue mounts into the top bar after this first pass, so
-        // re-measure whenever its height actually changes.
-        if (!page.wpfnlOffsetObserved && $topBar.length && window.ResizeObserver) {
-            page.wpfnlOffsetObserved = true;
-            new window.ResizeObserver(syncSettingsViewportOffset).observe($topBar[0]);
-        }
-    }
-
-    /**
-     * Mirror the active nav item into the sticky settings header: its label and
-     * icon become the page title, and panels that ship their own save controls
-     * (`data-save="false"`) hide the global "Save changes" button.
-     *
-     * @since 1.0.0
-     */
-    function updateSettingsHeader($navItem) {
-        var $header = $('.wpfn-settings__header');
-
-        if (!$header.length || !$navItem || !$navItem.length) {
-            return;
-        }
-
-        var $label = $navItem.children('span').not('.pro-tag, .pro-tag-icon').first();
-        var $icon = $navItem.find('svg').first();
-
-        $header.find('.wpfn-settings__header-text').text($label.text());
-
-        var $iconHolder = $header.find('.wpfn-settings__header-icon').empty();
-
-        if ($icon.length) {
-            $iconHolder.append($icon.clone());
-        }
-
-        $header.toggleClass('is-actionless', $navItem.attr('data-save') === 'false');
-    }
-
-    /**
-     * settings page tab nav
-     *
-     * @since 1.0.0
-     */
-    function activateSettingsTab(dataID, syncHash) {
-        // dataID comes straight off the URL hash, which is not always a settings tab
-        // id: the funnel canvas parks router paths there (VerticalFlowView.vue sets
-        // `#<step_id>/automation/`). Resolve the panel with getElementById, which
-        // accepts any string, and bail before building a selector out of dataID —
-        // `$('#17/automation/')` throws "unrecognized expression", and on the
-        // ready-time syncSettingsTabFromHash() call that abort takes every event
-        // binding below it in this file down with it.
-        var containerEl = dataID ? document.getElementById(dataID) : null;
-
-        if (!containerEl) {
-            return false;
-        }
-
-        var $container = $(containerEl);
-        var $navItem = $('.wpfn-settings__nav .nav-li:not(.disabled)').filter(function () {
-            return $(this).attr('data-id') === dataID;
-        });
-
-        if (!$navItem.length) {
-            return false;
-        }
-
-        // The nav is split into groups, each with its own <ul>, so siblings()
-        // would only clear the active item within the group that was clicked.
-        $('.wpfn-settings__nav .nav-li').removeClass('active');
-        $navItem.addClass('active');
-
-        updateSettingsHeader($navItem);
-
-        // Show the selected panel, hide others.
-        $container.show().siblings('.wpfnl-funnel__single-settings').hide();
-
-        // The content column is its own scroll area — start each panel at the top.
-        $('.wpfn-settings__content').scrollTop(0);
-
-        // Inside the visible panel, activate the first inner-tab.
-        $container.find('.inner-tab').removeClass('active');
-        $container.find('.wpfnl-tab-content').removeClass('active');
-
-        var $firstInnerTab = $container.find('.inner-tab').first();
-        var tabId = $firstInnerTab.data('tab');
-
-        if ($firstInnerTab.length) {
-            $firstInnerTab.addClass('active');
-        }
-
-        if (tabId) {
-            $container.find('.wpfnl-tab-content').filter(function () {
-                return this.id === String(tabId);
-            }).addClass('active');
-        }
-
-        if (syncHash && window.location.hash !== '#' + dataID) {
-            if (window.history && window.history.replaceState) {
-                window.history.replaceState(null, '', window.location.pathname + window.location.search + '#' + dataID);
-            } else {
-                window.location.hash = dataID;
-            }
-        }
-
-        return true;
-    }
-
-    function syncSettingsTabFromHash() {
-        var dataID = (window.location.hash || '').replace(/^#/, '');
-
-        if (!dataID) {
-            return;
-        }
-
-        activateSettingsTab(dataID, false);
-    }
-
-    $('.wpfn-settings__nav .nav-li:not(.disabled)').on('click', function () {
-        activateSettingsTab($(this).attr('data-id'), true);
-    });
-
-    syncSettingsViewportOffset();
-    $(window).on('resize', syncSettingsViewportOffset);
-
-    syncSettingsTabFromHash();
-    $(window).on('hashchange', syncSettingsTabFromHash);
-
-    // No hash (or an unrelated one): the markup already marks a panel active, so
-    // seed the sticky header from it.
-    updateSettingsHeader($('.wpfn-settings__nav .nav-li.active').first());
 
 
     /**

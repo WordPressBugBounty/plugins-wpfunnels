@@ -102,17 +102,10 @@ class Manager
         add_action('admin_enqueue_scripts', [$this, 'enqueue_scripts']);
     }
 
+
     public function enqueue_scripts($hook)
     {
-        if (in_array($hook, ['wpfunnels_page_wp_funnels', 'wpfunnels_page_wpf_templates', 'wpfunnels_page_store_checkout'])) {
-            $funnel_id = 0;
-            if (isset($_GET['page'])) {
-                if ($_GET['page'] === 'edit_funnel') {
-                    if (isset($_GET['id'])) {
-                        $funnel_id = sanitize_text_field($_GET['id']);
-                    }
-                }
-            }
+        if (in_array($hook, ['wpfunnels_page_store_checkout'], true)) {
             wp_enqueue_script('funnel-template-library', WPFNL_URL . 'admin/assets/dist/js/template-library.min.js', ['jquery', 'wp-util'], WPFNL_VERSION, true);
             Wpfnl_functions::enqueue_bundle_style( 'template-library', 'funnel-template-library-bundle' );
         }

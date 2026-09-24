@@ -6,6 +6,11 @@
  */
 use WPFunnels\Wpfnl_functions;
 
+/*
+ * `route` is for the screens that live in the React admin: they are all one
+ * WordPress page with the screen in the hash, so a plain `page` would only
+ * reach the dashboard. The entries without one are still their own page.
+ */
 $nav_menus = apply_filters('wpfnl_dashboard_nav_lists', [
 		'dashboard' => [
 			'title' => __('Dashboard', 'wpfnl'),
@@ -15,7 +20,8 @@ $nav_menus = apply_filters('wpfnl_dashboard_nav_lists', [
         'overview' => [
             'title' => __('Funnels', 'wpfnl'),
             'icon'  => 'overview-icon',
-            'page'  => WPFNL_FUNNEL_PAGE_SLUG,
+            'page'  => WPFNL_MAIN_PAGE_SLUG,
+            'route' => '#/funnels',
         ],
         'store_checkout' => [
             'title' => __('Store Checkout', 'wpfnl'),
@@ -35,7 +41,8 @@ $nav_menus = apply_filters('wpfnl_dashboard_nav_lists', [
         'templates' => [
             'title' => __('Templates', 'wpfnl'),
             'icon'  => 'templates-icon',
-            'page'  => WPFNL_TEMPLATE_PAGE_SLUG,
+            'page'  => WPFNL_MAIN_PAGE_SLUG,
+            'route' => '#/funnel-templates',
         ],
         // 'addons' => [
         //     'title' => __('Add-ons', 'wpfnl'),
@@ -62,6 +69,11 @@ $nav_menus = apply_filters('wpfnl_dashboard_nav_lists', [
                 ],
                 admin_url('admin.php')
             );
+
+            if (!empty($menu['route'])) {
+                $link .= $menu['route'];
+            }
+
             if($key === 'create_funnel') $link='#'; ?>
 
             <li class="wpfnl-dashboard__nav-li <?php echo $key .' '. $active_class; ?>">

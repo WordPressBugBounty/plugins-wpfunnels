@@ -5606,6 +5606,22 @@ class Wpfnl_functions {
 	public static function get_text() {
 		return array(
 			'error_occurred'                              => __( 'Error Occurred!', 'wpfnl' ),
+
+			// Funnel import progress. Read by admin/assets/js/wpfnl-admin.js, which predates
+			// the Vue bundles and has no wp.i18n of its own.
+			'import_preparing'                            => __( 'Preparing import…', 'wpfnl' ),
+			'import_in_progress'                          => __( 'Importing funnels…', 'wpfnl' ),
+			'import_completed'                            => __( 'Import complete.', 'wpfnl' ),
+			'import_failed'                               => __( 'The import could not be completed.', 'wpfnl' ),
+			'import_failed_item'                          => __( 'failed', 'wpfnl' ),
+			'import_partial'                              => __( 'some steps failed', 'wpfnl' ),
+			'import_funnels_word'                         => __( 'funnels', 'wpfnl' ),
+			'import_steps_word'                           => __( 'steps', 'wpfnl' ),
+			'import_stalled'                              => __( 'The import seems to have stopped responding. Cancel it to try again.', 'wpfnl' ),
+			'import_taking_long'                          => __( 'This import is taking longer than expected. Refresh the page to check on it.', 'wpfnl' ),
+			'import_status_unavailable'                   => __( 'Lost contact with the import. Refresh the page to check on it.', 'wpfnl' ),
+			'import_cancelled'                            => __( 'The import has been cancelled.', 'wpfnl' ),
+			'import_cancel_failed'                        => __( 'Could not cancel the import.', 'wpfnl' ),
 			'stats'                                       => __( 'Stats', 'wpfnl' ),
 			'stats_tooltip_txt'                           => __( 'Toggle to get a quick view of visits & conversion of steps right on the canvas.', 'wpfnl' ),
 			'find_your_templates'                         => __( 'Find your templates', 'wpfnl' ),
@@ -5892,6 +5908,9 @@ class Wpfnl_functions {
 			'no_back'                                     => __( 'No & Back', 'wpfnl' ),
 			'yes_back'                                    => __( 'Yes & Back', 'wpfnl' ),
 			'saving'                                      => __( 'Saving...', 'wpfnl' ),
+			'unsaved_changes'                             => __( 'Unsaved changes', 'wpfnl' ),
+			'automation_save_failed'                      => __( 'Could not save your changes', 'wpfnl' ),
+			'remove_automation_step_confirm'              => __( 'Remove this step from the automation?', 'wpfnl' ),
 
 			'choose_list'                                 => __( 'Choose List', 'wpfnl' ),
 			'select_lists'                                => __( 'Select Lists', 'wpfnl' ),
@@ -7373,16 +7392,39 @@ class Wpfnl_functions {
 	 * @since 3.13.0
 	 */
 	public static function enqueue_bundle_style( $entry, $handle, $deps = array() ) {
+		$url = self::get_bundle_style_url( $entry );
+
+		if ( ! $url ) {
+			return;
+		}
+
+		wp_enqueue_style( $handle, $url, $deps, WPFNL_VERSION );
+	}
+
+
+	/**
+	 * URL of a webpack entry's extracted stylesheet, if there is one.
+	 *
+	 * A development build injects its styles from JavaScript and emits no
+	 * stylesheet at all, so an empty string here means "nothing to load", not
+	 * "something went wrong".
+	 *
+	 * @param string $entry Webpack entry name.
+	 *
+	 * @return string Stylesheet URL, or '' when the build emitted none.
+	 * @since 3.13.8
+	 */
+	public static function get_bundle_style_url( $entry ) {
 		$styles_dir = WPFNL_DIR . '/admin/assets/dist/styles/';
 
 		if ( ! is_dir( $styles_dir ) ) {
-			return;
+			return '';
 		}
 
 		$files = glob( $styles_dir . $entry . '.*.css' );
 
 		if ( empty( $files ) ) {
-			return;
+			return '';
 		}
 
 		// Newest wins, so a stale hash left behind by an interrupted build never
@@ -7394,12 +7436,7 @@ class Wpfnl_functions {
 			}
 		);
 
-		wp_enqueue_style(
-			$handle,
-			WPFNL_URL . 'admin/assets/dist/styles/' . basename( $files[0] ),
-			$deps,
-			WPFNL_VERSION
-		);
+		return WPFNL_URL . 'admin/assets/dist/styles/' . basename( $files[0] );
 	}
 
 	/**

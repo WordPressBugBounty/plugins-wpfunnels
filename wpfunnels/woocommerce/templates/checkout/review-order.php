@@ -234,6 +234,7 @@ do_action( 'wpfunnel_review_order_before_cart_contents' );
 
 	</tfoot>
 </table>
+
 <?php
 	/**
 	 * Everything hooked here (coupon field, order bumps, testimonials) is rendered

@@ -17,6 +17,17 @@ class DashboardController extends Wpfnl_REST_Controller
 {
 
 	/**
+	 * Transient holding the last known answer to "is the onboarding checklist
+	 * on show?", read by the admin page so it can decide whether to hold space
+	 * for it while the real status loads.
+	 *
+	 * @var string
+	 * @since 3.13.3
+	 */
+	const ONBOARDING_VISIBILITY_KEY = 'wpfnl_onboarding_should_show';
+
+
+	/**
 	 * Endpoint namespace.
 	 *
 	 * @var string
@@ -300,6 +311,29 @@ class DashboardController extends Wpfnl_REST_Controller
 
 
 	/**
+	 * Remember whether the checklist was on show, for the next page load.
+	 *
+	 * Working this out costs several queries, so the admin page cannot ask
+	 * before it prints — but it can read the last answer. The React dashboard
+	 * uses it for one thing: whether to hold space for the checklist while the
+	 * real status loads. Someone who is done with onboarding then sees no
+	 * placeholder at all, instead of a skeleton that resolves to nothing.
+	 *
+	 * Short lived on purpose: it only has to outlive the gap between one page
+	 * load and the next, and a stale answer costs at most one wrong placeholder.
+	 *
+	 * @param bool $is_visible Whether the checklist is on show.
+	 *
+	 * @return void
+	 * @since 3.13.3
+	 */
+	private function remember_onboarding_visibility( $is_visible )
+	{
+		set_transient( self::ONBOARDING_VISIBILITY_KEY, $is_visible ? 'yes' : 'no', 15 * MINUTE_IN_SECONDS );
+	}
+
+
+	/**
 	 * Get onboarding status.
 	 *
 	 * Determines whether the onboarding section should be shown on the dashboard.
@@ -318,6 +352,8 @@ class DashboardController extends Wpfnl_REST_Controller
 		// ── Check if onboarding has been dismissed ──
 		$is_dismissed = get_transient( 'wpfnl_onboarding_dismissed' );
 		if ( $is_dismissed ) {
+			$this->remember_onboarding_visibility( false );
+
 			return rest_ensure_response( array(
 				'success' => true,
 				'show_onboarding' => false,
@@ -533,6 +569,8 @@ class DashboardController extends Wpfnl_REST_Controller
 
 		$total_steps = count($steps_status);
 		$progress_percent = $total_steps > 0 ? round(($completed_count / $total_steps) * 100) : 0;
+
+		$this->remember_onboarding_visibility( !$should_hide_onboarding );
 
 		return rest_ensure_response(array(
 			'success' => true,

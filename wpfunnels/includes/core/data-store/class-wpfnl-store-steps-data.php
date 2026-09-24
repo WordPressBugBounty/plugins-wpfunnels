@@ -71,12 +71,48 @@ class Wpfnl_Steps_Store_Data extends Wpfnl_Abstract_Store_data implements Wpfnl_
             $this->type = $type;
             $this->set_id($step_id);
             $this->set_default_props();
-
+            $this->maybe_mark_step_as_divi_built($step_id, $post_content);
         }
 
         do_action('wpfunnels_after_step_creation');
         update_post_meta($step_id, '_wp_page_template', 'wpfunnels_default');
         return $step_id;
+    }
+
+
+    /**
+     * Flag a blank Divi step as builder-enabled so Divi offers its editor toggle.
+     *
+     * Divi's block editor integration only injects the "Edit With The Divi Builder"
+     * placeholder when et_pb_is_pagebuilder_used() is true, or when the post is a
+     * brand new unsaved one. A step is wp_insert_post()'d and published before the
+     * user ever opens it, so it is never "new" by the time Divi looks — without
+     * this meta a scratch-built step opens in Gutenberg with no way to reach Divi.
+     * Imported steps work today only because the template meta they copy already
+     * carries _et_pb_use_builder.
+     *
+     * Only blank steps are touched: import and clone pass content through here too,
+     * and those carry their own (possibly non-Divi) builder meta.
+     *
+     * @param int    $step_id      Newly created step id.
+     * @param string $post_content Content the step was created with.
+     *
+     * @return void
+     */
+    private function maybe_mark_step_as_divi_built($step_id, $post_content)
+    {
+        if ('' !== trim((string) $post_content)) {
+            return;
+        }
+
+        if ('divi-builder' !== Wpfnl_functions::get_builder_type()) {
+            return;
+        }
+
+        update_post_meta($step_id, '_et_pb_use_builder', 'on');
+        // Divi stores the post type the layout was built for; steps mirror pages,
+        // which is what imported Divi templates carry.
+        update_post_meta($step_id, '_et_pb_built_for_post_type', 'page');
     }
 
 

@@ -13,19 +13,6 @@ if(document.getElementById("templates-library")){
 j(document).ready(function (j) {
  
     let TemplateLibrary = function() {
-        const params = new URLSearchParams(window.location.search);
-        if( params.has('page') && params.get('page') === 'wpf_templates' ){
-            j('#create-funnel-loader').addClass('show');
-            j('#template-library-modal').show();
-            j('#wpfnl-create-funnel__inner-content').show();
-            j('#wpfnl-create-steps_inner-content').hide();
-
-            j('.wpfnl-dashboard__header:not(.create-funnel__header)').hide();
-            j('.wpfnl-dashboard__inner-content').hide();
-            j('.wpfnl-funnel-settings__inner-content').hide();
-        }
-        
-
         j('#wpfnl-tab-create_funnel, .add-new-funnel-btn').on('click', this.showTemplateLibrary)
         j('.wpfnl-modal-close').on('click', this.closeTemplateLibraryModal)
         j('#create-first-step, #add-new-step').on('click', this.getStepTemplates)

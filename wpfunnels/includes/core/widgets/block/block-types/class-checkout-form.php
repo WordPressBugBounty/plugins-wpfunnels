@@ -303,11 +303,11 @@ class CheckoutForm extends AbstractDynamicBlock {
 
         // Check display conditions
         $display_condition_type = isset( $attributes['displayConditionType'] ) ? $attributes['displayConditionType'] : 'none';
-        
+
         if ( 'user_state' === $display_condition_type ) {
             $hide_from_logged_in = isset( $attributes['hideFromLoggedIn'] ) ? $attributes['hideFromLoggedIn'] : false;
             $hide_from_logged_out = isset( $attributes['hideFromLoggedOut'] ) ? $attributes['hideFromLoggedOut'] : false;
-            
+
             if ( $hide_from_logged_in && is_user_logged_in() ) {
                 return '';
             }
@@ -327,7 +327,7 @@ class CheckoutForm extends AbstractDynamicBlock {
             if ( 'none' !== $hide_on_browser ) {
                 $user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
                 $browser_match = false;
-                
+
                 if ( 'mozilla' === $hide_on_browser && stripos( $user_agent, 'Firefox' ) !== false ) {
                     $browser_match = true;
                 } elseif ( 'chrome' === $hide_on_browser && stripos( $user_agent, 'Chrome' ) !== false && stripos( $user_agent, 'Edg' ) === false ) {
@@ -339,7 +339,7 @@ class CheckoutForm extends AbstractDynamicBlock {
                 } elseif ( 'edge' === $hide_on_browser && stripos( $user_agent, 'Edg' ) !== false ) {
                     $browser_match = true;
                 }
-                
+
                 if ( $browser_match ) {
                     return '';
                 }
@@ -349,7 +349,7 @@ class CheckoutForm extends AbstractDynamicBlock {
             if ( 'none' !== $hide_on_os ) {
                 $user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
                 $os_match = false;
-                
+
                 if ( 'ios' === $hide_on_os && ( stripos( $user_agent, 'iPhone' ) !== false || stripos( $user_agent, 'iPad' ) !== false ) ) {
                     $os_match = true;
                 } elseif ( 'android' === $hide_on_os && stripos( $user_agent, 'Android' ) !== false ) {
@@ -365,7 +365,7 @@ class CheckoutForm extends AbstractDynamicBlock {
                 } elseif ( 'openbsd' === $hide_on_os && stripos( $user_agent, 'OpenBSD' ) !== false ) {
                     $os_match = true;
                 }
-                
+
                 if ( $os_match ) {
                     return '';
                 }
@@ -568,11 +568,13 @@ class CheckoutForm extends AbstractDynamicBlock {
             /* -------------------Shipping section style-------------------- */
             '.wpfnl-checkout .woocommerce-additional-fields h3,
             .wpfnl-checkout .woocommerce-shipping-fields #ship-to-different-address,
+            .wpfnl-checkout .woocommerce-shipping-fields .shipping-field-title,
             .wpfnl-checkout .woocommerce-shipping-fields #ship-to-different-address label' => array(
                 'color' => $attributes['shippingHeaderColor'],
             ),
 
             '.wpfnl-checkout .woocommerce-additional-fields h3,
+			.wpfnl-checkout .woocommerce-shipping-fields .shipping-field-title,
             .wpfnl-checkout .woocommerce-shipping-fields #ship-to-different-address' => array(
                 'margin-top' => $attributes['shippingHeaderMarginTop'].'px',
                 'margin-right' => $attributes['shippingHeaderMarginRight'].'px',
@@ -824,9 +826,17 @@ class CheckoutForm extends AbstractDynamicBlock {
      */
     public function show_checkout_markup() {
 
+		if ( ! check_ajax_referer( 'wp_rest', 'nonce', false ) ) {
+			wp_send_json_error( __( 'Invalid request.', 'wpfnl' ), 403 );
+		}
+
+		if ( ! current_user_can( 'edit_post', isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0 ) ) {
+			wp_send_json_error( __( 'You are not allowed to do this.', 'wpfnl' ), 403 );
+		}
+
 		$get_attributes = array(
-			'billingHeaderColor'    => isset( $_POST['billingHeaderColor'] ) ? $_POST['billingHeaderColor'] : 'red',
-			'layout'                => isset( $_POST['layout'] ) ? $_POST['layout'] : 'wpfnl-col-2',
+			'billingHeaderColor'    => isset( $_POST['billingHeaderColor'] ) ? $this->sanitize_css_color( wp_unslash( $_POST['billingHeaderColor'] ) ) : 'red',
+			'layout'                => isset( $_POST['layout'] ) ? sanitize_html_class( wp_unslash( $_POST['layout'] ) ) : 'wpfnl-col-2',
 			'placeOrderBtnText'     => isset( $_POST['placeOrderBtnText'] ) ? sanitize_text_field( $_POST['placeOrderBtnText'] ) : 'Place Order',
 			'placeOrderSubText'     => isset( $_POST['placeOrderSubText'] ) ? sanitize_text_field( $_POST['placeOrderSubText'] ) : '',
 			'placeOrderEnableIcon'  => isset( $_POST['placeOrderEnableIcon'] ) ? filter_var( $_POST['placeOrderEnableIcon'], FILTER_VALIDATE_BOOLEAN ) : false,
@@ -834,10 +844,10 @@ class CheckoutForm extends AbstractDynamicBlock {
 			'placeOrderEnablePrice' => isset( $_POST['placeOrderEnablePrice'] ) ? filter_var( $_POST['placeOrderEnablePrice'], FILTER_VALIDATE_BOOLEAN ) : false,
 			'placeOrderBelowText'   => isset( $_POST['placeOrderBelowText'] ) ? sanitize_text_field( $_POST['placeOrderBelowText'] ) : '',
 		);
-		$checkout_id				= isset($_POST['post_id']) ? $_POST['post_id'] : 0;
+		$checkout_id				= isset($_POST['post_id']) ? absint( $_POST['post_id'] ) : 0;
 
-		$checkout_layout 	= isset($_POST['layout']) ? $_POST['layout'] : 'wpfnl-col-2';
-		$floating_label 	= isset($_POST['floating_label']) ? $_POST['floating_label'] : '';
+		$checkout_layout 	= isset($_POST['layout']) ? sanitize_html_class( wp_unslash( $_POST['layout'] ) ) : 'wpfnl-col-2';
+		$floating_label 	= isset($_POST['floating_label']) ? sanitize_html_class( wp_unslash( $_POST['floating_label'] ) ) : '';
 
 		if( PHP_SESSION_DISABLED == session_status() ) {
 			session_start();
@@ -889,7 +899,7 @@ class CheckoutForm extends AbstractDynamicBlock {
 
 		$output  		= sprintf( '<div class="%1$s" style="%2$s">', esc_attr( $this->get_classes( $attributes ) ), esc_attr( $this->get_styles( $attributes ) ) );
 
-		$output 		.= '<div class="wpfnl-block-checkout-form__wrapper wpfnl-checkout '.$checkout_layout.' '.$floating_label.'">';
+		$output 		.= '<div class="wpfnl-block-checkout-form__wrapper wpfnl-checkout '. esc_attr( $checkout_layout ) .' '. esc_attr( $floating_label ) .'">';
 		$output 		.= do_shortcode('[woocommerce_checkout]');
 		$output 		.= '</div>';
 		$output 		.= '</div>';

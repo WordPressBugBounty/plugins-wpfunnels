@@ -500,17 +500,17 @@ class Checkout_Form extends Widget_Base
         $roles = array(
             'none' => __('None', 'wpfnl'),
         );
-        
+
         if (!function_exists('get_editable_roles')) {
             require_once ABSPATH . 'wp-admin/includes/user.php';
         }
-        
+
         $wp_roles = get_editable_roles();
-        
+
         foreach ($wp_roles as $role_key => $role_info) {
             $roles[$role_key] = $role_info['name'];
         }
-        
+
         return $roles;
     }
 
@@ -2478,7 +2478,7 @@ class Checkout_Form extends Widget_Base
                 'default' => '',
                 'selectors' => [
                     '{{WRAPPER}} .wpfnl-checkout .woocommerce-shipping-fields #ship-to-different-address label.woocommerce-form__label,
-                    {{WRAPPER}} .wpfnl-checkout .woocommerce-additional-fields > h3' => 'color: {{VALUE}};'
+                    {{WRAPPER}} .wpfnl-checkout .woocommerce-additional-fields > h3, {{WRAPPER}} .wpfnl-checkout .woocommerce-shipping-fields .shipping-field-title' => 'color: {{VALUE}};'
                 ],
             ]
         );
@@ -2489,7 +2489,7 @@ class Checkout_Form extends Widget_Base
                 'name' => 'shipping_heading_typography',
                 'label' => 'Typography',
                 'selector' => '{{WRAPPER}} .wpfnl-checkout .woocommerce-shipping-fields #ship-to-different-address span,
-                {{WRAPPER}} .wpfnl-checkout .woocommerce-additional-fields > h3'
+                {{WRAPPER}} .wpfnl-checkout .woocommerce-additional-fields > h3, {{WRAPPER}} .wpfnl-checkout .woocommerce-shipping-fields .shipping-field-title'
             ]
         );
 
@@ -2501,7 +2501,7 @@ class Checkout_Form extends Widget_Base
                 'size_units' => ['px', '%', 'em'],
                 'selectors' => [
                     '{{WRAPPER}} .wpfnl-checkout .woocommerce-shipping-fields #ship-to-different-address,
-                    {{WRAPPER}} .wpfnl-checkout .woocommerce-additional-fields > h3' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
+                    {{WRAPPER}} .wpfnl-checkout .woocommerce-additional-fields > h3, {{WRAPPER}} .wpfnl-checkout .woocommerce-shipping-fields .shipping-field-title' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
                 ],
             ]
         );
@@ -2514,7 +2514,7 @@ class Checkout_Form extends Widget_Base
                 'size_units' => ['px', '%', 'em'],
                 'selectors' => [
                     '{{WRAPPER}} .wpfnl-checkout .woocommerce-shipping-fields #ship-to-different-address,
-                    {{WRAPPER}} .wpfnl-checkout .woocommerce-additional-fields > h3' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
+                    {{WRAPPER}} .wpfnl-checkout .woocommerce-additional-fields > h3, {{WRAPPER}} .wpfnl-checkout .woocommerce-shipping-fields .shipping-field-title' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
                 ],
                 'separator' => 'after',
             ]
@@ -3523,17 +3523,17 @@ class Checkout_Form extends Widget_Base
 
         // ---- Display Conditions ----------------------------------------
         $display_condition = isset($settings['display_condition_type']) ? $settings['display_condition_type'] : 'none';
-        
+
         // Check display conditions and return early if widget should be hidden
         if ($display_condition === 'user_state') {
             $hide_logged_in = isset($settings['hide_from_logged_in']) ? $settings['hide_from_logged_in'] : 'no';
             $hide_logged_out = isset($settings['hide_from_logged_out']) ? $settings['hide_from_logged_out'] : 'no';
-            
+
             // Hide from logged in users
             if ($hide_logged_in === 'yes' && is_user_logged_in()) {
                 return;
             }
-            
+
             // Hide from logged out users
             if ($hide_logged_out === 'yes' && !is_user_logged_in()) {
                 return;
@@ -3541,7 +3541,7 @@ class Checkout_Form extends Widget_Base
 
         } elseif ($display_condition === 'user_role') {
             $hide_for_user_role = isset($settings['hide_for_user_role']) ? $settings['hide_for_user_role'] : 'none';
-            
+
             if ($hide_for_user_role !== 'none' && is_user_logged_in()) {
                 $user = wp_get_current_user();
                 if (in_array($hide_for_user_role, $user->roles)) {
@@ -3551,7 +3551,7 @@ class Checkout_Form extends Widget_Base
 
         } elseif ($display_condition === 'day') {
             $disable_on_days = isset($settings['disable_on_days']) ? $settings['disable_on_days'] : array();
-            
+
             if (!empty($disable_on_days) && is_array($disable_on_days)) {
                 $current_day = strtolower(date('l')); // e.g., 'monday'
                 if (in_array($current_day, $disable_on_days)) {
@@ -3561,11 +3561,11 @@ class Checkout_Form extends Widget_Base
 
         } elseif ($display_condition === 'browser') {
             $hide_on_browser = isset($settings['hide_on_browser']) ? $settings['hide_on_browser'] : 'none';
-            
+
             if ($hide_on_browser !== 'none') {
                 $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? strtolower($_SERVER['HTTP_USER_AGENT']) : '';
                 $current_browser = '';
-                
+
                 // Detect browser from user agent
                 if (strpos($user_agent, 'edg') !== false) {
                     $current_browser = 'edge';
@@ -3578,7 +3578,7 @@ class Checkout_Form extends Widget_Base
                 } elseif (strpos($user_agent, 'firefox') !== false) {
                     $current_browser = 'mozilla';
                 }
-                
+
                 // Hide widget if current browser matches
                 if ($current_browser === $hide_on_browser) {
                     return;
@@ -3586,11 +3586,11 @@ class Checkout_Form extends Widget_Base
             }
         } elseif ($display_condition === 'operating_system') {
             $hide_on_os = isset($settings['hide_on_os']) ? $settings['hide_on_os'] : 'none';
-            
+
             if ($hide_on_os !== 'none') {
                 $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? strtolower($_SERVER['HTTP_USER_AGENT']) : '';
                 $current_os = '';
-                
+
                 // Detect operating system from user agent
                 if (strpos($user_agent, 'windows') !== false || strpos($user_agent, 'win32') !== false || strpos($user_agent, 'win64') !== false) {
                     $current_os = 'windows';
@@ -3607,7 +3607,7 @@ class Checkout_Form extends Widget_Base
                 } elseif (strpos($user_agent, 'openbsd') !== false) {
                     $current_os = 'openbsd';
                 }
-                
+
                 // Hide widget if current OS matches
                 if ($current_os === $hide_on_os) {
                     return;

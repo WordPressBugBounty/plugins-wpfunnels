@@ -272,7 +272,7 @@ class Checkout extends Elements {
         $this->configure_header_style(
             'shipping_header',
             __('Shipping Heading', 'wpfnl'),
-            '.wpfnl-checkout .woocommerce-shipping-fields #ship-to-different-address span, .wpfnl-checkout .woocommerce-additional-fields > h3'
+            '.wpfnl-checkout .woocommerce-shipping-fields #ship-to-different-address span, .wpfnl-checkout .woocommerce-additional-fields > h3, .wpfnl-checkout .woocommerce-shipping-fields .shipping-field-title'
         );
 
         // Configure Shipping Label Style

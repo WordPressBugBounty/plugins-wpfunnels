@@ -266,6 +266,13 @@
         var is_user_logged_in = window.wpfnl_obj.is_user_logged_in
         var is_login_reminder = window.wpfnl_obj.is_login_reminder
 
+        /*
+         * The billing wizard step renders the contact card and the billing address card as
+         * two siblings inside #customer_details, so its validation gate has to cover both -
+         * #wpfnl_checkout_billing alone would let a buyer past the step with no email.
+         */
+        var billingStepSelector = '#wpfnl_customer_information, #wpfnl_checkout_billing'
+
         function scroll_to_top() {
             $('html, body').animate(
                 {
@@ -436,9 +443,9 @@
                     '.theme-woostify.checkout-layout-2 .wpfnl-checkout-form-wpfnl-multistep .multi-step-checkout-wrapper .multi-step-checkout-button-wrapper',
                 ).hide()
 
-                checkoutFieldValidation('#wpfnl_checkout_billing')
+                checkoutFieldValidation(billingStepSelector)
 
-                $('#wpfnl_checkout_billing .validate-required').each(function () {
+                $(billingStepSelector).find('.validate-required').each(function () {
                     if ($(this).hasClass('woocommerce-invalid-required-field')) {
                         isValidate = false
                     }
@@ -469,9 +476,9 @@
 
                 //------start two step checkout billing field validation-----
                 if ($(this).hasClass('two-step')) {
-                    checkoutFieldValidation('#wpfnl_checkout_billing')
+                    checkoutFieldValidation(billingStepSelector)
 
-                    $('#wpfnl_checkout_billing .validate-required').each(function () {
+                    $(billingStepSelector).find('.validate-required').each(function () {
                         if ($(this).hasClass('woocommerce-invalid-required-field')) {
                             isValidate = false
                         }
@@ -602,8 +609,7 @@
 
             if ('billing' == targetID) {
                 // Login validation goes here if needed
-                $(
-                    '.theme-woostify.checkout-layout-2 .wpfnl-checkout.wpfnl-multistep .multi-step-checkout-wrapper .multi-step-checkout-content',
+                $('.theme-woostify.checkout-layout-2 .wpfnl-checkout.wpfnl-multistep .multi-step-checkout-wrapper .multi-step-checkout-content',
                 ).hide()
                 $(
                     '.theme-woostify.checkout-layout-2 .wpfnl-checkout.wpfnl-multistep .multi-step-checkout-wrapper .multi-step-checkout-content[data-step="first"]',
@@ -644,9 +650,9 @@
                     '.theme-woostify.checkout-layout-2 .wpfnl-checkout-form-wpfnl-multistep .multi-step-checkout-wrapper .multi-step-checkout-button-wrapper',
                 ).hide()
 
-                checkoutFieldValidation('#wpfnl_checkout_billing')
+                checkoutFieldValidation(billingStepSelector)
 
-                $('#wpfnl_checkout_billing .validate-required').each(function () {
+                $(billingStepSelector).find('.validate-required').each(function () {
                     if ($(this).hasClass('woocommerce-invalid-required-field')) {
                         isValidate = false
                     }
@@ -677,9 +683,9 @@
 
                 //------start two step checkout billing field validation-----
                 if ($(this).hasClass('two-step')) {
-                    checkoutFieldValidation('#wpfnl_checkout_billing')
+                    checkoutFieldValidation(billingStepSelector)
 
-                    $('#wpfnl_checkout_billing .validate-required').each(function () {
+                    $(billingStepSelector).find('.validate-required').each(function () {
                         if ($(this).hasClass('woocommerce-invalid-required-field')) {
                             isValidate = false
                         }
@@ -814,7 +820,7 @@
                 return msgTemplate.replace('{field}', fieldName);
             }
 
-            $(step + ' .validate-required input').each(function () {
+            $(step).find('.validate-required input').each(function () {
                 var fieldValue = $(this).val()
                 if (!fieldValue) {
                     var errorMsg = getErrorMessage($(this));
@@ -840,7 +846,7 @@
                 }
             })
 
-            $(step + ' .validate-required select').each(function () {
+            $(step).find('.validate-required select').each(function () {
                 var fieldValue = $(this).children('option:selected').val()
                 if (!fieldValue) {
                     var errorMsg = getErrorMessage($(this));
@@ -852,7 +858,7 @@
                 }
             })
 
-            $(step + ' .validate-required input[type="checkbox"]').each(function () {
+            $(step).find('.validate-required input[type="checkbox"]').each(function () {
                 var fieldValue = $(this).is(':checked')
                 if (!fieldValue) {
                     var errorMsg = getErrorMessage($(this));
@@ -2151,17 +2157,15 @@
 
                 var handleResize = function() {
                     if ($(window).width() <= 768) {
-                        $('.wpfnl-mobile-order-summary-toggle').css('display', 'flex');
                         if (!$('.woocommerce-checkout-review-order-table').hasClass('wpfnl-mos-collapsed') && !$('.woocommerce-checkout-review-order-table').is(':visible')) {
                             // Already handled
                         } else if (!$('.woocommerce-checkout-review-order-table').hasClass('wpfnl-mos-collapsed')) {
-                            $('.woocommerce-checkout-review-order-table').hide().addClass('wpfnl-mos-collapsed');
+                            $('.woocommerce-checkout-review-order-table').addClass('wpfnl-mos-collapsed');
                             $('.wpfnl-mobile-order-summary-toggle .wpfnl-mos-text').text('Show order summary');
                             $('.wpfnl-mobile-order-summary-toggle .wpfnl-mos-icon').css('transform', 'rotate(0deg)');
                         }
                     } else {
-                        $('.wpfnl-mobile-order-summary-toggle').hide();
-                        $('.woocommerce-checkout-review-order-table').show().removeClass('wpfnl-mos-collapsed');
+                        $('.woocommerce-checkout-review-order-table').removeClass('wpfnl-mos-collapsed');
                     }
                 };
 
@@ -2190,7 +2194,7 @@
 			var $chk = $('#billing-same-as-shipping-checkbox');
 			if ($chk.length && $chk.is(':checked')) {
 				$('.wpfnl-billing-fields').hide();
-				
+
 				var fields = ['first_name', 'last_name', 'company', 'country', 'address_1', 'address_2', 'city', 'state', 'postcode', 'phone'];
 				$.each(fields, function(i, field) {
 					var $shipField = $('#shipping_' + field);
@@ -2362,6 +2366,7 @@
 
 		function initModernMultistepCheckoutToggle(target) {
 			var hasBillingStep = $('.wpfnl-modern-multistep-nav-step[data-step="billing"]').length > 0 && $('.wpfnl-modern-multistep-nav-step[data-step="billing"]').is(':visible');
+
 			if ( 'information' == target ) {
 				$('.wpfnl-modern-multistep .wpfnl-modern-section--customer-information').show();
 				if (hasBillingStep) {
@@ -2373,6 +2378,9 @@
 					$('.wpfnl-modern-multistep .woocommerce-additional-fields').hide();
 					$('.wpfnl-modern-multistep .wpfnl-billing-fields').show();
 				}
+
+				$('.wpfnl-modern-multistep .wpfnl-billing-same-as-shipping').hide();
+				$('.wpfnl-modern-multistep .wpfnl-customer-shipping').show();
 				$('.wpfnl-modern-multistep .wpfnl-modern-section--payment').hide();
 				$('.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation').show();
 				$('.wpfnl-modern-multistep .money-back-guarantee-text').show();
@@ -2381,15 +2389,24 @@
 				$('.wpfnl-modern-multistep .wpfnl-modern-section--customer-information').hide();
 				$('.wpfnl-modern-multistep .wpfnl-shipping-fields').hide();
 				$('.wpfnl-modern-multistep .woocommerce-additional-fields').hide();
-				$('.wpfnl-modern-multistep .wpfnl-billing-fields').show();
+				$('.wpfnl-modern-multistep .wpfnl-customer-shipping').hide();
+				$('.wpfnl-modern-multistep .wpfnl-billing-same-as-shipping').show();
 				$('.wpfnl-modern-multistep .wpfnl-modern-section--payment').hide();
 				$('.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation').show();
 				$('.wpfnl-modern-multistep .money-back-guarantee-text').show();
+
+				let isSameAsShipping = $('#billing-same-as-shipping-checkbox').is(':checked');
+				if (isSameAsShipping) {
+					$('.wpfnl-modern-multistep .wpfnl-billing-fields').hide();
+				} else {
+					$('.wpfnl-modern-multistep .wpfnl-billing-fields').show();
+				}
 
 			}else if ( 'payment' == target ) {
 				$('.wpfnl-modern-multistep .wpfnl-modern-section--customer-information').hide();
 				$('.wpfnl-modern-multistep .wpfnl-shipping-fields').hide();
 				$('.wpfnl-modern-multistep .woocommerce-additional-fields').hide();
+				$('.wpfnl-modern-multistep .wpfnl-billing-same-as-shipping').hide();
 				$('.wpfnl-modern-multistep .wpfnl-billing-fields').hide();
 				$('.wpfnl-modern-multistep .wpfnl-modern-section--payment').show();
 				$('.wpfnl-modern-multistep .wpfnl-modern-multistep-navigation').hide();

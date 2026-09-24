@@ -193,6 +193,7 @@
 		.woocommerce-billing-fields > h3,
 		.woocommerce-additional-fields > h3,
 		.woocommerce-shipping-fields > #ship-to-different-address,
+		.woocommerce-shipping-fields .shipping-field-title,
 		.wpfnl-checkout-variable-product .variable-product-title {
 			background: transparent;
 			color: #1A241A;
@@ -729,6 +730,10 @@
 			margin-top: 20px;
 		}
 
+		.wpfnl-billing-same-as-shipping {
+			display: none;
+		}
+
 		.wpfnl-shipping-fields {
 			display: none;
 		}
@@ -890,6 +895,12 @@
 
 }
 
+@media only screen and (max-width: 783px){
+	.wpfnl-express-checkout .wpfnl-express-checkout-wrapper .wpfnl-express-checkout-right #order_review_heading {
+		display: none;
+	}
+}
+
 @media only screen and (max-width: 575px){
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields__field-wrapper #shipping_phone_field,
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields__field-wrapper #shipping_postcode_field,
@@ -952,10 +963,12 @@
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-billing-fields > h3,
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-additional-fields > h3,
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields > #ship-to-different-address,
+	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields .shipping-field-title,
 	.wpfnl-checkout.wpfnl-modern-checkout .wpfnl-checkout-variable-product .variable-product-title {
 		font-size: 18px;
 		margin-bottom: 16px;
 	}
+	.wpfnl-checkout .woocommerce-shipping-fields .shipping-field-title,
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields > #ship-to-different-address {
 		margin-bottom: 0;
 	}
@@ -964,6 +977,7 @@
 		font-size: 18px;
 		margin-bottom: 6px;
 	}
+	.wpfnl-checkout .woocommerce-shipping-fields .shipping-field-title,
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields > #ship-to-different-address label span {
 		font-size: 18px;
 	}
@@ -974,27 +988,6 @@
 		background: #F9FAFB;
 		border: 1px solid #E5E7EB;
 		border-radius: 8px;
-
-		label > span {
-			padding-left: 28px;
-			color: #374151;
-			font-size: 15px;
-			font-weight: 500;
-
-			&:before {
-				width: 18px;
-				height: 18px;
-				border-radius: 4px;
-				border: 1px solid rgba(0, 0, 0, 0.15);
-				background: #FFFFFF;
-				top: 1px;
-			}
-		}
-
-		label input[type=checkbox]:checked + span::before {
-			background-color: $primary-color;
-			border-color: $primary-color;
-		}
 	}
 
 	.wpfnl-checkout.wpfnl-modern-checkout .woocommerce-shipping-fields .shipping_address {

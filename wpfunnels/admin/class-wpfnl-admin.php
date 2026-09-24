@@ -43,6 +43,21 @@ class Wpfnl_Admin
 	const WPFNL_FEED_OPTION_KEY = 'wpfnl_remote_info_feed_data';
 
 	/**
+	 * Plugin file of the free Mail Mint plugin, as wordpress.org ships it.
+	 */
+	const MAIL_MINT_BASENAME = 'mail-mint/mail-mint.php';
+
+	/**
+	 * Plugin file of Mail Mint Pro.
+	 */
+	const MAIL_MINT_PRO_BASENAME = 'mail-mint-pro/mail-mint-pro.php';
+
+	/**
+	 * Plugin file of WPFunnels Pro.
+	 */
+	const WPFNL_PRO_BASENAME = 'wpfunnels-pro/wpfnl-pro.php';
+
+	/**
 	 * The ID of this plugin.
 	 *
 	 * @since  1.0.0
@@ -65,30 +80,30 @@ class Wpfnl_Admin
 
 
 	/**
-	 * Page hooks
+	 * Screens still rendered by the legacy PHP/Vue admin, which is what the
+	 * legacy stylesheet and bundle are written against.
+	 *
+	 * NOTE: 'toplevel_page_wpfunnels' is deliberately absent. That screen is the
+	 * React admin, which ships its own namespaced bundle and must not inherit
+	 * the legacy admin CSS. The funnel list, its trash tab and the Templates
+	 * page are routes of that same app now, so their hooks are gone from here
+	 * too.
 	 *
 	 * @var array
 	 */
 	private $page_hooks = [
-		'toplevel_page_wpf_templates',
-		'toplevel_page_wpfunnels',
-		'wpfunnels_page_wpf_templates',
-		'wpfunnels_page_trash_funnels',
 		'wpfunnels_page_wpf_feature_comparison',
 		'wpfunnels_page_wp_funnel_settings',
 		'wpfunnels_page_wpfnl_settings',
 		'wpfunnels_page_wp_global_store',
 		'wpfunnels_page_edit_funnel',
 		'wpfunnels_page_create_funnel',
-		'wpfunnels_page_wpfnl_settings',
 		'wpfunnels_page_wpfnl_automations',
 		'wpfunnels_page_wpfnl_addons',
 		'wpfunnels_page_store_checkout',
 		'wpfunnels_page_wpfunnels_integrations',
 		'wpfunnels_page_wpf-license',
 		'wpfunnels_page_email-builder',
-		'wpfunnels_page_wp_funnels',
-		'wpfunnels_page_wpf_templates'
 	];
 
 	/**
@@ -841,16 +856,6 @@ class Wpfnl_Admin
 			wp_enqueue_style($this->plugin_name . '-email-builder', plugin_dir_url(__FILE__) . 'assets/dist/email-builder/email-builder.css', [], $this->version, 'all');
 		}
 
-		if ('wpfunnels_page_' . WPFNL_AI_FUNNEL_PAGE_SLUG === $hook) {
-			wp_enqueue_style('wpfnl-admin-app', plugin_dir_url(__FILE__) . 'assets/css/admin-app.css', [], $this->version, 'all');
-			wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'assets/css/wpfnl-admin.css', [], $this->version, 'all');
-		}
-
-		if ($this->is_current_page('wpfunnels')) {
-			wp_enqueue_style('wpfnl-admin-app', plugin_dir_url(__FILE__) . 'assets/css/admin-app.css', [], $this->version, 'all');
-		}
-
-
 		if (in_array($hook, $this->page_hooks)) {
 			wp_enqueue_style('wp-color-picker');
 			wp_enqueue_style($this->plugin_name . '-jquery-ui', plugin_dir_url(__FILE__) . 'assets/css/jquery-ui.min.css', [], $this->version, 'all');
@@ -860,6 +865,553 @@ class Wpfnl_Admin
 			do_action('wpfunnels_after_styles_loaded');
 		}
 	}
+
+	/**
+	 * Screen hooks the React single-page admin renders on — the WPFunnels
+	 * dashboard, plus the alias slug it was first built under.
+	 *
+	 * The settings page is here too. It normally redirects to `#/settings`
+	 * before this ever runs, so nothing loads on the way through; the entry
+	 * matters for the case where that redirect is filtered off, when the page
+	 * renders the app itself and needs the app's assets to do it.
+	 *
+	 * @return array Hook suffixes.
+	 * @since 3.13.2
+	 */
+	private function get_react_admin_hooks()
+	{
+		return array(
+			'toplevel_page_' . WPFNL_MAIN_PAGE_SLUG,
+			'wpfunnels_page_' . WPFNL_REACT_ADMIN_SLUG,
+			'wpfunnels_page_' . WPFNL_GLOBAL_SETTINGS_SLUG,
+		);
+	}
+
+
+	/**
+	 * Resolve what the automation screen still needs before it can be used.
+	 *
+	 * Automations run on four things: WPFunnels and WPFunnels Pro with an
+	 * activated licence, and Mail Mint and Mail Mint Pro with an activated
+	 * licence. Each of the two Pro stacks walks the same ladder — not on the
+	 * site, on the site but switched off, running but unlicensed, satisfied —
+	 * and each rung needs a different next step, so the whole thing is resolved
+	 * here rather than in the React app: only PHP can tell an uninstalled plugin
+	 * from a deactivated one, and only PHP knows the licence state.
+	 *
+	 * @return array List of dependency descriptors, in the order they should be
+	 *               presented.
+	 * @since 3.13.3
+	 */
+	private function get_automation_dependencies()
+	{
+		return array(
+			$this->get_wpfnl_pro_dependency(),
+			$this->get_mail_mint_dependency(),
+		);
+	}
+
+
+	/**
+	 * Dependency descriptor for the WPFunnels Pro half of the ladder.
+	 *
+	 * WPFunnels Pro is not on wordpress.org, so the "not installed" rung is a
+	 * purchase link rather than a one-click install.
+	 *
+	 * @return array Dependency descriptor.
+	 * @since 3.13.3
+	 */
+	private function get_wpfnl_pro_dependency()
+	{
+		$base = array(
+			'id'       => 'wpfunnels-pro',
+			'name'     => __('WPFunnels Pro', 'wpfnl'),
+			'basename' => self::WPFNL_PRO_BASENAME,
+			'slug'     => 'wpfunnels-pro',
+			'action'   => '',
+			'url'      => '',
+			'newTab'   => false,
+		);
+
+		if ((bool) apply_filters('wpfunnels/is_pro_license_activated', false)) {
+			return array_merge($base, array(
+				'state'   => 'satisfied',
+				'message' => '',
+				'label'   => '',
+			));
+		}
+
+		if (Wpfnl_functions::is_plugin_activated(self::WPFNL_PRO_BASENAME)) {
+			return array_merge($base, array(
+				'state'   => 'needs_license',
+				'message' => __('WPFunnels Pro is active, but its license has not been activated yet.', 'wpfnl'),
+				'label'   => __('Activate License', 'wpfnl'),
+				'url'     => esc_url_raw(add_query_arg(array('page' => 'wpf-license'), admin_url('admin.php'))),
+			));
+		}
+
+		if (Wpfnl_functions::is_plugin_installed(self::WPFNL_PRO_BASENAME)) {
+			return array_merge($base, array(
+				'state'   => 'needs_activation',
+				'message' => __('WPFunnels Pro is installed but currently inactive.', 'wpfnl'),
+				'label'   => __('Activate WPFunnels Pro', 'wpfnl'),
+				'action'  => 'activate',
+			));
+		}
+
+		return array_merge($base, array(
+			'state'   => 'not_installed',
+			'message' => __('Automations need WPFunnels Pro, which is not installed on this site.', 'wpfnl'),
+			'label'   => __('Upgrade to Pro', 'wpfnl'),
+			'url'     => 'https://getwpfunnels.com/pricing/',
+			'newTab'  => true,
+		));
+	}
+
+
+	/**
+	 * Dependency descriptor for the Mail Mint half of the ladder.
+	 *
+	 * The free plugin comes from wordpress.org, so its first two rungs are
+	 * one-click: wpfunnels/v1/activate-plugin installs the package when it is
+	 * missing and activates it either way. Mail Mint Pro is a paid plugin, so
+	 * its "not installed" rung is a purchase link.
+	 *
+	 * @return array Dependency descriptor.
+	 * @since 3.13.3
+	 */
+	private function get_mail_mint_dependency()
+	{
+		$base = array(
+			'id'       => 'mail-mint',
+			'name'     => __('Mail Mint', 'wpfnl'),
+			'basename' => self::MAIL_MINT_BASENAME,
+			'slug'     => 'mail-mint',
+			'action'   => '',
+			'url'      => '',
+			'newTab'   => false,
+		);
+
+		if (Wpfnl_functions::is_mail_mint_pro_license_active() && Wpfnl_functions::is_mail_mint_free_active()) {
+			return array_merge($base, array(
+				'state'   => 'satisfied',
+				'message' => '',
+				'label'   => '',
+			));
+		}
+
+		if (!Wpfnl_functions::is_plugin_installed(self::MAIL_MINT_BASENAME)) {
+			return array_merge($base, array(
+				'state'   => 'not_installed',
+				'message' => __('Automations need Mail Mint, which is not installed on this site.', 'wpfnl'),
+				'label'   => __('Install Mail Mint', 'wpfnl'),
+				'action'  => 'install',
+			));
+		}
+
+		if (!Wpfnl_functions::is_mail_mint_free_active()) {
+			return array_merge($base, array(
+				'state'   => 'needs_activation',
+				'message' => __('Mail Mint is installed but currently inactive.', 'wpfnl'),
+				'label'   => __('Activate Mail Mint', 'wpfnl'),
+				'action'  => 'activate',
+			));
+		}
+
+		// Mail Mint is running; the rest of the ladder is about its Pro plugin.
+		if (Wpfnl_functions::is_plugin_activated(self::MAIL_MINT_PRO_BASENAME)) {
+			return array_merge($base, array(
+				'state'    => 'needs_license',
+				'name'     => __('Mail Mint Pro', 'wpfnl'),
+				'basename' => self::MAIL_MINT_PRO_BASENAME,
+				'message'  => __('Mail Mint Pro is active, but its license has not been activated yet.', 'wpfnl'),
+				'label'    => __('Activate License', 'wpfnl'),
+				'url'      => esc_url_raw(admin_url('admin.php?page=mrm-admin#/settings/license')),
+			));
+		}
+
+		if (Wpfnl_functions::is_plugin_installed(self::MAIL_MINT_PRO_BASENAME)) {
+			return array_merge($base, array(
+				'state'    => 'needs_activation',
+				'name'     => __('Mail Mint Pro', 'wpfnl'),
+				'basename' => self::MAIL_MINT_PRO_BASENAME,
+				'slug'     => 'mail-mint-pro',
+				'message'  => __('Mail Mint Pro is installed but currently inactive.', 'wpfnl'),
+				'label'    => __('Activate Mail Mint Pro', 'wpfnl'),
+				'action'   => 'activate',
+			));
+		}
+
+		return array_merge($base, array(
+			'state'    => 'not_installed',
+			'name'     => __('Mail Mint Pro', 'wpfnl'),
+			'basename' => self::MAIL_MINT_PRO_BASENAME,
+			'slug'     => 'mail-mint-pro',
+			'message'  => __('Automations need Mail Mint Pro with an activated license.', 'wpfnl'),
+			'label'    => __('Get Mail Mint Pro', 'wpfnl'),
+			'url'      => 'https://getwpfunnels.com/pricing/#mail-mint',
+			'newTab'   => true,
+		));
+	}
+
+
+	/**
+	 * Work out what the header's Pro call to action should say and where it
+	 * should go.
+	 *
+	 * There are three ways an install can fall short of a licensed Pro, and each
+	 * needs a different next step — telling someone to buy Pro when the plugin is
+	 * sitting deactivated in their plugins list is a dead end. Resolved here
+	 * rather than in the React app because the activation link needs a nonce and
+	 * a capability check.
+	 *
+	 * @return array|null CTA descriptor, or null when Pro is fully licensed and
+	 *                    no call to action belongs in the header.
+	 * @since 3.13.2
+	 */
+	private function get_pro_cta()
+	{
+		if (!function_exists('get_plugins')) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$basename = 'wpfunnels-pro/wpfnl-pro.php';
+
+		if ((bool) apply_filters('wpfunnels/is_pro_license_activated', false)) {
+			return null;
+		}
+
+		// Installed and running, but unlicensed — the features stay locked until
+		// the licence is activated, so send them to the licence screen.
+		if (Wpfnl_functions::is_plugin_activated($basename)) {
+			return array(
+				'state'  => 'needs_license',
+				'label'  => __('Activate License', 'wpfnl'),
+				'title'  => __('Activate your WPFunnels Pro license to unlock Pro features', 'wpfnl'),
+				'url'    => esc_url_raw(add_query_arg(array('page' => 'wpf-license'), admin_url('admin.php'))),
+				'newTab' => false,
+			);
+		}
+
+		// Present but deactivated — one click away, no purchase needed.
+		if (Wpfnl_functions::is_plugin_installed($basename)) {
+			$plugins_url = admin_url('plugins.php');
+			$can_activate = current_user_can('activate_plugins');
+
+			/*
+			 * Built with add_query_arg rather than wp_nonce_url on purpose.
+			 * wp_nonce_url() returns esc_html()'d output, so its separators come
+			 * back as `&#038;`. That is correct for a URL echoed straight into
+			 * markup — the HTML parser decodes it — but this one travels through
+			 * wp_localize_script and is applied by React with setAttribute,
+			 * where nothing decodes entities. The literal `&#038;` would split
+			 * the query string into junk parameters, `plugin` and `_wpnonce`
+			 * would arrive empty, and WordPress would answer the click with
+			 * "The link you followed has expired."
+			 *
+			 * wp_localize_script's own html_entity_decode() does not save us
+			 * either: it only walks top-level scalars, and this URL is nested
+			 * inside the CTA array.
+			 *
+			 * Without the capability the one-click link would only bounce off a
+			 * permission check, so point at the plugins list instead.
+			 */
+			$url = $can_activate
+				? add_query_arg(
+					array(
+						'action'   => 'activate',
+						'plugin'   => rawurlencode($basename),
+						'_wpnonce' => wp_create_nonce('activate-plugin_' . $basename),
+					),
+					$plugins_url
+				)
+				: $plugins_url;
+
+			return array(
+				'state'  => 'needs_activation',
+				'label'  => __('Activate Pro', 'wpfnl'),
+				'title'  => __('WPFunnels Pro is installed but not active — activate it to unlock Pro features', 'wpfnl'),
+				'url'    => esc_url_raw($url),
+				'newTab' => false,
+			);
+		}
+
+		// Not on the site at all.
+		return array(
+			'state'  => 'not_installed',
+			'label'  => __('Upgrade to Pro', 'wpfnl'),
+			'title'  => __('Upgrade to WPFunnels Pro', 'wpfnl'),
+			'url'    => 'https://getwpfunnels.com/pricing/',
+			'newTab' => true,
+		);
+	}
+
+
+	/**
+	 * Enqueue the React single-page admin bundle.
+	 *
+	 * Deliberately kept out of the `$page_hooks` group: the React admin ships
+	 * its own namespaced stylesheet (every class prefixed `rwpfnl`) and must not
+	 * inherit the legacy admin CSS, which is written against the Vue markup.
+	 *
+	 * @param string $hook Current admin screen hook suffix.
+	 *
+	 * @return void
+	 * @since 3.13.2
+	 */
+	/**
+	 * Data the React template library screen needs.
+	 *
+	 * The same facts the Vue library read off `WPFunnelVars` and
+	 * `template_library_object`, narrowed to what the standalone Templates page
+	 * actually uses. The listing itself still comes from the REST API; this is
+	 * only the context the listing is read in.
+	 *
+	 * @return array Template library context.
+	 * @since  3.13.5
+	 */
+	private function get_template_library_data()
+	{
+		$is_pro_license_active = (bool) apply_filters('wpfunnels/is_pro_license_activated', false);
+
+		return array(
+			'builder'            => Wpfnl_functions::get_builder_type(),
+			'isAnyPluginMissing' => Wpfnl_functions::is_any_plugin_missing(),
+			'dependencyPlugins'  => Wpfnl_functions::get_dependency_plugins_status(),
+			'types'              => Wpfnl_functions::get_template_types(),
+			// Store Checkout funnels have their own allowance, so they are not
+			// counted against this one.
+			'activeFunnels'      => Wpfnl_functions::count_non_store_checkout_funnels(),
+			// -1 once the licence lifts the cap.
+			'allowedFunnels'     => $is_pro_license_active ? -1 : 3,
+			// The remote-funnel add-on serves the library from elsewhere, and
+			// this screen then has nothing of its own to fetch.
+			'isRemote'           => Wpfnl_functions::maybe_remote_funnel(),
+		);
+	}
+
+
+	private function enqueue_react_admin_assets($hook)
+	{
+		if (!in_array($hook, $this->get_react_admin_hooks(), true)) {
+			return;
+		}
+
+		/*
+		 * A production build splits the webpack runtime into its own chunk that
+		 * every entry depends on, so it has to load first. A development build
+		 * (npm run start) keeps the runtime inside each entry and emits no such
+		 * file, hence the existence check rather than a hard dependency.
+		 */
+		$runtime_deps = array();
+		$runtime_path = WPFNL_DIR . '/admin/assets/dist/runtime/index.min.js';
+
+		if (file_exists($runtime_path)) {
+			wp_enqueue_script(
+				'wpfnl-webpack-runtime',
+				plugin_dir_url(__FILE__) . 'assets/dist/runtime/index.min.js',
+				array(),
+				$this->version,
+				true
+			);
+
+			$runtime_deps[] = 'wpfnl-webpack-runtime';
+		}
+
+		wp_enqueue_script(
+			'wpfnl-react-admin',
+			plugin_dir_url(__FILE__) . 'assets/dist/js/wpfnl-react-admin.min.js',
+			$runtime_deps,
+			$this->version,
+			true
+		);
+
+		Wpfnl_functions::enqueue_bundle_style('wpfnl-react-admin', 'wpfnl-react-admin-bundle');
+
+		// The React admin renders the whole header action group itself — the
+		// AI Assistant drawer included (see src/admin/components/AiDrawer/) —
+		// so the Vue global-ai-drawer bundle is NOT loaded on this screen: it
+		// would find neither of its mount points (#wpfnl-header-actions,
+		// #wpfnl-global-ai-drawer), and loading it anyway only shipped a second
+		// copy of the group's markup and styles.
+		$_is_pro_license_active = (bool) apply_filters('wpfunnels/is_pro_license_activated', false);
+
+		/*
+		 * Everything after the page name in the title WordPress just printed —
+		 * separator, site name, " — WordPress". The React admin is one WordPress
+		 * page with its routes in the hash, so WordPress titles the tab once,
+		 * with this page's own name ("Dashboard"), and every route below it
+		 * inherits that. The app retitles itself per route (see
+		 * src/admin/utils/documentTitle.js) and needs this tail, which is
+		 * translatable and so cannot be rebuilt in JavaScript.
+		 *
+		 * `$admin_title` is built from `$title`, so it always starts with it;
+		 * the prefix check is only there in case an `admin_title` filter has
+		 * rewritten the whole thing, in which case the app keeps what WordPress
+		 * printed for the page name it resolves. Entities such as `&lsaquo;`
+		 * survive here: wp_localize_script() decodes them on the way out.
+		 */
+		$_document_title_suffix = '';
+
+		if (isset($GLOBALS['title'], $GLOBALS['admin_title'])) {
+			$_page_title  = (string) $GLOBALS['title'];
+			$_admin_title = (string) $GLOBALS['admin_title'];
+
+			if ('' !== $_page_title && 0 === strpos($_admin_title, $_page_title)) {
+				$_document_title_suffix = substr($_admin_title, strlen($_page_title));
+			}
+		}
+
+		// Mail Mint's install state is read from get_plugins() below.
+		if (!function_exists('get_plugins')) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		/*
+		 * Core's plugin updater. The template library route offers to install
+		 * the page builder its templates are authored for when that plugin is
+		 * missing, and `wp.updates` is what does the installing.
+		 */
+		wp_enqueue_script('updates');
+
+		wp_localize_script(
+			'wpfnl-react-admin',
+			'RWPFNLAdmin',
+			array(
+				'rest_api_url'           => get_rest_url(),
+				'nonce'                  => wp_create_nonce('wp_rest'),
+				'security'               => wp_create_nonce('wpfnl-admin'),
+				'admin_url'              => admin_url(),
+				'image_path'             => WPFNL_URL . 'admin/assets/images',
+				// Base URL the bundle resolves its async chunks against — the
+				// canvas editor is code-split (see src/admin/public-path.js).
+				'dist_url'               => WPFNL_URL . 'admin/assets/dist/',
+				'priceConfig'            => Wpfnl_functions::get_wc_price_config(),
+				'isProActivated'         => apply_filters('wpfunnels/is_wpfnl_pro_active', false),
+				'isWPFIntegrationActive' => apply_filters('wpfunnels/is_integration_license_active', false),
+				/*
+				 * Mail Mint's licence state, which decides whether the automation
+				 * route shows the promo screen at all or hands the visitor to the
+				 * legacy automation list.
+				 */
+				'isMailMintProLicenseActive' => Wpfnl_functions::is_mail_mint_pro_license_active(),
+				/*
+				 * What the automation screen still needs, rung by rung, with the
+				 * next step for each. Plugin-installing rungs carry a basename and
+				 * slug the screen posts to wpfunnels/v1/activate-plugin; the rest
+				 * carry a URL.
+				 */
+				'automationDependencies'     => $this->get_automation_dependencies(),
+				'canInstallPlugins'          => current_user_can('install_plugins'),
+				'canActivatePlugins'         => current_user_can('activate_plugins'),
+				'getText'                => Wpfnl_functions::get_text(),
+				'startOfWeek'            => (int) get_option('start_of_week', 0),
+				/*
+				 * Whether the onboarding checklist was on show last time the
+				 * dashboard asked — 'yes', 'no', or absent when unknown. Only
+				 * decides whether to hold space for it while its real status
+				 * loads; the status itself still comes from the REST call.
+				 */
+				'onboardingHint'         => get_transient(\WPFunnels\Rest\Controllers\DashboardController::ONBOARDING_VISIBILITY_KEY),
+				/*
+				 * Header action group data. It has to ride on this handle, not on
+				 * the AI-drawer handle the Vue group used: WordPress prints a
+				 * script's localized data immediately before that script's own
+				 * tag, and the React bundle is enqueued first — so anything
+				 * attached to the drawer does not exist yet when React renders.
+				 */
+				'isProLicenseActive'     => $_is_pro_license_active,
+				'upgradeUrl'             => 'https://getwpfunnels.com/pricing/',
+				'proCta'                 => $this->get_pro_cta(),
+				'documentTitleSuffix'    => $_document_title_suffix,
+				/*
+				 * What the template library route runs on. Every value here is
+				 * something only PHP can answer — which page builder the site is
+				 * set up for and whether its plugin is actually there, how much
+				 * of an unlicensed install's funnel allowance is left, which
+				 * template types this install has. Arrives as a real object:
+				 * wp_localize_script only stringifies top-level scalars.
+				 */
+				'templateLibrary'        => $this->get_template_library_data(),
+				/*
+				 * The two settings panels that are still Vue apps of their own,
+				 * fetched by the settings screen when one of them is opened.
+				 */
+				'settingsPanelApps'      => $this->get_settings_panel_apps(),
+			)
+		);
+
+		$this->enqueue_settings_panel_apps();
+	}
+
+
+	/**
+	 * The two settings panels that are still Vue apps of their own.
+	 *
+	 * "AI Assistant" and "MCP for AI Agents" each own their fields and save them
+	 * through their own REST routes, so the React settings screen renders a
+	 * mount point and asks those bundles to mount into it rather than
+	 * reimplementing them (see src/admin/pages/Settings/VuePanel.jsx). The
+	 * bundles are unchanged — they still mount themselves on the legacy settings
+	 * page, where the mount point is printed by PHP.
+	 *
+	 * @return void
+	 * @since  3.13.8
+	 */
+	private function enqueue_settings_panel_apps()
+	{
+		$_current_user = wp_get_current_user();
+		$_common       = array(
+			'username'  => $_current_user ? $_current_user->user_login : '',
+			'rest_url'  => esc_url_raw(get_rest_url()),
+			'nonce'     => wp_create_nonce('wp_rest'),
+			'admin_url' => esc_url_raw(admin_url()),
+		);
+
+		/*
+		 * The globals the two bundles read, printed before the React bundle so
+		 * they are there whenever a bundle is pulled in later. They are a few
+		 * hundred bytes; the bundles themselves are megabytes, which is why
+		 * only the data is printed up front.
+		 */
+		wp_add_inline_script(
+			'wpfnl-react-admin',
+			'window.WPFnlMcpSettings = ' . wp_json_encode(array_merge($_common, array('site_url' => esc_url_raw(home_url())))) . ';' .
+			'window.WPFnlAiAssistantSettings = ' . wp_json_encode($_common) . ';',
+			'before'
+		);
+	}
+
+
+	/**
+	 * Where the settings screen fetches its two Vue panels from.
+	 *
+	 * Neither bundle is enqueued: only one settings panel in the app needs
+	 * either of them, and the route is in the fragment, which the server never
+	 * sees — so loading them on every screen of the admin would cost every
+	 * screen megabytes for a panel most visitors never open. The panel loads
+	 * what it needs when it is opened (see pages/Settings/panels/VuePanel.jsx).
+	 *
+	 * The stylesheet is empty on a development build, which injects its styles
+	 * from JavaScript and emits none.
+	 *
+	 * @return array Script and stylesheet URL per panel.
+	 * @since  3.13.8
+	 */
+	private function get_settings_panel_apps()
+	{
+		return array(
+			'aiAssistant' => array(
+				'script' => plugin_dir_url(__FILE__) . 'assets/dist/js/ai-assistant-settings.min.js',
+				'style'  => Wpfnl_functions::get_bundle_style_url('ai-assistant-settings'),
+			),
+			'mcp'         => array(
+				'script' => plugin_dir_url(__FILE__) . 'assets/dist/js/mcp-agent-settings.min.js',
+				'style'  => Wpfnl_functions::get_bundle_style_url('mcp-agent-settings'),
+			),
+		);
+	}
+
 
 	/**
 	 * Register the JavaScript for the admin area.
@@ -882,6 +1434,9 @@ class Wpfnl_Admin
 
 
 		$screen = get_current_screen();
+
+
+		$this->enqueue_react_admin_assets($hook);
 
 
 		if ('dashboard' === $screen->id || 'plugins' === $screen->id) {
@@ -949,81 +1504,22 @@ class Wpfnl_Admin
 			));
 		}
 
-		if ('wpfunnels_page_' . WPFNL_AI_FUNNEL_PAGE_SLUG === $hook) {
-			wp_enqueue_script('wpfnl-ai-funnel-app', plugin_dir_url(__FILE__) . 'assets/dist/js/ai-funnel-app.min.js', [], $this->version, true);
-			Wpfnl_functions::enqueue_bundle_style( 'ai-funnel-app', 'wpfnl-ai-funnel-app-bundle' );
-			$_ai_pro_active  = Wpfnl_functions::is_wpfnl_pro_activated();
-			$_ai_enabled     = \WPFunnels\AI\Settings\AISettings::isEnabled();
-			wp_localize_script('wpfnl-ai-funnel-app', 'WPFNAIFunnel', array(
-				'adminUrl' => esc_url_raw(admin_url('admin.php')),
-				'pageUrl' => esc_url_raw(add_query_arg(array(
-					'page' => WPFNL_AI_FUNNEL_PAGE_SLUG,
-				), admin_url('admin.php'))),
-				'funnelsUrl' => esc_url_raw(add_query_arg(array(
-					'page' => WPFNL_FUNNEL_PAGE_SLUG,
-				), admin_url('admin.php'))),
-				// The combined "AI Settings" tab was split into "MCP for AI Agents"
-				// and "AI Assistant" — deep-link to the AI Assistant tab, its direct
-				// feature successor.
-				'settingsUrl'  => esc_url_raw( add_query_arg( array( 'page' => WPFNL_GLOBAL_SETTINGS_SLUG ), admin_url( 'admin.php' ) ) . '#ai-assistant-settings' ),
-				'restApiUrl'   => esc_url_raw( get_rest_url() ),
-				'restNonce'    => wp_create_nonce( 'wp_rest' ),
-				// The copilot client reads rest_url/nonce; without these it falls
-				// back to an empty nonce and every REST call 401s.
-				'rest_url'     => esc_url_raw( get_rest_url() ),
-				'nonce'        => wp_create_nonce( 'wp_rest' ),
-				'rest_nonce'   => wp_create_nonce( 'wp_rest' ),
-				'settingsPage' => esc_url_raw( add_query_arg( array( 'page' => WPFNL_GLOBAL_SETTINGS_SLUG ), admin_url( 'admin.php' ) ) . '#ai-assistant-settings' ),
-				'isProActive'  => $_ai_pro_active  ? 'yes' : 'no',
-				'isAiEnabled'  => $_ai_enabled     ? 'yes' : 'no',
-			));
-		}
-
-		if ( 'wpfunnels_page_' . WPFNL_GLOBAL_SETTINGS_SLUG === $hook ) {
-			$_current_user  = wp_get_current_user();
-			$_settings_common_data = array(
-				'username'  => $_current_user ? $_current_user->user_login : '',
-				'rest_url'  => esc_url_raw( get_rest_url() ),
-				'nonce'     => wp_create_nonce( 'wp_rest' ),
-				'admin_url' => esc_url_raw( admin_url() ),
-			);
-
-			wp_enqueue_script( 'wpfnl-mcp-agent-settings', plugin_dir_url( __FILE__ ) . 'assets/dist/js/mcp-agent-settings.min.js', [], $this->version, true );
-			Wpfnl_functions::enqueue_bundle_style( 'mcp-agent-settings', 'wpfnl-mcp-agent-settings-bundle' );
-			wp_localize_script(
-				'wpfnl-mcp-agent-settings',
-				'WPFnlMcpSettings',
-				array_merge(
-					$_settings_common_data,
-					array(
-						'site_url' => esc_url_raw( home_url() ),
-					)
-				)
-			);
-
-			wp_enqueue_script( 'wpfnl-ai-assistant-settings', plugin_dir_url( __FILE__ ) . 'assets/dist/js/ai-assistant-settings.min.js', [], $this->version, true );
-			Wpfnl_functions::enqueue_bundle_style( 'ai-assistant-settings', 'wpfnl-ai-assistant-settings-bundle' );
-			wp_localize_script( 'wpfnl-ai-assistant-settings', 'WPFnlAiAssistantSettings', $_settings_common_data );
-		}
 
 		if (in_array($hook, $this->page_hooks)) {
 
 			// Admin header actions — the Knowledge Base, AI Assistant, Settings
 			// and Upgrade group rendered into #wpfnl-header-actions from every
-			// WPFunnels admin screen. Reuses the same WPFNAIFunnel global name
-			// the full-page ai-funnel-app bundle localizes (see above) so
-			// admin/src/copilot/services/ai.js works unmodified; safe because
-			// $this->page_hooks and the AI-funnel page hook never match on the
-			// same request.
-			$_settings_page_url = add_query_arg( array( 'page' => WPFNL_GLOBAL_SETTINGS_SLUG ), admin_url( 'admin.php' ) );
+			// legacy WPFunnels admin screen. The data goes out under the
+			// WPFNAIFunnel global because that is the name
+			// admin/src/copilot/services/ai.js reads, and the drawer shares
+			// that client with what is left of the copilot bundle.
+			$_settings_page_url = admin_url( 'admin.php?page=' . WPFNL_MAIN_PAGE_SLUG ) . '#/settings';
 
 			wp_enqueue_script('wpfnl-global-ai-drawer', plugin_dir_url(__FILE__) . 'assets/dist/js/global-ai-drawer.min.js', [], $this->version, true);
 			Wpfnl_functions::enqueue_bundle_style( 'global-ai-drawer', 'wpfnl-global-ai-drawer-bundle' );
 			wp_localize_script('wpfnl-global-ai-drawer', 'WPFNAIFunnel', array(
 				'adminUrl'        => esc_url_raw( admin_url( 'admin.php' ) ),
-				'settingsUrl'     => esc_url_raw( $_settings_page_url . '#ai-assistant-settings' ),
 				'settingsPageUrl' => esc_url_raw( $_settings_page_url ),
-				'isSettingsPage'  => isset( $_GET['page'] ) && WPFNL_GLOBAL_SETTINGS_SLUG === sanitize_text_field( wp_unslash( $_GET['page'] ) ),
 				'isPro'           => (bool) apply_filters( 'wpfunnels/is_pro_license_activated', false ),
 				'upgradeUrl'      => 'https://getwpfunnels.com/pricing/',
 				'restApiUrl'      => esc_url_raw( get_rest_url() ),
@@ -1229,7 +1725,6 @@ class Wpfnl_Admin
 				'settings_url' => esc_url_raw(admin_url('admin.php?page=settings')),
 				'home_url' => esc_url_raw(home_url()),
 				'funnel_id' => $funnel_id,
-				'isTemplatePage' => 'wpfunnels_page_wpf_templates' === $hook,
 				'is_pro' => Wpfnl_functions::is_pro_license_activated(),
 				'is_ab_tesing_available' => defined('WPFNL_PRO_VERSION') ? version_compare(WPFNL_PRO_VERSION, "1.7.3", ">=") : false,
 				'is_webhook_licensed' => Wpfnl_functions::is_webhook_license_activated(),
@@ -1283,24 +1778,6 @@ class Wpfnl_Admin
 				'shippingClasses' => Wpfnl_functions::get_shipping_classes(),
 			)
 			);
-
-			// Enqueue the admin dashboard script only on WPFunnels Main Page
-
-			if ($this->is_current_page('wpfunnels')) {
-				wp_enqueue_script('wpfnl-admin-app', plugin_dir_url(__FILE__) . 'assets/dist/js/wpfnl-admin-app.min.js', array(), $this->version, true);
-				Wpfnl_functions::enqueue_bundle_style( 'wpfnl-admin-app', 'wpfnl-admin-app-bundle' );
-				wp_localize_script('wpfnl-admin-app', 'WPFAdminObj', array(
-					'rest_api_url' => get_rest_url(),
-					'security' => wp_create_nonce('wpfnl-admin'),
-					'nonce' => wp_create_nonce('wp_rest'),
-					'priceConfig' => Wpfnl_functions::get_wc_price_config(),
-					'isProActivated' => apply_filters('wpfunnels/is_wpfnl_pro_active', false),
-					'isWPFIntegrationActive' => apply_filters( 'wpfunnels/is_integration_license_active', false ),
-					'getText' => Wpfnl_functions::get_text(),
-					'startOfWeek' => (int) get_option('start_of_week', 0),
-					'admin_url' => admin_url(),
-				));
-			}
 
 
 			/**
@@ -1948,7 +2425,13 @@ class Wpfnl_Admin
 		if ($screen && (in_array($screen->id, $this->page_hooks) || 'wpfunnels_page_' . WPFNL_AI_FUNNEL_PAGE_SLUG === $screen->id)) {
 			$classes .= ' wpfunnels-body';
 		}
-		
+
+		// The React admin styles the WordPress content column itself, so it gets
+		// its own class instead of the legacy one.
+		if ($screen && in_array($screen->id, $this->get_react_admin_hooks(), true)) {
+			$classes .= ' rwpfnl-page';
+		}
+
 		return $classes;
 	}
 

@@ -657,6 +657,7 @@ body.wpfunnel_steps-template {
 .wpfnl-checkout .woocommerce-checkout-review-order #order_review_heading,
 .wpfnl-checkout .woocommerce-billing-fields > h3,
 .wpfnl-checkout .woocommerce-additional-fields > h3,
+.wpfnl-checkout .woocommerce-shipping-fields .shipping-field-title,
 .wpfnl-checkout .woocommerce-shipping-fields > #ship-to-different-address,
 .wpfnl-checkout .wpfnl-checkout-variable-product .variable-product-title {
   background: #F7F7FA;

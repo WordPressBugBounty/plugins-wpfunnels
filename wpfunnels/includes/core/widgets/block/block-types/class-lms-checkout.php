@@ -205,60 +205,60 @@ class LmsCheckout extends AbstractDynamicBlock {
 					<div class="wpfnl-reset wpfnl-lms-checkout">
 						<div class="lms-checkout-box">
 							<div class="lms-checkout-header">
-								<h4><?php echo $lmsCheckoutHeaderTitle ?></h4>
+								<h4><?php echo esc_html( $lmsCheckoutHeaderTitle ); ?></h4>
 							</div>
 							<div class="lms-checkout-body">
 								<div class="course-image">
-									<img src="<?php echo $image; ?>" alt="course image" />
+									<img src="<?php echo esc_url( $image ); ?>" alt="course image" />
 								</div>
 
 								<div class="course-content">
 									<h2 class="course-title">
-										<?php echo $course_title ?>
-										<span class="no-of-lesson">- <?php echo $no_of_lesson ?> Lessons</span>
+										<?php echo esc_html( $course_title ); ?>
+										<span class="no-of-lesson">- <?php echo esc_html( $no_of_lesson ); ?> Lessons</span>
 									</h2>
 
 									<div class="lms-single-block course-details-block">
-										<h4 class="lms-block-title"><?php echo $lmsCourseDetailsTitle ?></h4>
+										<h4 class="lms-block-title"><?php echo esc_html( $lmsCourseDetailsTitle ); ?></h4>
 										<div class="course-description">
 											<?php
-												echo $lmsCourseDescriptionTitle;
+												echo wp_kses_post( $lmsCourseDescriptionTitle );
 											?>
 										</div>
 									</div>
 
 									<div class="lms-single-block course-plan-block">
-										<h4 class="lms-block-title"><?php echo $lmsPlanDetailsTitle ?></h4>
+										<h4 class="lms-block-title"><?php echo esc_html( $lmsPlanDetailsTitle ); ?></h4>
 										<div class="course-plan">
 											<?php
 											if( $course_type == 'subscribe' ){
 												
 												if( $discount_price ){
-													echo $course_type_text .' - <span class="primary-color"><del>'.$currency.$price.'</del> <ins style="text-decoration:none">'.$currency.$discount_price.'</ins>/'.$billing_cycle_unit_text.'</span>';
+													echo esc_html( $course_type_text ) .' - <span class="primary-color"><del>'. wp_kses_post( $currency ) . esc_html( $price ) .'</del> <ins style="text-decoration:none">'. wp_kses_post( $currency ) . esc_html( $discount_price ) .'</ins>/'. esc_html( $billing_cycle_unit_text ) .'</span>';
 												}else{
-													echo $course_type_text .' - <span class="primary-color">'.$currency.$price.'/'.$billing_cycle_unit_text.'</span>';
+													echo esc_html( $course_type_text ) .' - <span class="primary-color">'. wp_kses_post( $currency ) . esc_html( $price ) .'/'. esc_html( $billing_cycle_unit_text ) .'</span>';
 												}
 
 												if( !empty( $trial_period ) ){
-													echo '<small> ('.$trial_period.' '.$trial_period_unit_text.' trial period)</small>';
+													echo '<small> ('. esc_html( $trial_period ) .' '. esc_html( $trial_period_unit_text ) .' trial period)</small>';
 												}
 
 											} else if( $course_type == 'paynow' ){
 												
 												if( $discount_price ){
-													echo $course_type_text .' - <span class="primary-color"><del>'.$currency.$price.'</del>  <ins style="text-decoration:none">'.$currency.$discount_price.'</ins></span>';
+													echo esc_html( $course_type_text ) .' - <span class="primary-color"><del>'. wp_kses_post( $currency ) . esc_html( $price ) .'</del>  <ins style="text-decoration:none">'. wp_kses_post( $currency ) . esc_html( $discount_price ) .'</ins></span>';
 												}else{
-													echo $course_type_text .' - <span class="primary-color">'.$currency.$price.'</span>';
+													echo esc_html( $course_type_text ) .' - <span class="primary-color">'. wp_kses_post( $currency ) . esc_html( $price ) .'</span>';
 												}
 
 												if( $is_expire == 'on' ){
-													echo '<small> (expires in '.$expire_days.' days)</small>';
+													echo '<small> (expires in '. esc_html( $expire_days ) .' days)</small>';
 												}
 											}else{
-												echo $course_type_text;
+												echo esc_html( $course_type_text );
 
 												if( $is_expire == 'on' ){
-													echo '<small> (Login or register to enroll) (expires in '.$expire_days.' days)</small>';
+													echo '<small> (Login or register to enroll) (expires in '. esc_html( $expire_days ) .' days)</small>';
 												}
 											}
 											?>
@@ -273,18 +273,18 @@ class LmsCheckout extends AbstractDynamicBlock {
 								if( !empty( $trial_period ) ){
 									?>
 
-									<p class="footer-title">Course Trial Fees <span class="footer-price"><?php echo $currency.$trial_price; ?></span></p>
+									<p class="footer-title">Course Trial Fees <span class="footer-price"><?php echo wp_kses_post( $currency ) . esc_html( $trial_price ); ?></span></p>
 
 								<?php }else{ ?>
 
-									<p class="footer-title">Course Subscription Fees <span class="footer-price"><?php echo $currency.$price; ?></span></p>
+									<p class="footer-title">Course Subscription Fees <span class="footer-price"><?php echo wp_kses_post( $currency ) . esc_html( $price ); ?></span></p>
 									<?php
 								}
 							}else if( $course_type == 'paynow' ){
 								if( $discount_price ){ ?>
-									<p class="footer-title">Course Fees <span class="footer-price"><del><?php echo $currency.$price; ?></del> <ins style="text-decoration:none"> <?php echo $currency.$discount_price; ?> </ins></span></p>
+									<p class="footer-title">Course Fees <span class="footer-price"><del><?php echo wp_kses_post( $currency ) . esc_html( $price ); ?></del> <ins style="text-decoration:none"> <?php echo wp_kses_post( $currency ) . esc_html( $discount_price ); ?> </ins></span></p>
 								<?php } else{ ?>
-									<p class="footer-title">Course Fees <span class="footer-price"><?php echo $currency.$price; ?></span></p>
+									<p class="footer-title">Course Fees <span class="footer-price"><?php echo wp_kses_post( $currency ) . esc_html( $price ); ?></span></p>
 								<?php }
 								?>
 							<?php }else{ ?>
@@ -308,15 +308,15 @@ class LmsCheckout extends AbstractDynamicBlock {
 								}
 								
 								if ($course_access ){
-									echo '<a class="btn-default" href="'.$next_step_url.'?wpfnl_lms_payment=free" id="wpfnl-lms-access-course">'.$button_text.'</a>';
+									echo '<a class="btn-default" href="'. esc_url( add_query_arg( 'wpfnl_lms_payment', 'free', $next_step_url ) ) .'" id="wpfnl-lms-access-course">'. esc_html( $button_text ) .'</a>';
 									echo '<span class="wpfnl-lms-access-course-message"></span>';
 								}else if($course_type == 'free' || $course_type == 'open'){
-									echo '<a class="btn-default" href="'.$next_step_url.'" user_id="'.get_current_user_id().'" step_id="'.$step_id.'" course_id="'.$course['id'].'" id="wpfnl-lms-free-course">'.$button_text.'</a>';
+									echo '<a class="btn-default" href="'. esc_url( $next_step_url ) .'" user_id="'. esc_attr( get_current_user_id() ) .'" step_id="'. esc_attr( $step_id ) .'" course_id="'. esc_attr( $course['id'] ) .'" id="wpfnl-lms-free-course">'. esc_html( $button_text ) .'</a>';
 									echo '<span class="wpfnl-lms-free-course-message"></span>';
 								}else{
 									// Provider-specific payment buttons
 									if ($provider_id === 'learndash') {
-										echo do_shortcode('[learndash_payment_buttons course_id='.$course['id'].']');
+										echo do_shortcode( '[learndash_payment_buttons course_id='. absint( $course['id'] ) .']' );
 									} else {
 										// CreatorLMS and other providers - show WooCommerce add to cart
 										if (function_exists('crlms_get_course')) {
@@ -324,7 +324,7 @@ class LmsCheckout extends AbstractDynamicBlock {
 											if ($course_obj && method_exists($course_obj, 'get_product_id')) {
 												$product_id = $course_obj->get_product_id();
 												if ($product_id) {
-													echo do_shortcode('[add_to_cart id="'.$product_id.'" show_price="false"]');
+													echo do_shortcode( '[add_to_cart id="'. absint( $product_id ) .'" show_price="false"]' );
 												}
 											}
 										}
@@ -335,7 +335,7 @@ class LmsCheckout extends AbstractDynamicBlock {
 								if ($provider_id === 'learndash') {
 									echo do_shortcode('[learndash_login]');
 								} else {
-									echo '<p>Please <a href="'.wp_login_url(get_permalink()).'">login</a> to enroll in this course.</p>';
+									echo '<p>Please <a href="'. esc_url( wp_login_url( get_permalink() ) ) .'">login</a> to enroll in this course.</p>';
 								}
 							}
 							?>
@@ -349,67 +349,67 @@ class LmsCheckout extends AbstractDynamicBlock {
 
 					<style>
 						<?php
-							$lmsCheckoutHeaderBg = isset($attributes['lmsCheckoutHeaderBg']) ? $attributes['lmsCheckoutHeaderBg'] : '';
-							$lmsCheckoutHeaderColor = isset($attributes['lmsCheckoutHeaderColor']) ? $attributes['lmsCheckoutHeaderColor'] : '';
-							$lmsCheckoutHeaderBorderColor = isset($attributes['lmsCheckoutHeaderBorderColor']) ? $attributes['lmsCheckoutHeaderBorderColor'] : '';
-							$lmsCheckoutBodyBg = isset($attributes['lmsCheckoutBodyBg']) ? $attributes['lmsCheckoutBodyBg'] : '';
-							$lmsCheckoutBodyTitleColor = isset($attributes['lmsCheckoutBodyTitleColor']) ? $attributes['lmsCheckoutBodyTitleColor'] : '';
-							$lmsCheckoutBodyContentColor = isset($attributes['lmsCheckoutBodyContentColor']) ? $attributes['lmsCheckoutBodyContentColor'] : '';
-							$lmsCheckoutHighlightedTextColor = isset($attributes['lmsCheckoutHighlightedTextColor']) ? $attributes['lmsCheckoutHighlightedTextColor'] : '';
-							$lmsCheckoutBodyBorderColor = isset($attributes['lmsCheckoutBodyBorderColor']) ? $attributes['lmsCheckoutBodyBorderColor'] : '';
-							$lmsCheckoutFooterTextColor = isset($attributes['lmsCheckoutFooterTextColor']) ? $attributes['lmsCheckoutFooterTextColor'] : '';
-							$lmsCheckoutFooterHighlightedTextColor = isset($attributes['lmsCheckoutFooterHighlightedTextColor']) ? $attributes['lmsCheckoutFooterHighlightedTextColor'] : '';
-							$lmsCheckoutButtonColor = isset($attributes['lmsCheckoutButtonColor']) ? $attributes['lmsCheckoutButtonColor'] : '';
-							$lmsCheckoutButtonHover = isset($attributes['lmsCheckoutButtonHover']) ? $attributes['lmsCheckoutButtonHover'] : '';
-							$lmsCheckoutButtonBg = isset($attributes['lmsCheckoutButtonBg']) ? $attributes['lmsCheckoutButtonBg'] : '';
-							$lmsCheckoutButtonHvrBg = isset($attributes['lmsCheckoutButtonHvrBg']) ? $attributes['lmsCheckoutButtonHvrBg'] : '';
+							$lmsCheckoutHeaderBg = isset($attributes['lmsCheckoutHeaderBg']) ? $this->sanitize_css_color( $attributes['lmsCheckoutHeaderBg'] ) : '';
+							$lmsCheckoutHeaderColor = isset($attributes['lmsCheckoutHeaderColor']) ? $this->sanitize_css_color( $attributes['lmsCheckoutHeaderColor'] ) : '';
+							$lmsCheckoutHeaderBorderColor = isset($attributes['lmsCheckoutHeaderBorderColor']) ? $this->sanitize_css_color( $attributes['lmsCheckoutHeaderBorderColor'] ) : '';
+							$lmsCheckoutBodyBg = isset($attributes['lmsCheckoutBodyBg']) ? $this->sanitize_css_color( $attributes['lmsCheckoutBodyBg'] ) : '';
+							$lmsCheckoutBodyTitleColor = isset($attributes['lmsCheckoutBodyTitleColor']) ? $this->sanitize_css_color( $attributes['lmsCheckoutBodyTitleColor'] ) : '';
+							$lmsCheckoutBodyContentColor = isset($attributes['lmsCheckoutBodyContentColor']) ? $this->sanitize_css_color( $attributes['lmsCheckoutBodyContentColor'] ) : '';
+							$lmsCheckoutHighlightedTextColor = isset($attributes['lmsCheckoutHighlightedTextColor']) ? $this->sanitize_css_color( $attributes['lmsCheckoutHighlightedTextColor'] ) : '';
+							$lmsCheckoutBodyBorderColor = isset($attributes['lmsCheckoutBodyBorderColor']) ? $this->sanitize_css_color( $attributes['lmsCheckoutBodyBorderColor'] ) : '';
+							$lmsCheckoutFooterTextColor = isset($attributes['lmsCheckoutFooterTextColor']) ? $this->sanitize_css_color( $attributes['lmsCheckoutFooterTextColor'] ) : '';
+							$lmsCheckoutFooterHighlightedTextColor = isset($attributes['lmsCheckoutFooterHighlightedTextColor']) ? $this->sanitize_css_color( $attributes['lmsCheckoutFooterHighlightedTextColor'] ) : '';
+							$lmsCheckoutButtonColor = isset($attributes['lmsCheckoutButtonColor']) ? $this->sanitize_css_color( $attributes['lmsCheckoutButtonColor'] ) : '';
+							$lmsCheckoutButtonHover = isset($attributes['lmsCheckoutButtonHover']) ? $this->sanitize_css_color( $attributes['lmsCheckoutButtonHover'] ) : '';
+							$lmsCheckoutButtonBg = isset($attributes['lmsCheckoutButtonBg']) ? $this->sanitize_css_color( $attributes['lmsCheckoutButtonBg'] ) : '';
+							$lmsCheckoutButtonHvrBg = isset($attributes['lmsCheckoutButtonHvrBg']) ? $this->sanitize_css_color( $attributes['lmsCheckoutButtonHvrBg'] ) : '';
 						?>
 
 						.wpfnl-lms-checkout .lms-checkout-header {
-							background-color: <?php echo $lmsCheckoutHeaderBg; ?>;
-							border-color: <?php echo $lmsCheckoutHeaderBorderColor; ?>;
+							background-color: <?php echo esc_html( $lmsCheckoutHeaderBg ); ?>;
+							border-color: <?php echo esc_html( $lmsCheckoutHeaderBorderColor ); ?>;
 						}
 						.wpfnl-lms-checkout .lms-checkout-header h4 {
-							color: <?php echo $lmsCheckoutHeaderColor; ?>;
+							color: <?php echo esc_html( $lmsCheckoutHeaderColor ); ?>;
 						}
 
 						.wpfnl-lms-checkout .lms-checkout-body {
-							background-color: <?php echo $lmsCheckoutBodyBg; ?>;
-							border-color: <?php echo $lmsCheckoutBodyBorderColor; ?>;
+							background-color: <?php echo esc_html( $lmsCheckoutBodyBg ); ?>;
+							border-color: <?php echo esc_html( $lmsCheckoutBodyBorderColor ); ?>;
 						}
 						.wpfnl-lms-checkout .lms-checkout-body .course-title,
 						.wpfnl-lms-checkout .lms-checkout-body .lms-single-block .lms-block-title {
-							color: <?php echo $lmsCheckoutBodyTitleColor; ?>;
+							color: <?php echo esc_html( $lmsCheckoutBodyTitleColor ); ?>;
 						}
 						.wpfnl-lms-checkout .lms-checkout-body .course-title .no-of-lesson,
 						.wpfnl-lms-checkout .lms-checkout-body .lms-single-block .course-description,
 						.wpfnl-lms-checkout .lms-checkout-body .lms-single-block .course-plan {
-							color: <?php echo $lmsCheckoutBodyContentColor; ?>;
+							color: <?php echo esc_html( $lmsCheckoutBodyContentColor ); ?>;
 						}
 						.wpfnl-lms-checkout .lms-checkout-body .lms-single-block .course-plan .primary-color {
-							color: <?php echo $lmsCheckoutHighlightedTextColor; ?>;
+							color: <?php echo esc_html( $lmsCheckoutHighlightedTextColor ); ?>;
 						}
 
 
 						.wpfnl-lms-checkout .lms-checkout-footer .footer-title {
-							color: <?php echo $lmsCheckoutFooterTextColor; ?>;
+							color: <?php echo esc_html( $lmsCheckoutFooterTextColor ); ?>;
 						}
 						.wpfnl-lms-checkout .lms-checkout-footer .footer-price {
-							color: <?php echo $lmsCheckoutFooterHighlightedTextColor; ?>;
+							color: <?php echo esc_html( $lmsCheckoutFooterHighlightedTextColor ); ?>;
 						}
 
 
 						.wpfnl-lms-checkout .lms-checkout-footer .btn-default,
 						.wpfnl-lms-checkout .lms-checkout-footer .ld-login-button,
 						.wpfnl-lms-checkout .lms-checkout-footer .btn-join {
-							color: <?php echo $lmsCheckoutButtonColor; ?>;
-							background-color: <?php echo $lmsCheckoutButtonBg; ?> !important;
+							color: <?php echo esc_html( $lmsCheckoutButtonColor ); ?>;
+							background-color: <?php echo esc_html( $lmsCheckoutButtonBg ); ?> !important;
 						}
 						.wpfnl-lms-checkout .lms-checkout-footer .btn-default:hover,
 						.wpfnl-lms-checkout .lms-checkout-footer .ld-login-button:hover,
 						.wpfnl-lms-checkout .lms-checkout-footer .btn-join:hover {
-							color: <?php echo $lmsCheckoutButtonHover; ?>;
-							background-color: <?php echo $lmsCheckoutButtonHvrBg; ?> !important;
+							color: <?php echo esc_html( $lmsCheckoutButtonHover ); ?>;
+							background-color: <?php echo esc_html( $lmsCheckoutButtonHvrBg ); ?> !important;
 						}
 
 					</style>
@@ -514,11 +514,20 @@ class LmsCheckout extends AbstractDynamicBlock {
 	 */
 	public function show_checkout_markup() {
 
-		$step_id  = isset($_POST['post_id']) ? $_POST['post_id'] : 0;;
-		$lmsCheckoutHeaderTitle 	= $_POST['lmsCheckoutHeaderTitle'];
-		$lmsCourseDetailsTitle 		= $_POST['lmsCourseDetailsTitle'];
-		$lmsCourseDescriptionTitle 	= $_POST['lmsCourseDescriptionTitle'];
-		$lmsPlanDetailsTitle 		= $_POST['lmsPlanDetailsTitle'];
+		if ( ! check_ajax_referer( 'wp_rest', 'nonce', false ) ) {
+			wp_send_json_error( __( 'Invalid request.', 'wpfnl' ), 403 );
+		}
+
+		$step_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+
+		if ( ! $step_id || ! current_user_can( 'edit_post', $step_id ) ) {
+			wp_send_json_error( __( 'You are not allowed to do this.', 'wpfnl' ), 403 );
+		}
+
+		$lmsCheckoutHeaderTitle 	= isset( $_POST['lmsCheckoutHeaderTitle'] ) ? sanitize_text_field( wp_unslash( $_POST['lmsCheckoutHeaderTitle'] ) ) : __( 'Order Details', 'wpfnl' );
+		$lmsCourseDetailsTitle 		= isset( $_POST['lmsCourseDetailsTitle'] ) ? sanitize_text_field( wp_unslash( $_POST['lmsCourseDetailsTitle'] ) ) : __( 'Course Details', 'wpfnl' );
+		$lmsCourseDescriptionTitle 	= isset( $_POST['lmsCourseDescriptionTitle'] ) ? wp_kses_post( wp_unslash( $_POST['lmsCourseDescriptionTitle'] ) ) : '';
+		$lmsPlanDetailsTitle 		= isset( $_POST['lmsPlanDetailsTitle'] ) ? sanitize_text_field( wp_unslash( $_POST['lmsPlanDetailsTitle'] ) ) : __( 'Plan Details', 'wpfnl' );
 		ob_start();
 
 			$funnel_id = get_post_meta($step_id,'_funnel_id',true);
@@ -539,7 +548,7 @@ class LmsCheckout extends AbstractDynamicBlock {
 					), HOUR_IN_SECONDS);
 					
 					// Render CreatorLMS checkout shortcode
-					echo do_shortcode('[creator_lms_checkout course_id="' . $course_id . '"]');
+					echo do_shortcode( '[creator_lms_checkout course_id="' . absint( $course_id ) . '"]' );
 					
 				} elseif (!empty($course)){
 					// For LearnDash, use custom checkout layout
@@ -616,50 +625,50 @@ class LmsCheckout extends AbstractDynamicBlock {
 					<div class="wpfnl-reset wpfnl-lms-checkout">
 						<div class="lms-checkout-box">
 							<div class="lms-checkout-header">
-								<h4><?php echo $lmsCheckoutHeaderTitle ?></h4>
+								<h4><?php echo esc_html( $lmsCheckoutHeaderTitle ); ?></h4>
 							</div>
 							<div class="lms-checkout-body">
 								<div class="course-image">
-									<img src="<?php echo $image; ?>" alt="course image" />
+									<img src="<?php echo esc_url( $image ); ?>" alt="course image" />
 								</div>
 
 								<div class="course-content">
 									<h2 class="course-title">
-										<?php echo $course_title ?>
-										<span class="no-of-lesson">- <?php echo $no_of_lesson ?> Lessons</span>
+										<?php echo esc_html( $course_title ); ?>
+										<span class="no-of-lesson">- <?php echo esc_html( $no_of_lesson ); ?> Lessons</span>
 									</h2>
 
 									<div class="lms-single-block course-details-block">
-										<h4 class="lms-block-title"><?php echo $lmsCourseDetailsTitle ?></h4>
+										<h4 class="lms-block-title"><?php echo esc_html( $lmsCourseDetailsTitle ); ?></h4>
 										<div class="course-description">
 											<?php
-												echo $lmsCourseDescriptionTitle;
+												echo wp_kses_post( $lmsCourseDescriptionTitle );
 											 ?>
 										</div>
 									</div>
 
 									<div class="lms-single-block course-plan-block">
-										<h4 class="lms-block-title"><?php echo $lmsPlanDetailsTitle ?></h4>
+										<h4 class="lms-block-title"><?php echo esc_html( $lmsPlanDetailsTitle ); ?></h4>
 										<div class="course-plan">
 											<?php
 											if( $course_type == 'subscribe' ){
-												echo $course_type_text .' - <span class="primary-color">'.$currency.$price.'/'.$billing_cycle_unit_text.'</span>';
+												echo esc_html( $course_type_text ) .' - <span class="primary-color">'. wp_kses_post( $currency ) . esc_html( $price ) .'/'. esc_html( $billing_cycle_unit_text ) .'</span>';
 
 												if( !empty( $trial_period ) ){
-													echo '<small> ('.$trial_period.' '.$trial_period_unit_text.' trial period)</small>';
+													echo '<small> ('. esc_html( $trial_period ) .' '. esc_html( $trial_period_unit_text ) .' trial period)</small>';
 												}
 
 											} else if( $course_type == 'paynow' ){
-												echo $course_type_text .' - <span class="primary-color">'.$currency.$price.'</span>';
+												echo esc_html( $course_type_text ) .' - <span class="primary-color">'. wp_kses_post( $currency ) . esc_html( $price ) .'</span>';
 
 												if( $is_expire == 'on' ){
-													echo '<small> (expires in '.$expire_days.' days)</small>';
+													echo '<small> (expires in '. esc_html( $expire_days ) .' days)</small>';
 												}
 											}else{
-												echo $course_type_text;
+												echo esc_html( $course_type_text );
 
 												if( $is_expire == 'on' ){
-													echo '<small> (Login or register to enroll) (expires in '.$expire_days.' days)</small>';
+													echo '<small> (Login or register to enroll) (expires in '. esc_html( $expire_days ) .' days)</small>';
 												}
 											}
 											?>
@@ -675,17 +684,17 @@ class LmsCheckout extends AbstractDynamicBlock {
 								if( !empty( $trial_period ) ){
 									?>
 
-									<p class="footer-title">Course Trial Fees <span class="footer-price"><?php echo $currency.$trial_price; ?></span></p>
+									<p class="footer-title">Course Trial Fees <span class="footer-price"><?php echo wp_kses_post( $currency ) . esc_html( $trial_price ); ?></span></p>
 
 								<?php }else{ ?>
 
-									<p class="footer-title">Course Subscription Fees <span class="footer-price"><?php echo $currency.$price; ?></span></p>
+									<p class="footer-title">Course Subscription Fees <span class="footer-price"><?php echo wp_kses_post( $currency ) . esc_html( $price ); ?></span></p>
 									<?php
 								}
 							}else if( $course_type == 'paynow' ){
 								?>
 
-								<p class="footer-title">Course Fees <span class="footer-price"><?php echo $currency.$price; ?></span></p>
+								<p class="footer-title">Course Fees <span class="footer-price"><?php echo wp_kses_post( $currency ) . esc_html( $price ); ?></span></p>
 
 							<?php }else{ ?>
 								<p class="footer-title">Course Fees <span class="footer-price">Free</span></p>
@@ -708,15 +717,15 @@ class LmsCheckout extends AbstractDynamicBlock {
 								}
 								
 								if ($course_access ){
-									echo '<a class="btn-default" href="'.$next_step_url.'?wpfnl_lms_payment=free" id="wpfnl-lms-access-course">'.$button_text.'</a>';
+									echo '<a class="btn-default" href="'. esc_url( add_query_arg( 'wpfnl_lms_payment', 'free', $next_step_url ) ) .'" id="wpfnl-lms-access-course">'. esc_html( $button_text ) .'</a>';
 									echo '<span class="wpfnl-lms-access-course-message"></span>';
 								}else if($course_type == 'free' || $course_type == 'open'){
-									echo '<a class="btn-default" href="'.$next_step_url.'" user_id="'.get_current_user_id().'" step_id="'.$step_id.'" course_id="'.$course['id'].'" id="wpfnl-lms-free-course">'.$button_text.'</a>';
+									echo '<a class="btn-default" href="'. esc_url( $next_step_url ) .'" user_id="'. esc_attr( get_current_user_id() ) .'" step_id="'. esc_attr( $step_id ) .'" course_id="'. esc_attr( $course['id'] ) .'" id="wpfnl-lms-free-course">'. esc_html( $button_text ) .'</a>';
 									echo '<span class="wpfnl-lms-free-course-message"></span>';
 								}else{
 									// Provider-specific payment buttons
 									if ($provider_id === 'learndash') {
-										echo do_shortcode('[learndash_payment_buttons course_id='.$course['id'].']');
+										echo do_shortcode( '[learndash_payment_buttons course_id='. absint( $course['id'] ) .']' );
 									} else {
 										// CreatorLMS and other providers - show WooCommerce add to cart
 										if (function_exists('crlms_get_course')) {
@@ -724,7 +733,7 @@ class LmsCheckout extends AbstractDynamicBlock {
 											if ($course_obj && method_exists($course_obj, 'get_product_id')) {
 												$product_id = $course_obj->get_product_id();
 												if ($product_id) {
-													echo do_shortcode('[add_to_cart id="'.$product_id.'" show_price="false"]');
+													echo do_shortcode( '[add_to_cart id="'. absint( $product_id ) .'" show_price="false"]' );
 												}
 											}
 										}
@@ -735,7 +744,7 @@ class LmsCheckout extends AbstractDynamicBlock {
 								if ($provider_id === 'learndash') {
 									echo do_shortcode('[learndash_login]');
 								} else {
-									echo '<p>Please <a href="'.wp_login_url(get_permalink()).'">login</a> to enroll in this course.</p>';
+									echo '<p>Please <a href="'. esc_url( wp_login_url( get_permalink() ) ) .'">login</a> to enroll in this course.</p>';
 								}
 							}
 							?>

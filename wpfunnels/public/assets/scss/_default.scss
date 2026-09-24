@@ -113,6 +113,7 @@ body.wpfnl-theme-style-removed {
 
 }
 
+
 %input-field-default-style {
     input[type="text"],
     input[type="email"],
@@ -185,6 +186,13 @@ body.wpfnl-theme-style-removed {
         form .form-row-last {
             float: right;
         }
+
+		form .form-row textarea,
+		form .form-row select {
+			border-color: #E5E8F3!important;
+			padding: 11px 14px;
+			border-radius: 5px;
+		}
 
     }
 

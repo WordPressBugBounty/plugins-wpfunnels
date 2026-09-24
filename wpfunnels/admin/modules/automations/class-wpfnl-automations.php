@@ -19,21 +19,100 @@ class Module extends Wpfnl_Admin_Module
     {
         // Enqueue automation-canvas scripts
         add_action('admin_enqueue_scripts', [$this, 'enqueue_automation_scripts']);
+
+        // The whole screen lives in the React admin now.
+        add_action('admin_init', [$this, 'maybe_redirect_to_react_admin']);
         
         // Initialize REST API
         require_once WPFNL_DIR . '/admin/modules/automations/class-wpfnl-automation-rest-api.php';
     }
 
     /**
-     * Enqueue automation canvas scripts
+     * Send this screen to the React admin route.
+     *
+     * Both halves of this module's view — the promo for installs that are not
+     * licensed yet, and the automation list for the ones that are — now live at
+     * `?page=wpfunnels#/automation` (see src/admin/pages/Automation). The view
+     * is left in place as the fallback for anything that filters the redirect
+     * off.
+     *
+     * @return void
+     * @since 3.13.3
+     */
+    public function maybe_redirect_to_react_admin()
+    {
+        if (wp_doing_ajax() || wp_doing_cron()) {
+            return;
+        }
+
+        $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+        if (WPFNL_AUTOMATIONS_SLUG !== $page) {
+            return;
+        }
+
+        /**
+         * Filters whether the unlicensed automations screen redirects to the
+         * React admin route.
+         *
+         * @param bool $redirect Whether to redirect. Default true.
+         *
+         * @since 3.13.3
+         */
+        if (!apply_filters('wpfunnels/redirect_automations_to_react_admin', true)) {
+            return;
+        }
+
+        $url = admin_url('admin.php?page=' . WPFNL_MAIN_PAGE_SLUG) . '#/automation';
+
+        if (wp_safe_redirect($url)) {
+            exit;
+        }
+    }
+
+
+    /**
+     * Whether the React admin is being loaded by an install that can open the
+     * canvas editor.
+     *
+     * The editor ships inside the React bundle as a lazily loaded chunk, so the
+     * screen needs none of its own scripts — only the globals the editor reads
+     * and the WordPress editor pieces it embeds.
+     *
+     * @param string $hook Current admin screen hook suffix.
+     * @return bool
+     * @since 3.13.3
+     */
+    private function is_react_admin_screen($hook)
+    {
+        $react_admin_hooks = [
+            'toplevel_page_' . WPFNL_MAIN_PAGE_SLUG,
+            'wpfunnels_page_' . WPFNL_REACT_ADMIN_SLUG,
+        ];
+
+        if (!in_array($hook, $react_admin_hooks, true)) {
+            return false;
+        }
+
+        return Wpfnl_functions::is_mail_mint_pro_license_active()
+            && Wpfnl_functions::is_mail_mint_free_active()
+            && Wpfnl_functions::is_pro_license_activated();
+    }
+
+
+    /**
+     * Give the React admin what the canvas editor needs.
+     *
+     * The editor itself travels inside the React bundle as a lazily loaded
+     * chunk, so nothing is enqueued for it here — only the WordPress editor
+     * pieces it embeds and the two globals it reads.
      *
      * @param string $hook Current admin page hook
      * @since 3.9.5
      */
     public function enqueue_automation_scripts($hook)
     {
-        // Only load on automation page
-        if ('wpfunnels_page_wpfnl_automations' !== $hook) {
+        if (!$this->is_react_admin_screen($hook)) {
             return;
         }
 
@@ -41,62 +120,17 @@ class Module extends Wpfnl_Admin_Module
         wp_tinymce_inline_scripts();
         wp_enqueue_editor();
 
-        // Load automation-canvas script
-        $automation_asset_file = WPFNL_DIR . '/admin/assets/dist/js/automation-canvas.min.asset.php';
-        $automation_dependencies = ['wp-element', 'wp-i18n', 'wp-api-fetch', 'wp-data'];
-        $automation_version = WPFNL_VERSION;
-
-        if (file_exists($automation_asset_file)) {
-            $automation_asset = require $automation_asset_file;
-            $automation_dependencies = isset($automation_asset['dependencies']) ? $automation_asset['dependencies'] : $automation_dependencies;
-            $automation_version = isset($automation_asset['version']) ? $automation_asset['version'] : $automation_version;
-        }
-
-        // The automation-canvas bundle ships its own copy of lodash (pulled in by
-        // easy-email's `import { ... } from "lodash"`). Lodash's UMD wrapper self-registers
-        // as the global `_`, clobbering WP core's Underscore.js that media-views.js relies
-        // on for `_.each(list, iteratee, context)` context-binding — breaking the media
-        // modal ("this.activateMode is not a function") once this script has run.
-        // Force load-order against 'underscore' and snapshot/restore the real global
-        // around it rather than reworking the bundled easy-email/lodash import graph.
-        $automation_dependencies[] = 'underscore';
-        $automation_dependencies   = array_unique($automation_dependencies);
-
-        wp_add_inline_script(
-            'underscore',
-            'window.__wpfnlCoreUnderscore = window.__wpfnlCoreUnderscore || window._;',
-            'after'
-        );
-
-        wp_enqueue_script(
-            'wpfnl-automation-canvas',
-            WPFNL_URL . 'admin/assets/dist/js/automation-canvas.min.js',
-            $automation_dependencies,
-            $automation_version,
-            true
-        );
-
-        wp_add_inline_script(
-            'wpfnl-automation-canvas',
-            'if (window.__wpfnlCoreUnderscore) { window._ = window.__wpfnlCoreUnderscore; }',
-            'after'
-        );
-
-        // Enqueue automation-canvas styles extracted by a production build.
-        Wpfnl_functions::enqueue_bundle_style( 'automation-canvas', 'wpfnl-automation-canvas-styles' );
-
-        // The automation editor's own full-screen overlay (.wpfnl-automation-modal, see
-        // admin/src/automation-canvas/AutomationModal.scss) sits at z-index: 999999,
-        // higher than WP core's default .media-modal z-index — pushing the media
-        // library modal behind the editor chrome. Force it back on top.
+        // The editor's full-screen overlay (.wpfnl-automation-modal) sits at
+        // z-index: 999999, higher than WP core's default .media-modal z-index —
+        // pushing the media library modal behind the editor chrome. Force it
+        // back on top.
         wp_add_inline_style(
             'media-views',
             '.media-modal { z-index: 9999999999 !important; } .media-modal-backdrop { z-index: 999999998 !important; }'
         );
 
-        // Localize script with data
         wp_localize_script(
-            'wpfnl-automation-canvas',
+            'wpfnl-react-admin',
             'wpfnlAutomationVars',
             [
                 'ajaxUrl'   => admin_url('admin-ajax.php'),
@@ -122,7 +156,7 @@ class Module extends Wpfnl_Admin_Module
                                 : array();
 
         wp_localize_script(
-            'wpfnl-automation-canvas',
+            'wpfnl-react-admin',
             'MRM_Vars',
             array(
                 'ajaxurl'                        => admin_url( 'admin-ajax.php' ),

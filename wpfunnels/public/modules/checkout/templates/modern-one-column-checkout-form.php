@@ -267,7 +267,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 		<div class="wpfnl-modern-section wpfnl-modern-section--payment" data-section="payment">
 			<h3 class="wpfnl-modern-section__title"><?php esc_html_e( 'Payment', 'wpfnl' ); ?></h3>
 			<div class="wpfnl-modern-section__content">
-				<?php wc_get_template( 'checkout/payment.php', array( 'checkout' => $checkout ) ); ?>
+				<?php woocommerce_checkout_payment(); ?>
 			</div>
 		</div>
 

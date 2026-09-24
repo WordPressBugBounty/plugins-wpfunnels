@@ -5,7 +5,7 @@ Tags: funnel builder, woocommerce checkout, order bump, woocommerce funnel build
 Requires at least: 6.1
 Tested up to:  7.1
 Requires PHP: 7.4
-Stable tag: 3.13.1
+Stable tag: 3.13.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -577,6 +577,28 @@ The Patchstack team helps validate, triage, and handle any security vulnerabilit
 
 == Changelog ==
 
+= 3.13.2 (2026-09-24) =
+* Improvement: Redesigned React-based admin interface for funnels, automations, store checkout and settings.
+* Improvement: AI Assistant page with chat history, provider connection and progress feedback.
+* Improvement: Live progress while funnels import.
+* Improvement: Funnel list can now be filtered by status and sorted by conversions and sales.
+* Improvement: Funnel list shows the exact last modified time on hover and orders rows by funnel id.
+* Improvement: Import now continues after a funnel fails and reports every skipped funnel.
+* Vulnerability: Cross Site Scripting (XSS) on LMS Checkout page.
+* Vulnerability: Cross Site Scripting (XSS) on the funnel list pagination links.
+* Fix: Checkout email field hidden behind "Use same address for billing", so orders could not be completed.
+* Fix: Funnel id missing from checkout fragments, so placed orders lost their funnel and skipped the upsell step.
+* Fix: Payment options not displayed correctly in checkout templates.
+* Fix: Modern multistep checkout layout issues.
+* Fix: Two-step checkout layout issues.
+* Fix: Checkout template issues on Elementor, Bricks, Divi, Oxygen and Gutenberg steps.
+* Fix: Upsell and downsell offers failing to charge on sites using WooPayments.
+* Fix: Divi builder not opening for funnel steps.
+* Fix: Template library requests timing out.
+* Fix: Create-from-scratch funnel modal missing its backdrop and panel.
+* Fix: Automation autosave dropping edits in the funnel drawer.
+* Fix: Import button not disabled when the free funnel limit was reached.
+
 = 3.13.1 (2026-09-15) =
 * New: Custom date range picker for dashboard reports with quick presets and dual calendars.
 * New: "View all" link on the Top Performing Funnels section of the dashboard.
@@ -967,43 +989,5 @@ The Patchstack team helps validate, triage, and handle any security vulnerabilit
 * New: Post Block on the Automation Email Editor
 * Bugfix: A/B Testing Conversion Rate Showing Wrong Data
 * Compatibility : Compatible with the Latest WooCommerce
-
-= 3.5.9 (2024-12-27) =
-* Bugfix: Multiple Order Bump Issues on the Checkout
-* Bugfix: Order Bump Showing Wrong Data
-
-= 3.5.8 (2024-12-18) =
-* Bugfix: Compatibility with the Latest Elementor
-
-= 3.5.7 (2024-11-27) =
-* Bugfix: _load_textdomain_just_in_time Notice with WordPress 6.7
-
-= 3.5.6 (2024-11-20) =
-* Bugfix: SQL injection vulnerability Issues
-
-= 3.5.5 (2024-11-19) =
-* Compatibility : Compatible with WordPress 6.7.0
-* Bugfix: Checkout Page Breaks with Thrive Architect Builder
-
-= 3.5.4 (2024-11-05) =
-* Bugfix: Order Details on the Funnel Templates are not Responsive
-* Bugfix: Unauthorized Access Vulnerability Issues
-
-= 3.5.3 (2024-10-10) =
-* BugFix: Resolved PHP error.
-
-= 3.5.2 (2024-10-04) =
-* BugFix: Opt-in form submission issue with shortcode.
-* BugFix: Back button link issue on funnel template page.
-* BugFix: A/B testing variant creation issue on funnel duplication.
-
-= 3.5.1 (2024-09-30) =
-* BugFix: Resolved spelling issues
-
-= 3.5.0 (2024-09-30) =
-* New: Funnel dashboard menu with analytics
-* Compatibility: User role management of WPFunnels Pro
-* Compatibility: Tutor LMS for Upsell and Downsell
-* BugFix: Displaying wrong discount amount on step settings
 
 The full changelog is available [here](https://getwpfunnels.com/changelog/).

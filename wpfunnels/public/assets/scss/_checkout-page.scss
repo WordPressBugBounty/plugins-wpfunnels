@@ -97,7 +97,9 @@
 	.woocommerce-checkout-review-order #order_review_heading,
 	.woocommerce-billing-fields > h3,
 	.woocommerce-additional-fields > h3,
+	.woocommerce-shipping-fields .shipping-field-title,
 	.woocommerce-shipping-fields > #ship-to-different-address,
+	.wpfnl-customer-info-section #customer_information_heading,
 	.wpfnl-checkout-variable-product .variable-product-title {
 		background: #F7F7FA;
 		color: #363B4E;
@@ -116,6 +118,7 @@
 
 	.woocommerce-shipping-fields .shipping_address,
 	.woocommerce-additional-fields__field-wrapper,
+	.wpfnl-customer-info-section .woocommerce-billing-fields__customer-info-wrapper,
 	.woocommerce-billing-fields__field-wrapper {
 		background: #fff;
 		padding: 16px 20px 20px;
@@ -281,13 +284,6 @@
 		margin-top: 6px;
 		border-radius: 5px;
 	}
-
-	form .show-password-input,
-	form .show-password-input {
-		right: 0;
-		top: 0;
-	}
-
 
 	//--------order table style---------
 	table.woocommerce-checkout-review-order-table {
@@ -629,6 +625,13 @@
 							}
 						}
 					}
+				}
+
+				.woocommerce-notice.woocommerce-notice--info.woocommerce-info {
+					font-size: 15px;
+					line-height: 1.5!important;
+					letter-spacing: 0;
+					font-weight: 400;
 				}
 			}
 
@@ -1678,58 +1681,45 @@
 		display: block;
 
 		label.woocommerce-form__label-for-checkbox {
-			display: inline-block !important;
+			display: block !important;
 			cursor: pointer;
 			margin: 0;
 
 			input[type="checkbox"] {
 				display: none !important;
 			}
-			& > span {
-				position: relative;
-				line-height: 1.4;
-				font-size: 15px;
-				color: #363B4E;
-				padding-left: 28px;
-				cursor: pointer;
-				display: inline-block;
 
-				&:before {
-					content: "";
-					position: absolute;
-					left: 0;
-					top: 2px;
-					width: 18px;
-					height: 18px;
-					border-radius: 4px;
-					border: 2px solid #72737e;
-					background-color: transparent;
-					transition: all 0.3s ease;
-					box-sizing: border-box;
+			.checkbox-text {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				font-size: 15px;
+				line-height: 1.3;
+				font-weight: 500;
+
+				svg {
+					width: 20px;
+					height: auto;
+					display: block;
 				}
-				&:after {
-					content: "";
-					position: absolute;
-					top: 4px;
-					left: 6px;
-					width: 5px;
-					height: 9px;
-					background: transparent;
+
+				.check-rect {
+					transition: all 0.3s ease;
+				}
+				.check-tick {
 					opacity: 0;
-					transform: rotate(45deg);
+					visibility: hidden;
 					transition: all 0.3s ease;
-					border: 2px solid #fff;
-					border-left: none;
-					border-top: none;
-					box-sizing: border-box;
 				}
 			}
-			input[type=checkbox]:checked + span::before {
-				background-color: $primary-color;
-				border-color: $primary-color;
+
+			input[type=checkbox]:checked + .checkbox-text .check-rect {
+				fill: $primary-color;
+				stroke: $primary-color;
 			}
-			input[type=checkbox]:checked + span::after {
+			input[type=checkbox]:checked + .checkbox-text .check-tick {
 				opacity: 1;
+				visibility: visible;
 			}
 		}
 	}
@@ -1970,11 +1960,27 @@ body.rtl {
 }
 
 
+@media only screen and (max-width: 783px){
+	.wpfnl-checkout .woocommerce-checkout-review-order #order_review_heading {
+		display: none;
+	}
+
+	.wpfnl-checkout .wpfnl-mobile-order-summary-toggle {
+		display: flex;
+	}
+
+	.wpfnl-checkout table.woocommerce-checkout-review-order-table {
+		display:none;
+	}
+
+}
+
 @media only screen and (max-width: 575px){
 	.wpfnl-checkout .woocommerce-checkout-review-order #order_review_heading,
 	.wpfnl-checkout .woocommerce-billing-fields > h3,
 	.wpfnl-checkout .woocommerce-additional-fields > h3,
 	.wpfnl-checkout .woocommerce-shipping-fields > #ship-to-different-address,
+	.wpfnl-checkout .wpfnl-customer-info-section #customer_information_heading,
 	.wpfnl-checkout .wpfnl-checkout-variable-product .variable-product-title {
 		font-size: 18px;
 		padding: 10px 13px;
