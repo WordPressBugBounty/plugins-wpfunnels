@@ -86,6 +86,10 @@ class Wpfnl_Plugin_Compatibility {
             [
                 'name'          => 'WooCommerce Germanized',
                 'class_name'    => 'WooCommerceGermanized'
+            ],
+            [
+                'name'          => 'Mail Mint',
+                'class_name'    => 'MailMint'
             ]
         ];
         return $plugins;

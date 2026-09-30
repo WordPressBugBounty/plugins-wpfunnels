@@ -15,7 +15,7 @@
  * Plugin Name:       WPFunnels
  * Plugin URI:        https://getwpfunnels.com
  * Description:       Easiest 💥 Sales Funnel Builder 💥 For WordPress & WooCommerce by WPFunnels - Generate Leads & Craft A Highly-Converting Sales Journey In Minutes
- * Version:           3.13.2
+ * Version:           3.13.3
  * Author:            WPFunnels Team
  * Author URI:        https://getwpfunnels.com
  * License:           GPL-2.0+
@@ -40,7 +40,7 @@ if (!defined('WPINC')) {
  */
 
 if (!defined('WPFNL_VERSION')) {
-	define('WPFNL_VERSION', '3.13.2');
+	define('WPFNL_VERSION', '3.13.3');
 }
 
 if (!defined('WPFNL_FILE')) {
@@ -158,12 +158,19 @@ function deactivate_wpfnl()
 	Wpfnl_Deactivator::deactivate();
 }
 
-require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
-require_once plugin_dir_path(__FILE__) . 'includes/core/Tracking/class-wpfnl-telemetry.php';
-Telemetry::init();
-
+/*
+ * Registered before the telemetry client is built: the SDK registers its own
+ * deactivation callback when constructed, at the same priority, and that one
+ * deletes the "feedback modal submitted" transient. wpfunnels_plugin_deactivated
+ * (which sends the activity trail) has to read it first.
+ */
 register_activation_hook(__FILE__, 'activate_wpfnl');
 register_deactivation_hook(__FILE__, 'deactivate_wpfnl');
+
+require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
+require_once plugin_dir_path(__FILE__) . 'includes/core/Tracking/class-wpfnl-activity-trail.php';
+require_once plugin_dir_path(__FILE__) . 'includes/core/Tracking/class-wpfnl-telemetry.php';
+Telemetry::init();
 
 
 

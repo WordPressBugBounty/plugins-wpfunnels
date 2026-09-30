@@ -170,6 +170,7 @@ class ToolGateway {
 		if ( function_exists( 'wp_get_ability' ) ) {
 			$ability = wp_get_ability( $tool_name );
 			if ( ! $ability || ! str_starts_with( $tool_name, 'wpfunnels/' ) ) {
+				do_action( 'wpfnl_ai_tool_failed', $tool_name, 'unknown_tool' );
 				return [
 					'content'  => sprintf( 'Unknown tool "%s".', $tool_name ),
 					'is_error' => true,
@@ -201,6 +202,17 @@ class ToolGateway {
 		}
 
 		if ( is_wp_error( $result ) ) {
+			/**
+			 * Fires when a copilot tool call fails (the counterpart of
+			 * `wpfnl_ai_tool_executed`).
+			 *
+			 * @since 3.14.0
+			 *
+			 * @param string $tool_name  Ability name.
+			 * @param string $error_code WP_Error code.
+			 */
+			do_action( 'wpfnl_ai_tool_failed', $tool_name, $result->get_error_code() );
+
 			return [
 				'content'  => wp_json_encode(
 					[

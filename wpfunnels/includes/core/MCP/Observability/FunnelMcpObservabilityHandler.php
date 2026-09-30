@@ -15,6 +15,7 @@ namespace WPFunnels\MCP\Observability;
 defined( 'ABSPATH' ) || exit;
 
 use WP\MCP\Infrastructure\Observability\ErrorLogMcpObservabilityHandler as AdapterErrorLogHandler;
+use WPFunnels\Tracking\ActivityTrail;
 
 /**
  * Class FunnelMcpObservabilityHandler
@@ -50,6 +51,14 @@ class FunnelMcpObservabilityHandler extends AdapterErrorLogHandler {
 	public function record_event( string $event, array $tags = array(), ?float $duration_ms = null ): void {
 		if ( in_array( self::format_metric_name( $event ), self::LIFECYCLE_EVENTS, true ) ) {
 			return;
+		}
+
+		// Feed MCP usage into the product activity trail (tool, client, outcome).
+		if ( 'mcp.request' === self::format_metric_name( $event ) ) {
+			$trail = ActivityTrail::get_instance();
+			if ( $trail ) {
+				$trail->record_mcp_request( $tags );
+			}
 		}
 
 		parent::record_event( $event, $tags, $duration_ms );

@@ -5,7 +5,7 @@ Tags: funnel builder, woocommerce checkout, order bump, woocommerce funnel build
 Requires at least: 6.1
 Tested up to:  7.1
 Requires PHP: 7.4
-Stable tag: 3.13.2
+Stable tag: 3.13.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -576,6 +576,12 @@ The Patchstack team helps validate, triage, and handle any security vulnerabilit
 8. The Visual Funnel Canvas
 
 == Changelog ==
+
+= 3.13.3 (2026-09-30) =
+* Improvement: Carts restored by Mail Mint are now kept when the shopper lands on a funnel checkout.
+* Improvement: Funnel list now opens on published funnels by default and has a refreshed status filter icon.
+* Improvement: Each funnel’s own type now decides the available steps instead of a global setting.
+* Improvement: Hardened funnel import against malicious and malformed files
 
 = 3.13.2 (2026-09-24) =
 * Improvement: Redesigned React-based admin interface for funnels, automations, store checkout and settings.

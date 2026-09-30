@@ -63,7 +63,7 @@ class CheckoutTracker {
 		global $wpdb;
 		$table = $wpdb->prefix . self::TABLE_SUFFIX;
 
-		$wpdb->query( $wpdb->prepare(
+		$inserted = $wpdb->query( $wpdb->prepare(
 			"INSERT IGNORE INTO {$table} (type, funnel_id, session_hash, visit_date, date_created)
 			 VALUES (%s, %d, %s, %s, %s)",
 			$type,
@@ -72,6 +72,18 @@ class CheckoutTracker {
 			$visit_date,
 			$date_created
 		) );
+
+		if ( $inserted ) {
+			/**
+			 * Fires when a new unique checkout visit is recorded (a repeat visit
+			 * the same day is ignored by the table's unique key).
+			 *
+			 * @since 3.14.0
+			 *
+			 * @param string $type 'funnel' or 'store'.
+			 */
+			do_action( 'wpfunnels/checkout_visit_recorded', $type );
+		}
 	}
 
 	/**

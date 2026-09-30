@@ -79,6 +79,13 @@ class Telemetry {
         }
 
         $this->register_triggers();
+        $this->register_retention_events();
+
+        /*
+         * Product activity trail: every screen and REST action, sent daily for
+         * opted-in sites and at deactivation for every site.
+         */
+        ActivityTrail::init( $this->client, self::POSTHOG_API_KEY );
     }
 
     /**
@@ -111,6 +118,45 @@ class Telemetry {
                     'vertical_canvas_mode' => [
                         'hook'     => 'wpfunnels_vertical_mode_used',
                         'callback' => [ $this, 'feature_usage_payload' ],
+                    ],
+                    // Retention signals — low-frequency admin or AI-driven actions, sent on every use.
+                    // template_funnel_imported — a funnel was built from the template library.
+                    'template_funnel_imported' => [
+                        'hook'     => 'wpfunnels_after_funnel_imported',
+                        'callback' => function ( $funnel_id = 0, $type = '', $builder = '' ) {
+                            return [
+                                'template_type' => sanitize_key( (string) $type ),
+                                'builder'       => sanitize_key( (string) $builder ),
+                            ];
+                        },
+                    ],
+                    // ai_chat_started — the AI assistant was opened for real work.
+                    'ai_chat_started' => [
+                        'hook'     => 'wpfunnels_ai_chat_started',
+                        'callback' => function ( $conversation_id = 0, $user_id = 0, $context_type = '' ) {
+                            return [ 'context_type' => sanitize_key( (string) $context_type ) ];
+                        },
+                    ],
+                    // ai_funnel_published — a funnel built by the AI assistant went live.
+                    'ai_funnel_published' => [
+                        'hook'     => 'wpfunnels_ai_funnel_published',
+                        'callback' => function () {
+                            return [];
+                        },
+                    ],
+                    // mail_mint_automation_saved — email automation attached to a funnel.
+                    'mail_mint_automation_saved' => [
+                        'hook'     => 'wpfunnels/save_mint_automation',
+                        'callback' => function () {
+                            return [];
+                        },
+                    ],
+                    // step_duplicated — a step was duplicated on the canvas.
+                    'step_duplicated' => [
+                        'hook'     => 'wpfunnels/after_step_duplicate',
+                        'callback' => function () {
+                            return [];
+                        },
                     ],
                 ],
             ] );
@@ -151,6 +197,210 @@ class Telemetry {
         // instance by the plugin_action_links hook it registers for WPFNL_FILE.
         add_action( 'admin_footer', [ $this, 'remove_sdk_deactivation_modal' ], 0 );
         add_action( 'admin_footer', [ $this, 'render_deactivation_modal' ] );
+    }
+
+    // -------------------------------------------------------------------------
+    // Retention: weekly "value delivered" signals
+    // -------------------------------------------------------------------------
+
+    /**
+     * Is WPFunnels producing results on this site this week?
+     *
+     * Every hook below fires on visitor or cron traffic (checkouts, offers,
+     * opt-ins), so each feature is sent at most once a week per site through
+     * the weekly gate. Properties are non-personal: step or offer type and a
+     * value bucket — never order, customer or funnel ids.
+     *
+     * Hooks were chosen by their call sites, not their names. Left out on
+     * purpose: `wpfunnels/update_ab_testing_winner` (fires on every Pro step
+     * visit, not when a winner is chosen), `wpfunnels/ab_testing_auto_end`
+     * (fires when the auto-end setting is saved) and `wpfunnels/trigger_automation`
+     * (fires at the end of every journey whether or not an automation exists).
+     */
+    private function register_retention_events(): void {
+        // funnel_order_placed — a WooCommerce order was placed through a funnel checkout.
+        add_action(
+            'wpfunnels/funnel_order_placed',
+            function ( $order_id = 0 ) {
+                $this->send_weekly_feature_used(
+                    'funnel_order_placed',
+                    function () use ( $order_id ) {
+                        $order = function_exists( 'wc_get_order' ) ? wc_get_order( $order_id ) : null;
+                        return [ 'value_bucket' => $order ? self::value_bucket( $order->get_total() ) : 'unknown' ];
+                    }
+                );
+            },
+            10,
+            1
+        );
+
+        // order_bump_accepted — a shopper ticked an order bump at checkout (before the order).
+        add_action(
+            'wpfunnels/order_bump_accepted',
+            function () {
+                $this->send_weekly_feature_used( 'order_bump_accepted' );
+            }
+        );
+
+        // offer_accepted / offer_rejected — an upsell or downsell was answered.
+        foreach ( [ 'wpfunnels/offer_accepted' => 'offer_accepted', 'wpfunnels/offer_rejected' => 'offer_rejected' ] as $hook => $feature ) {
+            add_action(
+                $hook,
+                function ( $order = null, $offer_product = [] ) use ( $feature ) {
+                    $this->send_weekly_feature_used(
+                        $feature,
+                        function () use ( $offer_product ) {
+                            $step_id    = is_array( $offer_product ) && isset( $offer_product['step_id'] ) ? absint( $offer_product['step_id'] ) : 0;
+                            $properties = [ 'offer_type' => $step_id ? sanitize_key( (string) get_post_meta( $step_id, '_step_type', true ) ) : 'unknown' ];
+                            if ( is_array( $offer_product ) && isset( $offer_product['total'] ) && is_numeric( $offer_product['total'] ) ) {
+                                $properties['value_bucket'] = self::value_bucket( $offer_product['total'] );
+                            }
+                            return $properties;
+                        }
+                    );
+                },
+                10,
+                2
+            );
+        }
+
+        // optin_submitted — a visitor submitted a funnel opt-in form.
+        add_action(
+            'wpfunnels/after_optin_submit',
+            function ( $step_id = 0, $post_action = '' ) {
+                $this->send_weekly_feature_used( 'optin_submitted', [ 'post_action' => sanitize_key( (string) $post_action ) ] );
+            },
+            10,
+            2
+        );
+
+        // funnel_visited / funnel_completed — a visitor entered a funnel's first
+        // step or reached its last one. Admins previewing their own funnels are skipped.
+        foreach ( [ 'wpfunnels/funnel_journey_starts' => 'funnel_visited', 'wpfunnels/funnel_journey_end' => 'funnel_completed' ] as $hook => $feature ) {
+            add_action(
+                $hook,
+                function () use ( $feature ) {
+                    if ( current_user_can( 'wpf_manage_funnels' ) ) {
+                        return;
+                    }
+                    $this->send_weekly_feature_used( $feature );
+                }
+            );
+        }
+
+        // checkout_visit_recorded — a unique visitor reached a funnel or store checkout.
+        add_action(
+            'wpfunnels/checkout_visit_recorded',
+            function ( $type = '' ) {
+                $this->send_weekly_feature_used( 'checkout_visit_recorded', [ 'checkout_type' => sanitize_key( (string) $type ) ] );
+            }
+        );
+
+        // offer_subscription_created — an offer created a WooCommerce subscription (Pro).
+        add_action(
+            'wpfunnels/subscription_created',
+            function () {
+                $this->send_weekly_feature_used( 'offer_subscription_created' );
+            }
+        );
+    }
+
+    /**
+     * Send a `feature_used` event at most once a week per site.
+     *
+     * These hooks sit on hot visitor paths, so the two cheap checks come first:
+     * not opted in (track_feature_used() would drop the event anyway) and
+     * already sent this week. Only then does claim_weekly_slot() take the
+     * atomic slot. Properties may be a callable, evaluated only when the event
+     * is actually sent.
+     *
+     * @param string         $feature    Feature name.
+     * @param array|callable $properties Event properties, or a callable returning them.
+     * @return void
+     */
+    public function send_weekly_feature_used( string $feature, $properties = [] ): void {
+        try {
+            if ( ! $this->client || 'yes' !== $this->client->get_optin_state() ) {
+                return;
+            }
+
+            if ( ! self::claim_weekly_slot( 'wpfunnels_telemetry_' . $feature . '_last_sent' ) ) {
+                return;
+            }
+
+            $properties = is_callable( $properties ) ? call_user_func( $properties ) : $properties;
+            $this->client->track_feature_used( $feature, is_array( $properties ) ? $properties : [] );
+        } catch ( \Throwable $e ) {
+            // Telemetry must never break a checkout or an offer.
+        }
+    }
+
+    /**
+     * Claim this week's send slot for a gate option.
+     *
+     * Fast path: already sent this week — skips the write for almost every
+     * call; a stale read just falls through to the atomic claim. The claim is a
+     * conditional UPDATE, so only one of several concurrent requests can flip
+     * the value; the rest affect 0 rows.
+     *
+     * @param string   $option_key Gate option storing the last-sent time.
+     * @param int|null $now        Current time (for tests).
+     * @return bool True when this call won the slot.
+     */
+    public static function claim_weekly_slot( string $option_key, ?int $now = null ): bool {
+        global $wpdb;
+
+        $now       = null === $now ? time() : $now;
+        $threshold = $now - WEEK_IN_SECONDS;
+
+        if ( (int) get_option( $option_key, 0 ) >= $threshold ) {
+            return false;
+        }
+
+        // Ensure the row exists so the conditional UPDATE has something to claim.
+        // add_option is a no-op if it already exists, preserving the last send time.
+        add_option( $option_key, '0', '', false );
+
+        $claimed = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE {$wpdb->options} SET option_value = %d WHERE option_name = %s AND option_value < %d",
+                $now,
+                $option_key,
+                $threshold
+            )
+        ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- atomic claim; the options API check-then-set is racy under concurrency.
+
+        if ( empty( $claimed ) ) {
+            return false;
+        }
+
+        // Keep the options cache in sync with the value just written directly.
+        wp_cache_delete( $option_key, 'options' );
+
+        return true;
+    }
+
+    /**
+     * Bucket a money amount so no exact order value is sent. Store currency
+     * is not converted; the buckets only tell small from large orders.
+     *
+     * @param mixed $amount Amount.
+     * @return string
+     */
+    public static function value_bucket( $amount ): string {
+        $amount = (float) $amount;
+
+        if ( $amount <= 0 ) {
+            return '0';
+        }
+
+        foreach ( [ 50 => '1-49', 100 => '50-99', 250 => '100-249', 500 => '250-499', 1000 => '500-999' ] as $limit => $bucket ) {
+            if ( $amount < $limit ) {
+                return $bucket;
+            }
+        }
+
+        return '1000+';
     }
 
     // -------------------------------------------------------------------------
