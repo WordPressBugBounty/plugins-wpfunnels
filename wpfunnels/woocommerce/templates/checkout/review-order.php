@@ -41,6 +41,17 @@ if ( ! $checkout_id || 'wpfunnel_steps' !== get_post_type( $checkout_id ) ) {
 $show_product_images = 'yes' === get_post_meta( $checkout_id, '_wpfnl_display_product_images', true );
 
 do_action( 'wpfunnel_review_order_before_cart_contents' );
+
+/**
+ * "Before Order" order bumps and "Before bump" testimonials. They used to print on
+ * woocommerce_review_order_before_cart_contents, inside <tbody>, where a <div> is
+ * invalid: the browser moved it in front of the table and every order review refresh
+ * added another copy. Module::split_after_order_total_fragment() serves this wrapper as
+ * its own fragment, so the closing marker must stay exactly as printed here.
+ */
+echo '<div class="wpfnl-before-order-review">';
+do_action( 'wpfunnels/before_order_review_table' );
+echo '</div><!-- /.wpfnl-before-order-review -->';
 ?>
 <table class="shop_table woocommerce-checkout-review-order-table<?php echo $show_product_images ? ' has-product-images' : ''; ?>">
 	<thead>

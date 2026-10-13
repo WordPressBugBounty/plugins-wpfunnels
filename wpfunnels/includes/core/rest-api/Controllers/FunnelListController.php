@@ -258,6 +258,12 @@ class FunnelListController extends Wpfnl_REST_Controller
 			'/' . $this->rest_base . '/(?P<funnel_id>\d+)',
 			array(
 				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array($this, 'get_funnel'),
+					'permission_callback' => array($this, 'get_items_permissions_check'),
+					'args'                => $this->get_funnel_id_arg(),
+				),
+				array(
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => array($this, 'delete_funnel'),
 					'permission_callback' => array($this, 'update_items_permissions_check'),
@@ -780,6 +786,140 @@ class FunnelListController extends Wpfnl_REST_Controller
 
 
 	/**
+	 * One funnel, as the React canvas header reads it.
+	 *
+	 * The list row's fields, so the header and the list agree on the view URL
+	 * and the disabled state, plus what only the canvas needs: the raw title
+	 * the rename field edits (`name` is the list's "(no title)" label), whether
+	 * the funnel is a store checkout, the viewer's saved canvas layout, and the
+	 * step types the step importer may offer.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 *
+	 * @return \WP_REST_Response|WP_Error
+	 * @since 3.13.8
+	 */
+	public function get_funnel($request)
+	{
+		$funnel = get_post(absint($request->get_param('funnel_id')));
+
+		if (!$funnel || WPFNL_FUNNELS_POST_TYPE !== $funnel->post_type) {
+			return new WP_Error(
+				'wpfunnels_rest_funnel_not_found',
+				__('Funnel not found.', 'wpfnl'),
+				array('status' => 404)
+			);
+		}
+
+		$data = $this->prepare_funnel($funnel);
+
+		// A global funnel has no single public entry point, so the classic
+		// header hid its view button too.
+		if (Wpfnl_functions::is_global_funnel($funnel->ID)) {
+			$data['viewDisabled'] = true;
+		}
+
+		$data['title']           = $funnel->post_title;
+		$data['isStoreCheckout'] = 'store_checkout' === get_post_meta($funnel->ID, '_wpfnl_funnel_type', true);
+		// A Global Funnel (Pro's add-on, switched on in the funnel settings):
+		// the canvas disables its landing card, limits the step importer and
+		// reads the product badges from get_gbf_data. As the classic maybe_gbf().
+		$data['isGbf']           = Wpfnl_functions::is_global_funnel_activated()
+			&& 'yes' === get_post_meta($funnel->ID, 'is_global_funnel', true);
+		$data['canvasViewMode']  = Wpfnl_functions::get_canvas_view_mode();
+		// Step types the step importer lists; Pro adds downsell and custom.
+		$data['supportedSteps']  = array_values(Wpfnl_functions::get_supported_step_type());
+
+		// For the condition drawer's billing/shipping rules; a few hundred
+		// entries, so only when asked for.
+		if ($request->get_param('with_countries')) {
+			$data['countries'] = Wpfnl_functions::get_countries();
+		}
+
+		// What the checkout settings drawer read from the classic canvas's
+		// localized WPFunnelVars and wpfnl_addons_vars; only when asked for.
+		if ($request->get_param('with_checkout')) {
+			$data['checkoutContext'] = $this->get_checkout_context($funnel->ID);
+		}
+
+		// What the funnel settings drawer read from WPFunnelVars; only when asked for.
+		if ($request->get_param('with_settings')) {
+			$data['settingsContext'] = $this->get_settings_context($funnel->ID);
+		}
+
+		return rest_ensure_response($data);
+	}
+
+
+	/**
+	 * The classic canvas's funnel-settings localized values, for one funnel.
+	 *
+	 * Mirrors Wpfnl_Admin's `WPFunnelVars` (isGlobalFunnelActivated, isGbf,
+	 * isSkipOffer, isLmsSettings, isLmsDisbaled), which decide which rows the
+	 * funnel settings drawer shows and whether the LMS switch can be used.
+	 *
+	 * @param int $funnel_id Funnel id.
+	 *
+	 * @return array
+	 * @since 3.13.8
+	 */
+	private function get_settings_context($funnel_id)
+	{
+		$is_gbf_active = Wpfnl_functions::is_global_funnel_activated();
+
+		// Wpfnl_Admin::is_skip_offer(): built into Pro with Global Funnels, or
+		// the legacy standalone addon from 1.0.9.
+		$is_skip_offer = $is_gbf_active
+			|| (defined('WPFNL_PRO_GB_VERSION') && version_compare(WPFNL_PRO_GB_VERSION, '1.0.9', '>='));
+
+		return array(
+			'isGlobalFunnelActivated' => (bool) $is_gbf_active,
+			'isGbf'                   => $is_gbf_active && 'yes' === get_post_meta($funnel_id, 'is_global_funnel', true),
+			'isSkipOffer'             => (bool) $is_skip_offer,
+			'isLmsSettings'           => (bool) Wpfnl_functions::is_enable_lms_settings(),
+			// Wpfnl_Admin::maybe_lms_settings_disbaled(), which despite its name
+			// is true when the switch may be used.
+			'canSwitchLms'            => (bool) ( Wpfnl_functions::is_wc_active() && Wpfnl_functions::is_lms_addon_active() ),
+		);
+	}
+
+
+	/**
+	 * The classic canvas's checkout-related localized values, for one funnel.
+	 *
+	 * Mirrors Wpfnl_Admin's `WPFunnelVars` (isGlobalFunnelActivated, isGbf,
+	 * lmsVersion, availableGateways) and `wpfnl_addons_vars`, so the ported
+	 * checkout tabs see exactly what the Vue ones saw.
+	 *
+	 * @param int $funnel_id Funnel id.
+	 *
+	 * @return array
+	 * @since 3.13.8
+	 */
+	private function get_checkout_context($funnel_id)
+	{
+		$is_gbf_active = Wpfnl_functions::is_global_funnel_activated();
+
+		return array(
+			'isGlobalFunnelActivated' => (bool) $is_gbf_active,
+			'isGbf'                   => $is_gbf_active && 'yes' === get_post_meta($funnel_id, 'is_global_funnel', true),
+			'lmsVersion'              => (defined('WPFNL_PRO_LMS_VERSION') || defined('WPFUNNELS_PRO_LMS_VERSION')) && defined('LEARNDASH_VERSION')
+				? version_compare(LEARNDASH_VERSION, '4.2.1.1', '>=')
+				: false,
+			'availableGateways'       => Wpfnl_functions::get_enabled_payment_gateways(),
+			'addonsVars'              => array(
+				'addons'          => Wpfnl_functions::get_supported_addons(),
+				'gbf_conditions'  => Wpfnl_functions::get_supported_gbf_offer_condition(),
+				'categories'      => Wpfnl_functions::get_categories_gbf_offer_condition(),
+				'role'            => Wpfnl_functions::get_all_user_roles(),
+				'tags'            => Wpfnl_functions::get_all_tags(),
+				'shippingClasses' => Wpfnl_functions::get_shipping_classes(),
+			),
+		);
+	}
+
+
+	/**
 	 * Steps order meta of a funnel, always as an array.
 	 *
 	 * @param int $funnel_id Funnel id.
@@ -834,16 +974,7 @@ class FunnelListController extends Wpfnl_REST_Controller
 	 */
 	private function get_edit_url($funnel_id)
 	{
-		return esc_url_raw(
-			add_query_arg(
-				array(
-					'page'    => WPFNL_EDIT_FUNNEL_SLUG,
-					'id'      => $funnel_id,
-					'step_id' => Wpfnl_functions::get_first_step($funnel_id),
-				),
-				admin_url('admin.php')
-			)
-		);
+		return esc_url_raw(\WPFunnels\Wpfnl_functions::get_funnel_edit_url($funnel_id));
 	}
 
 

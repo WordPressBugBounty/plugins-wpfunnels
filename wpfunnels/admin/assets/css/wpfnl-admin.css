@@ -6491,6 +6491,15 @@ body.folded .create-funnel-loader-overlay#create-funnel-loader {
   top: calc(100% + 10px);
   z-index: 2;
 }
+.steps-page__header-right .wpfnl-header-action:hover, .steps-page__header-right .wpfnl-header-action:focus {
+  border-color: #6e42d3;
+  background: rgba(110, 66, 211, 0.06);
+  box-shadow: none;
+}
+.steps-page__header-right .wpfnl-header-action:focus-visible {
+  outline: 2px solid #6e42d3;
+  outline-offset: 2px;
+}
 .steps-page__header-right .btn-default {
   min-width: auto;
   position: relative;
@@ -13718,7 +13727,7 @@ body.wpfnl-builder-expand #adminmenuback {
 }
 .wpfunnels-setup .wpfnl-wz {
   /* ---------- Template preview modal ----------
-     PreviewTemplate.vue's own component — its styling never changed, only
+     the template preview's own component (src/admin/pages/SetupWizard/steps/PreviewTemplate.jsx) — its styling never changed, only
      moved here. Previously scoped under `.wpfnl-mm-setup-wizard-content`,
      a wrapper the sidebar-based wizard used that no longer exists in the
      DOM, so none of it was reaching the modal. */

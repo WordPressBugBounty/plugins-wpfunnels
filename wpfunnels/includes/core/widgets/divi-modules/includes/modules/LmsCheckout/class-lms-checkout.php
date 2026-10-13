@@ -582,7 +582,7 @@ class WPFNL_Lms_Checkout extends ET_Builder_Module {
 					<div class="wpfnl-reset wpfnl-lms-checkout">
 						<div class="lms-checkout-box">
 							<div class="lms-checkout-header">
-								<h4><?php echo $props['lms_order_header_title'] ?></h4>
+								<h4><?php echo wp_kses_post( $props['lms_order_header_title'] ) ?></h4>
 							</div>
 							<div class="lms-checkout-body">
 								<div class="course-image">
@@ -596,16 +596,16 @@ class WPFNL_Lms_Checkout extends ET_Builder_Module {
 									</h2>
 
 									<div class="lms-single-block course-details-block">
-										<h4 class="lms-block-title"><?php echo $props['lms_order_course_details_title'] ?></h4>
+										<h4 class="lms-block-title"><?php echo wp_kses_post( $props['lms_order_course_details_title'] ) ?></h4>
 										<div class="course-description">
 											<?php
-												echo $props['lms_order_course_description'];
+												echo wp_kses_post( $props['lms_order_course_description'] );
 											?>
 										</div>
 									</div>
 
 									<div class="lms-single-block course-plan-block">
-										<h4 class="lms-block-title"><?php echo $props['lms_order_plan_details_title']; ?></h4>
+										<h4 class="lms-block-title"><?php echo wp_kses_post( $props['lms_order_plan_details_title'] ); ?></h4>
 										<div class="course-plan">
 											<?php
 											if( $course_type == 'subscribe' ){

@@ -80,7 +80,71 @@ class Wpfnl_Menus
             unset( $routes[ WPFNL_STORE_CHECKOUT_SLUG ] );
         }
 
+        /*
+         * Integrations is a route only when the React screen can serve every
+         * case the PHP page serves today — see should_use_react_integrations().
+         * Otherwise it keeps its own page, its callback and its hooks.
+         */
+        if ( self::should_use_react_integrations() ) {
+            $routes[ WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG ] = '#/integrations';
+        }
+
         return $routes;
+    }
+
+
+    /**
+     * Whether the Integrations screen is the React route `#/integrations`.
+     *
+     * The PHP page has three owners, and the React screen can stand in for
+     * only two of them:
+     *
+     *  - the legacy `wpfunnels-pro-integrations` addon next to a Pro older than
+     *    2.9.0 registers its own menu (`wpfunnels/after_setup_menu`), so there
+     *    is no free page to replace;
+     *  - Pro on an integration plan renders working CRM forms. Only a Pro that
+     *    serves them over REST declares `wpfunnels/integrations_react_ready`;
+     *    an older one keeps its PHP page and admin-ajax handlers;
+     *  - everything else is the free upsell grid, which the React screen
+     *    renders from GET wpfunnels/v1/integrations.
+     *
+     * Pro registers its filters on `plugins_loaded`, before anything that asks
+     * this (admin_menu, admin_init, admin_bar_menu, REST callbacks).
+     *
+     * @return bool
+     * @since  3.13.9
+     */
+    public static function should_use_react_integrations()
+    {
+        // admin_menu, admin_init and REST requests run before WordPress loads
+        // the plugin API on its own.
+        if ( ! function_exists( 'is_plugin_active' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        $integrations_in_pro = defined( 'WPFNL_PRO_VERSION' ) && version_compare( WPFNL_PRO_VERSION, '2.9.0', '>=' );
+        $legacy_addon_active = is_plugin_active( 'wpfunnels-pro-integrations/wpfunnels-pro-integrations.php' );
+
+        if ( ! $integrations_in_pro && $legacy_addon_active ) {
+            return false; // The legacy addon owns its own menu.
+        }
+
+        $plan_active = apply_filters( 'wpfunnels/is_integration_license_active', false );
+
+        if ( $plan_active && ! apply_filters( 'wpfunnels/integrations_react_ready', false ) ) {
+            return false; // Pro too old to serve REST: keep its PHP page.
+        }
+
+        /**
+         * Filters whether the Integrations screen is the React route.
+         *
+         * Return false to keep the legacy `?page=wpfunnels_integrations` page.
+         *
+         * @param bool $use Whether to use the React screen. Default true.
+         *
+         * @since 3.13.9
+         */
+        return (bool) apply_filters( 'wpfunnels/use_react_integrations', true );
     }
 
 
@@ -193,12 +257,15 @@ class Wpfnl_Menus
 
         if ( $integrations_in_pro || ! $legacy_addon_active ) {
             // Pro owns the integrations menu; access is controlled by plan check inside the page renderer.
+            // When the screen is the React route (should_use_react_integrations)
+            // the item carries `#/integrations` and the old page is registered
+            // hidden with the other legacy slugs below.
             add_submenu_page(
                 WPFNL_MAIN_PAGE_SLUG,
                 __('Integrations', 'wpfnl'),
                 __('Integrations', 'wpfnl'),
                 Wpfnl_functions::role_permission_to_allow_wpfunnel( $role_permission ),
-                WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG,
+                self::react_admin_slug( WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG ),
                 [$this, 'render_integration_page']
             );
         } else {
@@ -264,6 +331,7 @@ class Wpfnl_Menus
             WPFNL_TEMPLATE_PAGE_SLUG  => 'render_funnel_template_page',
             WPFNL_AI_FUNNEL_PAGE_SLUG => 'render_ai_funnel_page',
             WPFNL_GLOBAL_SETTINGS_SLUG => 'render_settings_page',
+            WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG => 'render_integration_page',
         ];
 
         foreach ( array_keys( self::react_routes() ) as $legacy_slug ) {
@@ -368,6 +436,11 @@ class Wpfnl_Menus
 
 		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
+		if ( WPFNL_EDIT_FUNNEL_SLUG === $page ) {
+			$this->maybe_redirect_to_react_canvas();
+			return;
+		}
+
 		$routes = self::react_routes();
 
 		if ( ! isset( $routes[ $page ] ) ) {
@@ -430,9 +503,229 @@ class Wpfnl_Menus
 			}
 		}
 
+		/*
+		 * Integrations forwards every argument but `page`. Its old URL is the
+		 * redirect URI people registered with Constant Contact, AWeber and Zoho,
+		 * so the provider's `code`, `state` and `error` come back on it, and
+		 * notices or anything else a link added ride along too. They go into the
+		 * hash route's own query string, where the React screen can read them.
+		 */
+		if ( WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG === $page ) {
+			$carried = self::integrations_redirect_args( wp_unslash( $_GET ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+			if ( $carried ) {
+				// `?s=` may already have opened the route's query string.
+				$route_has_query = false !== strpos( (string) strstr( $url, '#' ), '?' );
+				$url            .= ( $route_has_query ? '&' : '?' ) . http_build_query( $carried, '', '&', PHP_QUERY_RFC3986 );
+			}
+		}
+
 		if ( wp_safe_redirect( $url ) ) {
 			exit;
 		}
+	}
+
+
+	/**
+	 * Query arguments the old Integrations URL carries into `#/integrations`.
+	 *
+	 * Everything but `page`, and `s`, which the generic block above already
+	 * forwards. Values are sanitized as text (nested arrays keep their shape),
+	 * since they end up in a URL the React screen reads; names are kept as
+	 * given, so an OAuth provider's `code` / `state` / `error` arrive intact.
+	 *
+	 * @param array $query The request's query arguments, unslashed.
+	 * @return array Arguments to append to the hash route.
+	 * @since  3.13.9
+	 */
+	public static function integrations_redirect_args( $query )
+	{
+		if ( ! is_array( $query ) ) {
+			return [];
+		}
+
+		unset( $query['page'], $query['s'] );
+
+		$clean = static function ( $value ) use ( &$clean ) {
+			return is_array( $value ) ? array_map( $clean, $value ) : sanitize_text_field( (string) $value );
+		};
+
+		return array_map( $clean, $query );
+	}
+
+
+	/**
+	 * URL of the React funnel canvas for one funnel.
+	 *
+	 * The canvas is a route of the single-page admin (see
+	 * src/admin/pages/FunnelCanvas/paths.js), so the funnel id lives in the
+	 * fragment: `admin.php?page=wpfunnels#/funnels/12/canvas`. Without an id
+	 * there is no canvas to open, so the funnel list is the destination.
+	 *
+	 * A deep link opens one step's drawer once the canvas has loaded — what the
+	 * classic `#<step>/settings/<tab>/` and `#<step>/automation/` fragments did:
+	 * `#/funnels/12/canvas?step=34&open=settings&tab=order-bump`.
+	 *
+	 * @param int   $funnel_id Funnel (post) id.
+	 * @param array $link      Optional deep link: `step` (step id), `open`
+	 *                         (`settings` or `automation`) and, for settings,
+	 *                         `tab` (the drawer tab id).
+	 * @return string Absolute admin URL.
+	 * @since  3.13.7
+	 */
+	public static function react_canvas_url( $funnel_id, $link = [] )
+	{
+		$funnel_id = absint( $funnel_id );
+
+		if ( ! $funnel_id ) {
+			return admin_url( 'admin.php?page=' . WPFNL_MAIN_PAGE_SLUG ) . '#/funnels';
+		}
+
+		$route = '#/funnels/' . $funnel_id . '/canvas';
+		$step  = isset( $link['step'] ) ? absint( $link['step'] ) : 0;
+		$open  = isset( $link['open'] ) ? $link['open'] : '';
+
+		if ( $step && in_array( $open, [ 'settings', 'automation' ], true ) ) {
+			$query = [
+				'step' => $step,
+				'open' => $open,
+			];
+
+			if ( 'settings' === $open && ! empty( $link['tab'] ) ) {
+				$query['tab'] = sanitize_key( $link['tab'] );
+			}
+
+			$route .= '?' . http_build_query( $query );
+		}
+
+		return admin_url( 'admin.php?page=' . WPFNL_MAIN_PAGE_SLUG ) . $route;
+	}
+
+
+	/**
+	 * Whether the classic (Vue) canvas can be opened.
+	 *
+	 * The classic canvas has been removed, so this is always false. Kept as a
+	 * stub for code that still asks.
+	 *
+	 * @return bool
+	 * @since  3.13.8
+	 * @deprecated 3.13.8 The classic canvas no longer exists.
+	 */
+	public static function classic_canvas_allowed()
+	{
+		return false;
+	}
+
+
+	/**
+	 * URL of the canvas for one funnel.
+	 *
+	 * The classic canvas has been removed, so this is the React canvas URL.
+	 * Kept as a stub for code that still builds the old `&classic=1` link.
+	 *
+	 * @param int $funnel_id Funnel (post) id.
+	 * @return string Absolute admin URL.
+	 * @since  3.13.8
+	 * @deprecated 3.13.8 Use funnel_edit_url().
+	 */
+	public static function classic_canvas_url( $funnel_id )
+	{
+		return self::react_canvas_url( $funnel_id );
+	}
+
+
+	/**
+	 * Where "edit this funnel" goes: always the React canvas.
+	 *
+	 * Every link generator goes through this, so the default lives in one place.
+	 *
+	 * @param int   $funnel_id Funnel (post) id.
+	 * @param array $link      Optional React deep link, see react_canvas_url().
+	 * @return string Absolute admin URL.
+	 * @since  3.13.8
+	 */
+	public static function funnel_edit_url( $funnel_id, $link = [] )
+	{
+		return self::react_canvas_url( $funnel_id, $link );
+	}
+
+
+	/**
+	 * Send the classic edit screen (`?page=edit_funnel&id=N`) to the React canvas.
+	 *
+	 * Bookmarks, old emails and anything still building `edit_funnel` links land
+	 * here. Their fragment — the classic deep links `#<step>/settings/<tab>/` and
+	 * `#<step>/automation/` — never reaches PHP, so a valid funnel gets a tiny
+	 * page that reads it in the browser and moves on to the React canvas with
+	 * the same drawer as a deep link (see src/admin/pages/FunnelCanvas/paths.js).
+	 *
+	 * This is unconditional: the classic canvas is gone, so neither `&classic=1`
+	 * nor the `wpfunnels/redirect_to_react_admin` filter can keep this page.
+	 *
+	 * @return void
+	 * @since  3.13.7
+	 */
+	private function maybe_redirect_to_react_canvas()
+	{
+		$funnel_id = isset( $_GET['id'] ) ? absint( wp_unslash( $_GET['id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		// A step or other post id is not a funnel; let the list handle it.
+		if ( $funnel_id && WPFNL_FUNNELS_POST_TYPE !== get_post_type( $funnel_id ) ) {
+			$funnel_id = 0;
+		}
+
+		if ( ! $funnel_id ) {
+			if ( wp_safe_redirect( self::react_canvas_url( 0 ) ) ) {
+				exit;
+			}
+			return;
+		}
+
+		self::print_canvas_bridge( self::react_canvas_url( $funnel_id ) );
+		exit;
+	}
+
+
+	/**
+	 * The page that carries a classic fragment over to the React canvas.
+	 *
+	 * `#12/settings/order-bump/` becomes `?step=12&open=settings&tab=order-bump`
+	 * and `#12/automation/` becomes `?step=12&open=automation` on the canvas
+	 * route; anything else opens the canvas as it is. Without JavaScript the
+	 * meta refresh still opens the canvas, just without the drawer.
+	 *
+	 * @param string $target React canvas URL for the funnel.
+	 * @return void
+	 * @since  3.13.8
+	 */
+	private static function print_canvas_bridge( $target )
+	{
+		nocache_headers();
+		header( 'Content-Type: text/html; charset=' . get_option( 'blog_charset' ) );
+		?>
+<!DOCTYPE html>
+<html><head><meta charset="<?php echo esc_attr( get_option( 'blog_charset' ) ); ?>">
+<meta name="robots" content="noindex">
+<noscript><meta http-equiv="refresh" content="0;url=<?php echo esc_url( $target ); ?>"></noscript>
+<title><?php esc_html_e( 'Opening the funnel canvas…', 'wpfnl' ); ?></title>
+<script>
+(function () {
+	var target = <?php echo wp_json_encode( $target ); ?>;
+	var match = /^#(\d+)\/(settings|automation)(?:\/([\w-]+))?/.exec( window.location.hash || '' );
+
+	if ( match ) {
+		target += '?step=' + match[1] + '&open=' + match[2];
+		if ( 'settings' === match[2] && match[3] ) {
+			target += '&tab=' + match[3];
+		}
+	}
+
+	window.location.replace( target );
+})();
+</script>
+</head><body></body></html>
+		<?php
 	}
 
 
@@ -494,9 +787,14 @@ class Wpfnl_Menus
      */
     public function render_edit_funnel_page()
     {
-        $funnel_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_SPECIAL_CHARS);
-        Wpfnl::$instance->module_manager->get_admin_modules('funnel')->init($funnel_id);
-        Wpfnl::$instance->module_manager->get_admin_modules('funnel')->get_view();
+        // The classic canvas is gone and maybe_redirect_to_react_canvas() sends
+        // this page to the React one before output, so this is only a fallback.
+        $funnel_id = isset( $_GET['id'] ) ? absint( wp_unslash( $_GET['id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $target    = self::react_canvas_url( $funnel_id && WPFNL_FUNNELS_POST_TYPE === get_post_type( $funnel_id ) ? $funnel_id : 0 );
+        ?>
+        <script>window.location.replace( <?php echo wp_json_encode( $target ); ?> );</script>
+        <p><a href="<?php echo esc_url( $target ); ?>"><?php esc_html_e( 'Open the funnel canvas', 'wpfnl' ); ?></a></p>
+        <?php
     }
 
 
@@ -850,7 +1148,8 @@ class Wpfnl_Menus
 			$subnodes[] = [
 				'id'    => 'wpfunnels-integrations',
 				'title' => __('Integrations', 'wpfnl'),
-				'href'  => admin_url('admin.php?page=' . WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG),
+				// `wpfunnels#/integrations` when the screen is the React route.
+				'href'  => admin_url('admin.php?page=' . self::react_admin_slug( WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG )),
 			];
 		}
 

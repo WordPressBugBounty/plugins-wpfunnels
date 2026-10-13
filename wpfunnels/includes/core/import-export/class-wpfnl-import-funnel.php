@@ -1016,14 +1016,7 @@ class Wpfnl_Import {
                     'steps'        => $result[ 'steps' ],
                     'failed_steps' => $result[ 'failed_steps' ],
                     'status'       => $result[ 'failed_steps' ] > 0 ? 'partial' : 'ok',
-                    'edit_url'     => add_query_arg(
-                        [
-                            'page'    => WPFNL_EDIT_FUNNEL_SLUG,
-                            'id'      => $result[ 'funnel_id' ],
-                            'step_id' => $result[ 'first_step_id' ],
-                        ],
-                        admin_url( 'admin.php' )
-                    ),
+                    'edit_url'     => \WPFunnels\Wpfnl_functions::get_funnel_edit_url( $result[ 'funnel_id' ] ),
                 ];
 
                 $this->set_import_status(

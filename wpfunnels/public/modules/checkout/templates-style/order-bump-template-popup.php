@@ -111,10 +111,15 @@ if( $type === 'lms' ){
                            data-key="<?php echo $key; ?>"
                            data-lms="<?php echo $type; ?>"
                            data-replace="<?php echo $settings['isReplace']; ?>"
+                           data-is-variable="<?php echo \WPFunnels\Wpfnl_functions::is_variable_order_bump( $order_bump_settings ) ? 'true' : 'false'; ?>"
                            <?php checked( $this->is_order_bump_in_cart( $order_bump_settings['product'] ) ); ?>
                            name="wpfnl-order-bump-cb" value="<?php echo $order_bump_settings["product"]; ?>">
                     <span class="wpfnl-bump-order-label"><?php echo $order_bump_settings["checkBoxLabel"]; ?></span>
                 </label>
+                <?php if ( \WPFunnels\Wpfnl_functions::is_variable_order_bump( $order_bump_settings ) ) : ?>
+                    <!-- Opens the variation modal when the checkbox is ticked -->
+                    <span id="option-selector-<?php echo $key; ?>" class="option-selector" style="display: none;"></span>
+                <?php endif; ?>
             </div>
         </div>
         <!-- /.wpfnl-order-bump__content-right -->

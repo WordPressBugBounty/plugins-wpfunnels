@@ -28,6 +28,7 @@ class CheckoutHelper extends Module
 
     public function update_order_bump_product( $order_bump_products, $order_id ) {
         if ( is_array( $order_bump_products ) && $order_id ){
+            $ob_products = [];
             foreach( $order_bump_products as $key => $orderBumpProduct ){
                 if ( isset( $_POST['_wpfunnels_order_bump_product_'.$key] ) ) {
                     $ob_product_id = wc_clean( sanitize_text_field( wp_unslash( $_POST['_wpfunnels_order_bump_product_'.$key] ) ) );

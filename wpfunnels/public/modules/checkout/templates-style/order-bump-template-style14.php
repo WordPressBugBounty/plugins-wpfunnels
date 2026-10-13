@@ -68,7 +68,7 @@ if( $type === 'lms' ){
         <span class="wpfnl-loader"></span>
     </div>
     <?php 
-        $isVariable = !empty($settings['isVariable']) ? $settings['isVariable'] : false; 
+        $isVariable = \WPFunnels\Wpfnl_functions::is_variable_order_bump( $settings ); 
     ?>
     <div class="offer-checkbox" style="border-color: <?php echo $orderbump_color; ?>">
         <span class="wpfnl-checkbox">

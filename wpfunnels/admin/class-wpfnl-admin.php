@@ -96,7 +96,6 @@ class Wpfnl_Admin
 		'wpfunnels_page_wp_funnel_settings',
 		'wpfunnels_page_wpfnl_settings',
 		'wpfunnels_page_wp_global_store',
-		'wpfunnels_page_edit_funnel',
 		'wpfunnels_page_create_funnel',
 		'wpfunnels_page_wpfnl_automations',
 		'wpfunnels_page_wpfnl_addons',
@@ -1191,32 +1190,48 @@ class Wpfnl_Admin
 	}
 
 
+	/**
+	 * The jQuery UI datepicker defaults WordPress sets when it prints
+	 * jquery-ui-datepicker (wp_localize_jquery_ui_datepicker()). The classic
+	 * analytics drawer's range picker runs on them — its dates go to the
+	 * analytics route in this format — so the React one is handed the same.
+	 *
+	 * @return array
+	 */
+	private function get_datepicker_defaults()
+	{
+		global $wp_locale;
+
+		return array(
+			'monthNames'      => array_values($wp_locale->month),
+			'monthNamesShort' => array_values($wp_locale->month_abbrev),
+			'dayNames'        => array_values($wp_locale->weekday),
+			'dayNamesShort'   => array_values($wp_locale->weekday_abbrev),
+			'dayNamesMin'     => array_values($wp_locale->weekday_initial),
+			'dateFormat'      => str_replace(
+				array('d', 'j', 'l', 'z', 'F', 'M', 'n', 'm', 'Y', 'y'),
+				array('dd', 'd', 'DD', 'o', 'MM', 'M', 'm', 'mm', 'yy', 'y'),
+				get_option('date_format')
+			),
+			'firstDay'        => absint(get_option('start_of_week')),
+		);
+	}
+
+
 	private function enqueue_react_admin_assets($hook)
 	{
 		if (!in_array($hook, $this->get_react_admin_hooks(), true)) {
 			return;
 		}
 
-		/*
-		 * A production build splits the webpack runtime into its own chunk that
-		 * every entry depends on, so it has to load first. A development build
-		 * (npm run start) keeps the runtime inside each entry and emits no such
-		 * file, hence the existence check rather than a hard dependency.
-		 */
-		$runtime_deps = array();
-		$runtime_path = WPFNL_DIR . '/admin/assets/dist/runtime/index.min.js';
+		// The shared webpack runtime chunk, when the build has one — see
+		// enqueue_webpack_runtime().
+		$runtime_deps = $this->enqueue_webpack_runtime() ? array($this->plugin_name . '-runtime') : array();
 
-		if (file_exists($runtime_path)) {
-			wp_enqueue_script(
-				'wpfnl-webpack-runtime',
-				plugin_dir_url(__FILE__) . 'assets/dist/runtime/index.min.js',
-				array(),
-				$this->version,
-				true
-			);
-
-			$runtime_deps[] = 'wpfnl-webpack-runtime';
-		}
+		// `wp.hooks` is the React canvas's extension surface (see
+		// src/admin/extensions/hooks.js): depending on it guarantees the global
+		// exists, so Pro and third-party scripts and the bundle share one instance.
+		$runtime_deps[] = 'wp-hooks';
 
 		wp_enqueue_script(
 			'wpfnl-react-admin',
@@ -1228,12 +1243,10 @@ class Wpfnl_Admin
 
 		Wpfnl_functions::enqueue_bundle_style('wpfnl-react-admin', 'wpfnl-react-admin-bundle');
 
-		// The React admin renders the whole header action group itself — the
-		// AI Assistant drawer included (see src/admin/components/AiDrawer/) —
-		// so the Vue global-ai-drawer bundle is NOT loaded on this screen: it
-		// would find neither of its mount points (#wpfnl-header-actions,
-		// #wpfnl-global-ai-drawer), and loading it anyway only shipped a second
-		// copy of the group's markup and styles.
+		// The React admin renders the header action group itself
+		// (src/admin/components/HeaderActions.jsx), so the standalone
+		// wpfnl-header-actions bundle is not loaded on this screen — see
+		// enqueue_header_actions().
 		$_is_pro_license_active = (bool) apply_filters('wpfunnels/is_pro_license_activated', false);
 
 		/*
@@ -1274,6 +1287,17 @@ class Wpfnl_Admin
 		 */
 		wp_enqueue_script('updates');
 
+		/*
+		 * The media library and the editor. The funnel canvas is a hash route
+		 * of this one page, so there is no narrower screen to hang them on:
+		 * the order bump's image picker opens `wp.media()`, and its description
+		 * is a TinyMCE field started with `wp.editor.initialize()`. Neither
+		 * global exists unless these are enqueued — the legacy edit_funnel
+		 * screen did the same (see enqueue_scripts()).
+		 */
+		wp_enqueue_media();
+		wp_enqueue_editor();
+
 		wp_localize_script(
 			'wpfnl-react-admin',
 			'RWPFNLAdmin',
@@ -1287,7 +1311,21 @@ class Wpfnl_Admin
 				// canvas editor is code-split (see src/admin/public-path.js).
 				'dist_url'               => WPFNL_URL . 'admin/assets/dist/',
 				'priceConfig'            => Wpfnl_functions::get_wc_price_config(),
+				// The canvas's layout, so its loading placeholder takes the right shape.
+				'canvasViewMode'         => Wpfnl_functions::get_canvas_view_mode(),
+				/*
+				 * The symbols the canvas analytics drawer prefixes, decoded as
+				 * the classic canvas's wc_currency / ld_currency are: WooCommerce
+				 * for sales funnels, LearnDash for LMS ones.
+				 */
+				'analyticsCurrency'      => array(
+					'wc'  => function_exists('get_woocommerce_currency_symbol') ? html_entity_decode(get_woocommerce_currency_symbol()) : '$',
+					'lms' => function_exists('learndash_get_currency_symbol') ? html_entity_decode(learndash_get_currency_symbol()) : '$',
+				),
+				'datepicker'             => $this->get_datepicker_defaults(),
 				'isProActivated'         => apply_filters('wpfunnels/is_wpfnl_pro_active', false),
+				// '0' sends #/integrations back to the legacy PHP page (old Pro, legacy addon, opt-out).
+				'useReactIntegrations'   => \WPFunnels\Menu\Wpfnl_Menus::should_use_react_integrations() ? '1' : '0',
 				'isWPFIntegrationActive' => apply_filters('wpfunnels/is_integration_license_active', false),
 				/*
 				 * Mail Mint's licence state, which decides whether the automation
@@ -1295,6 +1333,8 @@ class Wpfnl_Admin
 				 * legacy automation list.
 				 */
 				'isMailMintProLicenseActive' => Wpfnl_functions::is_mail_mint_pro_license_active(),
+				// Whether Mail Mint runs at all: the Canvas step cards' automation button, as the classic template_library_object.is_mint_active.
+				'isMintActive'               => Wpfnl_functions::is_mint_mrm_active(),
 				/*
 				 * What the automation screen still needs, rung by rung, with the
 				 * next step for each. Plugin-installing rungs carry a basename and
@@ -1305,6 +1345,18 @@ class Wpfnl_Admin
 				'canInstallPlugins'          => current_user_can('install_plugins'),
 				'canActivatePlugins'         => current_user_can('activate_plugins'),
 				'getText'                => Wpfnl_functions::get_text(),
+				/*
+				 * The plugin's translations as Jed locale data, which src/admin/i18n.js
+				 * hands to the bundled @wordpress/i18n. The bundle carries its own copy
+				 * of that package (it is not a webpack external), so core's JSON
+				 * translation files — what wp_set_script_translations() would register —
+				 * never reach it; the data has to ride on this handle instead.
+				 */
+				'i18n'                   => $this->get_jed_locale_data('wpfnl')['locale_data']['wpfnl'],
+				// Legacy Mail Mint action nodes (delay, sendMail, addTag, …) the
+				// funnel canvas draws as small settings-only cards, as the classic
+				// canvas's WPFunnelVars.onlySettingsSteps.
+				'onlySettingsSteps'      => array_values( Wpfnl_functions::get_only_settings_steps() ),
 				'startOfWeek'            => (int) get_option('start_of_week', 0),
 				/*
 				 * Whether the onboarding checklist was on show last time the
@@ -1323,6 +1375,19 @@ class Wpfnl_Admin
 				'isProLicenseActive'     => $_is_pro_license_active,
 				'upgradeUrl'             => 'https://getwpfunnels.com/pricing/',
 				'proCta'                 => $this->get_pro_cta(),
+				/*
+				 * A/B testing needs a Pro of at least 1.7.3 — the classic canvas's
+				 * template_library_object.is_ab_tesing_available, which also stops
+				 * it drawing running tests an older Pro cannot serve. The licence
+				 * half of the check is isProLicenseActive.
+				 */
+				'isAbTestingAvailable'   => defined('WPFNL_PRO_VERSION') ? version_compare(WPFNL_PRO_VERSION, '1.7.3', '>=') : false,
+				/*
+				 * What the classic canvas gets from the `wpfunnels/funnel_window_admin_localize`
+				 * filter (Pro's unsupported-gateway warning, the Oxygen notice, …),
+				 * as a real object — see get_canvas_localize().
+				 */
+				'canvasLocalize'         => $this->get_canvas_localize(),
 				'documentTitleSuffix'    => $_document_title_suffix,
 				/*
 				 * What the template library route runs on. Every value here is
@@ -1334,81 +1399,159 @@ class Wpfnl_Admin
 				 */
 				'templateLibrary'        => $this->get_template_library_data(),
 				/*
-				 * The two settings panels that are still Vue apps of their own,
-				 * fetched by the settings screen when one of them is opened.
+				 * Login name of the current user, which the MCP settings panel
+				 * writes into its connection snippets. No REST field carries it.
 				 */
-				'settingsPanelApps'      => $this->get_settings_panel_apps(),
+				'currentUserLogin'       => wp_get_current_user()->user_login,
+				/*
+				 * What the setup wizard route (`#/setup`) reads: plugin and
+				 * builder states, saved settings, the admin's name and email,
+				 * image URLs. Null for users who may not run it, which the
+				 * route takes as "send them to the dashboard".
+				 */
+				'setupWizard'            => current_user_can( 'manage_options' ) ? \WPFunnels\Admin\SetupWizard::get_app_data() : null,
 			)
 		);
 
-		$this->enqueue_settings_panel_apps();
+		/**
+		 * Fires once the React admin's script and its localized data are queued.
+		 *
+		 * The counterpart of the classic canvas's `wpfunnels_after_scripts_loaded`
+		 * (which fires after the Vue canvas's scripts), so an add-on that enqueues
+		 * its own script here reaches the React screens too. Such a script should
+		 * depend on `wp-hooks` and register its `wpfunnels.canvas.*` filters there.
+		 *
+		 * @since 3.12.0
+		 */
+		do_action('wpfunnels_after_scripts_loaded');
 	}
 
 
 	/**
-	 * The two settings panels that are still Vue apps of their own.
+	 * What the classic canvas's `wpfunnels/funnel_window_admin_localize` filter
+	 * collects, for the React canvas.
 	 *
-	 * "AI Assistant" and "MCP for AI Agents" each own their fields and save them
-	 * through their own REST routes, so the React settings screen renders a
-	 * mount point and asks those bundles to mount into it rather than
-	 * reimplementing them (see src/admin/pages/Settings/VuePanel.jsx). The
-	 * bundles are unchanged — they still mount themselves on the legacy settings
-	 * page, where the mount point is printed by PHP.
+	 * Pro adds its unsupported-gateway warning through that filter and WPFunnels
+	 * its Oxygen one, so applying it here is what lets both reach the React
+	 * canvas without either knowing it exists. Notice texts are HTML, which is
+	 * why they are run through wp_kses_post() — the React bar renders them as
+	 * markup.
 	 *
+	 * @return array Filter result, always an array (a callback returning nothing
+	 *               must not erase the others'), `notices` normalised.
+	 */
+	private function get_canvas_localize()
+	{
+		$localize = apply_filters('wpfunnels/funnel_window_admin_localize', array());
+
+		if (!is_array($localize)) {
+			$localize = array();
+		}
+
+		/**
+		 * Filters the data the React funnel canvas gets from PHP.
+		 *
+		 * Applied after `wpfunnels/funnel_window_admin_localize`, which the
+		 * classic canvas also reads, so code written for the React canvas only
+		 * hooks here. Arrives in the browser as `RWPFNLAdmin.canvasLocalize`,
+		 * then runs through the `wpfunnels.canvas.localize` JS filter (see
+		 * src/admin/extensions/hooks.js). `notices` entries are
+		 * `{ type, notice_type, notice_texts }`, with `notice_texts` as HTML
+		 * (passed through wp_kses_post).
+		 *
+		 * @param array $localize Canvas data.
+		 *
+		 * @since 3.13.8
+		 */
+		$localize = apply_filters('wpfunnels/react_canvas_localize', $localize);
+
+		if (!is_array($localize)) {
+			$localize = array();
+		}
+
+		$notices = array();
+
+		if (!empty($localize['notices']) && is_array($localize['notices'])) {
+			foreach ($localize['notices'] as $notice) {
+				if (!is_array($notice) || empty($notice['notice_texts'])) {
+					continue;
+				}
+
+				$notice['notice_texts'] = wp_kses_post($notice['notice_texts']);
+				$notices[]              = $notice;
+			}
+		}
+
+		$localize['notices'] = $notices;
+
+		return $localize;
+	}
+
+
+	/**
+	 * Enqueue the webpack runtime chunk, when the build has one.
+	 *
+	 * A production build splits the runtime every entry shares into its own
+	 * chunk, which has to load once and before them. A development build keeps
+	 * it inside each entry and emits no such file — enqueuing it anyway only
+	 * produced a 404 — hence the existence check.
+	 *
+	 * @return bool Whether the runtime was enqueued, i.e. whether a bundle
+	 *              should list it as a dependency.
+	 * @since  3.13.8
+	 */
+	private function enqueue_webpack_runtime()
+	{
+		if (!file_exists(WPFNL_DIR . '/admin/assets/dist/runtime/index.min.js')) {
+			return false;
+		}
+
+		wp_enqueue_script($this->plugin_name . '-runtime', plugin_dir_url(__FILE__) . 'assets/dist/runtime/index.min.js', array(), $this->version, true);
+
+		return true;
+	}
+
+
+	/**
+	 * The header action group on the screens that are still rendered by PHP.
+	 *
+	 * admin/partials/dashboard-nav.php prints a #wpfnl-header-actions slot on
+	 * each of them, and the `wpfnl-header-actions` bundle mounts the React
+	 * admin's own HeaderActions component into it (src/header-actions/). It reads
+	 * the same `RWPFNLAdmin` global as the React admin, limited to what the
+	 * group uses: the REST root and nonce for the AI drawer, the admin URL for
+	 * the Settings link, and the Pro call to action.
+	 *
+	 * Not loaded on the funnel canvas, which prints no slot, nor on a React
+	 * admin screen, which renders the group itself (the settings hook is on
+	 * both lists).
+	 *
+	 * @param string $hook Current admin page hook.
 	 * @return void
 	 * @since  3.13.8
 	 */
-	private function enqueue_settings_panel_apps()
+	private function enqueue_header_actions($hook)
 	{
-		$_current_user = wp_get_current_user();
-		$_common       = array(
-			'username'  => $_current_user ? $_current_user->user_login : '',
-			'rest_url'  => esc_url_raw(get_rest_url()),
-			'nonce'     => wp_create_nonce('wp_rest'),
-			'admin_url' => esc_url_raw(admin_url()),
-		);
+		if (in_array($hook, $this->get_react_admin_hooks(), true)) {
+			return;
+		}
 
-		/*
-		 * The globals the two bundles read, printed before the React bundle so
-		 * they are there whenever a bundle is pulled in later. They are a few
-		 * hundred bytes; the bundles themselves are megabytes, which is why
-		 * only the data is printed up front.
-		 */
-		wp_add_inline_script(
-			'wpfnl-react-admin',
-			'window.WPFnlMcpSettings = ' . wp_json_encode(array_merge($_common, array('site_url' => esc_url_raw(home_url())))) . ';' .
-			'window.WPFnlAiAssistantSettings = ' . wp_json_encode($_common) . ';',
-			'before'
-		);
-	}
+		$deps = $this->enqueue_webpack_runtime() ? array($this->plugin_name . '-runtime') : array();
 
+		wp_enqueue_script('wpfnl-header-actions', plugin_dir_url(__FILE__) . 'assets/dist/js/wpfnl-header-actions.min.js', $deps, $this->version, true);
+		Wpfnl_functions::enqueue_bundle_style('wpfnl-header-actions', 'wpfnl-header-actions-bundle');
 
-	/**
-	 * Where the settings screen fetches its two Vue panels from.
-	 *
-	 * Neither bundle is enqueued: only one settings panel in the app needs
-	 * either of them, and the route is in the fragment, which the server never
-	 * sees — so loading them on every screen of the admin would cost every
-	 * screen megabytes for a panel most visitors never open. The panel loads
-	 * what it needs when it is opened (see pages/Settings/panels/VuePanel.jsx).
-	 *
-	 * The stylesheet is empty on a development build, which injects its styles
-	 * from JavaScript and emits none.
-	 *
-	 * @return array Script and stylesheet URL per panel.
-	 * @since  3.13.8
-	 */
-	private function get_settings_panel_apps()
-	{
-		return array(
-			'aiAssistant' => array(
-				'script' => plugin_dir_url(__FILE__) . 'assets/dist/js/ai-assistant-settings.min.js',
-				'style'  => Wpfnl_functions::get_bundle_style_url('ai-assistant-settings'),
-			),
-			'mcp'         => array(
-				'script' => plugin_dir_url(__FILE__) . 'assets/dist/js/mcp-agent-settings.min.js',
-				'style'  => Wpfnl_functions::get_bundle_style_url('mcp-agent-settings'),
-			),
+		wp_localize_script(
+			'wpfnl-header-actions',
+			'RWPFNLAdmin',
+			array(
+				'rest_api_url'       => get_rest_url(),
+				'nonce'              => wp_create_nonce('wp_rest'),
+				'admin_url'          => admin_url(),
+				'isProLicenseActive' => (bool) apply_filters('wpfunnels/is_pro_license_activated', false),
+				'upgradeUrl'         => 'https://getwpfunnels.com/pricing/',
+				'proCta'             => $this->get_pro_cta(),
+			)
 		);
 	}
 
@@ -1507,27 +1650,9 @@ class Wpfnl_Admin
 
 		if (in_array($hook, $this->page_hooks)) {
 
-			// Admin header actions — the Knowledge Base, AI Assistant, Settings
-			// and Upgrade group rendered into #wpfnl-header-actions from every
-			// legacy WPFunnels admin screen. The data goes out under the
-			// WPFNAIFunnel global because that is the name
-			// admin/src/copilot/services/ai.js reads, and the drawer shares
-			// that client with what is left of the copilot bundle.
-			$_settings_page_url = admin_url( 'admin.php?page=' . WPFNL_MAIN_PAGE_SLUG ) . '#/settings';
-
-			wp_enqueue_script('wpfnl-global-ai-drawer', plugin_dir_url(__FILE__) . 'assets/dist/js/global-ai-drawer.min.js', [], $this->version, true);
-			Wpfnl_functions::enqueue_bundle_style( 'global-ai-drawer', 'wpfnl-global-ai-drawer-bundle' );
-			wp_localize_script('wpfnl-global-ai-drawer', 'WPFNAIFunnel', array(
-				'adminUrl'        => esc_url_raw( admin_url( 'admin.php' ) ),
-				'settingsPageUrl' => esc_url_raw( $_settings_page_url ),
-				'isPro'           => (bool) apply_filters( 'wpfunnels/is_pro_license_activated', false ),
-				'upgradeUrl'      => 'https://getwpfunnels.com/pricing/',
-				'restApiUrl'      => esc_url_raw( get_rest_url() ),
-				'restNonce'       => wp_create_nonce( 'wp_rest' ),
-				'rest_url'        => esc_url_raw( get_rest_url() ),
-				'nonce'           => wp_create_nonce( 'wp_rest' ),
-				'rest_nonce'      => wp_create_nonce( 'wp_rest' ),
-			));
+			// The header action group — Knowledge Base, AI Assistant, Settings,
+			// Upgrade — in the #wpfnl-header-actions slot of these screens.
+			$this->enqueue_header_actions($hook);
 
 			$is_wc_installed = 'no';
 			$is_wpfunnels_installed = 'no';
@@ -1589,9 +1714,6 @@ class Wpfnl_Admin
 			wp_enqueue_script($this->plugin_name . '-jed', plugin_dir_url(__FILE__) . 'assets/js/jed.js', ['jquery'], $this->version, true);
 			wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'assets/js/wpfnl-admin.js', ['jquery', 'jquery-ui-sortable'], $this->version, true);
 
-			wp_enqueue_script($this->plugin_name . '-runtime', plugin_dir_url(__FILE__) . 'assets/dist/runtime/index.min.js', ['jquery', 'wp-i18n', 'wp-util', 'updates', 'wp-color-picker', $this->plugin_name . '-jed'], $this->version, true);
-			wp_enqueue_script($this->plugin_name . '-funnel-window', plugin_dir_url(__FILE__) . 'assets/dist/js/funnel-components.min.js', ['jquery', 'wp-i18n', 'wp-util', 'updates', 'wp-color-picker', $this->plugin_name . '-jed', $this->plugin_name . '-runtime'], $this->version, true);
-			Wpfnl_functions::enqueue_bundle_style( 'funnel-components', $this->plugin_name . '-funnel-window-bundle' );
 			wp_enqueue_script($this->plugin_name . '-backbone-marionette', plugin_dir_url(__FILE__) . 'assets/lib/backbone/backbone.marionette.min.js', ['backbone'], $this->version, true);
 			wp_enqueue_script($this->plugin_name . '-backbone-radio', plugin_dir_url(__FILE__) . 'assets/lib/backbone/backbone.radio.min.js', ['backbone'], $this->version, true);
 
@@ -1740,57 +1862,6 @@ class Wpfnl_Admin
 				'isStoreCheckout' => 'wpfunnels_page_store_checkout' === $hook,
 			)
 			);
-
-			wp_localize_script(
-				$this->plugin_name,
-				'CheckoutStep',
-				array(
-				'ajaxurl' => esc_url_raw(admin_url('admin-ajax.php')),
-				'rest_api_url' => esc_url_raw(get_rest_url()),
-				'wc_currency' => $wc_currency_symbol,
-				'nonce' => wp_create_nonce('wp_rest'),
-				'security' => wp_create_nonce('wpfnl-admin'),
-				'image_path' => WPFNL_URL . 'admin/assets/images',
-				'tooltipIcon' => WPFNL_URL . 'admin/partials/icons/question-tooltip-icon.php',
-				'imageUploadIcon' => WPFNL_URL . 'admin/partials/icons/image-upload-icon.php',
-				'step_id' => $step_id,
-				'back' => add_query_arg(
-					array(
-					'page' => WPFNL_EDIT_FUNNEL_SLUG,
-					'id' => filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT),
-					'step_id' => $step_id,
-				),
-				admin_url('admin.php')
-			),
-				'priceConfig' => Wpfnl_functions::get_wc_price_config(),
-			)
-			);
-
-			wp_localize_script(
-				$this->plugin_name,
-				'wpfnl_addons_vars',
-				array(
-				'addons' => Wpfnl_functions::get_supported_addons(),
-				'gbf_conditions' => Wpfnl_functions::get_supported_gbf_offer_condition(),
-				'categories' => Wpfnl_functions::get_categories_gbf_offer_condition(),
-				'role' => Wpfnl_functions::get_all_user_roles(),
-				'tags' => Wpfnl_functions::get_all_tags(),
-				'shippingClasses' => Wpfnl_functions::get_shipping_classes(),
-			)
-			);
-
-
-			/**
-			 * Localize scripts for funnel window
-			 *
-			 * @var $localize
-			 */
-
-			$notices = $this->get_builder_notice();
-
-			$localize = apply_filters('wpfunnels/funnel_window_admin_localize', array());
-			wp_localize_script($this->plugin_name . '-funnel-window', 'wpfunnels_funnel_localize', array($localize));
-
 
 			do_action('wpfunnels_after_scripts_loaded');
 		}

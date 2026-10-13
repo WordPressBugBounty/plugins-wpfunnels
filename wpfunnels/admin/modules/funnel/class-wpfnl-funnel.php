@@ -70,6 +70,10 @@ class Module extends Wpfnl_Admin_Module
             ->with_callback([ $this, 'wpfnl_update_funnel_settings' ])
             ->with_validation($this->get_validation_data());
 
+        wp_ajax_helper()->handle('wpfnl-update-funnel-type-settings')
+            ->with_callback([ $this, 'wpfnl_update_funnel_type_settings' ])
+            ->with_validation($this->get_validation_data());
+
 		wp_ajax_helper()->handle('wpfnl-guided-tour')
 			->with_callback([ $this, 'wpfnl_guided_tour' ])
 			->with_validation($this->get_validation_data());
@@ -698,6 +702,55 @@ class Module extends Wpfnl_Admin_Module
         }
 
         return $response;
+    }
+
+    /**
+     * Switch a funnel between a regular sales funnel and an LMS funnel.
+     *
+     * Both funnel settings drawers — the classic Vue one and the React one —
+     * send `wpfnl-update-funnel-type-settings` with `is_lms` = `yes` | `no`
+     * from their LMS switch, and reload on success. The funnel type is the
+     * `_wpfnl_funnel_type` meta (`wc` or `lms`); a store checkout funnel has
+     * its own type and is not convertible.
+     *
+     * @param array $payload `funnel_id` and `is_lms` (`yes` | `no`).
+     *
+     * @return array
+     * @since 3.13.8
+     */
+    public function wpfnl_update_funnel_type_settings( $payload ){
+
+        $funnel_id = isset( $payload['funnel_id'] ) ? absint( $payload['funnel_id'] ) : 0;
+        $is_lms    = isset( $payload['is_lms'] ) ? sanitize_text_field( $payload['is_lms'] ) : '';
+
+        if ( ! $funnel_id || ! in_array( $is_lms, [ 'yes', 'no' ], true ) || WPFNL_FUNNELS_POST_TYPE !== get_post_type( $funnel_id ) ) {
+            return [
+                'success' => false,
+                'data'    => __( 'Invalid funnel or funnel type.', 'wpfnl' ),
+            ];
+        }
+
+        if ( ! current_user_can( 'edit_post', $funnel_id ) ) {
+            return [
+                'success' => false,
+                'data'    => __( 'You do not have permission to perform this action.', 'wpfnl' ),
+            ];
+        }
+
+        if ( 'store_checkout' === get_post_meta( $funnel_id, '_wpfnl_funnel_type', true ) ) {
+            return [
+                'success' => false,
+                'data'    => __( 'A store checkout funnel cannot be converted to another type.', 'wpfnl' ),
+            ];
+        }
+
+        $type = 'yes' === $is_lms ? 'lms' : 'wc';
+        update_post_meta( $funnel_id, '_wpfnl_funnel_type', $type );
+
+        return [
+            'success' => true,
+            'data'    => $type,
+        ];
     }
 
 	/**

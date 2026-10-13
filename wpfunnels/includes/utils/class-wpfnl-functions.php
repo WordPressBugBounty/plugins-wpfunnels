@@ -589,7 +589,8 @@ class Wpfnl_functions {
 			return true;
 		}
 
-		if ( $page === 'wpfunnels_integrations' && $key === 'integrations' ) {
+		// The legacy page; the React `#/integrations` route never renders this nav.
+		if ( $page === WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG && $key === 'integrations' ) {
 			return true;
 		}
 
@@ -2360,6 +2361,26 @@ class Wpfnl_functions {
 		}
 		
 		return false;
+	}
+
+
+	/**
+	 * Where "edit this funnel" links go.
+	 *
+	 * The React canvas (`admin.php?page=wpfunnels#/funnels/{id}/canvas`) by
+	 * default, the classic `edit_funnel` screen on a site that turned the
+	 * redirect off. Every link generator should use this rather than spelling
+	 * out `page=edit_funnel`.
+	 *
+	 * @param int   $funnel_id Funnel (post) id.
+	 * @param array $link      Optional deep link into a step's drawer:
+	 *                         `step`, `open` (`settings`|`automation`), `tab`.
+	 *
+	 * @return string Absolute admin URL.
+	 * @since  3.13.8
+	 */
+	public static function get_funnel_edit_url( $funnel_id, $link = array() ) {
+		return \WPFunnels\Menu\Wpfnl_Menus::funnel_edit_url( $funnel_id, $link );
 	}
 
 
@@ -4875,10 +4896,12 @@ class Wpfnl_functions {
 	 * @param mixed $key        Which bump on that step.
 	 * @param int $product_id   Product the request asked for.
 	 * @param int $variation_id Variation the request asked for, if any.
-	 * @return array|WP_Error   product_id, variation_id, cart_product_id, quantity and settings, or an error.
+	 * @param array $variation_data Attribute values the customer picked (attribute_* => value). Only used to fill in "Any" attributes.
+	 * @param bool $require_variation Whether a variable product must come with a purchasable, fully specified variation (true when adding the bump to the cart).
+	 * @return array|WP_Error   product_id, variation_id, cart_product_id, quantity, variation_data and settings, or an error.
 	 * @since 3.12.14
 	 */
-	public static function resolve_order_bump_item( $step_id, $key, $product_id, $variation_id = 0 ) {
+	public static function resolve_order_bump_item( $step_id, $key, $product_id, $variation_id = 0, $variation_data = array(), $require_variation = false ) {
 		$step_id      = absint( $step_id );
 		$product_id   = absint( $product_id );
 		$variation_id = absint( $variation_id );
@@ -4909,7 +4932,9 @@ class Wpfnl_functions {
 
 		$configured_id = absint( $settings['product'] );
 
-		if ( ! wc_get_product( $configured_id ) ) {
+		$configured_product = wc_get_product( $configured_id );
+
+		if ( ! $configured_product ) {
 			return new \WP_Error( 'wpfnl_invalid_product', __( 'The configured order bump product no longer exists.', 'wpfnl' ) );
 		}
 
@@ -4932,12 +4957,98 @@ class Wpfnl_functions {
 		$quantity = isset( $settings['quantity'] ) ? absint( $settings['quantity'] ) : 0;
 		$quantity = max( 1, $quantity );
 
+		$resolved_attributes = array();
+
+		if ( $require_variation ) {
+			$resolved = self::resolve_order_bump_variation( $configured_product, $variation_id, $variation_data, $quantity );
+
+			if ( is_wp_error( $resolved ) ) {
+				return $resolved;
+			}
+
+			$resolved_attributes = $resolved;
+		}
+
 		return array(
 			'product_id'      => $configured_id,
 			'variation_id'    => $variation_id,
 			'cart_product_id' => $variation_id ? $variation_id : $configured_id,
 			'quantity'        => $quantity,
+			'variation_data'  => $resolved_attributes,
 		);
+	}
+
+	/**
+	 * Whether an order bump offers a variable product the customer has to pick a variation of.
+	 *
+	 * Read from the product itself rather than a flag saved with the bump, so a
+	 * product that was changed to or from variable after the bump was saved is
+	 * still handled correctly.
+	 *
+	 * @param array $settings Order bump settings.
+	 * @return bool
+	 * @since 3.13.5
+	 */
+	public static function is_variable_order_bump( $settings ) {
+		if ( empty( $settings['product'] ) || ! self::is_wc_active() ) {
+			return false;
+		}
+
+		$product = wc_get_product( absint( $settings['product'] ) );
+
+		return $product && $product->is_type( array( 'variable', 'variable-subscription' ) );
+	}
+
+	/**
+	 * Checks that a variable order bump is added as a purchasable, fully specified variation.
+	 *
+	 * A variable parent cannot be added to the cart on its own, so the customer has to have
+	 * picked a variation. A variation that leaves an attribute on "Any" also needs the value
+	 * the customer chose for it, which WooCommerce validates again when adding to the cart.
+	 *
+	 * @param \WC_Product $configured_product The product configured on the bump.
+	 * @param int         $variation_id       Variation the request asked for, if any.
+	 * @param array       $variation_data     Attribute values the customer picked (attribute_* => value).
+	 * @param int         $quantity           Quantity the merchant configured.
+	 * @return array|\WP_Error                Attributes to add the variation with (empty for a simple product), or an error.
+	 * @since 3.13.5
+	 */
+	public static function resolve_order_bump_variation( $configured_product, $variation_id, $variation_data, $quantity = 1 ) {
+		if ( $configured_product->is_type( 'variation' ) ) {
+			$variation = $configured_product;
+		} elseif ( $configured_product->is_type( array( 'variable', 'variable-subscription' ) ) ) {
+			if ( ! $variation_id ) {
+				return new \WP_Error( 'wpfnl_variation_required', __( 'Please choose an option for this offer.', 'wpfnl' ) );
+			}
+
+			$variation = wc_get_product( $variation_id );
+		} else {
+			return array();
+		}
+
+		if ( ! $variation || ! $variation->is_purchasable() || ! $variation->is_in_stock() || ! $variation->has_enough_stock( $quantity ) ) {
+			return new \WP_Error( 'wpfnl_variation_unavailable', __( 'This option is not available right now.', 'wpfnl' ) );
+		}
+
+		$attributes = $variation->get_variation_attributes();
+		$submitted  = is_array( $variation_data ) ? $variation_data : array();
+
+		foreach ( $attributes as $attribute_key => $attribute_value ) {
+			// The variation fixes this attribute itself; only "Any" attributes take the customer's value.
+			if ( '' !== $attribute_value ) {
+				continue;
+			}
+
+			$chosen = isset( $submitted[ $attribute_key ] ) ? wc_clean( $submitted[ $attribute_key ] ) : '';
+
+			if ( '' === $chosen ) {
+				return new \WP_Error( 'wpfnl_variation_attributes', __( 'Please choose an option for this offer.', 'wpfnl' ) );
+			}
+
+			$attributes[ $attribute_key ] = $chosen;
+		}
+
+		return $attributes;
 	}
 
 	/**

@@ -153,13 +153,13 @@ class OfferButton extends AbstractBlock {
 
         ob_start();
         ?>
-        <div class="wp-block-wpfnl-offer-btn-<?php echo isset($attributes['buttonAlign']) ? $attributes['buttonAlign'] : ''; ?>" >
+        <div class="wp-block-wpfnl-offer-btn-<?php echo isset($attributes['buttonAlign']) ? esc_attr( $attributes['buttonAlign'] ) : ''; ?>" >
             <div class="wpfnl-offerbtn-wrapper" id="wpfnl-offerbtn-wrapper" >
                 <?php
                     if( !isset($attributes['offerAction']) || 'reject' !== $attributes['offerAction'] ){
                         if( $is_variable ){
                             if( isset($attributes['variationTblTitle']) && !empty( $attributes['variationTblTitle'] ) ){ 
-                                echo '<h5 class="wpfnl-product-variation-title">'.$attributes['variationTblTitle'].'</h5>';                       
+                                echo '<h5 class="wpfnl-product-variation-title">'. wp_kses_post( $attributes['variationTblTitle'] ) .'</h5>';                       
                             }
                             ?>
 
@@ -178,7 +178,7 @@ class OfferButton extends AbstractBlock {
                     }
                 ?>
 
-                <div class="wpfnl-offerbtn-and-price-wrapper <?php echo isset($attributes['showProductPrice']) && 'yes' === $attributes['showProductPrice'] ? $attributes['productPriceAlignment'] : '' ?>">
+                <div class="wpfnl-offerbtn-and-price-wrapper <?php echo isset($attributes['showProductPrice'], $attributes['productPriceAlignment']) && 'yes' === $attributes['showProductPrice'] ? esc_attr( $attributes['productPriceAlignment'] ) : '' ?>">
                     <?php if( isset($attributes['showProductPrice']) && 'yes' === $attributes['showProductPrice'] ){ ?>
                         <span class="wpfnl-offer-product-price" id="wpfnl-offer-product-price">
                             <?php
@@ -279,7 +279,8 @@ class OfferButton extends AbstractBlock {
         check_ajax_referer( 'wpfnl_gb_ajax_nonce', 'nonce' );
         $data = '';
         ob_start();
-        echo do_shortcode('[wpf_variable_offer post_id="'.$_POST['id'].'" ]');
+        $step_id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
+        echo do_shortcode('[wpf_variable_offer post_id="'.$step_id.'" ]');
         $data = ob_get_clean();
         wp_send_json_success( $data );
     }

@@ -80,7 +80,7 @@ if( $product ){
         <div class="offer-checkbox">
             <div class="wpfnl-checkbox">
                 <?php 
-                    $isVariable = !empty($settings['isVariable']) ? $settings['isVariable'] : false; 
+                    $isVariable = \WPFunnels\Wpfnl_functions::is_variable_order_bump( $settings ); 
                 ?>
                 <input
                     id="wpfnl-order-bump-cb-<?php echo $key . ( $this->render_instance ? '-' . $this->render_instance : '' ); ?>"

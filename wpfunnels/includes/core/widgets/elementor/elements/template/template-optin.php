@@ -10,7 +10,7 @@
 <?php
 if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $settings['optin_form_type'] ) {
     ?>
-    <div class="wpfnl-optin-clickto-expand align-<?php echo $settings['clickto_expand_btn_align'] ?>">
+    <div class="wpfnl-optin-clickto-expand align-<?php echo esc_attr( $settings['clickto_expand_btn_align'] ); ?>">
         <button class="btn-default clickto-expand-btn elementor-button" type="button" <?php echo $this->get_render_attribute_string('click-to-expand-button'); ?> >
             <?php $this->render_clickto_expand_text(); ?>
         </button>
@@ -28,14 +28,14 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
         echo $token_input ?? '';
         echo $token_secret_key ?? '';
         ?>
-        <div class="wpfnl-optin-form-wrapper <?php echo $settings['optin_form_layout']; ?>" >
+        <div class="wpfnl-optin-form-wrapper <?php echo esc_attr( $settings['optin_form_layout'] ); ?>" >
             <?php if( isset( $settings['first_name'] ) && 'yes' === $settings['first_name'] ){ ?>
                 <div class="wpfnl-optin-form-group first-name">
 
                     <?php if( isset( $settings['field_label'] ) && 'yes' === $settings['field_label'] ){ ?>
                         <label for="wpfnl-first-name">
                             <?php
-                            echo $settings['first_name_label'] ?? __('First Name','wpfnl');
+                            echo wp_kses_post( $settings['first_name_label'] ?? __('First Name','wpfnl') );
 
                             if( isset( $settings['required_mark'], $settings['is_required_name'] ) && 'yes' === $settings['required_mark'] && 'yes' === $settings['is_required_name'] ){ ?>
                                 <span class="required-mark">*</span>
@@ -51,7 +51,7 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
                         <?php }
                         $f_name_placeholder = $settings['first_name_placeholder'] ?? '';
                         ?>
-                        <input type="text" name="first_name" class="wpfnl-first-name" id="wpfnl-first-name" placeholder="<?php echo $f_name_placeholder; ?>" <?php echo 'yes' === $settings['is_required_name'] ? 'required' : ''; ?>/>
+                        <input type="text" name="first_name" class="wpfnl-first-name" id="wpfnl-first-name" placeholder="<?php echo esc_attr( $f_name_placeholder ); ?>" <?php echo 'yes' === $settings['is_required_name'] ? 'required' : ''; ?>/>
                     </span>
                 </div>
             <?php } ?>
@@ -62,7 +62,7 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
                     <?php if( 'yes' === $settings['field_label'] ){ ?>
                         <label for="wpfnl-last-name">
                             <?php
-                            echo $settings['last_name_label'] ?? __('Last Name','wpfnl');
+                            echo wp_kses_post( $settings['last_name_label'] ?? __('Last Name','wpfnl') );
 
                             if( isset( $settings['required_mark'], $settings['is_required_last_name'] ) && 'yes' === $settings['required_mark'] && 'yes' === $settings['is_required_last_name'] ){ ?>
                                 <span class="required-mark">*</span>
@@ -78,7 +78,7 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
                         <?php }
                         $l_name_placeholder = $settings['last_name_placeholder'] ?? '';
                         ?>
-                        <input type="text" name="last_name" class="wpfnl-last-name" id="wpfnl-last-name" placeholder="<?php echo $l_name_placeholder;?>" <?php echo 'yes' === $settings['is_required_last_name'] ? 'required' : ''; ?>/>
+                        <input type="text" name="last_name" class="wpfnl-last-name" id="wpfnl-last-name" placeholder="<?php echo esc_attr( $l_name_placeholder ); ?>" <?php echo 'yes' === $settings['is_required_last_name'] ? 'required' : ''; ?>/>
                     </span>
                 </div>
             <?php } ?>
@@ -87,7 +87,7 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
                 <?php if( isset( $settings['field_label'] ) && 'yes' === $settings['field_label'] ){ ?>
                     <label for="wpfnl-email">
                         <?php
-                        echo $settings['email_label'] ?? __('Email','wpfnl');
+                        echo wp_kses_post( $settings['email_label'] ?? __('Email','wpfnl') );
 
                         if( isset( $settings['required_mark'] ) && 'yes' === $settings['required_mark'] ){ ?>
                             <span class="required-mark">*</span>
@@ -102,7 +102,7 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
                     <?php }
                     $email_placeholder = $settings['email_placeholder'] ?? '';
                     ?>
-                    <input type="email" name="email" class="wpfnl-email" id="wpfnl-email" placeholder="<?php echo $email_placeholder; ?>" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required />
+                    <input type="email" name="email" class="wpfnl-email" id="wpfnl-email" placeholder="<?php echo esc_attr( $email_placeholder ); ?>" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required />
                 </span>
             </div>
 
@@ -112,7 +112,7 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
                     <?php if( isset( $settings['field_label'] ) && 'yes' === $settings['field_label'] ){ ?>
                         <label for="wpfnl-phone">
                             <?php
-                            echo $settings['phone_label'] ?? __('Phone','wpfnl');
+                            echo wp_kses_post( $settings['phone_label'] ?? __('Phone','wpfnl') );
 
                             if( isset( $settings[ 'required_mark' ], $settings[ 'is_required_phone' ] ) && 'yes' === $settings['required_mark'] && 'yes' === $settings['is_required_phone'] ){ ?>
                                 <span class="required-mark">*</span>
@@ -128,7 +128,7 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
                         <?php }
                         $phone_placeholder = $settings['phone_placeholder'] ?? '';
                         ?>
-                        <input type="text" name="phone" class="wpfnl-phone" id="wpfnl-phone" placeholder="<?php echo $phone_placeholder; ?>" <?php echo 'yes' === $settings['is_required_phone'] ? 'required' : ''; ?>/>
+                        <input type="text" name="phone" class="wpfnl-phone" id="wpfnl-phone" placeholder="<?php echo esc_attr( $phone_placeholder ); ?>" <?php echo 'yes' === $settings['is_required_phone'] ? 'required' : ''; ?>/>
                     </span>
                 </div>
             <?php } ?>
@@ -139,7 +139,7 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
                     <?php if( isset( $settings['field_label'] ) && 'yes' === $settings['field_label'] ){ ?>
                         <label for="wpfnl-web-url">
                             <?php
-                            echo $settings['website_url_label'] ?? __('Website Url','wpfnl');
+                            echo wp_kses_post( $settings['website_url_label'] ?? __('Website Url','wpfnl') );
 
                             if( 'yes' === $settings['required_mark'] && 'yes' === $settings['is_required_website_url'] ){ ?>
                                 <span class="required-mark">*</span>
@@ -155,7 +155,7 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
                         <?php }
                         $weburl_placeholder = $settings['website_url_placeholder'] ?? '';
                         ?>
-                        <input type="text" name="web-url" class="wpfnl-web-url" id="wpfnl-web-url" pattern="(https?://)?.+" size="30" placeholder="<?php echo $weburl_placeholder; ?>" <?php echo 'yes' === $settings['is_required_website_url'] ? 'required' : ''; ?>/>
+                        <input type="text" name="web-url" class="wpfnl-web-url" id="wpfnl-web-url" pattern="(https?://)?.+" size="30" placeholder="<?php echo esc_attr( $weburl_placeholder ); ?>" <?php echo 'yes' === $settings['is_required_website_url'] ? 'required' : ''; ?>/>
                     </span>
                 </div>
             <?php } ?>
@@ -166,7 +166,7 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
                     <?php if( 'yes' === $settings['field_label'] ){ ?>
                         <label for="wpfnl-message">
                             <?php
-                            echo $settings['message_label'] ?? __('Message','wpfnl');
+                            echo wp_kses_post( $settings['message_label'] ?? __('Message','wpfnl') );
 
                             if( isset( $settings['required_mark'], $settings['is_required_message'] ) && 'yes' === $settings['required_mark'] && 'yes' === $settings['is_required_message'] ){ ?>
                                 <span class="required-mark">*</span>
@@ -178,7 +178,7 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
                     ?>
 
                     <span class="input-wrapper">
-                        <textarea name="message" class="wpfnl-message" id="wpfnl-message" cols="30" rows="3" placeholder="<?php echo $message_placeholder; ?>" <?php echo 'yes' === $settings['is_required_message'] ? 'required' : ''; ?> ></textarea>
+                        <textarea name="message" class="wpfnl-message" id="wpfnl-message" cols="30" rows="3" placeholder="<?php echo esc_attr( $message_placeholder ); ?>" <?php echo 'yes' === $settings['is_required_message'] ? 'required' : ''; ?> ></textarea>
                     </span>
                 </div>
             <?php } ?>
@@ -191,7 +191,7 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
                     <label for="wpfnl-acceptance_checkbox-<?php echo esc_attr( $this->get_id() ); ?>">
                         <span class="check-box"></span>
                         <?php
-                        echo $settings['acceptance_checkbox_text'] ?? '';
+                        echo wp_kses_post( $settings['acceptance_checkbox_text'] ?? '' );
 
                         if( isset( $settings['required_mark'], $settings['is_required_acceptance'] ) && 'yes' === $settings['required_mark'] && 'yes' === $settings['is_required_acceptance'] ){
                             echo '<span class="required-mark">*</span>';
@@ -215,7 +215,7 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
                         <label for="wpfnl-registration_checkbox-<?php echo esc_attr( $this->get_id() ); ?>">
                             <span class="check-box"></span>
                             <?php
-                            echo $settings['allow_user_registration_permission_text'] ?? '';
+                            echo wp_kses_post( $settings['allow_user_registration_permission_text'] ?? '' );
                             ?>
                             <span class="required-mark">*</span>
                         </label>
@@ -232,7 +232,7 @@ if( isset( $settings['optin_form_type'] ) && 'clickto-expand-optin' === $setting
             }
             ?>
 
-            <div class="wpfnl-optin-form-group submit align-<?php echo $settings['btn_align'] ?>">
+            <div class="wpfnl-optin-form-group submit align-<?php echo esc_attr( $settings['btn_align'] ); ?>">
                 <button type="submit" <?php echo $this->get_render_attribute_string('button'); ?>>
                     <?php $this->render_text(); ?>
                     <span class="wpfnl-loader"></span>

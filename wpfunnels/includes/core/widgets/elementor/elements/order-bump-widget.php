@@ -284,22 +284,22 @@ class Order_Bump extends Widget_Base
 
             <div class="wpfnl-content-container">
                 <div class="wpfnl-bump-order-offer-content-left">
-                    <img src="<?php echo $settings["order_bump_image"]["url"]; ?>" alt="Order bump image" class="wpfnl-image">
+                    <img src="<?php echo esc_url( $settings["order_bump_image"]["url"] ); ?>" alt="Order bump image" class="wpfnl-image">
                 </div>
 
                 <div class="wpfnl-bump-order-offer-content-right">
                     <div class="wpfnl-bump-order-field-wrap">
                         <label>
                             <input type="checkbox" id="wpfnl-order-bump-cb" data-step="<?php echo get_the_ID(); ?>" class="wpfnl-order-bump-cb" name="wpfnl-order-bump-cb" value="<?php echo $settings["order_bump_product_selector"]; ?>" <?php echo $checker; ?>>
-                            <span class="wpfnl-bump-order-label"><?php echo $settings["order_bump_checkbox_label"]; ?></span>
+                            <span class="wpfnl-bump-order-label"><?php echo wp_kses_post( $settings["order_bump_checkbox_label"] ); ?></span>
                         </label>
                     </div>
 
                     <div class="wpfnl-bump-order-offer-title">
-                        <span class="wpfnl-bump-order-bump-highlight"><?php echo $settings["order_bump_product_detail_header"]; ?></span>
+                        <span class="wpfnl-bump-order-bump-highlight"><?php echo wp_kses_post( $settings["order_bump_product_detail_header"] ); ?></span>
                     </div>
                     <div class="wpfnl-bump-order-desc">
-                        <?php echo $settings["order_bump_product_detail"]; ?>
+                        <?php echo wp_kses_post( $settings["order_bump_product_detail"] ); ?>
                     </div>
                 </div>
             </div>

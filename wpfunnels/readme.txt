@@ -5,7 +5,7 @@ Tags: funnel builder, woocommerce checkout, order bump, woocommerce funnel build
 Requires at least: 6.1
 Tested up to:  7.1
 Requires PHP: 7.4
-Stable tag: 3.13.3
+Stable tag: 3.13.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -576,6 +576,25 @@ The Patchstack team helps validate, triage, and handle any security vulnerabilit
 8. The Visual Funnel Canvas
 
 == Changelog ==
+
+= 3.13.4 (2026-10-13) =
+* New: Redesigned React-based funnel canvas with a horizontal layout, zoom controls, copy and paste of steps, deep links to steps and an expand mode.
+* New: Step settings, thank you step settings, funnel settings (UTM and tracking), upsell and downsell settings, webhooks, A/B testing and analytics now open in drawers inside the canvas.
+* New: Build and edit automations directly in the funnel canvas, with draft saving and Automation Analytics.
+* New: Integrations page for connecting CRM and marketing tools, with a documentation link on each card.
+* New: Order bumps now support variable products and variable subscriptions.
+* Improvement: Global Funnel rules and settings are available in the new canvas.
+* Improvement: Pro upgrade prompts in the Order Bump and Products tabs, and for automations that need Pro.
+* Improvement: Funnel revisions are checked on save to prevent conflicts when a funnel is edited in two places.
+* Improvement: Skeleton loaders for checkout fields, products, order bumps, step templates and the funnel step board.
+* Improvement: Admin pages load on demand with better error handling, and the legacy Vue code has been removed.
+* Vulnerability: Stored Cross Site Scripting (XSS) through block, shortcode and page builder widget attributes.
+* Vulnerability: Escaped output on the Divi opt-in, Divi LMS checkout, Divi next step button and Elementor next step button.
+* Fix: Prices converted twice on funnel checkout with multi-currency plugins, such as WooPayments Multi-Currency.
+* Fix: Checkout rendering twice on funnel steps.
+* Fix: Order bump and testimonial output breaking the checkout HTML structure.
+* Fix: Checkout review order width in RTL layouts.
+* Fix: Template library not recognising the store checkout flag.
 
 = 3.13.3 (2026-09-30) =
 * Improvement: Carts restored by Mail Mint are now kept when the shopper lands on a funnel checkout.

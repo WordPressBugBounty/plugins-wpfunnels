@@ -81,7 +81,8 @@ class Wpfnl_Order_Bump_Action {
 		foreach( $this->ob_settings as $key=>$settings ){
 			if ( $settings['isEnabled'] ) {
 				$in_cart = isset( $settings['product'] ) && $this->is_order_bump_in_cart( $settings['product'] );
-				echo '<input type="hidden" name="_wpfunnels_order_bump_product_'.$key.'" value="'.( $in_cart ? esc_attr( $settings['product'] ) : '' ).'">';
+				// A variable bump sits in the cart as a variation, and the order item is matched on that id.
+				echo '<input type="hidden" name="_wpfunnels_order_bump_product_'.$key.'" value="'.( $in_cart ? esc_attr( $this->get_order_bump_cart_product_id( $settings['product'] ) ) : '' ).'">';
 				echo '<input type="hidden" name="_wpfunnels_order_bump_clicked" value="">';
 			}
 		}
@@ -211,7 +212,8 @@ class Wpfnl_Order_Bump_Action {
 					add_action( 'wpfunnels/after_order_total', [ $this, 'render_order_bump_after_order' ], 10 );
 				}
 				elseif( $position === 'before-order' ) {
-					add_action( 'woocommerce_review_order_before_cart_contents', [ $this, 'render_order_bump_before_order' ], 10 );
+					// Printed right before the review-order table; see review-order.php.
+					add_action( 'wpfunnels/before_order_review_table', [ $this, 'render_order_bump_before_order' ], 10 );
 				}
 				elseif( $position === 'after-customer-details' ) {
 					add_action( 'woocommerce_after_order_notes', [ $this, 'render_order_bump_after_customer_details' ], 10 );
@@ -283,6 +285,37 @@ class Wpfnl_Order_Bump_Action {
      * @return bool
      */
     public function is_order_bump_in_cart( $product_id ) {
+        return false !== $this->find_order_bump_cart_item( $product_id );
+    }
+
+
+    /**
+     * The id the order bump has in the cart: the variation id when a variable
+     * bump was added as a variation, otherwise the configured product id.
+     *
+     * @param int|string $product_id product/variation id stored in the order bump settings
+     *
+     * @return int|string
+     */
+    public function get_order_bump_cart_product_id( $product_id ) {
+        $cart_item = $this->find_order_bump_cart_item( $product_id );
+
+        if ( false === $cart_item ) {
+            return $product_id;
+        }
+
+        return ! empty( $cart_item['variation_id'] ) ? $cart_item['variation_id'] : $cart_item['product_id'];
+    }
+
+
+    /**
+     * Find the cart line an order bump added.
+     *
+     * @param int|string $product_id product/variation id stored in the order bump settings
+     *
+     * @return array|false
+     */
+    private function find_order_bump_cart_item( $product_id ) {
         if ( ! Wpfnl_functions::is_wc_active() || ! WC()->cart ) {
             return false;
         }
@@ -293,7 +326,7 @@ class Wpfnl_Order_Bump_Action {
             }
 
             if ( $cart_item['product_id'] == $product_id || ( ! empty( $cart_item['variation_id'] ) && $cart_item['variation_id'] == $product_id ) ) {
-                return true;
+                return $cart_item;
             }
         }
 

@@ -63,6 +63,10 @@ class Telemetry {
                     'privacy_url'          => 'https://getwpfunnels.com/privacy-policy/',
                     'installed_option_key' => 'wpfunnels_installed_time',
                     'position'             => 'bottom-right',
+                    // Matched against `?page=`. WPFNL_MAIN_PAGE_SLUG is the
+                    // React admin and covers every hash route on it
+                    // (#/integrations among them); the legacy slugs below
+                    // cover the PHP pages they still fall back to.
                     'allowed_screens'      => [
                         WPFNL_MAIN_PAGE_SLUG,
                         WPFNL_FUNNEL_PAGE_SLUG,

@@ -11,7 +11,6 @@ class FoxCurrencySwitcher extends PluginCompatibility{
      * Constructor: Initialize class and hook into price conversion.
      */
     public function init(){
-        add_filter('wpfunnels/modify_order_bump_price_on_main_order', array($this,'maybe_convert_product_price'));
         add_filter('wpfunnels/modify_order_bump_product_price', array($this, 'maybe_convert_order_bump_price'));
         add_filter('wpfunnels/checkout_ajax_custom_price', array($this, 'maybe_skip_custom_price_on_review'), 10, 3);
     }
@@ -50,29 +49,6 @@ class FoxCurrencySwitcher extends PluginCompatibility{
      */
     public function maybe_activate(){
         return class_exists('WOOCS');
-    }
-
-    /**
-     * Convert the price for the order bump using the current currency
-     * 
-     * @param float $price
-     * @return float Converted price
-     */
-    public function maybe_convert_product_price($price){
-        global $WOOCS;
-
-        if ($this->maybe_activate()) {
-            if ($WOOCS->is_multiple_allowed) {
-                $current = $WOOCS->current_currency;
-                if ($current != $WOOCS->default_currency) {
-                    $currencies = $WOOCS->get_currencies();
-                    $rate = $currencies[$current]['rate'];
-                    $price = $price / $rate;
-                }
-            }
-        }
-
-        return $price;
     }
 
     public function maybe_convert_order_bump_price($price){

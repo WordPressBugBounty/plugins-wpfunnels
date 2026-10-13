@@ -27,13 +27,15 @@
             });
         }
 
-        $('.option-selector').on('click', function() {
+        // Delegated: the checkout re-renders the order bump markup on every update_checkout
+        // refresh, which drops any handler bound directly to the checkbox or the selector.
+        $(document).on('click', '.option-selector', function() {
             var modalId = '#ob-modal-' + $(this).attr('id').replace('option-selector-', '');
             $(modalId).show();
             init_custom_gallery();
         });
 
-        $('.ob-close').on('click', function() {
+        $(document).on('click', '.ob-close', function() {
             $(this).closest('.ob-modal').hide();
         });
 
@@ -43,7 +45,7 @@
             }
         });
 
-        $('.variations_form').on('show_variation', function (event, variation) {
+        $(document).on('show_variation', '.variations_form', function (event, variation) {
             var $product = $(this).closest('.product');
             var $price = $product.find('.price');
             if (variation.price_html) {
@@ -59,7 +61,7 @@
             }
         });
 
-        $('.variations_form').on('hide_variation', function (event) {
+        $(document).on('hide_variation', '.variations_form', function (event) {
             var $product = $(this).closest('.product');
             var $price = $product.find('.price');
             var $regular_price = $product.data('regular-price');
@@ -69,7 +71,7 @@
             $(this).find('.single_add_to_cart_button').addClass('disabled');
         });
 
-        $('.single_add_to_cart_button').on('click', function (e) {
+        $(document).on('click', '.ob-modal .single_add_to_cart_button', function (e) {
             e.preventDefault();
             if ($(this).hasClass('disabled')) {
                 return;
@@ -79,12 +81,16 @@
             
             // Don't post to WooCommerce - let the order bump handler do the cart management
             // Just close modal and trigger the order bump change event
-            var key = $this.closest('.ob-modal').attr('id').replace('ob-modal-', '');
+            var key = $this.closest('.ob-modal').attr('data-key');
             $form.closest('.ob-modal').hide();
-            $('#wpfnl-order-bump-cb-' + key).prop('checked', true).trigger('change');
+
+            // The same bump can be on the page more than once, and not every style gives its
+            // checkbox the same id, so find it by key. The change handler keeps the copies in sync.
+            // If the bump is already in the cart this swaps it for the newly chosen variation.
+            $('.wpfnl-order-bump-cb[data-key="' + key + '"]').prop('checked', true).first().trigger('change');
         });
 
-        $('.wpfnl-order-bump-cb').on('click', function(e) {
+        $(document).on('click', '.wpfnl-order-bump-cb', function(e) {
             var $this = $(this);
             if ($this.data('is-variable') && $this.is(':checked')) {
                 e.preventDefault();

@@ -86,6 +86,12 @@ class SpecialOccasionBanner
     public function display_banner()
     {
         $screen                     = get_current_screen();
+        // Legacy screen ids only. The React admin (`toplevel_page_wpfunnels`,
+        // which serves #/funnels, #/integrations and the other routes) drops
+        // every admin notice before render — see
+        // Wpfnl_Menus::remove_notices_from_react_admin() — so it cannot carry
+        // this banner. `wpfunnels_page_wpfunnels_integrations` stays for the
+        // legacy Integrations page (opt-out, older Pro).
         $promotional_notice_pages   = ['dashboard', 'plugins', 'wpfunnels_page_store_checkout','wpfunnels_page_wp_funnels', 'wpfunnels_page_wpfunnels_integrations', 'wpfunnels_page_wpfnl_automations', 'wpfunnels_page_edit_funnel', 'wpfunnels_page_wpfnl_settings'];
         $current_date_time          = current_time('timestamp');
 

@@ -1069,10 +1069,10 @@ class Step_Pointer extends Widget_Base
 			?>
 			<div <?php echo $this->get_render_attribute_string('wrapper'); ?>>
 				<a href="#"  
-				   data-button-type="<?php echo $settings['button_type_selector']; ?>"  
-				   data-url="<?php echo $url; ?>"  
+				   data-button-type="<?php echo esc_attr( $settings['button_type_selector'] ); ?>"  
+				   data-url="<?php echo esc_attr( $url ); ?>"  
 				   data-id="<?php echo get_the_ID(); ?>" 
-				   data-products="<?php echo $products; ?>"
+				   data-products="<?php echo esc_attr( $products ); ?>"
 				   id="wpfunnels_next_step_controller"
 				   style="cursor: pointer;" 
 				   <?php echo $this->get_render_attribute_string('button'); ?> 
@@ -1164,7 +1164,7 @@ class Step_Pointer extends Widget_Base
 			<?php endif; ?>
 
             <span <?php echo $this->get_render_attribute_string('text'); ?>>
-				<?php echo $settings['text']; ?>
+				<?php echo wp_kses_post( $settings['text'] ); ?>
 			</span>
         </span>
 		<?php

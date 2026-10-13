@@ -1294,7 +1294,7 @@ class Wpfnl_Public
 				array(
 					'id'    => 'edit-funnel',
 					'title' => '<span class="ab-icon dashicons dashicons-edit"></span>' . esc_html__('Edit Funnel', 'wpfnl'),
-					'href'  => admin_url("admin.php?page=edit_funnel&id={$funnel_id}&step_id=0"),
+					'href'  => \WPFunnels\Wpfnl_functions::get_funnel_edit_url($funnel_id),
 					'meta'  => array(
 						'class' => 'wpf-admin-bar-edit-funnel-menu-item',
 					),
@@ -1369,7 +1369,7 @@ class Wpfnl_Public
 				foreach ( $order_bump_settings as $key => $settings ) {
 					if ( isset( $settings['product'] ) ) {
 						$product = wc_get_product( $settings['product'] );
-						if ( $product && $product->is_type( 'variable' ) ) {
+						if ( $product && $product->is_type( array( 'variable', 'variable-subscription' ) ) ) {
 							wc_get_template(
 								'variable-product-modal.php',
 								array(

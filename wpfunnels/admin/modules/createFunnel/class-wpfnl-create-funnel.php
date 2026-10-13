@@ -86,13 +86,7 @@ class Module extends Wpfnl_Admin_Module
             $templateLayout->save_funnel_data();
         }
         
-        $link = add_query_arg(
-            [
-                'page' => 'edit_funnel',
-                'id' => $funnel_id,
-            ],
-            admin_url('admin.php')
-        );
+        $link = \WPFunnels\Wpfnl_functions::get_funnel_edit_url( $funnel_id );
 
         do_action('wpfunnels_after_funnel_created', $funnel_id, $funnel_type);
 

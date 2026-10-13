@@ -11,6 +11,8 @@ use WPFunnels\Wpfnl_functions;
  * WordPress page with the screen in the hash, so a plain `page` would only
  * reach the dashboard. The entries without one are still their own page.
  */
+$wpfnl_react_integrations = \WPFunnels\Menu\Wpfnl_Menus::should_use_react_integrations();
+
 $nav_menus = apply_filters('wpfnl_dashboard_nav_lists', [
 		'dashboard' => [
 			'title' => __('Dashboard', 'wpfnl'),
@@ -33,10 +35,13 @@ $nav_menus = apply_filters('wpfnl_dashboard_nav_lists', [
             'icon'  => 'automations-icon',
             'page'  => WPFNL_AUTOMATIONS_SLUG,
         ],
+        // A route of the React admin unless should_use_react_integrations()
+        // keeps the PHP page (legacy addon, a Pro without REST, the opt-out).
         'integrations' => [
             'title' => __('Integrations', 'wpfnl'),
             'icon'  => 'settings-icon-2x',
-            'page'  => WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG,
+            'page'  => $wpfnl_react_integrations ? WPFNL_MAIN_PAGE_SLUG : WPFNL_INTEGRATIONS_MAIN_PAGE_SLUG,
+            'route' => $wpfnl_react_integrations ? '#/integrations' : '',
         ],
         'templates' => [
             'title' => __('Templates', 'wpfnl'),
@@ -87,6 +92,7 @@ $nav_menus = apply_filters('wpfnl_dashboard_nav_lists', [
 </ul>
 
 <!-- Header action group (Knowledge Base, AI Assistant, Settings, Upgrade).
-     Rendered by admin/src/global-ai-drawer/HeaderActions.vue so every page
-     that includes this nav gets the same right-hand controls. -->
+     Rendered by the wpfnl-header-actions bundle (src/header-actions/), the
+     React admin's own HeaderActions, so every page that includes this nav gets
+     the same right-hand controls as the React admin. -->
 <div id="wpfnl-header-actions" class="wpfnl-dashboard__nav-right"></div>

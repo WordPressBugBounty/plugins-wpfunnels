@@ -66,7 +66,7 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
     public function import_funnel($args = [])
     {
         $is_pro             = apply_filters( 'wpfunnels/is_pro_license_activated', false );
-        $is_store_checkout  = isset( $args['is_store_checkout'] ) && $args['is_store_checkout'] === 'true';
+        $is_store_checkout  = isset( $args['is_store_checkout'] ) && filter_var( $args['is_store_checkout'], FILTER_VALIDATE_BOOLEAN );
 
         if ( ! $is_pro ) {
             if ( $is_store_checkout ) {

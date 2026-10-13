@@ -599,7 +599,7 @@ class WPFNL_Next_Step_Button extends ET_Builder_Module {
 
 		$data_url = sprintf(
 			'data-url="%1$s"',
-			$args['data_url']
+			esc_attr( $args['data_url'] )
 		);
 
 		$data_button_type = sprintf(

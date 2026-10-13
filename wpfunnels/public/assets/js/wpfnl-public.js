@@ -1161,12 +1161,6 @@
                 specificLabel.text('Add');
             }
 
-            if (checker) {
-                $("input[name='_wpfunnels_order_bump_product_" + key + "']").val(product)
-            } else {
-                $("input[name='_wpfunnels_order_bump_product_" + key + "']").val('')
-            }
-
             $("input[name='_wpfunnels_order_bump_clicked']").val('yes')
             $('.wpfnl-order-bump-cb').each(function() {
                 $(this).prop('disabled', true);
@@ -1179,8 +1173,10 @@
             let variation_id = '';
             let variation_data = {};
 
-            // Find variation form within the modal for this product
-            var $variationForm = $('.variations_form[data-product_id="' + product + '"]');
+            // Only adding needs the variation. Removing the bump is matched on the configured product,
+            // and the modal may still hold a variation the customer looked at but never added.
+            // Look inside this bump's own modal: bumps can share a parent product.
+            var $variationForm = checker ? $('#ob-modal-' + key + ' .variations_form').first() : $();
             if ($variationForm.length) {
                 variation_id = $variationForm.find('input[name="variation_id"]').val();
 
@@ -1193,6 +1189,10 @@
                     }
                 });
             }
+
+            // The order item is matched on this value when the order is placed, and a variable
+            // bump is in the cart as a variation, not as the product that was configured.
+            $("input[name='_wpfunnels_order_bump_product_" + key + "']").val(checker ? (variation_id || product) : '')
 
             jQuery.ajax({
                 type: 'POST',
@@ -1281,6 +1281,22 @@
                     .css('top', '-' + inner_height + 'px')
 
                     $('.wpfnl-place-order').removeClass('wpfnl-place-order-add-overlay')
+                },
+                error: function (xhr) {
+                    // The server refused the change (e.g. no variation chosen or it is unavailable):
+                    // put the checkbox back to what the cart still holds and let the customer try again.
+                    $('.oderbump-loader').css('display', 'none')
+                    $('.wpfnl-order-bump-cb[data-key="' + key + '"]').prop('checked', !checker)
+                    $("input[name='_wpfunnels_order_bump_product_" + key + "']").val(checker ? '' : product)
+                    specificLabel.text(checker ? 'Add' : 'Remove')
+                    $('.wpfnl-order-bump-cb').each(function() {
+                        $(this).prop('disabled', false);
+                    });
+
+                    var message = xhr && xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message
+                    if (message) {
+                        window.alert(message)
+                    }
                 },
             })
         })

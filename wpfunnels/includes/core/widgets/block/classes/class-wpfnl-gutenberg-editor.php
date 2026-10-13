@@ -6,7 +6,6 @@
  */
 namespace WPFunnels\Widgets\Gutenberg;
 
-use WPFunnels\Meta\Wpfnl_Default_Meta;
 use WPFunnels\Traits\SingletonTrait;
 use WPFunnels\Wpfnl;
 use WPFunnels\Wpfnl_functions;
@@ -73,9 +72,14 @@ class Wpfnl_Gutenberg_Editor {
 		$frontend = Wpfnl::get_instance()->frontend;
 		add_filter('woocommerce_locate_template', array( $frontend, 'wpfunnels_woocommerce_locate_template' ), 20, 3);
 
-		$default_settings	= Wpfnl_Default_Meta::get_default_order_bump_meta();
-		$ob_data 			= isset( $post_data['order_bump_data'] ) ? $post_data['order_bump_data'] : $default_settings;
-		$ob_settings 		= $this->get_order_bump_settings_for_preview( $checkout_id, $ob_data );
+		// Some preview requests (e.g. a layout or floating label change) carry no order bump
+		// data. Render the saved settings then, instead of saving the empty defaults over them.
+		if ( empty( $post_data['order_bump_data'] ) ) {
+			do_action( 'wpfunnels/gb_render_order_bump_ajax', $checkout_id, Wpfnl_functions::get_ob_settings( $checkout_id ) );
+			return;
+		}
+
+		$ob_settings = $this->get_order_bump_settings_for_preview( $checkout_id, $post_data['order_bump_data'] );
 
 		update_post_meta($checkout_id, 'order-bump-settings', $ob_settings);
 		do_action('wpfunnels/gb_render_order_bump_ajax', $checkout_id, $ob_settings );

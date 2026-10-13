@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInita14973293b5863f9d3b8001f6878625f
+class ComposerStaticInit7cb0f1d0031a983d940736bc13bd8fe1
 {
     public static $files = array (
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
@@ -15,16 +15,16 @@ class ComposerStaticInita14973293b5863f9d3b8001f6878625f
     );
 
     public static $prefixLengthsPsr4 = array (
-        'c' =>
+        'c' => 
         array (
             'cweagans\\Composer\\' => 18,
         ),
-        'W' =>
+        'W' => 
         array (
             'WP\\McpSchema\\' => 13,
             'WP\\MCP\\' => 7,
         ),
-        'S' =>
+        'S' => 
         array (
             'Symfony\\Component\\Process\\' => 26,
             'Spatie\\TemporaryDirectory\\' => 26,
@@ -32,14 +32,14 @@ class ComposerStaticInita14973293b5863f9d3b8001f6878625f
             'Spatie\\ImageOptimizer\\' => 22,
             'Spatie\\Browsershot\\' => 19,
         ),
-        'P' =>
+        'P' => 
         array (
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
             'PostHog\\' => 8,
             'PhilipNewcomer\\WP_Ajax_Helper\\' => 30,
         ),
-        'L' =>
+        'L' => 
         array (
             'LinnoSDK\\Telemetry\\' => 19,
             'League\\MimeTypeDetection\\' => 25,
@@ -47,99 +47,99 @@ class ComposerStaticInita14973293b5863f9d3b8001f6878625f
             'League\\Flysystem\\Local\\' => 23,
             'League\\Flysystem\\' => 17,
         ),
-        'I' =>
+        'I' => 
         array (
             'Intervention\\Image\\' => 19,
         ),
-        'G' =>
+        'G' => 
         array (
             'GuzzleHttp\\Psr7\\' => 16,
         ),
-        'A' =>
+        'A' => 
         array (
             'Appsero\\' => 8,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'cweagans\\Composer\\' =>
+        'cweagans\\Composer\\' => 
         array (
             0 => __DIR__ . '/..' . '/cweagans/composer-patches/src',
         ),
-        'WP\\McpSchema\\' =>
+        'WP\\McpSchema\\' => 
         array (
             0 => __DIR__ . '/..' . '/wordpress/php-mcp-schema/src',
         ),
-        'WP\\MCP\\' =>
+        'WP\\MCP\\' => 
         array (
             0 => __DIR__ . '/..' . '/wordpress/mcp-adapter/includes',
         ),
-        'Symfony\\Component\\Process\\' =>
+        'Symfony\\Component\\Process\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/process',
         ),
-        'Spatie\\TemporaryDirectory\\' =>
+        'Spatie\\TemporaryDirectory\\' => 
         array (
             0 => __DIR__ . '/..' . '/spatie/temporary-directory/src',
         ),
-        'Spatie\\Image\\' =>
+        'Spatie\\Image\\' => 
         array (
             0 => __DIR__ . '/..' . '/spatie/image/src',
         ),
-        'Spatie\\ImageOptimizer\\' =>
+        'Spatie\\ImageOptimizer\\' => 
         array (
             0 => __DIR__ . '/..' . '/spatie/image-optimizer/src',
         ),
-        'Spatie\\Browsershot\\' =>
+        'Spatie\\Browsershot\\' => 
         array (
             0 => __DIR__ . '/..' . '/spatie/browsershot/src',
         ),
-        'Psr\\Log\\' =>
+        'Psr\\Log\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/log/src',
         ),
-        'Psr\\Http\\Message\\' =>
+        'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
-        'PostHog\\' =>
+        'PostHog\\' => 
         array (
             0 => __DIR__ . '/..' . '/posthog/posthog-php/lib',
         ),
-        'PhilipNewcomer\\WP_Ajax_Helper\\' =>
+        'PhilipNewcomer\\WP_Ajax_Helper\\' => 
         array (
             0 => __DIR__ . '/..' . '/philipnewcomer/wp-ajax-helper/src/components',
         ),
-        'LinnoSDK\\Telemetry\\' =>
+        'LinnoSDK\\Telemetry\\' => 
         array (
             0 => __DIR__ . '/..' . '/linno/telemetry/src',
         ),
-        'League\\MimeTypeDetection\\' =>
+        'League\\MimeTypeDetection\\' => 
         array (
             0 => __DIR__ . '/..' . '/league/mime-type-detection/src',
         ),
-        'League\\Glide\\' =>
+        'League\\Glide\\' => 
         array (
             0 => __DIR__ . '/..' . '/league/glide/src',
         ),
-        'League\\Flysystem\\Local\\' =>
+        'League\\Flysystem\\Local\\' => 
         array (
             0 => __DIR__ . '/..' . '/league/flysystem-local',
         ),
-        'League\\Flysystem\\' =>
+        'League\\Flysystem\\' => 
         array (
             0 => __DIR__ . '/..' . '/league/flysystem/src',
         ),
-        'Intervention\\Image\\' =>
+        'Intervention\\Image\\' => 
         array (
             0 => __DIR__ . '/..' . '/intervention/image/src/Intervention/Image',
         ),
-        'GuzzleHttp\\Psr7\\' =>
+        'GuzzleHttp\\Psr7\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
-        'Appsero\\' =>
+        'Appsero\\' => 
         array (
             0 => __DIR__ . '/..' . '/appsero/client/src',
         ),
@@ -150,8 +150,6 @@ class ComposerStaticInita14973293b5863f9d3b8001f6878625f
         'Appsero\\Insights' => __DIR__ . '/..' . '/appsero/client/src/Insights.php',
         'Appsero\\License' => __DIR__ . '/..' . '/appsero/client/src/License.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'Flatted' => __DIR__ . '/../..' . '/includes/core/widgets/block/node_modules/flatted/php/flatted.php',
-        'FlattedString' => __DIR__ . '/../..' . '/includes/core/widgets/block/node_modules/flatted/php/flatted.php',
         'GuzzleHttp\\Psr7\\AppendStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/AppendStream.php',
         'GuzzleHttp\\Psr7\\BufferStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/BufferStream.php',
         'GuzzleHttp\\Psr7\\CachingStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/CachingStream.php',
@@ -682,6 +680,7 @@ class ComposerStaticInita14973293b5863f9d3b8001f6878625f
         'WPFunnels\\Rest\\Controllers\\FunnelListController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/FunnelListController.php',
         'WPFunnels\\Rest\\Controllers\\GutenbergCSSController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-gutenberg-css-controller.php',
         'WPFunnels\\Rest\\Controllers\\ImportExportController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/ImportExportController.php',
+        'WPFunnels\\Rest\\Controllers\\IntegrationsPageController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-integrations-controller.php',
         'WPFunnels\\Rest\\Controllers\\McpSettingsController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/McpSettingsController.php',
         'WPFunnels\\Rest\\Controllers\\OfferController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/OfferController.php',
         'WPFunnels\\Rest\\Controllers\\OrderBumpController' => __DIR__ . '/../..' . '/includes/core/rest-api/Controllers/class-orderbump-controller.php',
@@ -1068,9 +1067,9 @@ class ComposerStaticInita14973293b5863f9d3b8001f6878625f
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInita14973293b5863f9d3b8001f6878625f::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInita14973293b5863f9d3b8001f6878625f::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInita14973293b5863f9d3b8001f6878625f::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit7cb0f1d0031a983d940736bc13bd8fe1::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit7cb0f1d0031a983d940736bc13bd8fe1::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit7cb0f1d0031a983d940736bc13bd8fe1::$classMap;
 
         }, null, ClassLoader::class);
     }

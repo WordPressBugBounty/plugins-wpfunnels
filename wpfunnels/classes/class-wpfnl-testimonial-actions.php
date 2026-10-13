@@ -149,7 +149,7 @@ class Wpfnl_Testimonial_Action {
 		if ( 'after_bump' === $position ) {
 			add_action( 'wpfunnels/after_order_total', array( $this, 'render' ), 20 );
 		} elseif ( 'before_bump' === $position ) {
-			add_action( 'woocommerce_review_order_before_cart_contents', array( $this, 'render' ), 20 );
+			add_action( 'wpfunnels/before_order_review_table', array( $this, 'render' ), 20 );
 		} elseif ( 'above_form' === $position ) {
 			add_action( 'woocommerce_before_checkout_form', array( $this, 'render' ), 20 );
 		} elseif ( 'below_form' === $position ) {

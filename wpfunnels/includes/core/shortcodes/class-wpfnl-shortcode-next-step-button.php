@@ -137,7 +137,7 @@ class Wpfnl_Shortcode_NextStepButton {
 
 			// Button Text with optional icon
 			$btn_text = isset($this->attributes['btn_text']) && $this->attributes['btn_text'] ? esc_html($this->attributes['btn_text']) : 'Get Now';
-			$icon = isset($this->attributes['icon']) ? $this->attributes['icon'] : '';
+			$icon = isset($this->attributes['icon']) ? wp_kses_post($this->attributes['icon']) : '';
 			$icon_position = isset($this->attributes['icon_position']) ? $this->attributes['icon_position'] : 'before';
 
 			$button_label = '';
@@ -159,10 +159,10 @@ class Wpfnl_Shortcode_NextStepButton {
 			data-id="' . get_the_ID() . '" 
 			data-products="' . esc_attr($products) . '" 
 			id="' . esc_attr(!empty($this->attributes['custom_id']) ? $this->attributes['custom_id'] : 'wpfunnels_next_step_controller') . '"
-			style="' . $style . '" 
+			style="' . esc_attr($style) . '" 
 			class="' . esc_attr($this->attributes['class']) . ' next-step-button btn-default" 
 			target="' . esc_attr($this->attributes['target']) . '"'
-				. (!empty($this->attributes['custom_attrs']) ? ' ' . $this->attributes['custom_attrs'] : '') . '>';
+				. $this->get_custom_attributes_html() . '>';
 
 			$html .= $button_label;
 
@@ -173,5 +173,33 @@ class Wpfnl_Shortcode_NextStepButton {
 			return $html;
 		}
 		return false;
+	}
+
+
+	/**
+	 * Build the extra HTML attributes passed through `custom_attrs`.
+	 *
+	 * Shortcode attributes are author-supplied, so only `data-*` and `aria-*`
+	 * attributes (plus a few harmless ones) are kept and every value is escaped.
+	 * Event handlers such as `onclick` are dropped.
+	 *
+	 * @return string Leading-space separated attribute string, or an empty string.
+	 * @since 3.13.4
+	 */
+	protected function get_custom_attributes_html() {
+		if (empty($this->attributes['custom_attrs']) || !is_string($this->attributes['custom_attrs'])) {
+			return '';
+		}
+
+		$allowed = array('title', 'rel', 'role', 'tabindex');
+		$html    = '';
+		foreach (wp_kses_hair($this->attributes['custom_attrs'], wp_allowed_protocols()) as $attr) {
+			$name = strtolower($attr['name']);
+			if (!in_array($name, $allowed, true) && !preg_match('/^(data|aria)-[a-z0-9_-]+$/', $name)) {
+				continue;
+			}
+			$html .= ' ' . $name . '="' . esc_attr($attr['value']) . '"';
+		}
+		return $html;
 	}
 }

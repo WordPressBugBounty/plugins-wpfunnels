@@ -369,12 +369,6 @@ class MCPHelper {
 	 * @return string
 	 */
 	public static function canvasUrl( $funnel_id ) {
-		return add_query_arg(
-			[
-				'page' => 'edit_funnel',
-				'id'   => (int) $funnel_id,
-			],
-			admin_url( 'admin.php' )
-		);
+		return \WPFunnels\Wpfnl_functions::get_funnel_edit_url( (int) $funnel_id );
 	}
 }

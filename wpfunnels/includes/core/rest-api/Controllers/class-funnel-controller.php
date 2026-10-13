@@ -750,8 +750,79 @@ class FunnelController extends Wpfnl_REST_Controller
 			$migration->update_funnel_data($funnel_id, $funnel_data);
 			update_post_meta($funnel_id, 'wpfnls_is_newui_migrated', 'yes');
 		}
+		$this->reconcile_derived_step_meta($funnel_id);
 		$response = $this->prepare_funnel_data_response($funnel_id);
+		// What saveFunnel checks before it overwrites the graph.
+		$response['revision'] = self::get_funnel_revision($funnel_id);
 		return $this->prepare_item_for_response($response, $request);
+	}
+
+
+	/**
+	 * Revision of a funnel's stored graph: a hash of `_funnel_data`.
+	 *
+	 * Every save posts the whole graph, so two editors (two tabs, two people,
+	 * or a canvas left open while an import, MCP call or A/B swap rewrites the
+	 * graph) would overwrite each other's steps. A hash rather than a counter
+	 * changes whoever writes the meta, so no writer has to remember to bump it.
+	 *
+	 * @param int $funnel_id Funnel ID.
+	 *
+	 * @return string Revision.
+	 * @since 3.13.8
+	 */
+	public static function get_funnel_revision($funnel_id)
+	{
+		return md5(maybe_serialize(get_post_meta($funnel_id, '_funnel_data', true)));
+	}
+
+
+	/**
+	 * Rebuild `_steps`, `_steps_order` and the first step from the stored graph
+	 * when they have drifted from it.
+	 *
+	 * The classic canvas saved the graph every time it opened, which rebuilt
+	 * these; the React canvas only saves after an edit. Funnels changed by an
+	 * import, MCP or an A/B swap would otherwise keep a stale `_steps_order`,
+	 * which gateways and A/B testing read on the front end. Writes only when
+	 * something differs, so an unchanged funnel costs no write.
+	 *
+	 * @param int $funnel_id Funnel ID.
+	 *
+	 * @return bool Whether anything was rewritten.
+	 * @since 3.13.8
+	 */
+	private function reconcile_derived_step_meta($funnel_id)
+	{
+		if ('yes' !== get_post_meta($funnel_id, 'wpfnls_is_newui_migrated', true)) {
+			return false;
+		}
+
+		$funnel_data = get_post_meta($funnel_id, '_funnel_data', true);
+
+		// An empty or scratch funnel has nothing to derive from; leave it alone.
+		if (empty($funnel_data['drawflow']['Home']['data']) || !is_array($funnel_data['drawflow']['Home']['data'])) {
+			return false;
+		}
+
+		$changed = false;
+		$steps   = $this->get_steps($funnel_data);
+
+		if ($steps != get_post_meta($funnel_id, '_steps', true)) {
+			update_post_meta($funnel_id, '_steps', $steps);
+			Wpfnl_functions::generate_first_step($funnel_id, $steps);
+			$changed = true;
+		}
+
+		// As save_funnel_data stores it: empty entries dropped.
+		$steps_order = array_values(array_filter($this->get_steps_order($funnel_data), 'count'));
+
+		if (count($steps_order) && $steps_order != get_post_meta($funnel_id, '_steps_order', true)) {
+			update_post_meta($funnel_id, '_steps_order', $steps_order);
+			$changed = true;
+		}
+
+		return $changed;
 	}
 
 
@@ -1181,6 +1252,8 @@ class FunnelController extends Wpfnl_REST_Controller
 			}
 
 			$_temp_step['should_assign_product'] = $should_assign_product;
+			// The Mail Mint automation linked to this step, so the canvas can open it.
+			$_temp_step['mint_automation_id'] = (int) get_post_meta( $step_id, 'wpfnl_mint_automation_id', true );
 
 			/**
 			 * Fires to add Mail Mint automation data
@@ -1460,6 +1533,25 @@ class FunnelController extends Wpfnl_REST_Controller
 		$_steps = [];
 		$response = ['success' => true, 'link' => home_url()];
 
+		/*
+		 * The revision the graph was read at (getFunnel / the last save). When
+		 * the stored graph has changed since, this save would drop whatever
+		 * changed it, so it is refused; the editor reloads and redoes its edit.
+		 * Without one (the classic canvas, older callers) nothing is checked.
+		 */
+		$base_revision = isset($request['revision']) ? sanitize_text_field($request['revision']) : '';
+
+		if ($funnel_id && '' !== $base_revision && self::get_funnel_revision($funnel_id) !== $base_revision) {
+			return new WP_Error(
+				'wpfunnels_funnel_conflict',
+				__('This funnel was changed somewhere else (another tab, another user or an import) since it was opened. The canvas now shows the latest version; please make your last change again.', 'wpfnl'),
+				array(
+					'status'   => 409,
+					'revision' => self::get_funnel_revision($funnel_id),
+				)
+			);
+		}
+
 		if ($funnel_json) {
 			$funnel_data = $funnel_json;
 			$steps = $funnel_data['drawflow']['Home']['data'];
@@ -1562,6 +1654,9 @@ class FunnelController extends Wpfnl_REST_Controller
 		Wpfnl_functions::generate_first_step($funnel_id);
 
 		do_action( 'wpfunnels_canvas_saved', absint( $funnel_id ) );
+
+		// Read after the hooks above, which may rewrite the graph themselves.
+		$response['revision'] = self::get_funnel_revision($funnel_id);
 
 		return rest_ensure_response($response);
 	}
@@ -1842,10 +1937,10 @@ class FunnelController extends Wpfnl_REST_Controller
 			return rest_ensure_response($response);
 		}
 
-		$is_gbf = get_post_meta($funnel_id, 'is_global_funnel', true);
+		$is_gbf   = get_post_meta($funnel_id, 'is_global_funnel', true);
+		$step_ids = array();
 		if ('yes' === $is_gbf) {
 			$start_condition = get_post_meta($funnel_id, 'global_funnel_start_condition', true);
-			$step_ids = array();
 			foreach ($steps as $step) {
 				if ($step['step_type'] == 'checkout') {
 					if (!empty($start_condition)) {
@@ -1864,9 +1959,12 @@ class FunnelController extends Wpfnl_REST_Controller
 				}
 			}
 		}
+		// The steps whose Global Funnel rules are set — the ones the canvas tags
+		// as having products. Fixed: the ids were collected and then dropped,
+		// so every Global Funnel card read "Add Product".
 		$response = array(
-			'success' => false,
-			'data' => []
+			'success' => 'yes' === $is_gbf,
+			'data'    => array_map('absint', $step_ids),
 		);
 		return rest_ensure_response($response);
 	}

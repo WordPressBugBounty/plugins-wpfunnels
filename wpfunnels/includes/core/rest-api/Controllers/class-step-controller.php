@@ -116,6 +116,25 @@ class StepController extends Wpfnl_REST_Controller
 
         register_rest_route(
             $this->namespace,
+            '/' . $this->rest_base . '/(?P<step_id>\d+)/thankyou-settings',
+            array(
+                array(
+                    'methods'             => \WP_REST_Server::CREATABLE,
+                    'callback'            => array( $this, 'update_thankyou_settings' ),
+                    'permission_callback' => array( $this, 'update_items_permissions_check' ),
+                    'args'                => array(
+                        'step_id' => array(
+                            'required'          => true,
+                            'type'              => 'integer',
+                            'sanitize_callback' => 'absint',
+                        ),
+                    ),
+                ),
+            )
+        );
+
+        register_rest_route(
+            $this->namespace,
             '/' . $this->rest_base . '/create-step',
             array(
                 array(
@@ -261,6 +280,53 @@ class StepController extends Wpfnl_REST_Controller
             )
         );
     }
+
+    /**
+     * Save a thank you step's settings.
+     *
+     * The REST twin of the `update-thankyou-settings` admin-ajax action the
+     * classic drawer posts to, running the same module method. Unlike that
+     * action it takes only the thank you settings: the module saves whatever
+     * key it is given under the `_wpfnl_thankyou_` prefix.
+     *
+     * @param WP_REST_Request $request Request.
+     *
+     * @return WP_REST_Response|WP_Error
+     * @since 3.13.8
+     */
+    public function update_thankyou_settings( $request )
+    {
+        $step_id = absint( $request['step_id'] );
+
+        if ( 'thankyou' !== get_post_meta( $step_id, '_step_type', true ) ) {
+            return new WP_Error(
+                'rest_invalid_step',
+                __( 'Not a thank you step.', 'wpfnl' ),
+                array( 'status' => 400 )
+            );
+        }
+
+        $payload = array( 'step_id' => $step_id );
+
+        foreach ( array( 'order_overview', 'order_details', 'billing_details', 'shipping_details', 'is_custom_redirect', 'is_direct_redirect' ) as $key ) {
+            if ( null !== $request->get_param( $key ) ) {
+                $payload[ $key ] = 'on' === $request->get_param( $key ) ? 'on' : 'off';
+            }
+        }
+
+        if ( null !== $request->get_param( 'set_time' ) ) {
+            $payload['set_time'] = sanitize_text_field( (string) $request->get_param( 'set_time' ) );
+        }
+
+        if ( null !== $request->get_param( 'custom_redirect_url' ) ) {
+            $payload['custom_redirect_url'] = esc_url_raw( (string) $request->get_param( 'custom_redirect_url' ) );
+        }
+
+        return rest_ensure_response(
+            \WPFunnels\Admin\Modules\Steps\Thankyou\Module::instance()->update_settings( $payload )
+        );
+    }
+
 
     /**
      * Responsible to create a single step of funnels

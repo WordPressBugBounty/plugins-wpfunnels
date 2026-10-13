@@ -80,7 +80,7 @@ if( $type === 'lms' ){
 
         <span class="wpfnl-checkbox">
             <?php 
-                $isVariable = !empty($settings['isVariable']) ? $settings['isVariable'] : false; 
+                $isVariable = \WPFunnels\Wpfnl_functions::is_variable_order_bump( $settings ); 
             ?>
             <input type="checkbox" id="wpfnl-order-bump-cb-<?php echo $key . ( $this->render_instance ? '-' . $this->render_instance : '' ); ?>" data-quantity="<?php echo $settings['quantity']; ?>"
                    data-step="<?php echo get_the_ID(); ?>" class="wpfnl-order-bump-cb" name="wpfnl-order-bump-cb-<?php echo $key ?>"

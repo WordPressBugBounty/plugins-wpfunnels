@@ -51,7 +51,7 @@ abstract class Wpfnl_Source_Base
         $imported_steps = isset($payload['importedSteps']) ? $payload['importedSteps'] : [];
         
         // Check if this is a Store Checkout funnel - check both payload flag AND funnel meta
-        $is_store_checkout_flag = isset($payload['is_store_checkout']) && $payload['is_store_checkout'] == 'true';
+        $is_store_checkout_flag = isset($payload['is_store_checkout']) && filter_var($payload['is_store_checkout'], FILTER_VALIDATE_BOOLEAN);
         $funnel_type = get_post_meta($payload['funnelID'], '_wpfnl_funnel_type', true);
         $is_store_checkout = $is_store_checkout_flag && ($funnel_type === 'store_checkout');
         // For Store Checkout, get all steps and filter to only checkout and thankyou
@@ -139,14 +139,7 @@ abstract class Wpfnl_Source_Base
 			update_post_meta($payload['funnelID'],'_funnel_data', $funnel_data);
 		}
 
-        $redirect_link = add_query_arg(
-            [
-                'page'      => WPFNL_EDIT_FUNNEL_SLUG,
-                'id'        => $payload['funnelID'],
-                'step_id'   => $funnel->get_first_step_id(),
-            ],
-            admin_url('admin.php')
-        );
+        $redirect_link = \WPFunnels\Wpfnl_functions::get_funnel_edit_url( $payload['funnelID'] );
 
         // Flush rewrite rules so newly created funnel/step permalinks resolve immediately.
         flush_rewrite_rules();
@@ -544,14 +537,7 @@ abstract class Wpfnl_Source_Base
      */
     public function after_step_creation($payload)
     {
-        $redirect_link = add_query_arg(
-            [
-                'page'      => WPFNL_EDIT_FUNNEL_SLUG,
-                'id'        => $payload['funnelID'],
-                'step_id'   => $payload['stepID'],
-            ],
-            admin_url('admin.php')
-        );
+        $redirect_link = \WPFunnels\Wpfnl_functions::get_funnel_edit_url( $payload['funnelID'] );
         return [
             'success'       => true,
             'redirectLink'  => $redirect_link,

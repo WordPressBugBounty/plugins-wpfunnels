@@ -14,16 +14,6 @@ class SetupWizard
 {
     use SingletonTrait;
 
-
-    public $step_name;
-
-    public $steps;
-
-    public function __construct()
-    {
-        $this->setup_wizard();
-    }
-
     /**
      * Register AJAX handlers
      * This should be called early, not just when rendering the wizard
@@ -172,147 +162,52 @@ class SetupWizard
     }
 
     /**
-     * Initialize setup wizards
+     * What the setup wizard needs from the server, for the React admin to
+     * localize as `setupWizard`.
      *
-     * @since 1.0.0
+     * The wizard is a route of the React admin (`?page=wpfunnels#/setup`,
+     * src/admin/pages/SetupWizard/) rather than a page of its own, so this is
+     * printed with the rest of the app's data instead of being enqueued on a
+     * separate screen. Only what the wizard reads: plugin and builder states,
+     * the saved settings, the admin's name and email for the opt-in contact,
+     * and its image URLs.
+     *
+     * @return array
+     * @since  3.13.8
      */
-    private function setup_wizard()
+    public static function get_app_data()
     {
-        $steps = array(
-            'type' => array(
-                'name'      => 'Funnel Type',
-                'slug'      => 'funnel-type',
-                'icon'      => WPFNL_URL . 'admin/assets/images/funnel-type.svg',
-                'iconActive'=> WPFNL_URL . 'admin/assets/images/funnel-type-active.svg',
-                'iconCompleted'=> WPFNL_URL . 'admin/assets/images/funnel-type-completed.svg',
-                'completed' => false,
-                'isActive'  => false,
-            ),
-            'builder' => array(
-                'name'      => 'Builder Type',
-                'slug'      => 'builder-type',
-                'icon'      => WPFNL_URL . 'admin/assets/images/builder.svg',
-                'iconActive'=> WPFNL_URL . 'admin/assets/images/builder-active.svg',
-                'iconCompleted'=> WPFNL_URL . 'admin/assets/images/builder-completed.svg',
-                'completed' => false,
-                'isActive'  => false,
-            ),
-            'automation' => array(
-                'name'      => 'Email Automation',
-                'slug'      => 'email-automation',
-                'icon'      => WPFNL_URL . 'admin/assets/images/email-automation.svg',
-                'iconActive'=> WPFNL_URL . 'admin/assets/images/email-automation-active.svg',
-                'iconCompleted'=> WPFNL_URL . 'admin/assets/images/email-automation-completed.svg',
-                'completed' => false,
-                'isActive'  => false,
-            ),
-            'permalink' => array(
-                'name'      => 'Permalink',
-                'slug'      => 'permalink',
-                'icon'      => WPFNL_URL . 'admin/assets/images/permalink.svg',
-                'iconActive'=> WPFNL_URL . 'admin/assets/images/permalink-active.svg',
-                'iconCompleted'=> WPFNL_URL . 'admin/assets/images/permalink-completed.svg',
-                'completed' => false,
-                'isActive'  => false,
-            ),
-            'thankyou' => array(
-                'name'      => 'Thank You',
-                'slug'      => 'thankyou',
-                'icon'      => WPFNL_URL . 'admin/assets/images/thankyou.svg',
-                'iconActive'=> WPFNL_URL . 'admin/assets/images/thankyou-active.svg',
-                'iconCompleted'=> WPFNL_URL . 'admin/assets/images/thankyou-completed.svg',
-                'completed' => false,
-                'isActive'  => false,
-            ),
-        );
-        $this->step_name = isset( $_GET['step'] ) ? sanitize_text_field( $_GET['step'] ) : current( array_keys( $steps ) );
-        foreach ( $steps as $key => $step ) {
-            if( $key === $this->step_name ) {
-                $step['isActive'] = true;
-                $this->steps[$key] = $step;
-            } else {
-                $step['completed'] = array_search($this->step_name,array_keys($steps)) > array_search($key,array_keys($steps)) ;
-                $this->steps[$key] = $step;
-            }
+        if ( ! function_exists( 'get_plugins' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
         }
+
         $installed_plugins = get_plugins();
 
-        $product_url = esc_url_raw(
-            add_query_arg(
-                array(
-                    'post_type'      => 'product',
-                    'wpfunnels' => 'yes',
-                ),
-                admin_url('post-new.php')
-            )
-        );
-
-        // Admin Name & Email Finding Starts
         $admin_email = get_option('admin_email');
-        $admin_user = get_user_by('email', $admin_email);
-        $admin_name = $admin_user ? $admin_user->display_name : '';
-        // Admin Name & Email Finding Ends
+        $admin_user  = get_user_by('email', $admin_email);
 
-        wp_enqueue_style('setup-wizard', WPFNL_URL . 'admin/assets/css/wpfnl-admin.css', false, '1.1', 'all');
-        wp_enqueue_script('setup-wizard-runtime', WPFNL_URL . 'admin/assets/dist/runtime/index.min.js', array(), time(), true);
-        wp_enqueue_script('setup-wizard', WPFNL_URL . 'admin/assets/dist/js/setup-wizard.min.js', array('jquery', 'wp-util', 'updates', 'setup-wizard-runtime'), time(), true);
-        Wpfnl_functions::enqueue_bundle_style( 'setup-wizard', 'setup-wizard-bundle' );
-        wp_localize_script('setup-wizard', 'setup_wizard_obj',
-            array(
-                'rest_api_url'          => esc_url_raw(get_rest_url()),
-                'ajax_url'              => esc_url_raw(admin_url('admin-ajax.php')),
-                'admin_url'             => esc_url_raw(admin_url()),
-                'dashboard_url'         => esc_url_raw(admin_url('admin.php?page=' . WPFNL_MAIN_PAGE_SLUG)),
-                'settings_url'          => class_exists( 'WooCommerce' ) ? esc_url_raw(admin_url('admin.php?page=wpfnl_settings')) : esc_url_raw(admin_url()),
-                'wizard_url'            => esc_url_raw(admin_url('admin.php?page=wpfunnels-setup')),
-                'home_url'              => esc_url_raw(home_url()),
-                'nonce'                 => wp_create_nonce('wp_rest'),
-                'product_url' 				=> $product_url,
-                'admin_nonce'           => wp_create_nonce('wpfnl-admin'),
-                'currency_symbol'       => class_exists( 'WooCommerce' ) ? get_woocommerce_currency_symbol() : '$',
-                'currency_position'     => class_exists( 'WooCommerce' ) ? get_option('woocommerce_currency_pos', 'left') : 'left',
-                'current_step'          => $this->step_name,
-                'steps'                 => $this->steps,
-                'next_step_link'        => $this->get_next_step_link(),
-                'prev_step_link'        => $this->get_prev_step_link(),
-                'is_woo_installed'      => isset( $installed_plugins['woocommerce/woocommerce.php'] ) ? 'yes' : 'no',
-                'is_mrm_installed'      => isset( $installed_plugins['mail-mint/mail-mint.php'] ) ? 'yes' : 'no',
-                'is_elementor_installed'=> isset( $installed_plugins['elementor/elementor.php'] ) ? 'yes' : 'no',
-                'is_ff_installed'       => isset( $installed_plugins['fluentform/fluentform.php'] ) ? 'yes' : 'no',
-                'is_cl_installed'       => isset( $installed_plugins['cart-lift/cart-lift.php'] ) ? 'yes' : 'no',
-                'is_lms_installed'      => is_plugin_active( 'wpfunnels-pro-lms/wpfunnels-pro-lms.php' ) ? 'yes' : 'no',
-				'is_qb_installed'       => isset( $installed_plugins['qubely/qubely.php'] ) ? 'yes' : 'no',
-				'is_woo_active'         => is_plugin_active( 'woocommerce/woocommerce.php' ) ? 'yes' : 'no',
-                'is_elementor_active'   => is_plugin_active( 'elementor/elementor.php' ) ? 'yes' : 'no',
-                'is_mrm_active'         => is_plugin_active( 'mail-mint/mail-mint.php' ) ? 'yes' : 'no',
-                'is_ff_active'          => is_plugin_active( 'fluentform/fluentform.php' ) ? 'yes' : 'no',
-                'is_cl_active'          => is_plugin_active( 'cart-lift/cart-lift.php' ) ? 'yes' : 'no',
-                'is_qb_active'          => is_plugin_active( 'qubely/qubely.php' ) ? 'yes' : 'no',
-                'is_pro_active'         => Wpfnl_functions::is_wpfnl_pro_activated() ? 'yes' : 'no',
-                'getPlugins'            => $this->get_essential_plugins(),
-                'defaultSettings'       => Wpfnl_functions::get_general_settings(),
-                'logo_url'              => WPFNL_URL .'admin/assets/images/setup-funnel-logo.png',
-                'welcome_image'         => WPFNL_URL .'admin/assets/images/welcome-image.png',
-                'gb_builder_img'        => WPFNL_URL .'admin/assets/images/gutenberg.png',
-                'elementor_img'         => WPFNL_URL .'admin/assets/images/elementor.png',
-                'oxygen_img'            => WPFNL_URL .'admin/assets/images/oxygen.png',
-                'divi_img'              => WPFNL_URL .'admin/assets/images/divi.png',
-                'bricks_img'            => WPFNL_URL .'admin/assets/images/bricks.png',
-                'others_builder_img'    => WPFNL_URL .'admin/assets/images/others.png',
-                'wc_logo'               => WPFNL_URL .'admin/assets/images/wc-logo.png',
-                'mail_mint_logo'        => WPFNL_URL .'admin/assets/images/mail-mint.png',
-                'wizard_video_poster'   => WPFNL_URL .'admin/assets/images/setup-wizard-done-video-poster.png',
-                'no_plugin_image'       => WPFNL_URL .'admin/assets/images/no-plugin-install.png',
-                'qubely_img'            => WPFNL_URL .'admin/assets/images/qubely.svg',
-                'quote_img'             => WPFNL_URL .'admin/assets/images/quote-icon.svg',
-                'done_icon'             => WPFNL_URL .'admin/assets/images/done-icon.svg',
-                'generate_funnel_image' => WPFNL_URL .'admin/assets/images/generate-funnel-image.webp',
-                'generate_store_image'  => WPFNL_URL .'admin/assets/images/generate-store-checkout.webp',
-                'admin_email'           => $admin_email,
-                'admin_name'            => $admin_name,
-            )
+        return array(
+            'is_woo_installed'       => isset( $installed_plugins['woocommerce/woocommerce.php'] ) ? 'yes' : 'no',
+            'is_mrm_installed'       => isset( $installed_plugins['mail-mint/mail-mint.php'] ) ? 'yes' : 'no',
+            'is_elementor_installed' => isset( $installed_plugins['elementor/elementor.php'] ) ? 'yes' : 'no',
+            'is_woo_active'          => is_plugin_active( 'woocommerce/woocommerce.php' ) ? 'yes' : 'no',
+            'is_elementor_active'    => is_plugin_active( 'elementor/elementor.php' ) ? 'yes' : 'no',
+            'is_mrm_active'          => is_plugin_active( 'mail-mint/mail-mint.php' ) ? 'yes' : 'no',
+            'getPlugins'             => self::get_essential_plugins(),
+            'defaultSettings'        => Wpfnl_functions::get_general_settings(),
+            'admin_email'            => $admin_email,
+            'admin_name'             => $admin_user ? $admin_user->display_name : '',
+            'logo_url'               => WPFNL_URL . 'admin/assets/images/setup-funnel-logo.png',
+            'welcome_image'          => WPFNL_URL . 'admin/assets/images/welcome-image.png',
+            'gb_builder_img'         => WPFNL_URL . 'admin/assets/images/gutenberg.png',
+            'elementor_img'          => WPFNL_URL . 'admin/assets/images/elementor.png',
+            'oxygen_img'             => WPFNL_URL . 'admin/assets/images/oxygen.png',
+            'divi_img'               => WPFNL_URL . 'admin/assets/images/divi.png',
+            'bricks_img'             => WPFNL_URL . 'admin/assets/images/bricks.png',
+            'others_builder_img'     => WPFNL_URL . 'admin/assets/images/others.png',
+            'wc_logo'                => WPFNL_URL . 'admin/assets/images/wc-logo.png',
+            'mail_mint_logo'         => WPFNL_URL . 'admin/assets/images/mail-mint.png',
         );
-        $this->output_html();
     }
 
 
@@ -322,7 +217,7 @@ class SetupWizard
      * @return array
      * @since 3.3.1
      */
-    public function get_essential_plugins(){
+    public static function get_essential_plugins(){
         $plugins = [
             ['name' => 'wc', 'slug' => 'woocommerce', 'type' => 'plugin', 'constant' => 'WC_PLUGIN_FILE', 'path' => 'woocommerce/woocommerce.php'],
             ['name' => 'mailmint', 'slug' => 'mail-mint', 'type' => 'plugin', 'constant' => 'MRM_VERSION', 'path' => 'mail-mint/mail-mint.php'],
@@ -332,7 +227,7 @@ class SetupWizard
         ];
     
         foreach($plugins as &$plugin) {
-            $plugin['status'] = $this->get_plugin_status($plugin['constant'], $plugin['path']);
+            $plugin['status'] = self::get_plugin_status($plugin['constant'], $plugin['path']);
         }
     
         $oxygen_status = 'uninstalled';
@@ -368,7 +263,7 @@ class SetupWizard
      * @return string
      * @since 3.3.1
      */
-    public function get_plugin_status($constant, $path) {
+    public static function get_plugin_status($constant, $path) {
         $installed_plugins = get_plugins();
         if(defined($constant)){
             return 'activated';
@@ -377,55 +272,5 @@ class SetupWizard
         } else {
             return 'uninstalled';
         }
-    }
-
-
-
-
-
-
-    /**
-     * Get next step link
-     *
-     * @return string|void
-     * @since  1.0.0
-     */
-    private function get_next_step_link() {
-        $keys       = array_keys( $this->steps );
-        $step_index = array_search( $this->step_name, $keys, true );
-        $step_index = ( count( $keys ) == $step_index + 1 ) ? $step_index : $step_index + 1;
-        $step       = $keys[ $step_index ];
-        return admin_url( 'admin.php?page=wpfunnels-setup&step=' . $step );
-    }
-
-
-    /**
-     * Get prev step link
-     *
-     * @return string|void
-     * @since  1.0.0
-     */
-    private function get_prev_step_link() {
-        $keys       = array_keys( $this->steps );
-        $step = '';
-        $step_index = array_search( $this->step_name, $keys, true );
-        $step_index = ( count( $keys ) == $step_index - 1 ) ? $step_index : $step_index - 1;
-        if (isset($keys[ $step_index ])) {
-            $step       = $keys[ $step_index ];
-        }
-
-        return admin_url( 'admin.php?page=wpfunnels-setup&step=' . $step );
-    }
-
-
-    /**
-     * Output the rendered contents
-     *
-     * @since 1.0.0
-     */
-    private function output_html()
-    {
-        require_once plugin_dir_path(__FILE__) . 'views/views.php';
-        exit();
     }
 }

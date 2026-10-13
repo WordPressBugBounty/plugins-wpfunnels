@@ -2,12 +2,12 @@
 
 <div class="wpfnl-optin-form wpfnl-shortcode-optin-form-wrapper" >
     <form method="post">
-        <input type="hidden" name="post_id" value="<?php echo $step_id ?>" />
-        <input type="hidden" name="admin_email" value="<?php echo $props[ 'admin_email' ] ?? ''; ?>" />
-        <input type="hidden" name="admin_email_subject" value="<?php echo $props[ 'admin_email_subject' ] ?? ''; ?>" />
-        <input type="hidden" name="redirect_url" value="<?php echo $props[ 'redirect_url' ] ?? ''; ?>" />
-        <input type="hidden" name="notification_text" value="<?php echo $props[ 'notification_text' ] ?? ''; ?>" />
-        <input type="hidden" name="post_action" value="<?php echo $props[ 'other_action' ] ?? ''; ?>" />
+        <input type="hidden" name="post_id" value="<?php echo esc_attr( $step_id ); ?>" />
+        <input type="hidden" name="admin_email" value="<?php echo esc_attr( $props[ 'admin_email' ] ?? '' ); ?>" />
+        <input type="hidden" name="admin_email_subject" value="<?php echo esc_attr( $props[ 'admin_email_subject' ] ?? '' ); ?>" />
+        <input type="hidden" name="redirect_url" value="<?php echo esc_attr( $props[ 'redirect_url' ] ?? '' ); ?>" />
+        <input type="hidden" name="notification_text" value="<?php echo esc_attr( $props[ 'notification_text' ] ?? '' ); ?>" />
+        <input type="hidden" name="post_action" value="<?php echo esc_attr( $props[ 'other_action' ] ?? '' ); ?>" />
 
         <?php
         echo $is_recaptch_input ?? '';
@@ -15,14 +15,14 @@
         echo $token_secret_key ?? '';
         ?>
 
-        <div class="wpfnl-optin-form-wrapper <?php echo $props[ 'layout' ] ?? ''; ?>" >
+        <div class="wpfnl-optin-form-wrapper <?php echo esc_attr( $props[ 'layout' ] ?? '' ); ?>" >
             <?php if( 'on' === $props['first_name'] ) { ?>
                 <div class="wpfnl-optin-form-group first-name">
 
                     <?php if( 'on' === $props['field_label'] ) { ?>
                         <label for="wpfnl-first-name">
                             <?php
-                            echo $props['first_name_label'] ?? __('First Name','wpfnl');
+                            echo wp_kses_post( $props['first_name_label'] ?? __('First Name','wpfnl') );
 
                             if( 'on' === $props['field_required_mark'] && 'on' === $props['is_required_name'] ) { ?>
                                 <span class="required-mark">*</span>
@@ -38,7 +38,7 @@
                         <?php }
                         $f_name_placeholder = $props['first_name_placeholder'] ?? '';
                         ?>
-                        <input type="text" name="first_name" class="wpfnl-first-name" id="wpfnl-first-name" placeholder="<?php echo $f_name_placeholder; ?>" <?php echo 'on' === $props['is_required_name'] ? 'required' : ''; ?>/>
+                        <input type="text" name="first_name" class="wpfnl-first-name" id="wpfnl-first-name" placeholder="<?php echo esc_attr( $f_name_placeholder ); ?>" <?php echo 'on' === $props['is_required_name'] ? 'required' : ''; ?>/>
                     </span>
                 </div>
             <?php } ?>
@@ -49,7 +49,7 @@
                     <?php if( 'on' === $props['field_label'] ) { ?>
                         <label for="wpfnl-last-name">
                             <?php
-                            echo $props['last_name_label'] ?? __('Last Name','wpfnl');
+                            echo wp_kses_post( $props['last_name_label'] ?? __('Last Name','wpfnl') );
 
                             if( 'on' === $props['field_required_mark'] && 'on' === $props['is_required_last_name'] ) { ?>
                                 <span class="required-mark">*</span>
@@ -65,7 +65,7 @@
                         <?php }
                         $l_name_placeholder = $props['last_name_placeholder'] ?? '';
                         ?>
-                        <input type="text" name="last_name" class="wpfnl-last-name" id="wpfnl-last-name" placeholder="<?php echo $l_name_placeholder; ?>" <?php echo 'on' === $props['is_required_last_name'] ? 'required' : ''; ?>/>
+                        <input type="text" name="last_name" class="wpfnl-last-name" id="wpfnl-last-name" placeholder="<?php echo esc_attr( $l_name_placeholder ); ?>" <?php echo 'on' === $props['is_required_last_name'] ? 'required' : ''; ?>/>
                     </span>
                 </div>
             <?php } ?>
@@ -74,7 +74,7 @@
                 <?php if( 'on' === $props['field_label'] ) { ?>
                     <label for="wpfnl-email">
                         <?php
-                        echo $props['email_label'] ?? __('Email','wpfnl');
+                        echo wp_kses_post( $props['email_label'] ?? __('Email','wpfnl') );
 
                         if( 'on' === $props['field_required_mark'] ) { ?>
                             <span class="required-mark">*</span>
@@ -89,7 +89,7 @@
                     <?php }
                     $email_placeholder = $props['email_placeholder'] ?? '';
                     ?>
-                    <input type="email" name="email" class="wpfnl-email" id="wpfnl-email" placeholder="<?php echo $email_placeholder; ?>" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required />
+                    <input type="email" name="email" class="wpfnl-email" id="wpfnl-email" placeholder="<?php echo esc_attr( $email_placeholder ); ?>" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required />
                 </span>
             </div>
 
@@ -99,7 +99,7 @@
                     <?php if( 'on' === $props['field_label'] ) { ?>
                         <label for="wpfnl-phone">
                             <?php
-                            echo $props['phone_label'] ?? __('Phone','wpfnl');
+                            echo wp_kses_post( $props['phone_label'] ?? __('Phone','wpfnl') );
 
                             if( 'on' === $props['field_required_mark'] && 'on' === $props['is_required_phn'] ) { ?>
                                 <span class="required-mark">*</span>
@@ -115,7 +115,7 @@
                         <?php }
                         $phone_placeholder = $props['phone_placeholder'] ?? '';
                         ?>
-                        <input type="text" name="phone" class="wpfnl-phone" id="wpfnl-phone" placeholder="<?php echo $phone_placeholder; ?>" <?php echo 'on' === $props['is_required_phn'] ? 'required' : ''; ?>/>
+                        <input type="text" name="phone" class="wpfnl-phone" id="wpfnl-phone" placeholder="<?php echo esc_attr( $phone_placeholder ); ?>" <?php echo 'on' === $props['is_required_phn'] ? 'required' : ''; ?>/>
                     </span>
                 </div>
             <?php } ?>
@@ -126,7 +126,7 @@
                     <?php if( 'on' === $props['field_label'] ) { ?>
                         <label for="wpfnl-web-url">
                             <?php
-                            echo $props['website_url_label'] ?? __('Website Url','wpfnl');
+                            echo wp_kses_post( $props['website_url_label'] ?? __('Website Url','wpfnl') );
 
                             if( 'on' === $props['field_required_mark'] && 'on' === $props['is_required_website_url'] ) { ?>
                                 <span class="required-mark">*</span>
@@ -142,7 +142,7 @@
                         <?php }
                         $weburl_placeholder = $props['website_url_placeholder'] ?? '';
                         ?>
-                        <input type="text" name="web-url" class="wpfnl-web-url" id="wpfnl-web-url" pattern="(https?://)?.+" size="30" placeholder="<?php echo $weburl_placeholder; ?>" <?php echo 'on' === $props['is_required_website_url'] ? 'required' : ''; ?> />
+                        <input type="text" name="web-url" class="wpfnl-web-url" id="wpfnl-web-url" pattern="(https?://)?.+" size="30" placeholder="<?php echo esc_attr( $weburl_placeholder ); ?>" <?php echo 'on' === $props['is_required_website_url'] ? 'required' : ''; ?> />
                     </span>
                 </div>
             <?php } ?>
@@ -153,7 +153,7 @@
                     <?php if( 'on' === $props['field_label'] ) { ?>
                         <label for="wpfnl-message">
                             <?php
-                            echo $props['message_label'] ?? __('Message','wpfnl');
+                            echo wp_kses_post( $props['message_label'] ?? __('Message','wpfnl') );
 
                             if( 'on' === $props['field_required_mark'] && 'on' === $props['is_required_message'] ) { ?>
                                 <span class="required-mark">*</span>
@@ -164,7 +164,7 @@
                     ?>
 
                     <span class="input-wrapper">
-                        <textarea name="message" id="wpfnl-message" class="wpfnl-message" cols="30" rows="3" placeholder="<?php echo $message_placeholder; ?>" <?php echo 'yes' === $props['is_required_message'] ? 'required' : ''; ?> ></textarea>
+                        <textarea name="message" id="wpfnl-message" class="wpfnl-message" cols="30" rows="3" placeholder="<?php echo esc_attr( $message_placeholder ); ?>" <?php echo 'yes' === $props['is_required_message'] ? 'required' : ''; ?> ></textarea>
                     </span>
                 </div>
             <?php } ?>
@@ -177,7 +177,7 @@
                     <label for="wpfnl-acceptance_checkbox-<?php echo esc_attr( $step_id ); ?>">
                         <span class="check-box"></span>
                         <?php
-                        echo $props['acceptance_checkbox_text'];
+                        echo wp_kses_post( $props['acceptance_checkbox_text'] );
 
                         if( 'on' === $props['field_required_mark'] && 'on' === $props['is_required_acceptance'] ) {
                             echo '<span class="required-mark">*</span>';
@@ -208,7 +208,7 @@
                         <label for="wpfnl-registration_checkbox-<?php echo esc_attr( $step_id ); ?>">
                             <span class="check-box"></span>
                             <?php
-                            echo $props['subscription_permission_text'];
+                            echo wp_kses_post( $props['subscription_permission_text'] );
                             ?>
                             <span class="required-mark">*</span>
                         </label>

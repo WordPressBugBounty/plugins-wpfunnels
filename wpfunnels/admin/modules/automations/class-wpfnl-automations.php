@@ -195,7 +195,9 @@ class Module extends Wpfnl_Admin_Module
                 'open_ai_key'                    => array(),
                 'twilio_settings'                => array(),
                 'post_types'                     => array(),
-                'contact_general_fields'         => array(),
+                'contact_general_fields'         => class_exists( 'MRM\\Common\\MrmCommon' ) && method_exists( 'MRM\\Common\\MrmCommon', 'get_contact_general_fields' )
+                                                    ? \MRM\Common\MrmCommon::get_contact_general_fields()
+                                                    : array(),
                 'contact_custom_fields'          => array(),
                 'editor_data_source'             => $this->get_editor_data_source(),
             )

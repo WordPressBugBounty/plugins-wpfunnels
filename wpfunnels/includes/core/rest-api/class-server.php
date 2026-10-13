@@ -89,6 +89,8 @@ class Server
 			'settings'              => 'SettingsController',
 			// The React settings screen (?page=wpfunnels#/settings).
 			'settings_page'         => 'SettingsPageController',
+			// The React integrations screen (?page=wpfunnels#/integrations).
+			'integrations_page'     => 'IntegrationsPageController',
 			'templates_library'     => 'TemplateLibraryController',
 			'order_bump'            => 'OrderBumpController',
 			'funnel_control'        => 'FunnelController',

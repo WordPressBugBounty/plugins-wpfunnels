@@ -12,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $is_pro_active             = apply_filters( 'wpfunnels/is_pro_license_activated', false );
 $is_integration_active     = apply_filters( 'wpfunnels/is_integration_license_active', false );
+
+// Copy and cards are shared with the React screen (GET wpfunnels/v1/integrations).
+$banner = \WPFunnels\Rest\Controllers\IntegrationsPageController::get_banner( (bool) $is_pro_active );
 ?>
 
 <div class="wpfnl">
@@ -32,156 +35,21 @@ $is_integration_active     = apply_filters( 'wpfunnels/is_integration_license_ac
                     <div class="integrations-banner">
                         <span class="circle-blur"></span>
                         <h1 class="banner-title">
-                            <?php if ( $is_pro_active ) : ?>
-                                <?php echo __('Unlock Every Integration with a Higher Plan', 'wpfnl'); ?>
-                            <?php else : ?>
-                                <?php echo __('Unlock Every Integration with WPFunnels Pro', 'wpfnl'); ?>
-                            <?php endif; ?>
+                            <?php echo $banner['title']; ?>
                         </h1>
 
                         <p class="banner-description">
-                            <?php if ( $is_pro_active ) : ?>
-                                <?php echo __('You are on the Starter plan. Upgrade to the Medium Annual or Large Annual plan to connect ActiveCampaign, Mailchimp, HubSpot, and 15 more CRM & email tools.', 'wpfnl'); ?>
-                            <?php else : ?>
-                                <?php echo __('Connect your favorite marketing tools and automate your sales funnel effortlessly. Unlock all integrations with a single upgrade and streamline your business operations.', 'wpfnl'); ?>
-                            <?php endif; ?>
+                            <?php echo $banner['description']; ?>
                         </p>
 
-                        <a href="https://getwpfunnels.com/pricing/" class="banner-cta-btn" title="<?php echo $is_pro_active ? __('Upgrade Plan', 'wpfnl') : __('Upgrade to Pro', 'wpfnl'); ?>" target="_blank">
+                        <a href="<?php echo esc_url( $banner['cta_url'] ); ?>" class="banner-cta-btn" title="<?php echo $banner['cta_title']; ?>" target="_blank">
                             <svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none"><path d="M13.3876 5.99025L11.4214 6.47988L8.9656 3.41968C8.85807 3.28565 8.72182 3.17748 8.56689 3.10315C8.41197 3.02882 8.24233 2.99023 8.07049 2.99023C7.89866 2.99023 7.72902 3.02882 7.57409 3.10315C7.41917 3.17748 7.28291 3.28565 7.17538 3.41968L4.71957 6.47988L2.71514 5.99025C2.52304 5.94427 2.32237 5.94832 2.13228 6.002C1.94219 6.05568 1.76904 6.15721 1.62937 6.29688C1.4897 6.43655 1.38818 6.6097 1.3345 6.79978C1.28082 6.98987 1.27677 7.19055 1.32275 7.38264L2.67689 12.1413C2.72316 12.3067 2.8238 12.4518 2.96259 12.5531C3.10137 12.6545 3.27022 12.7061 3.44194 12.6997H12.6225C12.7943 12.7061 12.9631 12.6545 13.1019 12.5531C13.2407 12.4518 13.3413 12.3067 13.3876 12.1413L14.7494 7.38264C14.7933 7.1936 14.789 6.99653 14.7367 6.80962C14.6843 6.62272 14.5858 6.45201 14.4501 6.31325C14.3144 6.17449 14.1459 6.07216 13.9602 6.01571C13.7745 5.95926 13.5776 5.9505 13.3876 5.99025Z" fill="#2fcf5c"/><path d="M0.956313 5.16397C1.48447 5.16397 1.91263 4.73581 1.91263 4.20766C1.91263 3.6795 1.48447 3.25134 0.956313 3.25134C0.428156 3.25134 0 3.6795 0 4.20766C0 4.73581 0.428156 5.16397 0.956313 5.16397Z" fill="#2fcf5c"/><path d="M15.1106 5.16397C15.6388 5.16397 16.0669 4.73581 16.0669 4.20766C16.0669 3.6795 15.6388 3.25134 15.1106 3.25134C14.5825 3.25134 14.1543 3.6795 14.1543 4.20766C14.1543 4.73581 14.5825 5.16397 15.1106 5.16397Z" fill="#2fcf5c"/><path d="M8.03249 1.91263C8.56064 1.91263 8.9888 1.48447 8.9888 0.956313C8.9888 0.428156 8.56064 0 8.03249 0C7.50433 0 7.07617 0.428156 7.07617 0.956313C7.07617 1.48447 7.50433 1.91263 8.03249 1.91263Z" fill="#2fcf5c"/><path d="M12.6234 15.4924H3.44279C3.23988 15.4924 3.04529 15.4118 2.90181 15.2683C2.75834 15.1248 2.67773 14.9302 2.67773 14.7273C2.67773 14.5244 2.75834 14.3298 2.90181 14.1864C3.04529 14.0429 3.23988 13.9623 3.44279 13.9623H12.6234C12.8263 13.9623 13.0209 14.0429 13.1644 14.1864C13.3078 14.3298 13.3884 14.5244 13.3884 14.7273C13.3884 14.9302 13.3078 15.1248 13.1644 15.2683C13.0209 15.4118 12.8263 15.4924 12.6234 15.4924Z" fill="#2fcf5c"/></svg>
-                            <?php echo $is_pro_active ? __('Upgrade Plan', 'wpfnl') : __('Get WPFunnels Pro', 'wpfnl'); ?>
+                            <?php echo $banner['cta_label']; ?>
                         </a>
                     </div>
 
                     <?php
-                    $integrations = array(
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-active-campaign-icon.svg',
-                            'title' => 'ActiveCampaign',
-                            'description' => 'Create advanced automated sequences and tag customers based on funnel behavior.',
-                            'is_locked' => true,
-                            'is_new' => true
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-mailchimp-icon.svg',
-                            'title' => 'Mailchimp',
-                            'description' => 'Sync your contacts instantly and trigger personalized email campaigns for every new lead.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-mailpoet-icon.svg',
-                            'title' => 'MailPoet',
-                            'description' => 'Manage your newsletter and automated emails directly within your WordPress dashboard.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-constant-contact-icon.svg',
-                            'title' => 'Constant Contact',
-                            'description' => 'Seamlessly move your funnel leads into professional email marketing workflows.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-mailerlite-icon.svg',
-                            'title' => 'MailerLite',
-                            'description' => 'A simple yet powerful way to capture leads and grow your email subscriber list.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-sendinblue-icon.svg',
-                            'title' => 'Breo (Sendinblue)',
-                            'description' => 'Send transactional emails and SMS alerts to your customers in real-time.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-encharge-icon.svg',
-                            'title' => 'Encharge',
-                            'description' => 'Automate your customer journey with behavior-based emails and deep CRM synchronization.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-aweber-icon.svg',
-                            'title' => 'AWeber',
-                            'description' => 'Automate your lead generation and build long-term relationships with your audience.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-convertkit-icon.svg',
-                            'title' => 'ConvertKit',
-                            'description' => 'Designed for creators—trigger tailored automations based on specific funnel actions.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-hubspot-icon.svg',
-                            'title' => 'HubSpot',
-                            'description' => 'Automatically sync funnel data with your CRM to manage your entire sales pipeline.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-zoho-icon.svg',
-                            'title' => 'Zoho CRM',
-                            'description' => 'Track every customer interaction and organize your leads for better conversion.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-zapier-icon.svg',
-                            'title' => 'Zapier',
-                            'description' => 'Automate workflows by connecting your favorite apps and services.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-getresponse-icon.svg',
-                            'title' => 'GetResponse',
-                            'description' => 'Manage your email marketing campaigns and automate your customer journeys.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-omnisend-icon.svg',
-                            'title' => 'Omnisend',
-                            'description' => 'Enhance your e-commerce marketing with automated workflows and personalized messaging.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-wpfusion-icon.svg',
-                            'title' => 'WPFusion',
-                            'description' => 'Integrate your WordPress site with your CRM to automate marketing and sales processes.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-drip-icon.svg',
-                            'title' => 'Drip',
-                            'description' => 'Automate your email marketing campaigns and nurture your leads effectively.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-pabblyemail-icon.svg',
-                            'title' => 'Pabbly Connect',
-                            'description' => 'Connect your apps and automate workflows seamlessly.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                        array(
-                            'icon' => WPFNL_URL .'admin/assets/images/integration-pabblyemail-icon.svg',
-                            'title' => 'Pabbly Email Marketing',
-                            'description' => 'Manage your email marketing campaigns and automate your customer journeys.',
-                            'is_locked' => true,
-                            'is_new' => false
-                        ),
-                    );
+                    $integrations = \WPFunnels\Rest\Controllers\IntegrationsPageController::get_catalog();
                     ?>
 
                     <div class="integrations-list">

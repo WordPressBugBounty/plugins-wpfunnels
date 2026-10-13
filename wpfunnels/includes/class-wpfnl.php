@@ -20,7 +20,6 @@ use Wpfnl_i18n;
 use Wpfnl_Loader;
 use Wpfnl_Logger;
 use WPFunnels\Admin\OptinField\OptinField;
-use WPFunnels\Admin\SetupWizard;
 use WPFunnels\Admin\Wpfnl_Admin as Admin;
 use WPFunnels\Admin\Notices\Notice;
 use WPFunnels\Admin\Banner\SpecialOccasionBanner;
@@ -740,18 +739,33 @@ class Wpfnl
 
 
     /**
-     * Register setup wizard
+     * URL of the setup wizard.
+     *
+     * The wizard is a route of the React admin (src/admin/pages/SetupWizard/),
+     * so moving between it and the rest of the admin costs no page load.
+     *
+     * @return string
+     * @since  3.13.8
+     */
+    public static function get_setup_wizard_url() {
+        return admin_url( 'admin.php?page=' . WPFNL_MAIN_PAGE_SLUG ) . '#/setup';
+    }
+
+
+    /**
+     * Send the old setup wizard screen to its React admin route.
+     *
+     * `?page=wpfunnels-setup` was a PHP page of its own; links to it (and
+     * bookmarks) still work, they just land on the route.
      */
     public function register_setup_wizard_page() {
-        if (!empty($_GET['page']) && 'wpfunnels-setup' == sanitize_text_field( $_GET['page'] )) {
-            add_action('admin_menu', function () {
-                add_dashboard_page('WPFunnels Setup', 'WPFunnels Setup', 'manage_options', 'wpfunnels-setup', function () {
-                    return '';
-                });
-            });
-            add_action('current_screen', function () {
-                new SetupWizard();
-            }, 999);
+        if ( ! empty( $_GET['page'] ) && 'wpfunnels-setup' === sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) {
+            // admin_menu, not admin_init: WordPress refuses an unregistered
+            // `page` (403) between the two.
+            add_action( 'admin_menu', function () {
+                wp_safe_redirect( self::get_setup_wizard_url() );
+                exit;
+            } );
         }
     }
 
@@ -767,14 +781,15 @@ class Wpfnl
         if (get_transient('_wpfunnels_activation_redirect')) {
             $do_redirect = true;
             // On these pages, or during these events, postpone the redirect.
-            if (wp_doing_ajax() || is_network_admin() || !current_user_can('manage_options')) {
+            // The wizard is a route of the React admin, which also needs its
+            // own capability (see Wpfnl_functions::role_permission_to_allow_wpfunnel()).
+            if (wp_doing_ajax() || is_network_admin() || !current_user_can('manage_options') || !current_user_can(\WPFunnels\Wpfnl_functions::role_permission_to_allow_wpfunnel())) {
                 $do_redirect = false;
             }
 
             if ( $do_redirect ) {
                 delete_transient('_wpfunnels_activation_redirect');
-                $url = admin_url('admin.php?page=wpfunnels-setup');
-                wp_safe_redirect(  wp_sanitize_redirect( esc_url_raw( $url ) ) );
+                wp_safe_redirect( self::get_setup_wizard_url() );
                 exit;
             }
         }

@@ -611,6 +611,7 @@ abstract class AbstractBlock {
                 $css .= $prefix . "}\n";
             } else {
                 $property = $key;
+                $value    = $this->sanitize_css_value( $value );
                 $css .= $prefix . "$property: $value;\n";
             }
         }
@@ -653,6 +654,26 @@ abstract class AbstractBlock {
     }
 
 
+
+
+	/**
+	 * Sanitize a CSS declaration value before printing it inside a <style> block.
+	 *
+	 * Block attributes come straight from post content, so a value must never
+	 * be able to close the <style> element or the declaration it sits in.
+	 *
+	 * @param mixed $value Raw declaration value.
+	 *
+	 * @return string Safe declaration value, or an empty string.
+	 * @since 3.13.4
+	 */
+	protected function sanitize_css_value( $value ) {
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+
+		return trim( preg_replace( '/[<>{};\\\\]|\/\*|\*\/|[\x00-\x1F]/', '', (string) $value ) );
+	}
 
 
 	/**

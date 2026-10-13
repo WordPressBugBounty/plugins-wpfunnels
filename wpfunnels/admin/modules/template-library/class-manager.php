@@ -7,7 +7,6 @@
 namespace WPFunnels\TemplateLibrary;
 
 use WPFunnels\Wpfnl;
-use WPFunnels\Wpfnl_functions;
 
 class Manager
 {
@@ -99,16 +98,6 @@ class Manager
     public function add_actions()
     {
         add_action('admin_footer', [$this, 'add_default_view']);
-        add_action('admin_enqueue_scripts', [$this, 'enqueue_scripts']);
-    }
-
-
-    public function enqueue_scripts($hook)
-    {
-        if (in_array($hook, ['wpfunnels_page_store_checkout'], true)) {
-            wp_enqueue_script('funnel-template-library', WPFNL_URL . 'admin/assets/dist/js/template-library.min.js', ['jquery', 'wp-util'], WPFNL_VERSION, true);
-            Wpfnl_functions::enqueue_bundle_style( 'template-library', 'funnel-template-library-bundle' );
-        }
     }
 
 

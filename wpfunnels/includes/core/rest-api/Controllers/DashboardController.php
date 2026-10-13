@@ -4,6 +4,7 @@
 namespace WPFunnels\Rest\Controllers;
 
 use WPFunnels\Report\ReportGenerator;
+use WPFunnels\Menu\Wpfnl_Menus;
 use WPFunnels\Wpfnl_functions;
 
 /**
@@ -494,9 +495,7 @@ class DashboardController extends Wpfnl_REST_Controller
 
 		if (!empty($recent_funnels)) {
 			// The upsell step is added on the canvas, so that is where its action goes.
-			$funnel_builder_url = admin_url(
-				sprintf('admin.php?page=edit_funnel&id=%d', $recent_funnels[0])
-			);
+			$funnel_builder_url = Wpfnl_Menus::react_canvas_url($recent_funnels[0]);
 		}
 
 		foreach ($recent_funnels as $recent_funnel_id) {
@@ -514,14 +513,14 @@ class DashboardController extends Wpfnl_REST_Controller
 					continue;
 				}
 
-				// The hash is what tells the canvas which step settings drawer and
-				// tab to open once the funnel editor has finished loading.
-				$order_bump_url = admin_url(
-					sprintf(
-						'admin.php?page=edit_funnel&id=%d&step_id=%d#%d/settings/order-bump/',
-						$recent_funnel_id,
-						$recent_step_id,
-						$recent_step_id
+				// The deep link tells the canvas which step settings drawer and
+				// tab to open once the funnel's steps have loaded.
+				$order_bump_url = Wpfnl_Menus::react_canvas_url(
+					$recent_funnel_id,
+					array(
+						'step' => $recent_step_id,
+						'open' => 'settings',
+						'tab'  => 'order-bump',
 					)
 				);
 				break 2;

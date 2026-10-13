@@ -72,7 +72,7 @@ if( $type === 'lms' ){
 
     <h6 class="subtitle" style="color: <?php echo $ob_highlight_color ?>" ><?php echo $settings['highLightText'] ?></h6>
     <?php 
-        $isVariable = !empty($settings['isVariable']) ? $settings['isVariable'] : false; 
+        $isVariable = \WPFunnels\Wpfnl_functions::is_variable_order_bump( $settings ); 
     ?>
     <div class="offer-checkbox" style="background-color: <?php echo $orderbump_color; ?>">
         <span class="wpfnl-checkbox">

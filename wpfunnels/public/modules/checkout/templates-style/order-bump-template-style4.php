@@ -105,17 +105,8 @@ if( $product ){
         <div class="offer-checkbox">
             <span class="wpfnl-checkbox">
                 <?php 
-                    $isVariable = !empty($settings['isVariable']) ? $settings['isVariable'] : false; 
+                    $isVariable = \WPFunnels\Wpfnl_functions::is_variable_order_bump( $settings ); 
                 ?>
-                <?php if ($isVariable): ?>
-                    <!-- Variable Product Option -->
-                    <!-- <label id="option-selector-<?php echo $key; ?>"  
-                        class="option-selector" 
-                        style="color: <?php echo $ob_choose_variant_color; ?>; border-color: <?php echo $ob_choose_variant_color ?>; cursor: pointer;">
-                        <?php echo $ob_choose_variant_name; ?>
-                    </label> -->
-                    <label for="wpfnl-order-bump-cb-<?php echo $key . ( $this->render_instance ? '-' . $this->render_instance : '' ); ?>" id="option-selector-<?php echo $key; ?>" class="option-selector" style="color: <?php echo $ob_checkbox_title_color ?>; border-color: <?php echo $ob_checkbox_title_color ?>" ><?php echo $settings['checkBoxLabel'] ?></label>
-                <?php else: ?>
                 <input
                     id="wpfnl-order-bump-cb-<?php echo $key . ( $this->render_instance ? '-' . $this->render_instance : '' ); ?>"
                     class="wpfnl-order-bump-cb"
@@ -125,11 +116,15 @@ if( $product ){
                     data-quantity="<?php echo $settings['quantity']; ?>"
                     data-replace="<?php echo $settings['isReplace']; ?>"
                     data-step="<?php echo get_the_ID(); ?>"
+                    data-is-variable="<?php echo $isVariable ? 'true' : 'false'; ?>"
                     data-lms="<?php echo $type; ?>"
                     <?php checked( $this->is_order_bump_in_cart( $settings['product'] ) ); ?>
                     value="<?php echo $settings['product'] ?>"
                 >
                 <label for="wpfnl-order-bump-cb-<?php echo $key . ( $this->render_instance ? '-' . $this->render_instance : '' ); ?>" style="color: <?php echo $ob_checkbox_title_color ?>; border-color: <?php echo $ob_checkbox_title_color ?>" ><?php echo $settings['checkBoxLabel'] ?></label>
+                <?php if ($isVariable): ?>
+                    <!-- Opens the variation modal when the checkbox is ticked -->
+                    <span id="option-selector-<?php echo $key; ?>" class="option-selector" style="display: none;"></span>
                 <?php endif; ?>
             </span>
         </div>

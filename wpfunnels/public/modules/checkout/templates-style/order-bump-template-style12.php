@@ -95,7 +95,7 @@ if( $type === 'lms' ){
             <img src="<?php echo $img; ?>" alt="" class="for-mobile">
         </div>
         <?php 
-            $isVariable = !empty($settings['isVariable']) ? $settings['isVariable'] : false; 
+            $isVariable = \WPFunnels\Wpfnl_functions::is_variable_order_bump( $settings ); 
         ?>
         <div class="template-content">
             <div class="subtitle" style="color: <?php echo $ob_highlight_color ?>" >

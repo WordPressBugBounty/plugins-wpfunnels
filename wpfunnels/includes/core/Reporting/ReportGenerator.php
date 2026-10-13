@@ -186,7 +186,7 @@ class ReportGenerator {
 
 			$funnel_data[] = array(
 				'id'              => $funnel_id,
-				'link'            => admin_url( "/admin.php?page=edit_funnel&id={$funnel_id}&step_id=0" ),
+				'link'            => \WPFunnels\Wpfnl_functions::get_funnel_edit_url( $funnel_id ),
 				'title'           => get_the_title( $funnel_id ),
 				'views'           => 0,
 				'orders'          => $orders,

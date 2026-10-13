@@ -1445,14 +1445,14 @@ class Optin extends Element
 					<?php
 				}
 				?>
-				<div class="wpfnl-optin-form-wrapper <?php echo isset($settings['optin_form_layout']) ? $settings['optin_form_layout'] : ''; ?>" >
+				<div class="wpfnl-optin-form-wrapper <?php echo isset($settings['optin_form_layout']) ? esc_attr( $settings['optin_form_layout'] ) : ''; ?>" >
 					<?php if( isset($settings['first_name']) && 'yes' == $settings['first_name'] ){ ?>
 						<div class="wpfnl-optin-form-group first-name">
 
 							<?php if( isset($settings['field_label']) && 'yes' == $settings['field_label'] ){ ?>
 								<label for="wpfnl-first-name">
 									<?php
-									echo isset($settings['first_name_label']) && $settings['first_name_label'] ? $settings['first_name_label'] : __('First Name','wpfnl');
+									echo wp_kses_post( isset($settings['first_name_label']) && $settings['first_name_label'] ? $settings['first_name_label'] : __('First Name','wpfnl') );
 
 									if( isset($settings['is_required_name']) && 'yes' == $settings['is_required_name'] ){ ?>
 										<span class="required-mark">*</span>
@@ -1468,7 +1468,7 @@ class Optin extends Element
 								<?php }
 								$f_name_placeholder = isset($settings['first_name_placeholder']) ? $settings['first_name_placeholder'] : '';
 								?>
-								<input type="text" name="first_name" class="wpfnl-first-name" id="wpfnl-first-name" placeholder="<?php echo $f_name_placeholder; ?>" <?php echo isset($settings['is_required_name']) && 'yes' == $settings['is_required_name'] ? 'required' : ''; ?> >
+								<input type="text" name="first_name" class="wpfnl-first-name" id="wpfnl-first-name" placeholder="<?php echo esc_attr( $f_name_placeholder ); ?>" <?php echo isset($settings['is_required_name']) && 'yes' == $settings['is_required_name'] ? 'required' : ''; ?> >
 							</span>
 
 						</div>
@@ -1480,7 +1480,7 @@ class Optin extends Element
 							<?php if( isset($settings['field_label']) & 'yes' == $settings['field_label'] ){ ?>
 								<label for="wpfnl-last-name">
 									<?php
-									echo isset($settings['last_name_label']) && $settings['last_name_label'] ? $settings['last_name_label'] : __('Last Name','wpfnl');
+									echo wp_kses_post( isset($settings['last_name_label']) && $settings['last_name_label'] ? $settings['last_name_label'] : __('Last Name','wpfnl') );
 
 									if( isset($settings['is_required_last_name']) && 'yes' == $settings['is_required_last_name'] ){ ?>
 										<span class="required-mark">*</span>
@@ -1496,7 +1496,7 @@ class Optin extends Element
 								<?php }
 								$l_name_placeholder = isset($settings['last_name_placeholder']) ? $settings['last_name_placeholder'] : '';
 								?>
-								<input type="text" name="last_name" class="wpfnl-last-name" id="wpfnl-last-name" placeholder="<?php echo $l_name_placeholder;?>" <?php echo isset($settings['is_required_last_name']) && 'yes' == $settings['is_required_last_name'] ? 'required' : ''; ?> >
+								<input type="text" name="last_name" class="wpfnl-last-name" id="wpfnl-last-name" placeholder="<?php echo esc_attr( $l_name_placeholder ); ?>" <?php echo isset($settings['is_required_last_name']) && 'yes' == $settings['is_required_last_name'] ? 'required' : ''; ?> >
 							</span>
 						</div>
 					<?php } ?>
@@ -1505,7 +1505,7 @@ class Optin extends Element
 						<?php if( isset($settings['field_label']) && 'yes' == $settings['field_label'] ){ ?>
 							<label for="wpfnl-email">
 								<?php
-								echo isset($settings['email_label']) && $settings['email_label'] ? $settings['email_label'] : __('Email','wpfnl');
+								echo wp_kses_post( isset($settings['email_label']) && $settings['email_label'] ? $settings['email_label'] : __('Email','wpfnl') );
 
 								if( isset($settings['required_mark']) && 'yes' == $settings['required_mark'] ){ ?>
 									<span class="required-mark">*</span>
@@ -1520,7 +1520,7 @@ class Optin extends Element
 							<?php }
 							$email_placeholder = isset($settings['email_placeholder']) ? $settings['email_placeholder'] : '';
 							?>
-							<input type="email" name="email" class="wpfnl-email" id="wpfnl-email" placeholder="<?php echo $email_placeholder; ?>" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required >
+							<input type="email" name="email" class="wpfnl-email" id="wpfnl-email" placeholder="<?php echo esc_attr( $email_placeholder ); ?>" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required >
 						</span>
 					</div>
 
@@ -1530,7 +1530,7 @@ class Optin extends Element
 							<?php if( isset($settings['field_label']) && 'yes' == $settings['field_label'] ){ ?>
 								<label for="wpfnl-phone">
 									<?php
-									echo isset($settings['phone_label']) && $settings['phone_label'] ? $settings['phone_label'] : __('Phone','wpfnl');
+									echo wp_kses_post( isset($settings['phone_label']) && $settings['phone_label'] ? $settings['phone_label'] : __('Phone','wpfnl') );
 
 									if( isset($settings['is_required_phone']) && 'yes' == $settings['is_required_phone'] ){ ?>
 										<span class="required-mark">*</span>
@@ -1546,7 +1546,7 @@ class Optin extends Element
 								<?php }
 								$phone_placeholder = isset($settings['phone_placeholder']) && $settings['phone_placeholder'] ? $settings['phone_placeholder'] : '';
 								?>
-								<input type="text" name="phone" class="wpfnl-phone" id="wpfnl-phone" placeholder="<?php echo $phone_placeholder; ?>" <?php echo isset($settings['is_required_phone']) && 'yes' == $settings['is_required_phone'] ? 'required' : ''; ?> >
+								<input type="text" name="phone" class="wpfnl-phone" id="wpfnl-phone" placeholder="<?php echo esc_attr( $phone_placeholder ); ?>" <?php echo isset($settings['is_required_phone']) && 'yes' == $settings['is_required_phone'] ? 'required' : ''; ?> >
 							</span>
 						</div>
 					<?php } ?>
@@ -1557,7 +1557,7 @@ class Optin extends Element
 							<?php if( isset($settings['field_label']) && 'yes' == $settings['field_label'] ){ ?>
 								<label for="wpfnl-web-url">
 									<?php
-									echo isset($settings['website_url_label']) && $settings['website_url_label'] ? $settings['website_url_label'] : __('Website Url','wpfnl');
+									echo wp_kses_post( isset($settings['website_url_label']) && $settings['website_url_label'] ? $settings['website_url_label'] : __('Website Url','wpfnl') );
 
 									if( isset($settings['is_required_website_url']) && 'yes' == $settings['is_required_website_url'] ){ ?>
 										<span class="required-mark">*</span>
@@ -1573,7 +1573,7 @@ class Optin extends Element
 								<?php }
 								$weburl_placeholder = isset($settings['website_url_placeholder']) && $settings['website_url_placeholder'] ? $settings['website_url_placeholder'] : '';
 								?>
-								<input type="text" name="web-url" class="wpfnl-web-url" id="wpfnl-web-url" pattern="(https?://)?.+" size="30" placeholder="<?php echo $weburl_placeholder; ?>" <?php echo isset($settings['is_required_website_url']) && 'yes' == $settings['is_required_website_url'] ? 'required' : ''; ?> >
+								<input type="text" name="web-url" class="wpfnl-web-url" id="wpfnl-web-url" pattern="(https?://)?.+" size="30" placeholder="<?php echo esc_attr( $weburl_placeholder ); ?>" <?php echo isset($settings['is_required_website_url']) && 'yes' == $settings['is_required_website_url'] ? 'required' : ''; ?> >
 							</span>
 						</div>
 					<?php } ?>
@@ -1584,7 +1584,7 @@ class Optin extends Element
 							<?php if( isset($settings['field_label']) && 'yes' == $settings['field_label'] ){ ?>
 								<label for="wpfnl-message">
 									<?php
-									echo isset($settings['message_label']) && $settings['message_label'] ? $settings['message_label'] : __('Message','wpfnl');
+									echo wp_kses_post( isset($settings['message_label']) && $settings['message_label'] ? $settings['message_label'] : __('Message','wpfnl') );
 
 									if( isset($settings['is_required_message']) && 'yes' == $settings['is_required_message'] ){ ?>
 										<span class="required-mark">*</span>
@@ -1596,7 +1596,7 @@ class Optin extends Element
 							?>
 
 							<span class="input-wrapper">
-								<textarea name="message" class="wpfnl-message" id="wpfnl-message" cols="30" rows="3" placeholder="<?php echo $message_placeholder; ?>" <?php echo isset($settings['is_required_message']) && 'yes' == $settings['is_required_message'] ? 'required' : ''; ?> ></textarea>
+								<textarea name="message" class="wpfnl-message" id="wpfnl-message" cols="30" rows="3" placeholder="<?php echo esc_attr( $message_placeholder ); ?>" <?php echo isset($settings['is_required_message']) && 'yes' == $settings['is_required_message'] ? 'required' : ''; ?> ></textarea>
 							</span>
 						</div>
 					<?php } ?>
@@ -1610,7 +1610,7 @@ class Optin extends Element
 							<label for="wpfnl-acceptance_checkbox-<?php echo $randomId; ?>">
 								<span class="check-box"></span>
 								<?php
-								echo isset($settings['acceptance_checkbox_text']) && $settings['acceptance_checkbox_text'] ? $settings['acceptance_checkbox_text'] : '';
+								echo wp_kses_post( isset($settings['acceptance_checkbox_text']) && $settings['acceptance_checkbox_text'] ? $settings['acceptance_checkbox_text'] : '' );
 
 								if( isset($settings['is_required_acceptance']) && 'yes' == $settings['is_required_acceptance'] ){
 									echo '<span class="required-mark">*</span>';
@@ -1635,7 +1635,7 @@ class Optin extends Element
 								<label for="wpfnl-registration_checkbox-<?php echo $randomId; ?>">
 									<span class="check-box"></span>
 									<?php
-									echo isset($settings['allow_user_registration_permission_text']) && $settings['allow_user_registration_permission_text'] ? $settings['allow_user_registration_permission_text'] : '';
+									echo wp_kses_post( isset($settings['allow_user_registration_permission_text']) && $settings['allow_user_registration_permission_text'] ? $settings['allow_user_registration_permission_text'] : '' );
 									?>
 									<span class="required-mark">*</span>
 								</label>
@@ -1719,7 +1719,7 @@ class Optin extends Element
 			Wpfnl_Widgets_Manager::render_mailmint_form( $settings[ 'mailmint_form_id' ] );
 			$mailmint_form = ob_get_clean();
 			$replace = 'id="mrm-form">';
-			$replace .= '<input type="hidden" name="widget_id" value="'.$settings[ 'mailmint_form_id' ].'"/>';
+			$replace .= '<input type="hidden" name="widget_id" value="'.esc_attr( $settings[ 'mailmint_form_id' ] ).'"/>';
 			if ( !empty( $settings[ 'data_to_checkout' ] ) && 'yes' == $settings[ 'data_to_checkout' ] ) {
 				$replace .= '<input type="hidden" name="data_to_checkout" value="yes"/>';
 			}

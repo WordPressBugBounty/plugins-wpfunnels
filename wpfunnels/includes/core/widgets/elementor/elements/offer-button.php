@@ -1519,7 +1519,7 @@ class Offer_Button extends Widget_Base
                     <?php endif; ?>
                 </span>
             <?php endif; ?>
-            <span <?php echo $this->get_render_attribute_string('text'); ?>><?php echo $settings['text']; ?></span>
+            <span <?php echo $this->get_render_attribute_string('text'); ?>><?php echo wp_kses_post( $settings['text'] ); ?></span>
         </span>
         <?php
     }

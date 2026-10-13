@@ -47,6 +47,13 @@ class Module extends Wpfnl_Frontend_Module
 	 */
 	private $additional_fields_rendered = false;
 
+	/**
+	 * Whether wpfnl_update_checkout_fragments() is rebuilding the customer details.
+	 *
+	 * @var bool
+	 */
+	private $rendering_checkout_fragments = false;
+
 	// const CHECKOUT = "";
 
 	public function __construct()
@@ -135,7 +142,9 @@ class Module extends Wpfnl_Frontend_Module
 		add_filter( 'woocommerce_available_payment_gateways', array($this, 'conditional_payment_gateways'),10 );
 		add_action( 'woocommerce_checkout_after_customer_details', array( $this, 'add_custom_shipping_section' ), 10 );
 		add_action( 'wpfunnels/after_order_total', array( $this, 'display_custom_coupon_field' ), 5 );
-		add_filter( 'woocommerce_update_order_review_fragments', array( $this, 'split_after_order_total_fragment' ) );
+		// Run last: the express layout (and third parties) overwrite the table fragment with
+		// the full review-order buffer at the default priority, which would undo the split.
+		add_filter( 'woocommerce_update_order_review_fragments', array( $this, 'split_after_order_total_fragment' ), PHP_INT_MAX );
 		add_filter( 'woocommerce_update_order_review_fragments', array( $this, 'wpfnl_update_checkout_fragments' ), 20 );
 
 		/* Manage Express Checkout buttons visibility dynamically */
@@ -446,7 +455,13 @@ class Module extends Wpfnl_Frontend_Module
 	public function init_actions() {
 		add_action( 'woocommerce_after_order_notes', [$this, 'checkout_shortcode_metas']);
 		add_action( 'woocommerce_before_order_notes', [$this, 'mark_additional_fields_rendered'], 1 );
-		// add_action( 'woocommerce_checkout_after_customer_details', [$this, 'maybe_render_additional_fields'], 15 );
+		// form-shipping.php only renders on carts that need a shipping address; without this
+		// fallback a virtual cart lost the order notes and `woocommerce_after_order_notes`
+		// (and with it every "After Customer Details" order bump). Render it at the end of
+		// #customer_details: placed after that column it pushes the order review below the
+		// form. Multi-step only fires the WooCommerce hook; the rendered flag stops a repeat.
+		add_action( 'wpfunnels/after_customer_details', [$this, 'maybe_render_additional_fields'], 15 );
+		add_action( 'woocommerce_checkout_after_customer_details', [$this, 'maybe_render_additional_fields'], 15 );
 		add_action( 'woocommerce_checkout_after_customer_details', [$this, 'maybe_render_checkout_metas'], 20 );
 		$this->display_coupon_field();
 		$this->enable_checkout_hook();
@@ -797,7 +812,7 @@ class Module extends Wpfnl_Frontend_Module
 							$is_bundle_exist = false;
 							if( $price_type == 'original' ||  $price_type == 'sale' ){
 								$custom_data = [
-									'custom_price' 	=> $product_object->is_on_sale() ? $product_object->get_sale_price() : $product_object->get_regular_price(),
+									'custom_price' 	=> $this->get_product_base_price( $product_object ),
 									'product_type'  => $product_type
 								];
 							}else{
@@ -943,6 +958,26 @@ class Module extends Wpfnl_Frontend_Module
         ] );
         return !empty( $product_id[ 0 ] ) ? $product_id[ 0 ] : null;
     }
+
+	/**
+	 * Get the product price to store as the funnel cart item custom price.
+	 *
+	 * The price is read in 'edit' context, i.e. the raw store (base) currency value,
+	 * because it is later re-applied with set_price() and then read back through the
+	 * price getters. Reading it in 'view' context would store a price that is already
+	 * converted by a multi-currency switcher (e.g. WooPayments Multi-Currency) and it
+	 * would get converted a second time on the checkout refresh.
+	 *
+	 * @param \WC_Product $product Product or variation.
+	 *
+	 * @return string
+	 * @since 3.13.4
+	 */
+	private function get_product_base_price( \WC_Product $product ) {
+		$price = $product->is_on_sale() ? $product->get_sale_price( 'edit' ) : $product->get_regular_price( 'edit' );
+		return '' !== $price ? $price : $product->get_price( 'edit' );
+	}
+
     /**
      * Add default variation to funnel checkout
      *
@@ -1007,7 +1042,7 @@ class Module extends Wpfnl_Frontend_Module
 		$custom_data = [];
 		if( $price_type == 'original' ||  $price_type == 'sale' ){
 			$custom_data = [
-				'custom_price' 	=> $variation_object->is_on_sale() ? $variation_object->get_sale_price() : $variation_object->get_regular_price(),
+				'custom_price' 	=> $this->get_product_base_price( $variation_object ),
 				'product_type'  => $product_type
 			];
 		}else{
@@ -1317,7 +1352,9 @@ class Module extends Wpfnl_Frontend_Module
 			return;
 		}
 
-		if ( ! Wpfnl_functions::check_if_this_is_step_type( 'checkout' ) ) {
+		// The update_order_review fragments have no global $post; they only run for a
+		// WPFunnels checkout step, see wpfnl_update_checkout_fragments().
+		if ( ! $this->rendering_checkout_fragments && ! Wpfnl_functions::check_if_this_is_step_type( 'checkout' ) ) {
 			return;
 		}
 
@@ -1610,7 +1647,10 @@ class Module extends Wpfnl_Frontend_Module
 		// the quantity is the merchant's. Otherwise any step's offer could be
 		// borrowed and applied to any product.
 		if ( 'lms' !== $type ) {
-			$bump = Wpfnl_functions::resolve_order_bump_item( $step_id, $key, $product_id, $variation_id );
+			$is_accept      = 'true' === $checker;
+			$variation_data = self::get_posted_variation_data();
+
+			$bump = Wpfnl_functions::resolve_order_bump_item( $step_id, $key, $product_id, $variation_id, $variation_data, $is_accept );
 
 			if ( is_wp_error( $bump ) ) {
 				wp_send_json_error( array( 'message' => $bump->get_error_message() ), 400 );
@@ -1619,7 +1659,10 @@ class Module extends Wpfnl_Frontend_Module
 			$product_id      = $bump['product_id'];
 			$variation_id    = $bump['variation_id'];
 			$quantity        = $bump['quantity'];
-			$cart_product_id = $bump['cart_product_id'];
+			// Removing a bump only needs the configured product. The variation the customer last
+			// looked at in the modal is not necessarily the one that is in the cart.
+			$cart_product_id = $is_accept ? $bump['cart_product_id'] : $product_id;
+			$variation_data  = $bump['variation_data'];
 		} else {
 			// Validate quantity - must be a positive integer
 			$quantity = absint( $quantity );
@@ -1629,21 +1672,53 @@ class Module extends Wpfnl_Frontend_Module
 
 			// If variation_id exists, use it as product_id for cart functions.
 			$cart_product_id = $variation_id ? $variation_id : $product_id;
+			$variation_data  = array();
 		}
 
 		$class_object = Wpfnl_Public_Type_Factory::build( $type );
 		if( $class_object ) {
-			$data = $class_object->wpfnl_order_bump_trigger( $step_id, $cart_product_id, $quantity, $key, $user_id, $funnel_id, $checker );
+			$data = $class_object->wpfnl_order_bump_trigger( $step_id, $cart_product_id, $quantity, $key, $user_id, $funnel_id, $checker, $variation_data );
 			if( $type === 'lms' ) {
 				wp_send_json( $data );
 			}
 			elseif( $type === 'wc' ) {
+				if ( isset( $data['status'] ) && 'fail' === $data['status'] ) {
+					wp_send_json_error( array( 'message' => isset( $data['message'] ) ? $data['message'] : '' ), 400 );
+				}
 				add_filter( 'woocommerce_locate_template', [ new Wpfnl_Public(), 'wpfunnels_woocommerce_locate_template' ], 20, 3 );
 				wp_send_json( Wpfnl_functions::get_wc_fragments( $data ) );
 			}
 		}
 	}
 
+
+	/**
+	 * Read the attribute values the customer picked in the order bump modal.
+	 *
+	 * Only `attribute_*` keys are kept, and the values are cleaned here. The
+	 * variation they belong to is validated when the bump is resolved.
+	 *
+	 * @return array attribute_* => value
+	 * @since 3.13.5
+	 */
+	private static function get_posted_variation_data() {
+		$posted = isset( $_POST['variation_data'] ) ? wp_unslash( $_POST['variation_data'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce is checked in wpfnl_order_bump_ajax().
+		$data   = array();
+
+		if ( ! is_array( $posted ) ) {
+			return $data;
+		}
+
+		foreach ( $posted as $name => $value ) {
+			$name = sanitize_text_field( $name );
+			if ( 0 !== strpos( $name, 'attribute_' ) || ! is_scalar( $value ) ) {
+				continue;
+			}
+			$data[ $name ] = sanitize_text_field( $value );
+		}
+
+		return $data;
+	}
 
 	/**
 	 * Get replaceable orderbump products
@@ -1901,12 +1976,44 @@ class Module extends Wpfnl_Frontend_Module
 		// markup echoed by a hooked callback can never be mistaken for it.
 		$position = strrpos( $fragments[ $table_key ], $wrapper );
 
-		if ( false === $position ) {
+		if ( false !== $position ) {
+			$fragments['.wpfnl-after-order-total']  = substr( $fragments[ $table_key ], $position );
+			$fragments[ $table_key ]                = substr( $fragments[ $table_key ], 0, $position );
+		}
+
+		return $this->split_before_order_review_fragment( $fragments );
+	}
+
+
+	/**
+	 * Give the `wpfunnels/before_order_review_table` block its own order-review fragment.
+	 *
+	 * review-order.php prints it right before the table, so like the after-order-total
+	 * block it would be re-inserted beside the old copy on every refresh. Cut it out of
+	 * the table fragment between its opening tag and the closing marker the template
+	 * prints; leave the fragments untouched when either is missing.
+	 *
+	 * @param array $fragments Fragments keyed by CSS selector.
+	 *
+	 * @return array
+	 * @since  3.13.4
+	 */
+	private function split_before_order_review_fragment( $fragments ) {
+		$table_key = '.woocommerce-checkout-review-order-table';
+		$open      = '<div class="wpfnl-before-order-review">';
+		$close     = '</div><!-- /.wpfnl-before-order-review -->';
+
+		$start = strpos( $fragments[ $table_key ], $open );
+		$end   = false === $start ? false : strpos( $fragments[ $table_key ], $close, $start );
+
+		if ( false === $end ) {
 			return $fragments;
 		}
 
-		$fragments['.wpfnl-after-order-total']  = substr( $fragments[ $table_key ], $position );
-		$fragments[ $table_key ]                = substr( $fragments[ $table_key ], 0, $position );
+		$end += strlen( $close );
+
+		$fragments['.wpfnl-before-order-review'] = substr( $fragments[ $table_key ], $start, $end - $start );
+		$fragments[ $table_key ]                 = substr( $fragments[ $table_key ], 0, $start ) . substr( $fragments[ $table_key ], $end );
 
 		return $fragments;
 	}
@@ -1971,7 +2078,9 @@ class Module extends Wpfnl_Frontend_Module
 		// guard in checkout_shortcode_metas() has to be cleared before every render.
 		// Without this only the first fragment carries _wpfunnels_funnel_id and the
 		// placed order loses its funnel, so the buyer never reaches the offer step.
-		$this->checkout_metas_rendered = false;
+		$this->checkout_metas_rendered      = false;
+		$this->additional_fields_rendered   = false;
+		$this->rendering_checkout_fragments = true;
 
 		// 1. Render #customer_details for default, express, 2-step, modern-one-column
 		if ( 'wpfnl-modern-one-column' === $checkout_layout ) {
@@ -2035,7 +2144,8 @@ class Module extends Wpfnl_Frontend_Module
 			$fragments['#customer_details'] = ob_get_clean();
 		}
 
-		$this->checkout_metas_rendered = false;
+		$this->checkout_metas_rendered    = false;
+		$this->additional_fields_rendered = false;
 
 		// 2. Render #wpfnl_modern_customer_details for modern 2-column and modern multistep
 		ob_start();
@@ -2050,6 +2160,7 @@ class Module extends Wpfnl_Frontend_Module
 		</div>
 		<?php
 		$fragments['#wpfnl_modern_customer_details'] = ob_get_clean();
+		$this->rendering_checkout_fragments = false;
 
 		// 3. Render .wpfnl-multistep-wizard for multistep/express/2-step layouts
 		ob_start();

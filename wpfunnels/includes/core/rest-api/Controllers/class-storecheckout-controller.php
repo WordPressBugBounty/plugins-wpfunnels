@@ -313,14 +313,7 @@ class StoreCheckoutController extends Wpfnl_REST_Controller {
 			'success'    => true,
 			'funnel_id'  => $store_checkout->ID,
 			'funnel_name' => get_the_title( $store_checkout->ID ),
-			'edit_url'   => add_query_arg(
-				array(
-					'page'    => WPFNL_EDIT_FUNNEL_SLUG,
-					'id'      => $store_checkout->ID,
-					'step_id' => 0,
-				),
-				admin_url( 'admin.php' )
-			),
+			'edit_url'   => \WPFunnels\Wpfnl_functions::get_funnel_edit_url( $store_checkout->ID ),
 		);
 
 		return rest_ensure_response( $response );
@@ -353,14 +346,7 @@ class StoreCheckoutController extends Wpfnl_REST_Controller {
 				'created_at'     => $funnel->post_date,
 				'step_id'        => $step_id,
 				'condition'      => $condition,
-				'edit_url'       => add_query_arg(
-					array(
-						'page'    => WPFNL_EDIT_FUNNEL_SLUG,
-						'id'      => $funnel->ID,
-						'step_id' => 0,
-					),
-					admin_url( 'admin.php' )
-				),
+				'edit_url'       => \WPFunnels\Wpfnl_functions::get_funnel_edit_url( $funnel->ID ),
 			);
 		}
 
@@ -1174,16 +1160,7 @@ class StoreCheckoutController extends Wpfnl_REST_Controller {
 	 * @since 3.13.6
 	 */
 	private function get_funnel_edit_url( $funnel_id ) {
-		return esc_url_raw(
-			add_query_arg(
-				array(
-					'page'    => WPFNL_EDIT_FUNNEL_SLUG,
-					'id'      => $funnel_id,
-					'step_id' => 0,
-				),
-				admin_url( 'admin.php' )
-			)
-		);
+		return esc_url_raw( \WPFunnels\Wpfnl_functions::get_funnel_edit_url( $funnel_id ) );
 	}
 
 

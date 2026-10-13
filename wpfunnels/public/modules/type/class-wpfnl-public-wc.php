@@ -20,7 +20,7 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
      *
      * @return Array
      */
-    public function wpfnl_order_bump_trigger( $step_id, $product_id, $quantity, $key, $user_id, $funnel_id , $checker ){
+    public function wpfnl_order_bump_trigger( $step_id, $product_id, $quantity, $key, $user_id, $funnel_id , $checker, $variation_data = array() ){
 
         //=== Custom price configured when you add sale price or apply coupon or add discount value ===//
         $ob_settings 			= get_post_meta($step_id, 'order-bump-settings', true);
@@ -89,7 +89,7 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 			];
             add_filter( 'woocommerce_checkout_cart_item_quantity', array($this, 'wpfnl_checkout_cart_item_quantity'), 10, 3 );
             if ($checker == "true") {
-                $data = $this->wpfnl_order_bump_accept( $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $replaceable_ob, $ob_cart_item_data, $should_replace_first_product, $replace_settings, $order_bump_settings );
+                $data = $this->wpfnl_order_bump_accept( $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $replaceable_ob, $ob_cart_item_data, $should_replace_first_product, $replace_settings, $order_bump_settings, $variation_data );
             }else{
                 $data = $this->wpfnl_order_bump_reject( $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $replaceable_ob, $ob_cart_item_data, $should_replace_first_product, $replace_settings );
             }
@@ -124,19 +124,151 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 
 
     /**
+     * Add the order bump product to the cart.
+     *
+     * A variation has to be added through its parent product together with its
+     * attributes, a simple product is added as is.
+     *
+     * @param int   $product_id        Product or variation id to add.
+     * @param int   $quantity          Quantity to add.
+     * @param array $ob_cart_item_data Order bump cart item data.
+     * @param array $variation_data    Resolved variation attributes (attribute_* => value).
+     *
+     * @return string|false Cart item key, or false when WooCommerce refused the item.
+     */
+    private function add_order_bump_to_cart( $product_id, $quantity, $ob_cart_item_data, $variation_data = array() ) {
+        $product = wc_get_product( $product_id );
+        if ( ! $product ) {
+            return false;
+        }
+
+        if ( $product->is_type( 'variation' ) ) {
+            $attributes = ! empty( $variation_data ) ? $variation_data : $product->get_variation_attributes();
+            return \WC()->cart->add_to_cart( $product->get_parent_id(), $quantity, $product_id, $attributes, $ob_cart_item_data );
+        }
+
+        return \WC()->cart->add_to_cart( $product_id, $quantity, 0, array(), $ob_cart_item_data );
+    }
+
+
+    /**
+     * Remove the cart lines this order bump added earlier.
+     *
+     * @param int $configured_product_id The product or variation configured on the bump.
+     *
+     * @return bool True when at least one line was removed.
+     */
+    private function remove_existing_order_bump_lines( $configured_product_id ) {
+        $configured_product_id = absint( $configured_product_id );
+        $removed               = false;
+
+        foreach ( \WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+            if ( empty( $cart_item['wpfnl_order_bump'] ) ) {
+                continue;
+            }
+
+            $line_variation_id = ! empty( $cart_item['variation_id'] ) ? absint( $cart_item['variation_id'] ) : 0;
+            if ( absint( $cart_item['product_id'] ) === $configured_product_id || ( $line_variation_id && $line_variation_id === $configured_product_id ) ) {
+                \WC()->cart->remove_cart_item( $cart_item_key );
+                $removed = true;
+            }
+        }
+
+        return $removed;
+    }
+
+
+    /**
+     * Put the cart back the way it was and report that the bump was not added.
+     *
+     * @param array $cart_backup Cart contents captured before the bump was touched.
+     *
+     * @return array
+     */
+    private function rollback_order_bump_accept( $cart_backup ) {
+        \WC()->cart->set_cart_contents( $cart_backup );
+        \WC()->cart->calculate_totals();
+
+        return array(
+            'status'  => 'fail',
+            'message' => __( 'This product could not be added to your order. Please choose another option.', 'wpfnl' ),
+        );
+    }
+
+
+    /**
      * When order bump accept for woocommerce
      *
      * @param $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $replaceable_ob, $ob_cart_item_data, $should_replace_first_product, $replace_settings, $order_bump_settings
      *
      * @return Array
      */
-    private function wpfnl_order_bump_accept( $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $replaceable_ob, $ob_cart_item_data, $should_replace_first_product, $replace_settings, $order_bump_settings = array() ){
+    private function wpfnl_order_bump_accept( $step_id, $product_id, $quantity, $key, $user_id, $funnel_id, $replaceable_ob, $ob_cart_item_data, $should_replace_first_product, $replace_settings, $order_bump_settings = array(), $variation_data = array() ){
 
         if( Wpfnl_functions::is_wc_active() ){
-            $cookie_name = 'wpfnl_order_bump';
-            $cookie      = isset( $_COOKIE[$cookie_name] ) ? json_decode( wp_unslash( $_COOKIE[$cookie_name] ), true ) : array();
 
-            $cookie['order_bump_accepted'] = 'yes';
+			// Keep a copy of the cart so a failed add never costs the customer what was already in it.
+			$cart_backup = \WC()->cart->get_cart_contents();
+
+			// Picking another variation of a bump that is already in the cart swaps the line instead of stacking a second one.
+			$removed_existing = $this->remove_existing_order_bump_lines( isset( $order_bump_settings['product'] ) ? $order_bump_settings['product'] : $product_id );
+
+            // if order bump is checked we will empty the cart in the first place. The we have to check if isReplace is yes or no.
+            // if replace first product is enabled, then we will only add the order bump product
+            // else we will add all the checkout product along with the order bump product
+            if ( $should_replace_first_product == 'yes' ) {
+
+                $is_gbf = get_post_meta( $funnel_id, 'is_global_funnel', true);
+
+				if(( isset($replace_settings['isAllReplace']) && 'yes' === $replace_settings['isAllReplace'] ) || 'yes' === $is_gbf ){
+					// When isAllReplace is 'yes', replace ALL products (main products + other order bumps)
+					// Empty the cart completely
+					\WC()->cart->empty_cart();
+
+					// Add only the new order bump product
+					$added = $this->add_order_bump_to_cart( $product_id, $quantity, $ob_cart_item_data, $variation_data );
+					if ( ! $added ) {
+						return $this->rollback_order_bump_accept( $cart_backup );
+					}
+				}else{
+					$added = false;
+					if( isset($replace_settings['selectedProducts']) ){
+						foreach ( \WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+							// Skip if this cart item is an order bump - we only want to replace main products
+							if ( isset($cart_item['wpfnl_order_bump']) && $cart_item['wpfnl_order_bump'] ) {
+								continue;
+							}
+
+							$car_product_id =  isset($cart_item['variation_id']) && $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
+							$key = array_search( $car_product_id, array_column($replace_settings['selectedProducts'], 'id'));
+							if( $key !== false ){
+								$added = $this->add_order_bump_to_cart( $product_id, $quantity, $ob_cart_item_data, $variation_data );
+								if ( ! $added ) {
+									return $this->rollback_order_bump_accept( $cart_backup );
+								}
+								\WC()->cart->remove_cart_item($cart_item_key);
+								break;
+							}
+						}
+					}
+
+					// The main product was already replaced by this bump earlier, so there is nothing left to swap. Put the bump back.
+					if ( ! $added && $removed_existing ) {
+						if ( ! $this->add_order_bump_to_cart( $product_id, $quantity, $ob_cart_item_data, $variation_data ) ) {
+							return $this->rollback_order_bump_accept( $cart_backup );
+						}
+					}
+				}
+            } else {
+				if ( ! $this->add_order_bump_to_cart( $product_id, $quantity, $ob_cart_item_data, $variation_data ) ) {
+					return $this->rollback_order_bump_accept( $cart_backup );
+				}
+            }
+
+			$cookie_name = 'wpfnl_order_bump';
+			$cookie      = isset( $_COOKIE[$cookie_name] ) ? json_decode( wp_unslash( $_COOKIE[$cookie_name] ), true ) : array();
+
+			$cookie['order_bump_accepted'] = 'yes';
 
 			// Check if 'order_bump_product' exists and is an array, if not initialize it as an array
 			if (!isset($cookie['order_bump_product']) || !is_array($cookie['order_bump_product'])) {
@@ -153,82 +285,6 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
             ob_end_flush();
 
             WC()->session->set('order_bump_accepted', 'yes');
-            // if order bump is checked we will empty the cart in the first place. The we have to check if isReplace is yes or no.
-            // if replace first product is enabled, then we will only add the order bump product
-            // else we will add all the checkout product along with the order bump product
-            if ( $should_replace_first_product == 'yes' ) {
-				
-                $checkout_products = get_post_meta( $step_id, '_wpfnl_checkout_products', true);
-                $is_gbf = get_post_meta( $funnel_id, 'is_global_funnel', true);
-
-				if(( isset($replace_settings['isAllReplace']) && 'yes' === $replace_settings['isAllReplace'] ) || 'yes' === $is_gbf ){
-					if( 'yes' === $is_gbf ){
-						if(isset( $_COOKIE['wpfunnels_global_funnel_specific_product'] ) ){
-							$checkout_products  = json_decode( wp_unslash( $_COOKIE['wpfunnels_global_funnel_specific_product'] ), true );
-						}
-					}
-					
-					// When isAllReplace is 'yes', replace ALL products (main products + other order bumps)
-					// Empty the cart completely
-					\WC()->cart->empty_cart();
-					
-					// Add only the new order bump product
-					// Check if product_id is actually a variation ID
-					$_temp_product = wc_get_product($product_id);
-					if( $_temp_product && $_temp_product->is_type('variation') ) {
-						// It's a variation - get parent ID
-						$parent_id = $_temp_product->get_parent_id();
-						$variation_id = $product_id;
-						$variation_data = $_temp_product->get_variation_attributes();
-						\WC()->cart->add_to_cart($parent_id, $quantity, $variation_id, $variation_data, $ob_cart_item_data);
-					} else {
-						// Simple product
-						\WC()->cart->add_to_cart($product_id, $quantity, 0, [], $ob_cart_item_data);
-					}
-				}else{
-					if( isset($replace_settings['selectedProducts']) ){
-						foreach ( \WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
-							// Skip if this cart item is an order bump - we only want to replace main products
-							if ( isset($cart_item['wpfnl_order_bump']) && $cart_item['wpfnl_order_bump'] ) {
-								continue;
-							}
-							
-							$car_product_id =  isset($cart_item['variation_id']) && $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
-							$key = array_search( $car_product_id, array_column($replace_settings['selectedProducts'], 'id'));
-							if( $key !== false ){
-								\WC()->cart->remove_cart_item($cart_item_key);
-								
-								// Check if product_id is actually a variation ID
-								$_temp_product = wc_get_product($product_id);
-								if( $_temp_product && $_temp_product->is_type('variation') ) {
-									// It's a variation - get parent ID
-									$parent_id = $_temp_product->get_parent_id();
-									$variation_id = $product_id;
-									$variation_data = $_temp_product->get_variation_attributes();
-									\WC()->cart->add_to_cart($parent_id, $quantity, $variation_id, $variation_data, $ob_cart_item_data);
-								} else {
-									// Simple product
-									\WC()->cart->add_to_cart( $product_id, $quantity, 0, [], $ob_cart_item_data);
-								}
-								break;
-							}
-						}
-					}
-				}
-            } else {
-                // Check if product_id is actually a variation ID
-				$_temp_product = wc_get_product($product_id);
-				if( $_temp_product && $_temp_product->is_type('variation') ) {
-					// It's a variation - get parent ID
-					$parent_id = $_temp_product->get_parent_id();
-					$variation_id = $product_id;
-					$variation_data = $_temp_product->get_variation_attributes();
-					\WC()->cart->add_to_cart($parent_id, $quantity, $variation_id, $variation_data, $ob_cart_item_data);
-				} else {
-					// Simple product
-					\WC()->cart->add_to_cart( $product_id, $quantity, 0, [], $ob_cart_item_data);
-				}
-            }
 
 			// Generate Product Object and Name.
 			$product      = wc_get_product( $product_id );
@@ -308,16 +364,27 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
                 $cookie['order_bump_accepted'] = 'no';
             }
 
+			// The cookie stores the id that was added to the cart, which is the variation id for a variable bump
+			// while the reject request only names the configured product. Clear both.
+			$ids_to_clear = array( $product_id );
+			foreach ( WC()->cart->get_cart() as $cart_item ) {
+				if ( ! empty( $cart_item['wpfnl_order_bump'] ) && ! empty( $cart_item['variation_id'] ) && $cart_item['product_id'] == $product_id ) {
+					$ids_to_clear[] = $cart_item['variation_id'];
+				}
+			}
+
 			// Check if 'order_bump_product' exists and is an array
 			if (isset($cookie['order_bump_product']) && is_array($cookie['order_bump_product'])) {
-				// Find the index of the product_id in the array
-				$index = array_search($product_id, $cookie['order_bump_product']);
-				if ($index !== false) {
-					// Remove the product_id from the array
-					unset($cookie['order_bump_product'][$index]);
-					// Re-index the array to remove gaps
-					$cookie['order_bump_product'] = array_values($cookie['order_bump_product']);
+				foreach ( $ids_to_clear as $id_to_clear ) {
+					// Find the index of the product_id in the array
+					$index = array_search($id_to_clear, $cookie['order_bump_product']);
+					if ($index !== false) {
+						// Remove the product_id from the array
+						unset($cookie['order_bump_product'][$index]);
+					}
 				}
+				// Re-index the array to remove gaps
+				$cookie['order_bump_product'] = array_values($cookie['order_bump_product']);
 			}
 
 			ob_start();
@@ -583,14 +650,40 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 	private function get_product_price( \WC_Product $product, $discount_apply = 'regular' ) {
 		$price = $product->get_regular_price();
 		if ($product->get_type() == 'variable' || $product->get_type() == 'variable-subscription') {
-			$price = $product->get_variation_regular_price('min') ? $product->get_variation_regular_price('min') : $product->get_price();
+			$price = $this->get_min_variation_base_regular_price( $product );
+			$price = $price ? $price : $product->get_price( 'edit' );
 		} else {
-			$price = $product->get_regular_price() ? $product->get_regular_price() : $product->get_price();
+			// Read in 'edit' context (store base currency): the price is re-applied with set_price()
+			// and converted by multi-currency switchers on read, so a 'view' value converts twice.
+			$price = $product->get_regular_price( 'edit' ) ? $product->get_regular_price( 'edit' ) : $product->get_price( 'edit' );
 		}
 
-		$final_price = $discount_apply === 'sale' && $product->get_sale_price() ? $product->get_sale_price() : $price;
+		$final_price = $discount_apply === 'sale' && $product->get_sale_price( 'edit' ) ? $product->get_sale_price( 'edit' ) : $price;
 
 		return apply_filters('wpfunnels/modify_order_bump_price_on_main_order', $final_price);
+	}
+
+
+	/**
+	 * Get the lowest regular price of a variable product's variations in store base currency.
+	 *
+	 * get_variation_regular_price() goes through the `woocommerce_variation_prices` filter,
+	 * which multi-currency switchers use to convert prices, so read each variation instead.
+	 *
+	 * @param \WC_Product $product Variable product.
+	 *
+	 * @return string Empty string when no variation has a regular price.
+	 * @since 3.13.4
+	 */
+	private function get_min_variation_base_regular_price( \WC_Product $product ) {
+		$prices = [];
+		foreach ( $product->get_visible_children() as $variation_id ) {
+			$variation = wc_get_product( $variation_id );
+			if ( $variation && '' !== $variation->get_regular_price( 'edit' ) ) {
+				$prices[] = (float) $variation->get_regular_price( 'edit' );
+			}
+		}
+		return $prices ? wc_format_decimal( min( $prices ) ) : '';
 	}
 
 

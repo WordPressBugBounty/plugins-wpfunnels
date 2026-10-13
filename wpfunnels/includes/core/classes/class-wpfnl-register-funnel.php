@@ -415,14 +415,7 @@ class Wpfnl_CPT
             return;
         }
 
-        $funnel_window_url = add_query_arg(
-            array(
-                'page'      => WPFNL_EDIT_FUNNEL_SLUG,
-                'id'        => $funnel_id,
-                'step_id'   => $step_id,
-            ),
-            admin_url('admin.php')
-        );
+        $funnel_window_url = \WPFunnels\Wpfnl_functions::get_funnel_edit_url( $funnel_id );
 
         wp_enqueue_script( 'wpfnl-gutenberg-back', WPFNL_DIR_URL . '/admin/assets/js/wpfnl-gutenberg-back.js', [], WPFNL_VERSION, true );
         wp_localize_script(

@@ -41,15 +41,15 @@ class LmsOrderDetails extends AbstractDynamicBlock {
 			$payment_method_enable = isset($attributes['paymentOverview']) ? $attributes['paymentOverview']: 'on';
 			$course_status_enable = isset($attributes['courseStatus']) ? $attributes['courseStatus']: 'on';
 
-			$globalTextColor = isset($attributes['globalTextColor']) ? $attributes['globalTextColor'] : '';
-			$lmsOrderDetailsHeaderBg = $attributes['lmsOrderDetailsHeaderBg'] ?? '';
-			$lmsOrderDetailsHeaderColor = $attributes['lmsOrderDetailsHeaderColor'] ?? '';
-			$lmsOrderDetailsHeaderBorderColor = $attributes['lmsOrderDetailsHeaderBorderColor'] ?? '';
+			$globalTextColor = isset($attributes['globalTextColor']) ? $this->sanitize_css_color( $attributes['globalTextColor'] ) : '';
+			$lmsOrderDetailsHeaderBg = $this->sanitize_css_color( $attributes['lmsOrderDetailsHeaderBg'] ?? '' );
+			$lmsOrderDetailsHeaderColor = $this->sanitize_css_color( $attributes['lmsOrderDetailsHeaderColor'] ?? '' );
+			$lmsOrderDetailsHeaderBorderColor = $this->sanitize_css_color( $attributes['lmsOrderDetailsHeaderBorderColor'] ?? '' );
 
-			$lmsOrderDetailsBodyBg = $attributes['lmsOrderDetailsBodyBg'] ?? '';
-			$lmsOrderDetailsBodyTextColor = $attributes['lmsOrderDetailsBodyTextColor'] ?? '';
-			$lmsOrderDetailsBodyLinkColor = $attributes['lmsOrderDetailsBodyLinkColor'] ?? '';
-			$lmsOrderDetailsBodyBorderColor = $attributes['lmsOrderDetailsBodyBorderColor'] ?? '';
+			$lmsOrderDetailsBodyBg = $this->sanitize_css_color( $attributes['lmsOrderDetailsBodyBg'] ?? '' );
+			$lmsOrderDetailsBodyTextColor = $this->sanitize_css_color( $attributes['lmsOrderDetailsBodyTextColor'] ?? '' );
+			$lmsOrderDetailsBodyLinkColor = $this->sanitize_css_color( $attributes['lmsOrderDetailsBodyLinkColor'] ?? '' );
+			$lmsOrderDetailsBodyBorderColor = $this->sanitize_css_color( $attributes['lmsOrderDetailsBodyBorderColor'] ?? '' );
 
 			ob_start();
 			$step_id  = isset($_POST['post_id']) ? $_POST['post_id'] : get_the_ID();

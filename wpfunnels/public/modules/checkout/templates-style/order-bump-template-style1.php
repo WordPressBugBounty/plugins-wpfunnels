@@ -104,7 +104,7 @@ if ($type === 'lms') {
             <img src="<?php echo $img; ?>" alt="<?php echo $settings['productName'] ?>" class="for-mobile">
         </div>
             <?php 
-            $isVariable = !empty($settings['isVariable']) ? $settings['isVariable'] : false; 
+            $isVariable = \WPFunnels\Wpfnl_functions::is_variable_order_bump( $settings ); 
             ?>
             <div class="template-content">
                 <h5 class="template-title" id="wpfnl-order-bump-title-<?php echo $key; ?>" style="color: <?php echo $ob_title_color ?>"><?php echo $settings['productName'] ?></h5>
