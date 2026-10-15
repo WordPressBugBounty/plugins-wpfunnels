@@ -307,6 +307,14 @@ class Wpfnl
 		add_action( 'wpfunnels/pro_init', array( $this, 'after_pro_plugin_init' ) );
 		add_action( 'plugins_loaded', array($this, 'load_plugin'), 9 );
 
+		// One-click OAuth connect for the MCP endpoint. Booted here, at plugin load, not in
+		// init(): its Bearer token filter runs on determine_current_user, which another plugin
+		// can trigger during plugins_loaded. Required directly so a stale classmap can't miss it.
+		foreach ( array( 'OAuthServer', 'OAuthClients', 'OAuthTokens', 'OAuthRoutes', 'OAuthAuthorize' ) as $wpfnl_oauth_file ) {
+			require_once __DIR__ . '/core/MCP/OAuth/' . $wpfnl_oauth_file . '.php';
+		}
+		\WPFunnels\MCP\OAuth\OAuthServer::boot();
+
         $this->set_locale();
         $this->init_hooks();
     }
@@ -440,7 +448,7 @@ class Wpfnl
         $this->widget_manager           = Widget_Manager::getInstance()->init();
         $this->page_templates           = new PageTemplates\Manager();
         $this->admin_notice             = new Notice();
-        $this->admin_banner             = new SpecialOccasionBanner('4thjuly', '2026-07-02 00:00:01', '2026-07-07 23:59:59', 'https://getwpfunnels.com/pricing/?utm_source=plugin&utm_medium=dashboard-banner-wpf&utm_campaign=4THJULY2026');
+        $this->admin_banner             = new SpecialOccasionBanner('halloween-26', '2026-10-15 00:00:01', '2026-10-30 23:59:59', 'https://getwpfunnels.com/pricing/?utm_source=plugin&utm_medium=dashboard-banner-wpf&utm_campaign=halloween26');
         $this->setup_reminder_banner    = new SetupReminderBanner();
         $this->order_bump_actions       = new Wpfnl_Order_Bump_Action();
         $this->testimonial_actions      = new Wpfnl_Testimonial_Action();

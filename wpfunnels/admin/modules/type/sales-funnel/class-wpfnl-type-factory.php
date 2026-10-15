@@ -21,11 +21,18 @@ class Wpfnl_Type_Factory {
         }
 
         $class_name = "WPFunnels\\Admin\\FunnelType\\Wpfunnels_".ucfirst($module)."_Checkout";
-        
-        if (!class_exists(ucfirst($class_name))) {
-            throw new \Exception('Invalid Condition Module.');
-        }else {
-            return new $class_name();
+
+        // Types with no checkout class of their own ('lead', or 'lms' while the
+        // LMS add-on is off) share the standard class; it already copes with
+        // WooCommerce being inactive. Throwing here fataled the products REST call.
+        if (!class_exists($class_name)) {
+            $class_name = "WPFunnels\\Admin\\FunnelType\\Wpfunnels_Wc_Checkout";
         }
+
+        if (!class_exists($class_name)) {
+            throw new \Exception('Invalid Condition Module.');
+        }
+
+        return new $class_name();
     }
 }

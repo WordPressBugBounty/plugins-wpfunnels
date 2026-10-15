@@ -959,13 +959,29 @@ class Wpfnl_Stripe_payment_process {
 
 
     /**
-     * @param $order
-     * @param $response
+     * Add an offer charge's Stripe fee and net to the order's totals.
+     *
+     * A legacy charge is requested with its balance transaction expanded, but
+     * a Payment Intent's charge only carries the balance transaction ID, so
+     * the transaction is fetched to read its fee and net.
+     *
+     * @param \WC_Order $order    Order.
+     * @param object    $response Stripe charge.
      */
     public function update_stripe_payout_details($order, $response)
     {
-        $fee = !empty($response->balance_transaction->fee) ? \WC_Stripe_Helper::format_balance_fee($response->balance_transaction, 'fee') : 0;
-        $net = !empty($response->balance_transaction->net) ? \WC_Stripe_Helper::format_balance_fee($response->balance_transaction, 'net') : 0;
+        $balance_transaction = isset( $response->balance_transaction ) ? $response->balance_transaction : null;
+
+        if ( is_string( $balance_transaction ) && '' !== $balance_transaction ) {
+            $balance_transaction = \WC_Stripe_API::retrieve( 'balance_transactions/' . $balance_transaction );
+        }
+
+        if ( ! is_object( $balance_transaction ) || ! empty( $balance_transaction->error ) ) {
+            return;
+        }
+
+        $fee = !empty($balance_transaction->fee) ? \WC_Stripe_Helper::format_balance_fee($balance_transaction, 'fee') : 0;
+        $net = !empty($balance_transaction->net) ? \WC_Stripe_Helper::format_balance_fee($balance_transaction, 'net') : 0;
 
         // WC Stripe 10.x moved fee/net helpers from WC_Stripe_Helper to WC_Stripe_Order_Helper.
         if ( class_exists( 'WC_Stripe_Order_Helper' ) ) {

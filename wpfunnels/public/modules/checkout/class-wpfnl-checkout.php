@@ -138,6 +138,8 @@ class Module extends Wpfnl_Frontend_Module
 		add_action( 'woocommerce_cart_calculate_fees', [$this,'wpfnl_checkout_discount'], 10);
 
 		add_action( 'wpfunnels/after_optin_submit', array( $this, 'get_optin_data_checkout' ), 10, 4 );
+		// Before the default priority, so a site's own filter still has the last word.
+		add_filter( 'wpfunnels_woo_customer_info_text', array( $this, 'filter_customer_info_heading' ), 5 );
 		add_filter( 'woocommerce_checkout_fields', array($this, 'set_option_data_in_checkout_filed'),10 );
 		add_filter( 'woocommerce_available_payment_gateways', array($this, 'conditional_payment_gateways'),10 );
 		add_action( 'woocommerce_checkout_after_customer_details', array( $this, 'add_custom_shipping_section' ), 10 );
@@ -704,7 +706,7 @@ class Module extends Wpfnl_Frontend_Module
 			|| Wpfnl_functions::is_product_option_from_post_data()
 			|| Wpfnl_functions::is_variation_selected_from_post_data()
 			|| Wpfnl_functions::maybe_select_quantity_from_post_data()
-			|| Wpfnl_functions::is_order_bump_already_accepted_from_cookie()
+			|| Wpfnl_functions::is_order_bump_already_accepted_from_cookie( $checkout_id )
 			// || Wpfnl_functions::is_coupon_applied_from_post_data()
         ) {
             return;
@@ -724,6 +726,52 @@ class Module extends Wpfnl_Frontend_Module
 
         $this->render_express_checkout( $checkout_id );
 
+        // Bumps accepted on another checkout leave the cart with this reset.
+        Wpfnl_functions::clear_order_bump_cookie();
+
+        $this->add_funnel_products_to_cart( $checkout_id, $funnel_id );
+    }
+
+
+    /**
+     * Use the "Customer information" heading set on the checkout widget.
+     *
+     * The widget saves it on the checkout step, so it holds when the checkout
+     * refreshes over AJAX as well as when the page renders. Empty keeps the
+     * translated default.
+     *
+     * @param string $text Heading.
+     * @return string
+     *
+     * @since 3.13.5
+     */
+    public function filter_customer_info_heading( $text ) {
+        $checkout_id = Wpfnl_functions::get_checkout_id_from_post( $_POST );
+        if ( ! $checkout_id ) {
+            $checkout_id = get_the_ID();
+        }
+
+        $heading = $checkout_id ? trim( (string) get_post_meta( $checkout_id, '_wpfnl_customer_info_heading', true ) ) : '';
+
+        return '' !== $heading ? $heading : $text;
+    }
+
+
+    /**
+     * Fill the cart with a funnel checkout step's products.
+     *
+     * Empties the cart (except for a store checkout), then adds the step's
+     * products at the funnel's price type and its coupons. Used for the
+     * funnel checkout page and to render the checkout in the Elementor editor.
+     *
+     * @param int|string $checkout_id Checkout step ID.
+     * @param int|string $funnel_id   Funnel ID.
+     *
+     * @throws \Exception
+     *
+     * @since 3.13.5
+     */
+    public function add_funnel_products_to_cart( $checkout_id, $funnel_id ) {
         /**
          * Filter hook to modify funnel products
          *

@@ -268,7 +268,13 @@ class Wpfnl_Public_Wc extends Wpfnl_Public_Funnel_Type
 			$cookie_name = 'wpfnl_order_bump';
 			$cookie      = isset( $_COOKIE[$cookie_name] ) ? json_decode( wp_unslash( $_COOKIE[$cookie_name] ), true ) : array();
 
+			// A bump accepted on another checkout belongs to that funnel: start over.
+			if ( ! is_array( $cookie ) || empty( $cookie['step_id'] ) || (int) $cookie['step_id'] !== (int) $step_id ) {
+				$cookie = array();
+			}
+
 			$cookie['order_bump_accepted'] = 'yes';
+			$cookie['step_id']             = (int) $step_id;
 
 			// Check if 'order_bump_product' exists and is an array, if not initialize it as an array
 			if (!isset($cookie['order_bump_product']) || !is_array($cookie['order_bump_product'])) {

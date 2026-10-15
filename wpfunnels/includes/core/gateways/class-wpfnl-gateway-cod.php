@@ -42,15 +42,7 @@ class Wpfnl_Gateway_Cod extends Wpfnl_Gateway {
      * @return string
      */
     public function maybe_setup_offer_for_cod( $order_status, $order ) {
-
-        $payment_method = $order->get_payment_method();
-        $funnel_id      = Wpfnl_functions::get_funnel_id_from_order( $order->get_id() );
-        $offer_settings = Wpfnl_functions::get_offer_settings();
-        if ( $offer_settings['offer_orders'] == 'main-order' && $funnel_id ) {
-            return 'wc-wpfnl-main-order';
-        }
-
-        return $order_status;
+        return Wpfnl_functions::get_offline_funnel_order_status( $order_status, $order );
     }
 
 

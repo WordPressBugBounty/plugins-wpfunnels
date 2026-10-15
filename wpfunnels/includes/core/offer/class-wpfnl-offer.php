@@ -1686,6 +1686,7 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
 
         $step_type = get_post_meta( $step_id, '_step_type', true );
         $offer_product = get_post_meta( $step_id, '_wpfnl_' . $step_type . '_products', true );
+        $discount = get_post_meta( $step_id, '_wpfnl_' . $step_type . '_discount', true );
 
         if ( isset( $offer_product[0] ) && ! $selected_product_id ) {
             $product_id = $offer_product[0]['id'];
@@ -1698,7 +1699,7 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
         if ( $product_id ) {
             $product = wc_get_product( $product_id );
             if ( $product ) {
-                $data = self::prepare_offer_data( $step_id, $product_id, $product_qty, $step_type, array(), false, 0, $order_id );
+                $data = self::prepare_offer_data( $step_id, $product_id, $product_qty, $step_type, $discount, false, 0, $order_id );
             }
         }
         return $data;
@@ -1729,6 +1730,16 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
         $unit_price_tax = $custom_price;
         $product_price = floatval( $custom_price ) * intval( $product_qty );
 
+        // Charge the discount saved on the step. As in Pro, the discounted
+        // price is for the whole quantity.
+        $discounted_total = self::get_offer_discounted_total( $step_id, $product, $product_qty, $discount );
+        if ( null !== $discounted_total ) {
+            $custom_price   = $discounted_total;
+            $unit_price     = $discounted_total;
+            $unit_price_tax = $discounted_total;
+            $product_price  = $discounted_total;
+        }
+
         $data = array(
             'step_id' => $step_id,
             'id' => $product_id,
@@ -1746,9 +1757,103 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
             'url' => $product->get_permalink(),
             'total' => $product_price,
             'cancel_main_order' => $cancel_main_order,
+            'discount' => $discount ? true : false,
+            'discount_type' => isset( $discount['discountType'] ) ? $discount['discountType'] : '',
+            'discount_apply_to' => isset( $discount['discountApplyTo'] ) ? $discount['discountApplyTo'] : '',
+            'discount_value' => isset( $discount['discountValue'] ) ? $discount['discountValue'] : '',
         );
 
         return $data;
+    }
+
+    /**
+     * Send the order emails again once an offer was added to the main order.
+     *
+     * WooCommerce sent the order emails at checkout, before the offer was
+     * accepted, so they never listed it. The buyer gets the order details
+     * (invoice) email and the shop owner the new order email again, both with
+     * every item. WPFunnels Pro holds the order until the funnel ends and sends
+     * the emails itself, so nothing is sent then; an unpaid order never got
+     * its emails, so it gets none here either.
+     *
+     * @param \WC_Order $order         Main order, with the offer added.
+     * @param array     $offer_product Offer product data.
+     * @return void
+     * @since 3.13.5
+     */
+    private static function send_offer_updated_emails( $order, $offer_product ) {
+        if ( Wpfnl_functions::is_funnel_order_status_registered() ) {
+            return;
+        }
+
+        if ( ! $order->has_status( array( 'processing', 'on-hold', 'completed' ) ) ) {
+            return;
+        }
+
+        /**
+         * Filters whether the order emails are sent again once an offer was
+         * added to the main order (WPFunnels without Pro).
+         *
+         * @param bool      $send          Send the emails. Default true.
+         * @param \WC_Order $order         Main order, with the offer added.
+         * @param array     $offer_product Offer product data.
+         * @since 3.13.5
+         */
+        if ( ! apply_filters( 'wpfunnels/send_offer_updated_emails', true, $order, $offer_product ) ) {
+            return;
+        }
+
+        $emails = WC()->mailer()->get_emails();
+
+        if ( isset( $emails['WC_Email_Customer_Invoice'] ) ) {
+            $emails['WC_Email_Customer_Invoice']->trigger( $order->get_id(), $order );
+        }
+
+        if ( isset( $emails['WC_Email_New_Order'] ) ) {
+            // WooCommerce sends the new order email once per order; allow this resend only.
+            add_filter( 'woocommerce_new_order_email_allows_resend', '__return_true' );
+            $emails['WC_Email_New_Order']->trigger( $order->get_id(), $order );
+            remove_filter( 'woocommerce_new_order_email_allows_resend', '__return_true' );
+        }
+
+        $order->add_order_note( __( 'Offer accepted: updated order emails sent to the customer and the store admin.', 'wpfnl' ) );
+    }
+
+    /**
+     * Get the discounted price of an offer for its whole quantity.
+     *
+     * Mirrors how Pro prices a discounted offer, including the time bound
+     * discount window.
+     *
+     * @param int         $step_id     Offer step ID.
+     * @param \WC_Product $product     Offer product.
+     * @param int         $product_qty Offer quantity.
+     * @param mixed       $discount    Discount saved on the step.
+     * @return float|null The discounted total, or null when no discount applies.
+     */
+    private static function get_offer_discounted_total( $step_id, $product, $product_qty, $discount ) {
+        if ( ! is_array( $discount ) || ! isset( $discount['discountType'] ) ) {
+            return null;
+        }
+
+        if ( ! in_array( $discount['discountType'], array( 'discount-percentage', 'discount-price' ), true ) ) {
+            return null;
+        }
+
+        $discount_instance = new WpfnlDiscount();
+        if ( $discount_instance->maybe_time_bound_discount( $step_id ) && ! $discount_instance->maybe_validate_discount_time( $step_id ) ) {
+            return null;
+        }
+
+        $apply_to   = isset( $discount['discountApplyTo'] ) ? $discount['discountApplyTo'] : 'regular';
+        $base_price = 'sale' === $apply_to ? $product->get_sale_price() : $product->get_regular_price();
+        $base_price = $base_price ? $base_price : $product->get_price();
+        $value      = isset( $discount['discountValue'] ) ? floatval( $discount['discountValue'] ) : 0;
+
+        $total = Wpfnl_functions::calculate_discount_price_for_widget( $discount['discountType'], $value, floatval( $base_price ) * intval( $product_qty ) );
+        $total = apply_filters( 'wpfunnels/modify_offer_product_price_data_with_discount', $total );
+
+        return max( 0, floatval( $total ) );
     }
 
     /**
@@ -1836,7 +1941,9 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
 
                     $order->calculate_totals();
                     $order->save();
-                    
+
+                    self::send_offer_updated_emails( $order, $offer_product );
+
                     $result = array(
                         'status' => 'success',
                         'message' => __( 'Product Added Successfully.', 'wpfnl' ),

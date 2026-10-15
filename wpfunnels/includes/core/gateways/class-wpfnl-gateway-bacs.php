@@ -54,9 +54,10 @@ class Wpfnl_Gateway_Bacs {
     /**
      * Possibly sets a custom order status for BACS payment method based on funnel settings.
      *
-     * If the 'offer_orders' setting is set to 'main-order' and a valid funnel ID exists 
-     * for the given order, the order status will be overridden with 'wc-wpfnl-main-order'.
-     * Otherwise, the original order status will be returned unchanged.
+     * If the 'offer_orders' setting is set to 'main-order', a valid funnel ID exists
+     * for the given order and the 'wc-wpfnl-main-order' status is registered (Pro),
+     * the order status will be overridden with it. Otherwise, the original order
+     * status will be returned unchanged.
      *
      * @param string        $order_status The current order status.
      * @param WC_Order      $order        The WooCommerce order object.
@@ -65,13 +66,7 @@ class Wpfnl_Gateway_Bacs {
      *  @since 2.5.10
      */
     public function maybe_setup_offer_for_bacs($order_status, $order){
-        $funnel_id      = Wpfnl_functions::get_funnel_id_from_order($order->get_id());
-        $offer_settings = Wpfnl_functions::get_offer_settings();
-        if ($offer_settings['offer_orders'] == 'main-order' && $funnel_id) {
-            return 'wc-wpfnl-main-order';
-        }
-
-        return $order_status;
+        return Wpfnl_functions::get_offline_funnel_order_status( $order_status, $order );
     }
 
 

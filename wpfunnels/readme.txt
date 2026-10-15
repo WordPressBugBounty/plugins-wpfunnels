@@ -5,7 +5,7 @@ Tags: funnel builder, woocommerce checkout, order bump, woocommerce funnel build
 Requires at least: 6.1
 Tested up to:  7.1
 Requires PHP: 7.4
-Stable tag: 3.13.4
+Stable tag: 3.13.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -576,6 +576,19 @@ The Patchstack team helps validate, triage, and handle any security vulnerabilit
 8. The Visual Funnel Canvas
 
 == Changelog ==
+
+= 3.13.5 (2026-10-15) =
+* New: One-click MCP connection with OAuth, including client registration, token refresh and revocation, and a list of connected clients.
+* Improvement: The checkout customer information heading can be edited from the Elementor checkout widget.
+* Improvement: Funnels stay editable when WooCommerce or the LMS add-on is inactive.
+* Improvement: Emails saved from the automation email builder are stored through WPFunnels, keeping automation and funnel step data in sync.
+* Fix: Upsell and downsell discounts were not applied to the charged amount, and the discount showed as undefined in the admin.
+* Fix: Order emails are resent with the updated totals when an offer is accepted.
+* Fix: COD and BACS funnel orders could stay pending when WPFunnels Pro is not active.
+* Fix: Stripe fee and net payout were not recorded for offer charges.
+* Fix: Accepting an order bump on one checkout hid the order bump on other checkouts.
+* Fix: Checkout widget rendered with an empty cart in the Elementor editor.
+* Fix: Fatal error when the conditional node endpoint was called without a funnel ID.
 
 = 3.13.4 (2026-10-13) =
 * New: Redesigned React-based funnel canvas with a horizontal layout, zoom controls, copy and paste of steps, deep links to steps and an expand mode.

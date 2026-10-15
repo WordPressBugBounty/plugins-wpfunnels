@@ -385,15 +385,43 @@ class Wpfnl_functions {
 	 * via the `wpfnl_order_bump` cookie set on accept/reject. Used to keep a
 	 * plain page reload from wiping an accepted bump back out of the cart.
 	 *
+	 * @param int $checkout_id Checkout step being loaded; the bump must have been accepted on it.
 	 * @return bool
 	 * @since 3.13.1
 	 */
-	public static function is_order_bump_already_accepted_from_cookie() {
+	public static function is_order_bump_already_accepted_from_cookie( $checkout_id = 0 ) {
 		if ( empty( $_COOKIE['wpfnl_order_bump'] ) ) {
 			return false;
 		}
 		$cookie = json_decode( wp_unslash( $_COOKIE['wpfnl_order_bump'] ), true );
-		return ! empty( $cookie['order_bump_accepted'] ) && 'yes' === $cookie['order_bump_accepted'];
+		if ( empty( $cookie['order_bump_accepted'] ) || 'yes' !== $cookie['order_bump_accepted'] ) {
+			return false;
+		}
+
+		// The bump only counts on the checkout it was accepted on; otherwise
+		// every other funnel's checkout would keep this funnel's cart.
+		return ! empty( $cookie['step_id'] ) && (int) $cookie['step_id'] === (int) $checkout_id;
+	}
+
+
+	/**
+	 * Forget accepted order bumps once a funnel checkout resets the cart.
+	 *
+	 * The bumps left the cart with that reset, so the cookie must not keep the
+	 * next checkout of their own funnel from refilling it.
+	 *
+	 * @return void
+	 * @since 3.13.5
+	 */
+	public static function clear_order_bump_cookie() {
+		if ( ! isset( $_COOKIE['wpfnl_order_bump'] ) ) {
+			return;
+		}
+
+		unset( $_COOKIE['wpfnl_order_bump'] );
+		if ( ! headers_sent() ) {
+			setcookie( 'wpfnl_order_bump', '', time() - DAY_IN_SECONDS, '/', COOKIE_DOMAIN );
+		}
 	}
 
 
@@ -1558,6 +1586,49 @@ class Wpfnl_functions {
 		);
 		$saved_settings   = self::get_admin_settings( '_wpfunnels_offer_settings' );
 		return wp_parse_args( $saved_settings, $default_settings );
+	}
+
+	/**
+	 * Get the status for an offline (COD/BACS) funnel order.
+	 *
+	 * With offers merged into the main order, a funnel order is held in
+	 * `wc-wpfnl-main-order` until the funnel ends. Only WPFunnels Pro registers
+	 * that status and moves the order on afterwards, so without it WooCommerce
+	 * would fall back to "Pending payment" for good and send no order email:
+	 * keep the gateway's own status instead.
+	 *
+	 * @param string    $order_status Status the gateway would set.
+	 * @param \WC_Order $order        Order.
+	 * @return string
+	 * @since 3.13.5
+	 */
+	public static function get_offline_funnel_order_status( $order_status, $order ) {
+		$offer_settings = self::get_offer_settings();
+
+		if ( 'main-order' !== $offer_settings['offer_orders'] || ! self::get_funnel_id_from_order( $order->get_id() ) ) {
+			return $order_status;
+		}
+
+		if ( ! self::is_funnel_order_status_registered() ) {
+			return $order_status;
+		}
+
+		return 'wc-wpfnl-main-order';
+	}
+
+	/**
+	 * Whether the funnel main order status is registered.
+	 *
+	 * WPFunnels Pro registers `wc-wpfnl-main-order`, holds funnel orders in it
+	 * and, once the funnel ends, moves them on and sends their order emails.
+	 * Checked instead of Pro being installed, as an inactive Pro, or one that
+	 * stopped loading, does none of that.
+	 *
+	 * @return bool
+	 * @since 3.13.5
+	 */
+	public static function is_funnel_order_status_registered() {
+		return array_key_exists( 'wc-wpfnl-main-order', wc_get_order_statuses() );
 	}
 
 	/**

@@ -122,6 +122,13 @@ class FunnelController extends Wpfnl_REST_Controller
 					$this,
 					'get_conditional_node'
 				],
+				'args' => array(
+					'funnel_id' => array(
+						'required' => true,
+						'type' => array('integer', 'string'),
+						'sanitize_callback' => 'absint',
+					),
+				),
 				'permission_callback' => [
 					$this,
 					'get_items_permissions_check'
@@ -475,7 +482,10 @@ class FunnelController extends Wpfnl_REST_Controller
 	 */
 	public function get_conditional_node($request)
 	{
-		$funnel_id = $request['funnel_id'];
+		$funnel_id = isset($request['funnel_id']) ? absint($request['funnel_id']) : 0;
+		if (!$funnel_id) {
+			return new \WP_Error('rest_missing_funnelID', __('Funnel id is missing', 'wpfnl'), array('status' => 400));
+		}
 
 		$steps = Wpfnl_functions::get_steps($funnel_id);
 		$optin_step = [];
@@ -1596,14 +1606,14 @@ class FunnelController extends Wpfnl_REST_Controller
 		$key = array_search('checkout', array_column($_steps_order, 'step_type'));
 		if (false !== $key) {
 			$funnel_type = get_post_meta($funnel_id, '_wpfnl_funnel_type', true);
+			// 'lead' means no checkout, so a funnel that has one is never 'lead'.
 			if ('lead' === $funnel_type) {
-				if (Wpfnl_functions::is_wc_active()) {
-					update_post_meta($funnel_id, '_wpfnl_funnel_type', 'wc');
+				// Check if LMS add-on is active AND at least one LMS plugin (LearnDash or CreatorLMS) is active
+				if (!Wpfnl_functions::is_wc_active() && Wpfnl_functions::is_lms_addon_active() && Wpfnl_functions::is_any_lms_plugin_active()) {
+					update_post_meta($funnel_id, '_wpfnl_funnel_type', 'lms');
 				} else {
-					// Check if LMS add-on is active AND at least one LMS plugin (LearnDash or CreatorLMS) is active
-					if (Wpfnl_functions::is_lms_addon_active() && Wpfnl_functions::is_any_lms_plugin_active()) {
-						update_post_meta($funnel_id, '_wpfnl_funnel_type', 'lms');
-					}
+					// WooCommerce is the default checkout stack, active or not.
+					update_post_meta($funnel_id, '_wpfnl_funnel_type', 'wc');
 				}
 			}
 		}

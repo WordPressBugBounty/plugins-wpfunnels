@@ -7,6 +7,7 @@
 namespace WPFunnels\Widgets\Elementor;
 
 use WPFunnels\Meta\Wpfnl_Default_Meta;
+use WPFunnels\Modules\Frontend\Checkout\Module as Checkout_Module;
 use WPFunnels\Traits\SingletonTrait;
 use WPFunnels\Wpfnl;
 use WPFunnels\Wpfnl_functions;
@@ -55,6 +56,16 @@ class Elemenetor_Editror_Compatibility {
 					$frontend = Wpfnl::get_instance()->frontend;
 					add_filter('woocommerce_locate_template', array($frontend, 'wpfunnels_woocommerce_locate_template'), 20, 3);
 
+					// Elementor renders the widgets' first HTML in the editor request itself,
+					// where WooCommerce has no cart: fill it so the checkout is not empty.
+					if ( 'elementor' === $_REQUEST['action'] ) {
+						add_action( 'elementor/widget/before_render_content', function ( $widget ) use ( $current_post_id ) {
+							if ( 'wpfnl-checkout' === $widget->get_name() ) {
+								$this->prepare_editor_checkout_cart( $current_post_id );
+							}
+						}, 5 );
+					}
+
 					// hook for showing order bump
 					add_action('elementor/widget/before_render_content', function ($widget) use ($current_post_id) {
 						$widget_type = $widget->get_name();
@@ -76,6 +87,44 @@ class Elemenetor_Editror_Compatibility {
 				}
 			}
 		}
+	}
+
+
+	/**
+	 * Fill the cart with a checkout step's products for the Elementor editor.
+	 *
+	 * WooCommerce has no cart in the editor request, so [woocommerce_checkout]
+	 * printed nothing and the Checkout widget showed as an empty bar until a
+	 * setting was changed. The cart is loaded and filled as the funnel
+	 * checkout page fills it.
+	 *
+	 * @param int $step_id Step being edited.
+	 *
+	 * @since 3.13.5
+	 */
+	public function prepare_editor_checkout_cart( $step_id ) {
+		if ( ! function_exists( 'wc_load_cart' ) || 'checkout' !== get_post_meta( $step_id, '_step_type', true ) ) {
+			return;
+		}
+
+		$funnel_id = get_post_meta( $step_id, '_funnel_id', true );
+		if ( ! $funnel_id || 'lms' === get_post_meta( $funnel_id, '_wpfnl_funnel_type', true ) ) {
+			return;
+		}
+
+		if ( null === WC()->cart ) {
+			wc_load_cart();
+		}
+
+		if ( null === WC()->cart ) {
+			return;
+		}
+
+		// A cart loaded this late reads the session on its first get_cart(); do it
+		// now, or that session cart is merged back in after the cart is emptied.
+		WC()->cart->get_cart();
+
+		Checkout_Module::instance()->add_funnel_products_to_cart( $step_id, $funnel_id );
 	}
 
 

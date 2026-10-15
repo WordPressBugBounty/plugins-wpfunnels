@@ -62,8 +62,12 @@ class Wpfnl_Funnel_Store_Data extends Wpfnl_Abstract_Store_data implements Wpfnl
 			// (create_funnel, the template importer) overwrite this straight after.
 			if( Wpfnl_functions::is_wc_active() ){
 				update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'wc' );
-			}else{
+			}elseif( Wpfnl_functions::is_lms_addon_active() ){
 				update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lms' );
+			}else{
+				// No WooCommerce and no LMS add-on: an 'lms' type here would lock
+				// the funnel behind "Activate LearnDash & WPFunnels Pro - LMS Funnel".
+				update_post_meta( $funnel_id, '_wpfnl_funnel_type', 'lead' );
 			}
 			$this->set_id($funnel_id);
 		}

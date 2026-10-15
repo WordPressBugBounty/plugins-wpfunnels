@@ -379,7 +379,19 @@ class Checkout_Form extends Widget_Base
                     '' 		            => __('Select option', 'wpfnl'),
                     'floating-label'    => __('Floating Label', 'wpfnl'),
                 ),
-                'separator' => 'after'
+            ]
+        );
+
+        $this->add_control(
+            'customer_info_heading',
+            [
+                'label'       => __('Customer Information Heading', 'wpfnl'),
+                'type'        => \Elementor\Controls_Manager::TEXT,
+                'default'     => '',
+                'placeholder' => __('Customer information', 'wpfnl'),
+                'description' => __('Heading above the email field. Leave empty to use the default (translatable) text.', 'wpfnl'),
+                'label_block' => true,
+                'separator'   => 'after',
             ]
         );
 
@@ -451,7 +463,19 @@ class Checkout_Form extends Widget_Base
                     '' 		            => __('Select option', 'wpfnl'),
                     'floating-label'    => __('Floating Label', 'wpfnl'),
                 ),
-                'separator' => 'after'
+            ]
+        );
+
+        $this->add_control(
+            'customer_info_heading',
+            [
+                'label'       => __('Customer Information Heading', 'wpfnl'),
+                'type'        => \Elementor\Controls_Manager::TEXT,
+                'default'     => '',
+                'placeholder' => __('Customer information', 'wpfnl'),
+                'description' => __('Heading above the email field. Leave empty to use the default (translatable) text.', 'wpfnl'),
+                'label_block' => true,
+                'separator'   => 'after',
             ]
         );
 
@@ -3692,6 +3716,14 @@ class Checkout_Form extends Widget_Base
         );
         update_post_meta( $checkout_id, '_wpfnl_place_order_settings', $place_order_meta );
 
+        // Saved on the step so the checkout refresh keeps it (see Module::filter_customer_info_heading).
+        $customer_info_heading = isset( $settings['customer_info_heading'] ) ? trim( sanitize_text_field( $settings['customer_info_heading'] ) ) : '';
+        update_post_meta( $checkout_id, '_wpfnl_customer_info_heading', $customer_info_heading );
+        $customer_info_heading_filter = function ( $text ) use ( $customer_info_heading ) {
+            return '' !== $customer_info_heading ? $customer_info_heading : $text;
+        };
+        add_filter( 'wpfunnels_woo_customer_info_text', $customer_info_heading_filter, 6 );
+
         $place_order_filter = $this->get_place_order_button_filter( $settings );
         add_filter( 'woocommerce_order_button_html', $place_order_filter );
 
@@ -3719,6 +3751,7 @@ class Checkout_Form extends Widget_Base
 		<?php
 
         remove_filter( 'woocommerce_order_button_html', $place_order_filter );
+        remove_filter( 'wpfunnels_woo_customer_info_text', $customer_info_heading_filter, 6 );
         if ( null !== $below_btn_filter ) {
             remove_action( 'woocommerce_review_order_after_submit', $below_btn_filter );
         }

@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'wpfunnels/wpfunnels',
-        'pretty_version' => 'dev-master',
-        'version' => 'dev-master',
-        'reference' => 'fd924a3416954158385ecfb18bfa1083ef7b90c7',
+        'pretty_version' => 'dev-develop',
+        'version' => 'dev-develop',
+        'reference' => '90701006d1a47acfcd3482e2bfdb01dbdcdba527',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -239,9 +239,9 @@
             'dev_requirement' => false,
         ),
         'wpfunnels/wpfunnels' => array(
-            'pretty_version' => 'dev-master',
-            'version' => 'dev-master',
-            'reference' => 'fd924a3416954158385ecfb18bfa1083ef7b90c7',
+            'pretty_version' => 'dev-develop',
+            'version' => 'dev-develop',
+            'reference' => '90701006d1a47acfcd3482e2bfdb01dbdcdba527',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

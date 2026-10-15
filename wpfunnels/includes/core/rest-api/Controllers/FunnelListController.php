@@ -738,20 +738,6 @@ class FunnelListController extends Wpfnl_REST_Controller
 		$analytics = $this->get_funnel_analytics($funnel_id);
 		$is_trash  = 'trash' === $funnel->post_status;
 
-		/*
-		 * A funnel whose stack is switched off must not be opened: the legacy
-		 * row greyed itself out and said why, and the reason is resolved here
-		 * because only PHP knows whether WooCommerce or the LMS addon is
-		 * running.
-		 */
-		$disabled_reason = '';
-
-		if ('wc' === $type['key'] && !Wpfnl_functions::is_wc_active()) {
-			$disabled_reason = __('To run/edit this funnel, please Activate WooCommerce.', 'wpfnl');
-		} elseif ('lms' === $type['key'] && !Wpfnl_functions::is_lms_addon_active()) {
-			$disabled_reason = __('To run/edit this funnel, please Activate LearnDash & WPFunnels Pro - LMS Funnel', 'wpfnl');
-		}
-
 		return array(
 			'id'             => $funnel_id,
 			'name'           => $funnel->post_title ? $funnel->post_title : __('(no title)', 'wpfnl'),
@@ -779,8 +765,6 @@ class FunnelListController extends Wpfnl_REST_Controller
 			'editUrl'        => $is_trash ? '' : $this->get_edit_url($funnel_id),
 			'viewUrl'        => $is_trash ? '' : $this->get_view_url($funnel_id),
 			'viewDisabled'   => (bool) apply_filters('wpfunnels/disable_funnel_view_button', false, $funnel_id),
-			'disabled'       => (bool) $disabled_reason,
-			'disabledReason' => $disabled_reason,
 		);
 	}
 
@@ -956,7 +940,7 @@ class FunnelListController extends Wpfnl_REST_Controller
 			return array('key' => 'lms', 'label' => __('LMS', 'wpfnl'));
 		}
 
-		if (defined('WC_PLUGIN_FILE')) {
+		if ('wc' === $type || defined('WC_PLUGIN_FILE')) {
 			return array('key' => 'wc', 'label' => __('Woo', 'wpfnl'));
 		}
 
