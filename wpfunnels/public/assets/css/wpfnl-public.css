@@ -8016,6 +8016,14 @@ body.rtl .wpfnl-order-bump__template-style14 .template-preview-wrapper .product-
     width: 100%;
   }
 }
+.wpfnl-checkout .form-row label:not(.screen-reader-text):not(.radio):not(.checkbox):not(.woocommerce-form__label-for-checkbox) {
+  opacity: 1;
+}
+
+.wpfnl-checkout:not(.floating-label) .form-row label:not(.screen-reader-text):not(.radio):not(.checkbox):not(.woocommerce-form__label-for-checkbox) {
+  position: static;
+}
+
 .theme-storefront #order_review_heading,
 .theme-storefront #order_review {
   width: 50%;

@@ -146,7 +146,13 @@ class Wpfnl_Funnel_Store_Data extends Wpfnl_Abstract_Store_data implements Wpfnl
 						];
 						$step->update_meta($step_id, '_funnel_id', $funnel_id);
 						$this->duplicate_all_meta( $_step_id, $step_id, array('_funnel_id','_is_duplicate','wpfnl_mint_automation_id') );
-						
+
+						// A/B testing stores the original step as its own parent. Copied verbatim it
+						// points at the source funnel's step, and the copy loses its next step.
+						if ( (int) get_post_meta( $_step_id, '_parent_step_id', true ) === (int) $_step_id ) {
+							$step->update_meta( $step_id, '_parent_step_id', $step_id );
+						}
+
 						/**
 						 * Save the new step information on funnel data and funnel identifier.
 						 * This is required to show steps in funnel canvas

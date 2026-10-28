@@ -114,6 +114,36 @@ class Wpfnl_Order_Bump_Action {
 	}
 
 
+	/**
+	 * Resolve the checkout step a bump is rendered for.
+	 *
+	 * update_order_review is posted to `/?wc-ajax=...`, so the global $post is the
+	 * site front page, and WooCommerce renders the order review and payment fragments
+	 * before WPFunnels swaps $post to the checkout step. When the front page is
+	 * another funnel step, those bumps failed the checkout check and vanished, so use
+	 * the checkout ID load_ajax_actions() read from the posted data instead.
+	 *
+	 * @return int
+	 */
+	private function get_render_checkout_id() {
+		global $post;
+
+		if ( $this->checkout_id && did_action( 'woocommerce_checkout_update_order_review' ) ) {
+			return (int) $this->checkout_id;
+		}
+
+		if ( $post ) {
+			return $post->ID;
+		}
+
+		if ( is_admin() && isset( $_POST['post_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return intval( $_POST['post_id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		}
+
+		return (int) $this->checkout_id;
+	}
+
+
 	public function load_actions( $checkout_id, $settings = array() ) {
 		if( !function_exists( 'is_plugin_active' ) ) {
 			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
@@ -686,20 +716,9 @@ class Wpfnl_Order_Bump_Action {
      * @since 2.0.3
      */
     public function render_order_bump_before_payment() {
-
-
-		global $post;
-        $checkout_id = 0;
+		$checkout_id = $this->get_render_checkout_id();
         $output = '';
-        if ( $post ) {
-            $checkout_id = $post->ID;
-        } elseif ( is_admin() && isset( $_POST['post_id'] ) ) {
-            $checkout_id = intval( $_POST['post_id'] );
-        }
 
-		if( !$checkout_id ){
-			$checkout_id = $this->checkout_id;
-		}
 		if( Wpfnl_functions::check_if_this_is_step_type_by_id( $checkout_id, 'checkout' ) ) {
             if ( ! empty( $_POST['order_bump_data'] ) ) {
                 $settings = $_POST['order_bump_data'];
@@ -768,19 +787,9 @@ class Wpfnl_Order_Bump_Action {
      * @since 2.0.3
      */
     public function render_order_bump_after_payment() {
-
-		global $post;
-        $checkout_id = 0;
+		$checkout_id = $this->get_render_checkout_id();
         $output = '';
 
-        if ( $post ) {
-            $checkout_id = $post->ID;
-        } elseif ( is_admin() && isset( $_POST['post_id'] ) ) {
-            $checkout_id = intval( $_POST['post_id'] );
-        }
-		if( !$checkout_id ){
-			$checkout_id = $this->checkout_id;
-		}
 		if( Wpfnl_functions::check_if_this_is_step_type_by_id( $checkout_id, 'checkout' ) ) {
             if ( ! empty( $_POST['order_bump_data'] ) ) {
                 $settings = $_POST['order_bump_data'];
@@ -930,21 +939,9 @@ class Wpfnl_Order_Bump_Action {
      * @since 2.0.3
      */
     public function render_order_bump_after_order() {
-
-		global $post;
-        $checkout_id = 0;
+		$checkout_id = $this->get_render_checkout_id();
         $output = '';
 
-        if ( $post ) {
-            $checkout_id = $post->ID;
-        } elseif ( is_admin() && isset( $_POST['post_id'] ) ) {
-            $checkout_id = intval( $_POST['post_id'] );
-        }
-		
-		if( !$checkout_id ){
-			$checkout_id = $this->checkout_id;
-		}
-		
 		if( Wpfnl_functions::check_if_this_is_step_type_by_id( $checkout_id, 'checkout' ) ) {
             if ( ! empty( $_POST['order_bump_data'] ) ) {
                 $settings = $_POST['order_bump_data'];
@@ -1015,21 +1012,8 @@ class Wpfnl_Order_Bump_Action {
      * @since 2.0.3
      */
     public function render_order_bump_before_order() {
-
-		global $post;
-        $checkout_id = 0;
+		$checkout_id = $this->get_render_checkout_id();
         $output = '';
-
-
-        if ( $post ) {
-            $checkout_id = $post->ID;
-        } elseif ( is_admin() && isset( $_POST['post_id'] ) ) {
-            $checkout_id = intval( $_POST['post_id'] );
-        }
-
-		if( !$checkout_id ){
-			$checkout_id = $this->checkout_id;
-		}
 
 		if( Wpfnl_functions::check_if_this_is_step_type_by_id( $checkout_id, 'checkout' ) ) {
             if ( ! empty( $_POST['order_bump_data'] ) ) {

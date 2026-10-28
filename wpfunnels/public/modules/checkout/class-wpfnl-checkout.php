@@ -2130,6 +2130,16 @@ class Module extends Wpfnl_Frontend_Module
 		$this->additional_fields_rendered   = false;
 		$this->rendering_checkout_fragments = true;
 
+		// update_order_review is posted to `/?wc-ajax=...`, so the global $post is the
+		// site front page. When the front page is another funnel step, the hidden
+		// fields below printed its ID as _wpfunnels_checkout_id and checkout validation
+		// loaded that step's (empty) field settings. Render as the checkout step instead.
+		global $post;
+		$original_post = $post;
+		if ( Wpfnl_functions::check_if_this_is_step_type_by_id( $checkout_id, 'checkout' ) ) {
+			$post = get_post( $checkout_id ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		}
+
 		// 1. Render #customer_details for default, express, 2-step, modern-one-column
 		if ( 'wpfnl-modern-one-column' === $checkout_layout ) {
 			ob_start();
@@ -2209,6 +2219,7 @@ class Module extends Wpfnl_Frontend_Module
 		<?php
 		$fragments['#wpfnl_modern_customer_details'] = ob_get_clean();
 		$this->rendering_checkout_fragments = false;
+		$post = $original_post; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
 		// 3. Render .wpfnl-multistep-wizard for multistep/express/2-step layouts
 		ob_start();
@@ -2735,6 +2746,12 @@ class Module extends Wpfnl_Frontend_Module
 	 * @return void
 	 */
 	public function wpfnl_set_checkout_id( $checkout ) {
+		// checkout_shortcode_metas() already printed the field in the checkout form.
+		// The login form is a separate <form>, so it still needs its own.
+		if ( $this->checkout_metas_rendered && 'woocommerce_login_form_end' !== current_action() ) {
+			return;
+		}
+
 		global $post;
 		$checkout_id = 0;
 		if ( Wpfnl_functions::is_funnel_checkout_page() ) {
@@ -2745,7 +2762,9 @@ class Module extends Wpfnl_Frontend_Module
 			}
 
 		}
-		if( $checkout_id ){
+		// is_funnel_checkout_page() returns an array, so the check above always passes.
+		// Only print a real checkout step: any other ID makes validation load the wrong field settings.
+		if( $checkout_id && Wpfnl_functions::check_if_this_is_step_type_by_id( intval( $checkout_id ), 'checkout' ) ){
 			echo '<input type="hidden" class="input-hidden _wpfunnels_checkout_id" name="_wpfunnels_checkout_id" value="' . intval( $checkout_id ) . '">';
 		}
 	}

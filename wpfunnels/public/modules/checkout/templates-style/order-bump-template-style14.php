@@ -73,7 +73,7 @@ if( $type === 'lms' ){
     <div class="offer-checkbox" style="border-color: <?php echo $orderbump_color; ?>">
         <span class="wpfnl-checkbox">
             <input type="checkbox" id="wpfnl-order-bump-cb-<?php echo $key . ( $this->render_instance ? '-' . $this->render_instance : '' ); ?>" data-quantity="<?php echo $settings['quantity']; ?>"
-                   data-step="<?php echo get_the_ID(); ?>" class="wpfnl-order-bump-cb" name="wpfnl-order-bump-cb-<?php echo $key ?>"
+                   data-step="<?php echo esc_attr( ! empty( $checkout_id ) ? $checkout_id : get_the_ID() ); ?>" class="wpfnl-order-bump-cb" name="wpfnl-order-bump-cb-<?php echo $key ?>"
                    data-key="<?php echo $key; ?>"
                    data-lms="<?php echo $type; ?>"
                    data-replace="<?php echo $settings['isReplace']; ?>"

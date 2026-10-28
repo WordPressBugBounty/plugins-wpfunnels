@@ -82,6 +82,9 @@ class Telemetry {
             return;
         }
 
+        // Priority 1: must run before the SDK's consent handler (admin_init, priority 10).
+        add_action( 'admin_init', [ __CLASS__, 'guard_consent_request' ], 1 );
+
         $this->register_triggers();
         $this->register_retention_events();
 
@@ -90,6 +93,44 @@ class Telemetry {
          * opted-in sites and at deactivation for every site.
          */
         ActivityTrail::init( $this->client, self::POSTHOG_API_KEY );
+    }
+
+    /**
+     * Keep the SDK's opt-in/opt-out handler away from requests that are not an administrator
+     * clicking the consent notice.
+     *
+     * The SDK's Consent::handle_optin_optout() runs on every admin_init and only reads
+     * `?action=optin|optout&plugin=<slug>`; it checks no login, capability or nonce. admin_init
+     * also fires for unauthenticated admin-ajax.php and admin-post.php requests, so anyone could
+     * flip consent. Dropping `plugin` makes the handler return early. This lives in the plugin
+     * because another Linno plugin (Mail Mint, WPVR) may load its own, unpatched copy of the SDK
+     * first and PHP keeps only the first class definition.
+     *
+     * The SDK's own fix also requires a nonce; this guard deliberately does not, so the consent
+     * notice links of an SDK copy that predates that fix keep working.
+     */
+    public static function guard_consent_request(): void {
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended -- the point is to reject requests before any handler trusts them.
+        if ( ! isset( $_GET['action'], $_GET['plugin'] ) || ! is_string( $_GET['action'] ) || ! is_string( $_GET['plugin'] ) ) {
+            return;
+        }
+
+        if ( 'wpfunnels' !== sanitize_key( wp_unslash( $_GET['plugin'] ) ) ) {
+            return;
+        }
+
+        if ( ! in_array( sanitize_key( wp_unslash( $_GET['action'] ) ), [ 'optin', 'optout' ], true ) ) {
+            return;
+        }
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+        $pagenow = isset( $GLOBALS['pagenow'] ) ? $GLOBALS['pagenow'] : '';
+
+        if ( ! wp_doing_ajax() && 'admin-post.php' !== $pagenow && current_user_can( 'manage_options' ) ) {
+            return;
+        }
+
+        unset( $_GET['plugin'], $_REQUEST['plugin'] );
     }
 
     /**

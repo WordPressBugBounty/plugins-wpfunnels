@@ -136,7 +136,7 @@ if( $type === 'lms' ){
                 data-key="<?php echo $key; ?>"
                 data-quantity="<?php echo $settings['quantity']; ?>"
                 data-replace="<?php echo $settings['isReplace']; ?>"
-                data-step="<?php echo get_the_ID(); ?>"
+                data-step="<?php echo esc_attr( ! empty( $checkout_id ) ? $checkout_id : get_the_ID() ); ?>"
                 data-lms="<?php echo $type; ?>"
                 data-is-variable="<?php echo $isVariable ? 'true' : 'false'; ?>"
                 <?php checked( $this->is_order_bump_in_cart( $settings['product'] ) ); ?>

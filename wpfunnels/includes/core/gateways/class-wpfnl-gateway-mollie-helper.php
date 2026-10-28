@@ -684,6 +684,11 @@ class Wpfnl_Pro_Mollie_Helper {
         $order_id = sanitize_text_field( wp_unslash( $_POST['order_id'] ) );
         $order_key = sanitize_text_field( wp_unslash( $_POST['order_key'] ) );
 
+        // This charges the order's saved payment method, so only the order's owner may trigger it.
+        if ( ! \WPFunnels\Wpfnl_functions::is_valid_order_owner( wc_get_order( $order_id ), $order_key ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
+        }
+
         $product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : '';
         $quantity = isset( $_POST['quantity'] ) ? intval( $_POST['quantity'] ) : '';
 

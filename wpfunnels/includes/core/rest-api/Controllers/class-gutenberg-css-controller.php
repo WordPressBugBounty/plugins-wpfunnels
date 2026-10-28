@@ -72,9 +72,7 @@ class GutenbergCSSController extends Wpfnl_REST_Controller {
 				array(
 					'methods'             => 'POST',
 					'callback'            => array( $this, 'append_gutenberg_css_callback' ),
-					'permission_callback' => function () {
-						return current_user_can( 'edit_posts' );
-					},
+					'permission_callback' => array( $this, 'can_edit_target_post' ),
 					'args'                => array(),
 				),
 			)
@@ -88,13 +86,36 @@ class GutenbergCSSController extends Wpfnl_REST_Controller {
 				array(
 					'methods'             => 'POST',
 					'callback'            => array( $this, 'save_block_css' ),
-					'permission_callback' => function () {
-						return current_user_can( 'edit_posts' );
-					},
+					'permission_callback' => array( $this, 'can_edit_target_post' ),
 					'args'                => array(),
 				),
 			)
 		);
+	}
+
+	/**
+	 * Permission check for both CSS-write routes: `current_user_can('edit_posts')`
+	 * alone only proves the caller can edit *some* post type, not this
+	 * specific `post_id` — any Contributor could target any published step.
+	 * This requires `edit_post` capability on the exact post the request
+	 * names.
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 * @return bool|WP_Error
+	 * @since 3.13.7
+	 */
+	public function can_edit_target_post( $request ) {
+		$post_id = (int) $request->get_param( 'post_id' );
+
+		if ( ! $post_id || ! get_post( $post_id ) ) {
+			return new WP_Error( 'wpfunnels_rest_invalid_post', __( 'Invalid post.', 'wpfnl' ), array( 'status' => 400 ) );
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return new WP_Error( 'wpfunnels_rest_cannot_edit', __( 'Sorry, you cannot edit this resource.', 'wpfnl' ), array( 'status' => rest_authorization_required_code() ) );
+		}
+
+		return true;
 	}
 
 
@@ -285,15 +306,28 @@ class GutenbergCSSController extends Wpfnl_REST_Controller {
 
 	/**
 	 * Sanitize CSS content to prevent XSS attacks
-	 * 
+	 *
+	 * The stored value is echoed raw inside a `<style>` tag
+	 * (class-manager.php::add_block_inline_css()), so this must guarantee no
+	 * `<` or `>` survives — a literal or entity-encoded `</style>` is enough
+	 * to break out of the style block and run as markup. Entities are
+	 * decoded FIRST so `&lt;/style&gt;` is caught by the same pass that
+	 * catches `</style>`, then every `<`/`>` is stripped outright: CSS never
+	 * needs them, so this can't legitimately break real stylesheets.
+	 *
 	 * @param string $css The CSS content to sanitize
 	 * @return string Sanitized CSS content
 	 * @since 3.5.27
 	 */
-	private function sanitize_css_content($css){
+	public function sanitize_css_content($css){
 		if (!is_string($css)) {
 			return '';
 		}
+
+		// Decode entities first so an encoded breakout (`&lt;/style&gt;`,
+		// `&lt;script&gt;`) is sanitized the same as a literal one, instead
+		// of surviving this function and only decoding back to life later.
+		$css = html_entity_decode($css, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
 		// Remove potentially dangerous CSS functions and properties
 		$dangerous_patterns = array(
@@ -306,40 +340,18 @@ class GutenbergCSSController extends Wpfnl_REST_Controller {
 			'/data\s*:\s*text\/html/i',    // Remove data:text/html
 			'/vbscript\s*:/i',             // Remove vbscript: URLs
 			'/on\w+\s*=/i',                // Remove event handlers
-			'/<script/i',                  // Remove script tags
-			'/<\/script/i',                // Remove closing script tags
-			'/&lt;script/i',               // Remove encoded script tags
-			'/&lt;\/script/i',             // Remove encoded closing script tags
 		);
 
 		// Apply sanitization patterns
 		$sanitized_css = preg_replace($dangerous_patterns, '', $css);
 
-		// Strip any remaining HTML/XML tags that might have sneaked in
+		// Strip any HTML/XML tags, then every remaining angle bracket, so no
+		// `<style`/`<script`/`</style>` variant — tagged or bare — can survive
+		// to be echoed into the page's `<style>` block.
 		$sanitized_css = strip_tags($sanitized_css);
-
-		// Additional validation for CSS structure
-		$sanitized_css = $this->validate_css_structure($sanitized_css);
+		$sanitized_css = str_replace(array('<', '>'), '', $sanitized_css);
 
 		return $sanitized_css;
-	}
-
-	/**
-	 * Validate CSS structure and remove potentially malicious content
-	 * 
-	 * @param string $css The CSS content to validate
-	 * @return string Validated CSS content
-	 * @since 3.5.27
-	 */
-	private function validate_css_structure($css){
-		// Remove any content that looks like HTML/XML
-		$css = preg_replace('/<[^>]*>/', '', $css);
-
-		// Remove any remaining HTML entities that could be used for XSS
-		$css = html_entity_decode($css, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-		$css = preg_replace('/&[#\w]+;/', '', $css);
-
-		return $css;
 	}
 
 	/**

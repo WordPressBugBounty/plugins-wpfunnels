@@ -15,54 +15,24 @@ class SetupWizard
     use SingletonTrait;
 
     /**
+     * Nonce action the wizard's AJAX handlers verify.
+     *
+     * @since 3.13.6
+     */
+    const NONCE_ACTION = 'wpfnl_setup_wizard';
+
+    /**
      * Register AJAX handlers
      * This should be called early, not just when rendering the wizard
      *
      * @since 3.3.1
      */
     public static function register_ajax_handlers() {
+        // `wpfnl_update_step_meta` was registered here too: it wrote any meta
+        // key and value to any post with no nonce and no per-post check, and
+        // nothing called it.
         add_action('wp_ajax_wpfnl_activate_plugin', array(__CLASS__, 'ajax_activate_plugin_static'));
-        add_action('wp_ajax_wpfnl_update_step_meta', array(__CLASS__, 'ajax_update_step_meta'));
         add_action('wp_ajax_wpfnl_activate_mail_mint', array(__CLASS__, 'ajax_activate_mail_mint'));
-    }
-
-    /**
-     * AJAX handler for updating step meta
-     *
-     * @since 3.3.1
-     */
-    public static function ajax_update_step_meta() {
-        // Check user capabilities
-        if (!current_user_can('wpf_manage_funnels')) {
-            wp_send_json_error(array('message' => 'Insufficient permissions'));
-            wp_die();
-        }
-
-        $step_id = isset($_POST['step_id']) ? absint($_POST['step_id']) : 0;
-        $meta_key = isset($_POST['meta_key']) ? sanitize_text_field($_POST['meta_key']) : '';
-        $meta_value = isset($_POST['meta_value']) ? $_POST['meta_value'] : '';
-
-        if (!$step_id || !$meta_key) {
-            wp_send_json_error(array('message' => 'Invalid parameters'));
-            wp_die();
-        }
-
-        // Decode JSON if it's a JSON string
-        if (is_string($meta_value) && (substr($meta_value, 0, 1) === '{' || substr($meta_value, 0, 1) === '[')) {
-            $decoded = json_decode(stripslashes($meta_value), true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $meta_value = $decoded;
-            }
-        }
-
-        update_post_meta($step_id, $meta_key, $meta_value);
-
-        wp_send_json_success(array(
-            'message' => 'Meta updated successfully',
-            'step_id' => $step_id,
-            'meta_key' => $meta_key
-        ));
-        wp_die();
     }
 
     /**
@@ -77,11 +47,22 @@ class SetupWizard
             wp_die();
         }
 
+        if (!check_ajax_referer(self::NONCE_ACTION, 'security', false)) {
+            wp_send_json_error(array('message' => 'Nonce verification failed'), 403);
+            wp_die();
+        }
+
         // Get the plugin parameter
-        $plugin = isset($_POST['plugin']) ? sanitize_text_field($_POST['plugin']) : '';
+        $plugin = isset($_POST['plugin']) ? sanitize_text_field(wp_unslash($_POST['plugin'])) : '';
 
         if (empty($plugin)) {
             wp_send_json_error(array('message' => 'Plugin parameter is required'));
+            wp_die();
+        }
+
+        // Only the plugins the wizard offers, never any installed plugin.
+        if (!in_array($plugin, self::get_activatable_plugins(), true)) {
+            wp_send_json_error(array('message' => 'This plugin cannot be activated from the setup wizard'), 403);
             wp_die();
         }
 
@@ -130,6 +111,11 @@ class SetupWizard
         // Check user capabilities first
         if (!current_user_can('activate_plugins')) {
             wp_send_json_error(array('message' => 'Insufficient permissions'));
+            wp_die();
+        }
+
+        if (!check_ajax_referer(self::NONCE_ACTION, 'security', false)) {
+            wp_send_json_error(array('message' => 'Nonce verification failed'), 403);
             wp_die();
         }
 
@@ -195,6 +181,7 @@ class SetupWizard
             'is_mrm_active'          => is_plugin_active( 'mail-mint/mail-mint.php' ) ? 'yes' : 'no',
             'getPlugins'             => self::get_essential_plugins(),
             'defaultSettings'        => Wpfnl_functions::get_general_settings(),
+            'ajax_nonce'             => wp_create_nonce( self::NONCE_ACTION ),
             'admin_email'            => $admin_email,
             'admin_name'             => $admin_user ? $admin_user->display_name : '',
             'logo_url'               => WPFNL_URL . 'admin/assets/images/setup-funnel-logo.png',
@@ -210,6 +197,23 @@ class SetupWizard
         );
     }
 
+
+    /**
+     * Plugin files `wpfnl_activate_plugin` may activate: the essential plugins
+     * the wizard offers. Mail Mint goes through `wpfnl_activate_mail_mint`.
+     *
+     * @return array
+     * @since 3.13.6
+     */
+    public static function get_activatable_plugins() {
+        return array(
+            'woocommerce/woocommerce.php',
+            'elementor/elementor.php',
+            'qubely/qubely.php',
+            'divi-builder/divi-builder.php',
+            'oxygen/functions.php',
+        );
+    }
 
     /**
      * Get essential plugins for WPFunnels

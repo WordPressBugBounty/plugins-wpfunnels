@@ -1512,6 +1512,16 @@ class Wpfnl_Gateway_Paypal_Express extends Wpfnl_Gateway {
             switch ($_GET['action']) {
                 case 'wpfunnels_paypal_express_return':
 
+                    // Same guards as offer_accepted(): only the order's owner, only an offer
+                    // step of the order's funnel, and each step once per order.
+                    $guard_order = wc_get_order( $order_id );
+                    if ( ! in_array( get_post_meta( $step_id, '_step_type', true ), array( 'upsell', 'downsell' ), true ) || ! Wpfnl_functions::is_valid_order_owner( $guard_order, $order_key ) || ! Wpfnl_functions::is_offer_step_for_order( $guard_order, $step_id ) ) {
+                        wp_die( esc_html__( 'Unauthorized request', 'wpfnl' ), '', array( 'response' => 403 ) );
+                    }
+                    if ( Wpfnl_functions::is_offer_accepted_on_order( $guard_order, $step_id ) ) {
+                        wp_die( esc_html__( 'This offer has already been accepted.', 'wpfnl' ), '', array( 'response' => 409 ) );
+                    }
+
                     $offer_product = Wpfnl_functions::get_offer_product_data($step_id);
 
                     $order = wc_get_order( $order_id );
@@ -1575,6 +1585,11 @@ class Wpfnl_Gateway_Paypal_Express extends Wpfnl_Gateway {
                             $data = $this->handle_offer_charge($order, $api_response_result, $offer_product);
                         }
 
+                        if ( ! empty( $api_response_result ) ) {
+
+                            Wpfnl_functions::mark_offer_accepted_on_order( $order_id, $step_id );
+
+                        }
                         $result = Wpfnl_functions::after_offer_charged( $step_id, $order_id, $order_key, $api_response_result, $variation_id, $input_qty, $offer_product );
                         $next_step = Wpfnl_functions::get_next_step($funnel_id, $step_id);
                         
@@ -1598,6 +1613,11 @@ class Wpfnl_Gateway_Paypal_Express extends Wpfnl_Gateway {
 
                     } else {
 
+                        if ( ! empty( $api_response_result ) ) {
+
+                            Wpfnl_functions::mark_offer_accepted_on_order( $order_id, $step_id );
+
+                        }
                         $result =  Wpfnl_functions::after_offer_charged( $step_id, $order_id, $order_key, $api_response_result, $variation_id, $input_qty, $offer_product );
                         $next_step = Wpfnl_functions::get_next_step($funnel_id, $step_id);
 

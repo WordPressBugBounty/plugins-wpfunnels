@@ -1179,6 +1179,34 @@ class Wpfnl_functions {
 
 
 	/**
+	 * Get the A/B testing parent of a step, if it belongs to the same funnel.
+	 *
+	 * Funnels duplicated before 3.13.6 copied `_parent_step_id` verbatim, so a copied
+	 * step can point at a step of the source funnel. That step has no node in the
+	 * copy's canvas, so following it loses the next step.
+	 *
+	 * @param int $step_id
+	 * @param int $funnel_id
+	 *
+	 * @return int Parent step ID, or 0 when there is none in this funnel.
+	 *
+	 * @since 3.13.6
+	 */
+	public static function get_parent_step_id( $step_id, $funnel_id ) {
+		$parent_step_id = (int) get_post_meta( $step_id, '_parent_step_id', true );
+		if ( ! $parent_step_id ) {
+			return 0;
+		}
+
+		if ( (int) get_post_meta( $parent_step_id, '_funnel_id', true ) !== (int) $funnel_id ) {
+			return 0;
+		}
+
+		return $parent_step_id;
+	}
+
+
+	/**
 	 * Get next step of the
 	 * funnel
 	 *
@@ -1194,7 +1222,7 @@ class Wpfnl_functions {
 		if ( ! $funnel_id || ! $step_id ) {
 			return false;
 		}
-		$parent_step_id = get_post_meta( $step_id, '_parent_step_id', true );
+		$parent_step_id = self::get_parent_step_id( $step_id, $funnel_id );
 		if ( $parent_step_id ) {
 			$step_id = $parent_step_id;
 		}
@@ -3133,7 +3161,7 @@ class Wpfnl_functions {
 		// unset cookie
 		ob_start();
 		if ( isset( $_COOKIE[ $cookie_name ] ) ) {
-			setcookie( $cookie_name, null, strtotime( '-1 days' ), '/', COOKIE_DOMAIN );
+			setcookie( $cookie_name, '', strtotime( '-1 days' ), '/', COOKIE_DOMAIN );
 		}
 		ob_end_flush();
 	}
@@ -5188,6 +5216,334 @@ class Wpfnl_functions {
 			'variation_id' => $variation_id,
 			'quantity'     => $quantity,
 		);
+	}
+
+	/**
+	 * Resolves what an offer accept request may add to the order.
+	 *
+	 * The accept handlers run for unauthenticated callers and only prove that the
+	 * caller owns the order, not what the step sells. Without this the request
+	 * chose the product and quantity, so the step's discount (up to 100%) could
+	 * be applied to any catalog product at any quantity. The product and quantity
+	 * come from the step; the request may only pick a variation of it.
+	 *
+	 * Global funnel steps in manual mode keep their products in the same meta and
+	 * are matched against all of them. In auto-match mode the product is chosen
+	 * on the server (random, best seller, ...) and Pro's offer_product_data
+	 * filter replaces whatever the request names, so there is nothing stored to
+	 * match; the requested product is kept and only the quantity is checked.
+	 *
+	 * @param int $step_id              The offer step being accepted.
+	 * @param int $requested_product_id Product or variation the request names.
+	 * @param int $requested_qty        Quantity the request names.
+	 * @return array|WP_Error           product_id (the id to price and add) and quantity, or an error.
+	 * @since 3.13.7
+	 */
+	public static function resolve_offer_accept_item( $step_id, $requested_product_id, $requested_qty = 0 ) {
+		$step_id              = absint( $step_id );
+		$requested_product_id = absint( $requested_product_id );
+		$funnel_id            = get_post_meta( $step_id, '_funnel_id', true );
+
+		if ( $funnel_id && 'yes' === get_post_meta( $funnel_id, 'is_global_funnel', true ) ) {
+			$step_type = get_post_meta( $step_id, '_step_type', true );
+
+			if ( ! in_array( $step_type, array( 'upsell', 'downsell' ), true ) ) {
+				return new \WP_Error( 'wpfnl_invalid_step', __( 'Invalid offer step.', 'wpfnl' ) );
+			}
+
+			$requested = $requested_product_id ? wc_get_product( $requested_product_id ) : false;
+
+			if ( ! $requested ) {
+				return new \WP_Error( 'wpfnl_invalid_product', __( 'This product is not part of the offer.', 'wpfnl' ) );
+			}
+
+			if ( 'manual' === self::get_global_offer_mode( $step_id, $step_type ) ) {
+				$configured = get_post_meta( $step_id, '_wpfnl_' . $step_type . '_products', true );
+
+				foreach ( is_array( $configured ) ? $configured : array() as $entry ) {
+					$entry_id = isset( $entry['id'] ) ? absint( $entry['id'] ) : 0;
+
+					if ( $entry_id && ( $entry_id === $requested_product_id || ( $requested->is_type( 'variation' ) && $requested->get_parent_id() === $entry_id ) ) ) {
+						if ( $requested->is_type( 'variable' ) ) {
+							return new \WP_Error( 'wpfnl_variation_attributes', __( 'Please choose an option for this offer.', 'wpfnl' ) );
+						}
+
+						return array(
+							'product_id' => $requested_product_id,
+							'quantity'   => max( 1, isset( $entry['quantity'] ) ? absint( $entry['quantity'] ) : 1 ),
+						);
+					}
+				}
+
+				return new \WP_Error( 'wpfnl_invalid_product', __( 'This product is not part of the offer.', 'wpfnl' ) );
+			}
+
+			// Auto-match is only safe while Pro's matcher replaces the requested product.
+			if ( ! self::is_global_funnel_activated() ) {
+				return new \WP_Error( 'wpfnl_invalid_step', __( 'Invalid offer step.', 'wpfnl' ) );
+			}
+
+			$quantity = intval( $requested_qty );
+
+			if ( $quantity < 1 ) {
+				return new \WP_Error( 'wpfnl_invalid_quantity', __( 'Invalid offer quantity.', 'wpfnl' ) );
+			}
+
+			return array(
+				'product_id' => $requested_product_id,
+				'quantity'   => $quantity,
+			);
+		}
+
+		$offer_item = self::resolve_offer_cart_item( $step_id );
+
+		if ( is_wp_error( $offer_item ) ) {
+			return $offer_item;
+		}
+
+		$product_id = $offer_item['product_id'];
+
+		// Anything other than the configured product must be one of its variations.
+		if ( $requested_product_id && $requested_product_id !== $product_id ) {
+			$offer_item = self::resolve_offer_cart_item( $step_id, $requested_product_id );
+
+			if ( is_wp_error( $offer_item ) ) {
+				return new \WP_Error( 'wpfnl_invalid_product', __( 'This product is not part of the offer.', 'wpfnl' ) );
+			}
+
+			$product_id = $offer_item['variation_id'];
+		}
+
+		// A variable product is sold as one of its variations, never as the parent.
+		$product = wc_get_product( $product_id );
+
+		if ( $product && $product->is_type( 'variable' ) ) {
+			return new \WP_Error( 'wpfnl_variation_attributes', __( 'Please choose an option for this offer.', 'wpfnl' ) );
+		}
+
+		return array(
+			'product_id' => $product_id,
+			'quantity'   => $offer_item['quantity'],
+		);
+	}
+
+	/**
+	 * Offer mode of a global funnel offer step: 'manual' or 'auto-match'.
+	 *
+	 * Mirrors Pro's Wpfnl_Pro_Global_Actions: downsells fall back to the upsell
+	 * key, and a step without a mode is auto-match.
+	 *
+	 * @param int    $step_id   The offer step.
+	 * @param string $step_type upsell or downsell.
+	 * @return string
+	 * @since 3.13.7
+	 */
+	public static function get_global_offer_mode( $step_id, $step_type ) {
+		$mode = 'downsell' === $step_type ? get_post_meta( $step_id, 'global_funnel_downsell_offer_mode', true ) : '';
+
+		if ( empty( $mode ) ) {
+			$mode = get_post_meta( $step_id, 'global_funnel_offer_mode', true );
+		}
+
+		return empty( $mode ) ? 'auto-match' : $mode;
+	}
+
+	/**
+	 * Narrows a requested offer selection to what the step sells.
+	 *
+	 * For the pricing helpers (get_offer_data, update_variation_product_details)
+	 * that gateways call with a request-supplied product before the offer is
+	 * accepted, e.g. to size a Stripe payment intent. A selection the step does
+	 * not sell falls back to the configured product, so nothing is ever priced
+	 * from the request alone. An empty selection is returned unchanged.
+	 *
+	 * @param int $step_id             The offer step.
+	 * @param int $selected_product_id Product or variation the request names.
+	 * @param int $input_qty           Quantity the request names.
+	 * @return array                   array( product_id, quantity ); product_id 0 if nothing can be sold.
+	 * @since 3.13.7
+	 */
+	public static function resolve_offer_selection( $step_id, $selected_product_id, $input_qty ) {
+		if ( ! $selected_product_id ) {
+			return array( $selected_product_id, $input_qty );
+		}
+
+		// Callers pass an empty quantity to mean "the default".
+		if ( intval( $input_qty ) < 1 ) {
+			$rules     = get_post_meta( $step_id, 'global_funnel_' . get_post_meta( $step_id, '_step_type', true ) . '_rules', true );
+			$input_qty = is_array( $rules ) && ! empty( $rules['quantity'] ) ? absint( $rules['quantity'] ) : 1;
+		}
+
+		$item = self::resolve_offer_accept_item( $step_id, $selected_product_id, $input_qty );
+
+		if ( is_wp_error( $item ) ) {
+			$item = self::resolve_offer_cart_item( $step_id );
+		}
+
+		if ( is_wp_error( $item ) ) {
+			return array( 0, 0 );
+		}
+
+		return array( $item['product_id'], $item['quantity'] );
+	}
+
+	/**
+	 * Keeps only the variation attributes of a requested offer selection.
+	 *
+	 * The selection is stored as the order item's variation data, and
+	 * WC_Order_Item_Product::set_variation() routes keys such as `_product_id`
+	 * or `_variation_id` to their setters, so an unfiltered array could change
+	 * which product the offer line points at.
+	 *
+	 * set_variation() strips every `attribute_` from a key, so the prefix alone
+	 * is not enough: `attribute__product_id` still reaches `_product_id`. Keys
+	 * must name a real attribute once stripped, and with a variation given only
+	 * that variation's own attributes are kept; a fixed attribute keeps the
+	 * variation's value and only "any" attributes take the requested one.
+	 *
+	 * @param mixed           $attr    Requested attributes.
+	 * @param WC_Product|null $product The product being added, if known.
+	 * @return array                   attribute_* => value pairs.
+	 * @since 3.13.7
+	 */
+	public static function sanitize_offer_attributes( $attr, $product = null ) {
+		$clean = array();
+
+		if ( ! is_array( $attr ) ) {
+			return $clean;
+		}
+
+		foreach ( $attr as $key => $value ) {
+			if ( ! is_string( $key ) || 0 !== strpos( $key, 'attribute_' ) || ! is_scalar( $value ) ) {
+				continue;
+			}
+
+			$name = str_replace( 'attribute_', '', $key );
+
+			if ( '' === $name || '_' === $name[0] || ! preg_match( '/^[a-z0-9_\-%]+$/i', $name ) ) {
+				continue;
+			}
+
+			$clean[ 'attribute_' . $name ] = wc_clean( wp_unslash( $value ) );
+		}
+
+		if ( $product instanceof \WC_Product && $product->is_type( 'variation' ) ) {
+			$own     = array();
+			$parent  = wc_get_product( $product->get_parent_id() );
+			$options = array();
+
+			// "Any" attributes may only take one of the parent's own options.
+			foreach ( $parent ? $parent->get_variation_attributes() : array() as $name => $values ) {
+				$options[ 'attribute_' . sanitize_title( $name ) ] = (array) $values;
+			}
+
+			foreach ( $product->get_variation_attributes() as $key => $fixed ) {
+				if ( '' !== $fixed ) {
+					$own[ $key ] = $fixed;
+				} elseif ( isset( $clean[ $key ], $options[ $key ] ) ) {
+					foreach ( $options[ $key ] as $option ) {
+						if ( sanitize_title( $option ) === sanitize_title( $clean[ $key ] ) ) {
+							$own[ $key ] = $option;
+							break;
+						}
+					}
+				}
+			}
+
+			return $own;
+		}
+
+		return $clean;
+	}
+
+	/**
+	 * Whether an offer step belongs to the funnel the order was placed in.
+	 *
+	 * Without this, the owner of any order could accept an offer step from a
+	 * different funnel and take that step's product at that step's discount.
+	 *
+	 * @param WC_Order $order   The parent order.
+	 * @param int      $step_id The offer step.
+	 * @return bool
+	 * @since 3.13.7
+	 */
+	public static function is_offer_step_for_order( $order, $step_id ) {
+		// Offers are accepted on the order the funnel started with. An offer's own
+		// child order carries the same funnel but none of the parent's accepted
+		// markers, so allowing it would let each child unlock the offers again.
+		if ( ! is_a( $order, 'WC_Order' ) || $order->get_meta( '_wpfunnels_offer_parent_id' ) || 'yes' === $order->get_meta( '_wpfunnels_offer' ) ) {
+			return false;
+		}
+
+		$order_funnel_id = self::get_funnel_id_from_order( $order );
+		$step_funnel_id  = absint( get_post_meta( absint( $step_id ), '_funnel_id', true ) );
+
+		return $order_funnel_id && $step_funnel_id && $order_funnel_id === $step_funnel_id;
+	}
+
+	/**
+	 * Whether an offer step has already been accepted on an order.
+	 *
+	 * The accept handlers are reachable for as long as the caller holds the order
+	 * key, so without this the same offer could be added to an order again and
+	 * again. `_wpfunnels_offer_{step_id}` covers offers accepted before the
+	 * dedicated marker existed (main order mode).
+	 *
+	 * @param WC_Order $order   The parent order.
+	 * @param int      $step_id The offer step.
+	 * @return bool
+	 * @since 3.13.7
+	 */
+	public static function is_offer_accepted_on_order( $order, $step_id ) {
+		if ( ! is_a( $order, 'WC_Order' ) ) {
+			return false;
+		}
+
+		$step_id = absint( $step_id );
+
+		if ( $order->get_meta( '_wpfunnels_offer_accepted_' . $step_id ) || $order->get_meta( '_wpfunnels_offer_' . $step_id ) ) {
+			return true;
+		}
+
+		// Offers accepted before the marker existed, in child order mode, are only
+		// recorded on the child order.
+		$children = wc_get_orders(
+			array(
+				'parent' => $order->get_id(),
+				'limit'  => -1,
+				'type'   => 'shop_order',
+			)
+		);
+
+		foreach ( $children as $child ) {
+			if ( absint( $child->get_meta( '_wpfunnels_offer_step_id' ) ) === $step_id ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Records on the parent order that an offer step was accepted.
+	 *
+	 * Written on the parent in both offer order modes, since in child order mode
+	 * the other offer meta lives on the child order.
+	 *
+	 * @param int $order_id The parent order id.
+	 * @param int $step_id  The offer step.
+	 * @return void
+	 * @since 3.13.7
+	 */
+	public static function mark_offer_accepted_on_order( $order_id, $step_id ) {
+		$order = wc_get_order( $order_id );
+
+		if ( ! $order ) {
+			return;
+		}
+
+		$order->update_meta_data( '_wpfunnels_offer_accepted_' . absint( $step_id ), 'yes' );
+		$order->save();
 	}
 
 	/**
@@ -7374,6 +7730,9 @@ class Wpfnl_functions {
 	 * @since 1.0.0
 	 */
 	public static function get_offer_data( $step_id, $selected_product_id = '', $input_qty = '', $order_id = 0 ) {
+		// Gateways price offers from request values before accepting; never price what the step does not sell.
+		list( $selected_product_id, $input_qty ) = self::resolve_offer_selection( $step_id, $selected_product_id, $input_qty );
+
 		$data              = array();
 		$amount_diff       = 0;
 		$cancel_main_order = false;
@@ -7619,6 +7978,35 @@ class Wpfnl_functions {
 		);
 
 		return WPFNL_URL . 'admin/assets/dist/styles/' . basename( $files[0] );
+	}
+
+
+	/**
+	 * Split the order review quantity markup into the badge and anything else
+	 * that `woocommerce_checkout_cart_item_quantity` callbacks added to it.
+	 *
+	 * The badge sits on the 64px product thumbnail. Other plugins add markup to
+	 * the same filter (WooCommerce Subscriptions appends div.wcs-checkout-item-price),
+	 * which can't fit there and has to print under the product name instead.
+	 *
+	 * @param string $quantity_html Filtered quantity markup.
+	 * @param string $badge_html    Badge markup the filter started from.
+	 *
+	 * @return array { badge: string, extra: string }
+	 * @since 3.13.8
+	 */
+	public static function split_checkout_cart_item_quantity( $quantity_html, $badge_html ) {
+		$position = strpos( $quantity_html, $badge_html );
+
+		// A callback replaced the badge, so none of it is ours to keep on the thumbnail.
+		if ( false === $position ) {
+			return array( 'badge' => '', 'extra' => $quantity_html );
+		}
+
+		return array(
+			'badge' => $badge_html,
+			'extra' => trim( substr_replace( $quantity_html, '', $position, strlen( $badge_html ) ) ),
+		);
 	}
 
 	/**

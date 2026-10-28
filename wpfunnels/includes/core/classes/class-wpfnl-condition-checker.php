@@ -159,7 +159,7 @@ class Wpfnl_Condition_Checker {
 				}
 				ob_start();
 				if( isset( $_COOKIE[$cookie_name] ) ){
-					setcookie( $cookie_name, null, strtotime( '-1 days' ), '/', COOKIE_DOMAIN );
+					setcookie( $cookie_name, '', strtotime( '-1 days' ), '/', COOKIE_DOMAIN );
 				}
 				ob_end_flush();
 

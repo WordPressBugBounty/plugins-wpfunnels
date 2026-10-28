@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'wpfunnels/wpfunnels',
-        'pretty_version' => 'dev-develop',
-        'version' => 'dev-develop',
-        'reference' => '90701006d1a47acfcd3482e2bfdb01dbdcdba527',
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'reference' => 'e60aabafa27c267adfb5746ff1c0a99c5ce4f305',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -94,7 +94,7 @@
         'linno/telemetry' => array(
             'pretty_version' => 'dev-update-for-onboarding',
             'version' => 'dev-update-for-onboarding',
-            'reference' => '402ca8b485d9a2670951cc83c578b2121982dfca',
+            'reference' => '53c7af3a7c21aa85b56d61edd7dc8eed70226f08',
             'type' => 'library',
             'install_path' => __DIR__ . '/../linno/telemetry',
             'aliases' => array(),
@@ -239,9 +239,9 @@
             'dev_requirement' => false,
         ),
         'wpfunnels/wpfunnels' => array(
-            'pretty_version' => 'dev-develop',
-            'version' => 'dev-develop',
-            'reference' => '90701006d1a47acfcd3482e2bfdb01dbdcdba527',
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => 'e60aabafa27c267adfb5746ff1c0a99c5ce4f305',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

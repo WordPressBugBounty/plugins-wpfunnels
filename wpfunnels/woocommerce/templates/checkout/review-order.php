@@ -79,6 +79,17 @@ echo '</div><!-- /.wpfnl-before-order-review -->';
 				if( !\WPFunnels\Wpfnl_functions::is_wpfnl_pro_activated() ) {
 					$isQuantity = 'no';
 				}
+
+				// Only the badge fits on the thumbnail; markup other plugins add to the
+				// quantity (e.g. the WooCommerce Subscriptions price) goes under the name.
+				$quantity_parts = array( 'badge' => '', 'extra' => '' );
+				if ( $show_product_images && $isQuantity === 'no' ) {
+					$quantity_badge = ' <strong class="product-quantity">' . sprintf( '%s', $cart_item['quantity'] ) . '</strong>';
+					$quantity_parts = \WPFunnels\Wpfnl_functions::split_checkout_cart_item_quantity(
+						apply_filters( 'woocommerce_checkout_cart_item_quantity', $quantity_badge, $cart_item, $cart_item_key ),
+						$quantity_badge
+					);
+				}
 				?>
 
 				<tr class="<?php echo esc_attr( apply_filters( 'woocommerce_cart_item_class', 'cart_item', $cart_item, $cart_item_key ) ); ?>">
@@ -90,10 +101,7 @@ echo '</div><!-- /.wpfnl-before-order-review -->';
 									<?php
 										$thumbnail = apply_filters( 'woocommerce_cart_item_thumbnail', $_product->get_image( 'thumbnail' ), $cart_item, $cart_item_key );
 										echo $thumbnail; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-
-										if($isQuantity === 'no'){
-											echo apply_filters( 'woocommerce_checkout_cart_item_quantity', ' <strong class="product-quantity">' . sprintf( '%s', $cart_item['quantity'] ) . '</strong>', $cart_item, $cart_item_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-										}
+										echo $quantity_parts['badge']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 									?>
 								</div>
 							<?php endif; ?>
@@ -106,6 +114,8 @@ echo '</div><!-- /.wpfnl-before-order-review -->';
 								</span>
 
 								<?php
+									echo $quantity_parts['extra']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
 									if($isQuantity === 'yes'){
 										echo apply_filters( 'woocommerce_checkout_cart_item_quantity', ' <strong class="product-quantity">' . sprintf( '%s', $cart_item['quantity'] ) . '</strong>', $cart_item, $cart_item_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 									}

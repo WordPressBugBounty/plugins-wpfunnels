@@ -397,7 +397,7 @@ class Wpfnl_Stripe_payment_process {
         if( !empty($_POST['attr']) && Wpfnl_functions::is_wc_active() ){
             $variation_id = (new \WC_Product_Data_Store_CPT())->find_matching_product_variation(
                 new \WC_Product($product_id),
-                $_POST['attr']
+                Wpfnl_functions::sanitize_offer_attributes( $_POST['attr'] )
             );
             if( $variation_id ){
                 $product_id = $variation_id;
@@ -405,6 +405,12 @@ class Wpfnl_Stripe_payment_process {
         }
       
         $order         = wc_get_order( $order_id );
+
+        // This charges the order's saved payment method, so only the order's owner may trigger it.
+        $order_key = isset( $_POST['order_key'] ) ? sanitize_text_field( wp_unslash( $_POST['order_key'] ) ) : '';
+        if ( ! Wpfnl_functions::is_valid_order_owner( $order, $order_key ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
+        }
         
         // Get offer product data - use offer class method if available, otherwise use pro functions
         if ( class_exists( '\WPFunnels\Offer\Wpfnl_Offer' ) ) {
@@ -697,6 +703,8 @@ class Wpfnl_Stripe_payment_process {
         // Save the intent ID to the order.
         if ( $step_id ) {
             update_post_meta($order_id, '_stripe_intent_id_' . $step_id, $intent->id);
+            // offer_accepted() only lets this intent pay for the product it was sized for.
+            update_post_meta( $order_id, '_wpfnl_stripe_intent_product_' . $step_id, isset( $product['id'] ) ? absint( $product['id'] ) : 0 );
         }
         
         return $intent;

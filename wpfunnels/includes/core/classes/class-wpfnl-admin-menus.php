@@ -56,7 +56,7 @@ class Wpfnl_Menus
      * which sends those old pages to the same routes.
      *
      * @return array Legacy page slug => hash route.
-     * @since  3.13.7
+     * @since  3.13.6
      */
     public static function react_routes()
     {
@@ -158,7 +158,7 @@ class Wpfnl_Menus
      *
      * @param string $page Legacy page slug of the screen.
      * @return string Slug to register the menu item under.
-     * @since  3.13.7
+     * @since  3.13.6
      */
     public static function react_admin_slug( $page )
     {
@@ -571,7 +571,7 @@ class Wpfnl_Menus
 	 *                         (`settings` or `automation`) and, for settings,
 	 *                         `tab` (the drawer tab id).
 	 * @return string Absolute admin URL.
-	 * @since  3.13.7
+	 * @since  3.13.6
 	 */
 	public static function react_canvas_url( $funnel_id, $link = [] )
 	{
@@ -664,7 +664,7 @@ class Wpfnl_Menus
 	 * nor the `wpfunnels/redirect_to_react_admin` filter can keep this page.
 	 *
 	 * @return void
-	 * @since  3.13.7
+	 * @since  3.13.6
 	 */
 	private function maybe_redirect_to_react_canvas()
 	{

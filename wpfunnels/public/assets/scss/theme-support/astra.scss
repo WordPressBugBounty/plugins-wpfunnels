@@ -76,3 +76,18 @@
         width: 100%;
     }
 }
+//------Astra Pro checkout labels------
+// Astra Pro hides checkout field labels (position: absolute; opacity: 0) with
+// `body:not(.cartflows-canvas):not(.cartflows-default):not(.cartflows-instant-checkout) .woocommerce form .form-row label`,
+// which only exempts CartFlows checkouts. Not scoped to .theme-astra, so a
+// renamed (white-label) Astra is covered too. The :not() list keeps radio and
+// checkbox labels on their own styles and brings the selector to six classes,
+// outranking Astra's five. Floating labels keep their position from _checkout-page.scss.
+$wpfnl-field-label: 'label:not(.screen-reader-text):not(.radio):not(.checkbox):not(.woocommerce-form__label-for-checkbox)';
+
+.wpfnl-checkout .form-row #{$wpfnl-field-label} {
+    opacity: 1;
+}
+.wpfnl-checkout:not(.floating-label) .form-row #{$wpfnl-field-label} {
+    position: static;
+}

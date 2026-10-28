@@ -168,6 +168,11 @@ class Wpfnl_Woocommerce_Payments {
         $product_id    = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : '';
         $quantity      = isset( $_POST['quantity'] ) ? intval( $_POST['quantity'] ) : '';
         $order         = wc_get_order( $order_id );
+
+        // This charges the order's saved payment method, so only the order's owner may trigger it.
+        if ( ! \WPFunnels\Wpfnl_functions::is_valid_order_owner( $order, ( isset( $_POST['order_key'] ) ? sanitize_text_field( wp_unslash( $_POST['order_key'] ) ) : '' ) ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
+        }
         $offer_product = Wpfnl_functions::get_offer_product_data( $step_id, $product_id, 0, $order_id );
     global $woocommerce;
 

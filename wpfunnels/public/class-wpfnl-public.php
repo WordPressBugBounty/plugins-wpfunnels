@@ -815,11 +815,16 @@ class Wpfnl_Public
 			}
 
 			$current_page_id = apply_filters('wpfunnels/current_step_id', $order->get_meta('_wpfunnels_checkout_id'), $order);
-			$parent_step_id = get_post_meta($current_page_id, '_parent_step_id', true);
+			$parent_step_id = Wpfnl_functions::get_parent_step_id($current_page_id, $funnel_id);
 			$current_page_id = $parent_step_id ? $parent_step_id : $current_page_id;
 			$next_node 				= Wpfnl_functions::get_next_conditional_step($funnel_id, $current_page_id, $order);
 			$next_node       		= apply_filters('wpfunnels/next_step_data', $next_node);
 			$next_node       		= apply_filters('wpfunnels/modify_next_step_based_on_order', $next_node, $order);
+
+			// Without a next step, get_permalink() below falls back to the global post (the front page).
+			if (empty($next_node['step_id'])) {
+				return $order_received_url;
+			}
 
 			if (isset($next_node['step_type']) && 'thankyou' === $next_node['step_type']) {
 				if( Wpfnl_functions::is_global_thank_you_page_enabled() ){

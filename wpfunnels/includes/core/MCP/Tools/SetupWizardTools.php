@@ -7,14 +7,9 @@
  * read-only listing of the recommended add-ons shown on the Add-ons admin
  * page (admin/modules/addons/view.php).
  *
- * `ajax_update_step_meta()` (also defined in setup-wizard.php) is deliberately
- * NOT wrapped here: it has no allow-list of meta keys today (any key the
- * caller names is written via `update_post_meta()`), and a repo-wide search
- * for its only registered AJAX action, `wp_ajax_wpfnl_update_step_meta`,
- * turned up no caller anywhere in this plugin's or WPFunnels Pro's JS/Vue —
- * it appears to be dead code. Wrapping it would mean guessing at an
- * allow-list rather than confirming real meta keys, which the security
- * review for this tool set explicitly rules out.
+ * The setup wizard's old `wpfnl_update_step_meta` AJAX action (an
+ * unrestricted `update_post_meta()` with no caller) has been removed and is
+ * deliberately not wrapped here.
  *
  * @package WPFunnels\MCP
  * @since 3.14.0

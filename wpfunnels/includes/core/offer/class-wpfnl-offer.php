@@ -638,6 +638,16 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
             $order_id                   = ( isset( $_GET['wpfnl-order'] ) ) ? intval( $_GET['wpfnl-order'] ) : 0;
             $order_key                  = ( isset( $_GET['wpfnl-key'] ) ) ? sanitize_text_field( wp_unslash( $_GET['wpfnl-key'] ) ) : '';
             $order                      = wc_get_order( $order_id );
+
+            // The order id comes from the URL. Until the caller proves they own the
+            // order, nothing about it (its gateway, the gateway action nonces) may
+            // reach the page.
+            if ( ! Wpfnl_functions::is_valid_order_owner( $order, $order_key ) ) {
+                $order     = false;
+                $order_id  = 0;
+                $order_key = '';
+            }
+
             $payment_method             = '';
             $is_reference_transaction   = false;
             $skip_offer                 = 'no';
@@ -830,7 +840,7 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
                 'product_id' => $product_id,
                 'data'       => $_POST['attr'],
             ];
-            $attr = $_POST['attr'];
+            $attr = Wpfnl_functions::sanitize_offer_attributes( $_POST['attr'] );
 
             $product_id = $this->wpfnl_get_variation_id($payload);
         }
@@ -895,7 +905,7 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
                 'product_id' => $product_id,
                 'data'       => $_POST['attr'],
             ];
-            $attr = $_POST['attr'];
+            $attr = Wpfnl_functions::sanitize_offer_attributes( $_POST['attr'] );
 
             $product_id = $this->wpfnl_get_variation_id($payload);
         }
@@ -1145,8 +1155,73 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
         $order_id               = $data['order_id'];
         $funnel_id              = $data['funnel_id'];
         $order_key              = $data['order_key'];
-        $input_qty              = $data['quantity'];
+        $input_qty              = isset( $data['quantity'] ) ? $data['quantity'] : ( isset( $data['input_qty'] ) ? $data['input_qty'] : 0 );
         $order                  = wc_get_order($order_id);
+
+        // The caller only proved they own the order. What is sold, and how many,
+        // comes from the step, and each step can be accepted once per order.
+        $offer_item = Wpfnl_functions::resolve_offer_accept_item( $step_id, $data['product_id'], $input_qty );
+
+        if ( is_wp_error( $offer_item ) ) {
+            return array(
+                'status'   => 'failed',
+                'message'  => $offer_item->get_error_message(),
+            );
+        }
+
+        if ( ! Wpfnl_functions::is_offer_step_for_order( $order, $step_id ) ) {
+            return array(
+                'status'   => 'failed',
+                'message'  => __( 'This offer is not available for this order.', 'wpfnl' ),
+            );
+        }
+
+        if ( Wpfnl_functions::is_offer_accepted_on_order( $order, $step_id ) ) {
+            return array(
+                'status'   => 'failed',
+                'message'  => __( 'This offer has already been accepted.', 'wpfnl' ),
+            );
+        }
+
+        // Serialise accepts of one offer on one order: a parallel request would pass
+        // the check above before the first one marks the order. INSERT IGNORE on the
+        // unique option_name is atomic; add_option() is not.
+        global $wpdb;
+        $offer_lock = 'wpfnl_offer_lock_' . absint( $order_id ) . '_' . absint( $step_id );
+        $is_locked  = ! $wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')", $offer_lock, time() ) );
+        if ( $is_locked && time() - (int) $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $offer_lock ) ) > 120 ) {
+            $wpdb->delete( $wpdb->options, array( 'option_name' => $offer_lock ) );
+            $is_locked = ! $wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')", $offer_lock, time() ) );
+        }
+        if ( $is_locked ) {
+            return array(
+                'status'   => 'failed',
+                'message'  => __( 'This offer is already being processed.', 'wpfnl' ),
+            );
+        }
+        add_action( 'shutdown', function () use ( $offer_lock ) {
+            global $wpdb;
+            $wpdb->delete( $wpdb->options, array( 'option_name' => $offer_lock ) );
+        } );
+
+        // A request that passed the check above while the previous holder was still
+        // charging must see its marker now that it holds the lock, so bypass the
+        // order loaded (and cached) before the lock was taken.
+        if ( function_exists( 'wc_get_container' ) && class_exists( '\Automattic\WooCommerce\Caches\OrderCache' ) ) {
+            wc_get_container()->get( \Automattic\WooCommerce\Caches\OrderCache::class )->remove( $order_id );
+        }
+        clean_post_cache( $order_id );
+        $order = wc_get_order( $order_id );
+        if ( Wpfnl_functions::is_offer_accepted_on_order( $order, $step_id ) ) {
+            return array(
+                'status'   => 'failed',
+                'message'  => __( 'This offer has already been accepted.', 'wpfnl' ),
+            );
+        }
+
+        $data['product_id'] = $offer_item['product_id'];
+        $input_qty          = $offer_item['quantity'];
+
         $skip_payment           = filter_input(INPUT_POST, 'stripe_sca_payment', FILTER_VALIDATE_BOOLEAN);
         $order_gateway          = $order->get_payment_method();
         if( 'stripe_cc' ===  $order_gateway ){
@@ -1158,12 +1233,30 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
         if ($skip_payment) {
             $_stripe_intent_id = get_post_meta($order->get_id(), '_stripe_intent_id_' . $step_id, true);
             $intent_id = isset( $_POST['stripe_intent_id'] ) ? sanitize_text_field( wp_unslash( $_POST['stripe_intent_id'] ) ) : '';
-            $skip_payment = ($intent_id === $_stripe_intent_id) ? true : false;
+            $skip_payment = ( '' !== $intent_id && $intent_id === $_stripe_intent_id ) ? true : false;
         }
 
         $offer_product = self::update_variation_product_details( $step_id, $data['product_id'], $input_qty, $order_id  );
 
-        $product       = wc_get_product($data['product_id']);
+        if ( empty( $offer_product['id'] ) ) {
+            return array(
+                'status'   => 'failed',
+                'message'  => __( 'This offer is not available for this order.', 'wpfnl' ),
+            );
+        }
+
+        // Variation data may only describe the product actually sold.
+        $attr = Wpfnl_functions::sanitize_offer_attributes( $attr, wc_get_product( $offer_product['id'] ) );
+
+        // An SCA intent was sized for one product; it may only pay for that product.
+        if ( $skip_payment && ( ! isset( $offer_product['id'] ) || absint( get_post_meta( $order->get_id(), '_wpfnl_stripe_intent_product_' . $step_id, true ) ) !== absint( $offer_product['id'] ) ) ) {
+            return array(
+                'status'   => 'failed',
+                'message'  => __( 'The payment does not match this offer.', 'wpfnl' ),
+            );
+        }
+
+        $product       = wc_get_product( $offer_product['id'] );
 
         if( $product && !$product->is_in_stock() || $product->managing_stock() && ( $product->get_stock_quantity() < intval($offer_product['qty']) || $product->get_stock_quantity() == 0 || intval($offer_product['qty']) == 0 ) ) {
             if( 'variation' === $product->get_type() ) {
@@ -1266,6 +1359,8 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
         }
 
         if( isset($is_charge_success['is_success'] ) && $is_charge_success['is_success'] ) {
+            // Mark before recording: once charged, a retry must not charge again.
+            Wpfnl_functions::mark_offer_accepted_on_order( $order_id, $step_id );
             $response           = self::after_offer_charged( $funnel_id, $step_id, $order_id, $order_key, $offer_product, true , $attr, '', '', $shipping );
             if( 'success' === $response['status'] ) {
                 delete_option( 'wpfunnels_dynamic_offer_data' );
@@ -1680,6 +1775,9 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
      * @return array
      */
     private static function get_offer_data( $step_id, $selected_product_id = '', $input_qty = '', $order_id = 0 ) {
+        // Gateways price offers from request values before accepting; never price what the step does not sell.
+        list( $selected_product_id, $input_qty ) = Wpfnl_functions::resolve_offer_selection( $step_id, $selected_product_id, $input_qty );
+
         $data = array();
         $product_id = 0;
         $product_qty = 0;
@@ -1866,6 +1964,9 @@ class Wpfnl_Offer extends Wpfnl_Frontend_Module
      * @return array
      */
     public static function update_variation_product_details( $step_id, $selected_product_id, $input_qty, $order_id ) {
+        // Gateways price offers from request values before accepting; never price what the step does not sell.
+        list( $selected_product_id, $input_qty ) = Wpfnl_functions::resolve_offer_selection( $step_id, $selected_product_id, $input_qty );
+
         // If pro plugin is available, use its method for full compatibility
         if ( class_exists( '\WPFunnelsPro\Wpfnl_Pro_functions' ) && method_exists( '\WPFunnelsPro\Wpfnl_Pro_functions', 'update_variation_product_details' ) ) {
             return \WPFunnelsPro\Wpfnl_Pro_functions::update_variation_product_details( $step_id, $selected_product_id, $input_qty, $order_id );

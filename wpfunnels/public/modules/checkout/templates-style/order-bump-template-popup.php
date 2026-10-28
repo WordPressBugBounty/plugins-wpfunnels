@@ -107,7 +107,7 @@ if( $type === 'lms' ){
                 <label>
                     <input type="checkbox" id="wpfnl-order-bump-cb"
                            data-quantity="<?php echo $order_bump_settings['quantity']; ?>"
-                           data-step="<?php echo get_the_ID(); ?>" class="wpfnl-order-bump-cb"
+                           data-step="<?php echo esc_attr( ! empty( $checkout_id ) ? $checkout_id : get_the_ID() ); ?>" class="wpfnl-order-bump-cb"
                            data-key="<?php echo $key; ?>"
                            data-lms="<?php echo $type; ?>"
                            data-replace="<?php echo $settings['isReplace']; ?>"

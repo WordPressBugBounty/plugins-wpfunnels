@@ -5,7 +5,7 @@ Tags: funnel builder, woocommerce checkout, order bump, woocommerce funnel build
 Requires at least: 6.1
 Tested up to:  7.1
 Requires PHP: 7.4
-Stable tag: 3.13.5
+Stable tag: 3.13.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -576,6 +576,21 @@ The Patchstack team helps validate, triage, and handle any security vulnerabilit
 8. The Visual Funnel Canvas
 
 == Changelog ==
+= 3.13.6 (2026-10-28) =
+* Security: Upsell and downsell offers accepting any product, quantity or discounted price instead of the product configured on the offer step, and being accepted more than once per order.
+* Security: Order details being exposed on upsell and downsell offer pages, and offer charges being triggered, by visitors who do not own the order.
+* Security: Setup wizard plugin activation running without a nonce and being able to activate plugins the wizard does not offer, and an unused setup wizard action that could write any post meta.
+* Security: Gutenberg CSS being saved on posts the user cannot edit, and Cross Site Scripting (XSS) through the saved Gutenberg CSS.
+* Security: Unauthenticated requests being able to change the telemetry opt-in and opt-out setting.
+* Security: Escaped the button text on the Bricks next step button.
+* Fix: Checkout failed validation when a funnel step was set as the site front page, because the checkout loaded that step's field settings instead of its own.
+* Fix: Order bumps disappeared after the checkout refreshed, and could not be accepted, when a funnel step was set as the site front page.
+* Fix: The checkout ID hidden field was printed twice on the checkout form.
+* Fix: A duplicated funnel's checkout redirected to the home page because it still pointed to the original funnel's A/B testing step.
+* Fix: Checkout field labels such as City and Postcode were hidden under Astra Pro checkout styles.
+* Fix: WooCommerce Subscriptions price details overlapped the Subtotal and Total rows in the order review when product images were shown.
+* Fix: PHP 8.1 deprecation notice when expiring cookies.
+* Fix: Images in the setup wizard overflowing their container.
 
 = 3.13.5 (2026-10-15) =
 * New: One-click MCP connection with OAuth, including client registration, token refresh and revocation, and a list of connected clients.

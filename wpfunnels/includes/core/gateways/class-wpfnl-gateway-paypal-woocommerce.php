@@ -74,6 +74,11 @@ class Wpfnl_Gateway_Paypal_WooCommerce extends Wpfnl_Gateway {
         $step_type   = get_post_meta( $step_id, '_step_type', true );
 
         $order        = wc_get_order( $order_id );
+
+        // This charges the order's saved payment method, so only the order's owner may trigger it.
+        if ( ! \WPFunnels\Wpfnl_functions::is_valid_order_owner( $order, $order_key ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unauthorized request', 'wpfnl' ) ), 403 );
+        }
         $variation_id = '';
         $quantity     = '';
 

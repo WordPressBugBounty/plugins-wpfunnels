@@ -508,7 +508,12 @@ class Wpfnl_Source_Remote extends Wpfnl_Source_Base
             return;
         }
 
+        // Sanitized like any other CSS write: the remote template server is
+        // first-party, but this value still ends up echoed raw inside a
+        // `<style>` tag (class-manager.php::add_block_inline_css()), so it
+        // gets no more trust than a REST-submitted one.
         $css_controller = new GutenbergCSSController();
+        $css            = $css_controller->sanitize_css_content( $css );
         $css            = $css_controller->set_import_url_to_top_css( $css );
 
         update_post_meta( $step_id, '_wpfunnels_gb_css', $css );

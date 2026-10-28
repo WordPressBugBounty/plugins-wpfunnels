@@ -605,7 +605,7 @@ class NextStep extends Element {
 						}
 
 						if ( ! empty( $settings['text'] ) ) {
-							$output .= trim( $settings['text'] );
+							$output .= wp_kses_post( trim( $settings['text'] ) );
 						}
 
 						if ( $icon && $icon_position === 'right' ) {
@@ -620,7 +620,7 @@ class NextStep extends Element {
 					}
 
 					if ( ! empty( $settings['text'] ) ) {
-						$output .= trim( $settings['text'] );
+						$output .= wp_kses_post( trim( $settings['text'] ) );
 					}
 
 					if ( $icon && $icon_position === 'right' ) {
